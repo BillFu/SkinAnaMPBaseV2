@@ -1,0 +1,5 @@
+{
+	"FaceMeshModelFile": 	"models/face_landmark.tflite",
+	"SourceImage":			"images/odd_face.jpg",
+	"AnnoPoseImage": 		"result/pose_odd_face.png"
+}

@@ -1,0 +1,9 @@
+opencv@3 is keg-only, which means it was not symlinked into /usr/local,
+because this is an alternate version of another formula.
+
+If you need to have opencv@3 first in your PATH, run:
+  echo 'export PATH="/usr/local/opt/opencv@3/bin:$PATH"' >> ~/.zshrc
+
+For compilers to find opencv@3 you may need to set:
+  export LDFLAGS="-L/usr/local/opt/opencv@3/lib"
+  export CPPFLAGS="-I/usr/local/opt/opencv@3/include"

@@ -1,0 +1,7 @@
+{
+	"FaceDetectModelFile": 	"models/face_detection_short_range.tflite",
+	"FaceMeshModelFile": 	"models/face_landmark.tflite",
+	"SourceImage":			"images/cross_1.jpg",
+	"AnnoFaceBoxImage": 	"result/box_cross_1.pnh",
+	"AnnoPoseImage": 		"result/pose_cross_1.png"
+}

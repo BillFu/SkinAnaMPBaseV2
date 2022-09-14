@@ -1,0 +1,375 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2602327628CCBFB100B11D7A /* HeadPoseEst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2602327528CCBFB100B11D7A /* HeadPoseEst.cpp */; };
+		263B540228CD861C004CF77D /* AnnoImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540028CD861C004CF77D /* AnnoImage.cpp */; };
+		263B540528CD8B34004CF77D /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540428CD8B34004CF77D /* Utils.cpp */; };
+		CB255A9628C7237A005C8A81 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB255A9528C7237A005C8A81 /* main.cpp */; };
+		CB79324A28D1AD9F00BE136B /* FaceLmAttenExtract.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB79324828D1AD9F00BE136B /* FaceLmAttenExtract.cpp */; };
+		CB79324D28D1CF0400BE136B /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CB3C248E28D00BA300804E6E /* libtensorflowlite.so */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		CB255A9028C7237A005C8A81 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		2602327428CCBFB100B11D7A /* HeadPoseEst.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = HeadPoseEst.hpp; sourceTree = "<group>"; };
+		2602327528CCBFB100B11D7A /* HeadPoseEst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HeadPoseEst.cpp; sourceTree = "<group>"; };
+		2602327828CCC52E00B11D7A /* libtensorflowlite.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtensorflowlite.so; path = SkinAnaMPBase/m1_lib/libtensorflowlite.so; sourceTree = "<group>"; };
+		263B540028CD861C004CF77D /* AnnoImage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AnnoImage.cpp; sourceTree = "<group>"; };
+		263B540128CD861C004CF77D /* AnnoImage.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AnnoImage.hpp; sourceTree = "<group>"; };
+		263B540328CD8B34004CF77D /* Utils.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Utils.hpp; sourceTree = "<group>"; };
+		263B540428CD8B34004CF77D /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utils.cpp; sourceTree = "<group>"; };
+		26F7BE6428CDE49500A83344 /* Common.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Common.hpp; sourceTree = "<group>"; };
+		CB255A9228C7237A005C8A81 /* SkinAnaMPBase */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SkinAnaMPBase; sourceTree = BUILT_PRODUCTS_DIR; };
+		CB255A9528C7237A005C8A81 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		CB3C248E28D00BA300804E6E /* libtensorflowlite.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtensorflowlite.so; path = SkinAnaMPBase/intel_lib/libtensorflowlite.so; sourceTree = "<group>"; };
+		CB79324828D1AD9F00BE136B /* FaceLmAttenExtract.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FaceLmAttenExtract.cpp; sourceTree = "<group>"; };
+		CB79324928D1AD9F00BE136B /* FaceLmAttenExtract.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FaceLmAttenExtract.hpp; sourceTree = "<group>"; };
+		CB79324B28D1B07400BE136B /* libtensorflow-lite.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libtensorflow-lite.a"; path = "SkinAnaMPBase/intel_lib/libtensorflow-lite.a"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CB255A8F28C7237A005C8A81 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CB79324D28D1CF0400BE136B /* libtensorflowlite.so in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2602327728CCC52E00B11D7A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				CB79324B28D1B07400BE136B /* libtensorflow-lite.a */,
+				CB3C248E28D00BA300804E6E /* libtensorflowlite.so */,
+				2602327828CCC52E00B11D7A /* libtensorflowlite.so */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CB255A8928C7237A005C8A81 = {
+			isa = PBXGroup;
+			children = (
+				CB255A9428C7237A005C8A81 /* SkinAnaMPBase */,
+				CB255A9328C7237A005C8A81 /* Products */,
+				2602327728CCC52E00B11D7A /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		CB255A9328C7237A005C8A81 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CB255A9228C7237A005C8A81 /* SkinAnaMPBase */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CB255A9428C7237A005C8A81 /* SkinAnaMPBase */ = {
+			isa = PBXGroup;
+			children = (
+				CB79324828D1AD9F00BE136B /* FaceLmAttenExtract.cpp */,
+				CB79324928D1AD9F00BE136B /* FaceLmAttenExtract.hpp */,
+				26F7BE6428CDE49500A83344 /* Common.hpp */,
+				263B540428CD8B34004CF77D /* Utils.cpp */,
+				263B540328CD8B34004CF77D /* Utils.hpp */,
+				263B540028CD861C004CF77D /* AnnoImage.cpp */,
+				263B540128CD861C004CF77D /* AnnoImage.hpp */,
+				2602327528CCBFB100B11D7A /* HeadPoseEst.cpp */,
+				2602327428CCBFB100B11D7A /* HeadPoseEst.hpp */,
+				CB255A9528C7237A005C8A81 /* main.cpp */,
+			);
+			path = SkinAnaMPBase;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CB255A9128C7237A005C8A81 /* SkinAnaMPBase */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CB255A9928C7237A005C8A81 /* Build configuration list for PBXNativeTarget "SkinAnaMPBase" */;
+			buildPhases = (
+				CB255A8E28C7237A005C8A81 /* Sources */,
+				CB255A8F28C7237A005C8A81 /* Frameworks */,
+				CB255A9028C7237A005C8A81 /* CopyFiles */,
+				2602327A28CCCB7000B11D7A /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SkinAnaMPBase;
+			productName = SkinAnaMPBase;
+			productReference = CB255A9228C7237A005C8A81 /* SkinAnaMPBase */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CB255A8A28C7237A005C8A81 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1340;
+				TargetAttributes = {
+					CB255A9128C7237A005C8A81 = {
+						CreatedOnToolsVersion = 13.4.1;
+					};
+				};
+			};
+			buildConfigurationList = CB255A8D28C7237A005C8A81 /* Build configuration list for PBXProject "SkinAnaMPBase" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CB255A8928C7237A005C8A81;
+			productRefGroup = CB255A9328C7237A005C8A81 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CB255A9128C7237A005C8A81 /* SkinAnaMPBase */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2602327A28CCCB7000B11D7A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncp ${TARGET_BUILD_DIR}/${TARGET_NAME} ${PROJECT_DIR}/bin/${TARGET_NAME}\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CB255A8E28C7237A005C8A81 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CB255A9628C7237A005C8A81 /* main.cpp in Sources */,
+				263B540228CD861C004CF77D /* AnnoImage.cpp in Sources */,
+				2602327628CCBFB100B11D7A /* HeadPoseEst.cpp in Sources */,
+				263B540528CD8B34004CF77D /* Utils.cpp in Sources */,
+				CB79324A28D1AD9F00BE136B /* FaceLmAttenExtract.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		CB255A9728C7237A005C8A81 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		CB255A9828C7237A005C8A81 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		CB255A9A28C7237A005C8A81 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXCLUDED_ARCHS = "";
+				HEADER_SEARCH_PATHS = (
+					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
+					/Users/meicet/SkinAnaMPBaseV2/SkinAnaMPBase/include,
+					/Users/meicet/nlohmann_json/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/Cellar/opencv/4.6.0/lib,
+					"$(PROJECT_DIR)/SkinAnaMPBase/intel_lib",
+				);
+				OTHER_LDFLAGS = (
+					"-lopencv_core",
+					"-lopencv_imgcodecs",
+					"-lopencv_calib3d",
+					"-lopencv_highgui",
+					"-lopencv_imgproc",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		CB255A9B28C7237A005C8A81 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXCLUDED_ARCHS = "";
+				HEADER_SEARCH_PATHS = (
+					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
+					/Users/meicet/SkinAnaMPBaseV2/SkinAnaMPBase/include,
+					/Users/meicet/nlohmann_json/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/Cellar/opencv/4.6.0/lib,
+					"$(PROJECT_DIR)/SkinAnaMPBase/intel_lib",
+				);
+				OTHER_LDFLAGS = (
+					"-lopencv_core",
+					"-lopencv_imgcodecs",
+					"-lopencv_calib3d",
+					"-lopencv_highgui",
+					"-lopencv_imgproc",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CB255A8D28C7237A005C8A81 /* Build configuration list for PBXProject "SkinAnaMPBase" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CB255A9728C7237A005C8A81 /* Debug */,
+				CB255A9828C7237A005C8A81 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CB255A9928C7237A005C8A81 /* Build configuration list for PBXNativeTarget "SkinAnaMPBase" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CB255A9A28C7237A005C8A81 /* Debug */,
+				CB255A9B28C7237A005C8A81 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CB255A8A28C7237A005C8A81 /* Project object */;
+}
