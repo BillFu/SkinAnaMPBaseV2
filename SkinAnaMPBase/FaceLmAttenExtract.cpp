@@ -41,6 +41,21 @@ void extractOutputAttenLM(int origImgWidth, int origImgHeight,
     }
 }
 
+void extractEyebow(int origImgWidth, int origImgHeight,
+                   float* outBufEyeBow, float EyeBowPts[71][2])
+{
+    float scale_x = origImgWidth / 192.0f;
+    float scale_y = origImgHeight / 192.0f;
+
+    for(int i=0; i<71; i++)
+    {
+        float x = outBufEyeBow[i*2];
+        float y = outBufEyeBow[i*2+1];
+
+        EyeBowPts[i][0] = (int)(x*scale_x);
+        EyeBowPts[i][1] = (int)(y*scale_y);
+    }
+}
 //-----------------------------------------------------------------------------------------
 
 /******************************************************************************************
@@ -128,16 +143,25 @@ bool ExtractFaceLmAtten(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     int d2 = interpreter->tensor(output_lm_ID)->dims->data[2];
     int d3 = interpreter->tensor(output_lm_ID)->dims->data[3];
     
-    float* netLMOutBuffer = interpreter->typed_output_tensor<float>(0);
+    float* LMOutBuffer = interpreter->typed_output_tensor<float>(0);
 
     /*
     The values in lm_3d are measured in the input coordinate system of our tf lite model,
     i.e., the values are in the range: [0.0, 192.0].
     The values in lm_2d are measured in the coordinate system of the source image!
     */
-    extractOutputAttenLM(srcImage.cols, srcImage.rows, netLMOutBuffer, lm_3d, lm_2d);
+    extractOutputAttenLM(srcImage.cols, srcImage.rows, LMOutBuffer, lm_3d, lm_2d);
 
     cout << "extractOutputLM() is well done!" << endl;
+    
+    float leftEyeBowPts[71][2];
+    float* outBuf_LeftEyeBow = interpreter->typed_output_tensor<float>(2);
+    extractEyebow(srcImage.cols, srcImage.rows, outBuf_LeftEyeBow, leftEyeBowPts);
+    
+    float rightEyeBowPts[71][2];
+    float* outBuf_RightEyeBow = interpreter->typed_output_tensor<float>(3);
+    extractEyebow(srcImage.cols, srcImage.rows, outBuf_RightEyeBow, rightEyeBowPts);
+    
     
     errorMsg = "OK";
     return true;
