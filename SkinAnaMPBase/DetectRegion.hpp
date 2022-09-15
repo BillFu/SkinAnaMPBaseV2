@@ -35,6 +35,9 @@ void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon);
 void ForgeSkinMask(int img_width, int img_height,
                    const FaceInfo& faceInfo, Mat& outMask);
 
+
+void ForgeMouthMask(int img_width, int img_height,
+                    const FaceInfo& faceInfo, Mat& outMask);
 //-------------------------------------------------------------------------------------------
 void OverlayMaskOnImage(const Mat& srcImg, const Mat& mask,
                         const string& maskName,

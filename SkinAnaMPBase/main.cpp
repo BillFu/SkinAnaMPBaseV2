@@ -102,5 +102,13 @@ int main(int argc, char **argv)
     OverlayMaskOnImage(srcImage, outMask,
                         "face_contour", faceMaskImgFile.c_str());
 
+    Mat mouthMask;
+    ForgeMouthMask(srcImgWidht, srcImgHeight, faceInfo, mouthMask);
+    
+    string mouthMaskImgFile = config_json.at("MouthContourImage");
+
+    OverlayMaskOnImage(srcImage, mouthMask,
+                        "mouth_contour", mouthMaskImgFile.c_str());
+
     return 0;
 }
