@@ -13,6 +13,7 @@
 		CB255A9628C7237A005C8A81 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB255A9528C7237A005C8A81 /* main.cpp */; };
 		CB79324A28D1AD9F00BE136B /* FaceLmAttenExtract.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB79324828D1AD9F00BE136B /* FaceLmAttenExtract.cpp */; };
 		CB79324D28D1CF0400BE136B /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CB3C248E28D00BA300804E6E /* libtensorflowlite.so */; };
+		CBAF932F28D3291000469F91 /* DetectRegion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBAF932D28D3291000469F91 /* DetectRegion.cpp */; };
 		CBDA5B2528D2F0DD002A35E2 /* TinyEXIF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA5B2128D2F0DD002A35E2 /* TinyEXIF.cpp */; };
 		CBDA5B2628D2F0DD002A35E2 /* tinyxml2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA5B2228D2F0DD002A35E2 /* tinyxml2.cpp */; };
 		CBDA5B2928D2F327002A35E2 /* EXIF_Extractor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA5B2828D2F327002A35E2 /* EXIF_Extractor.cpp */; };
@@ -45,6 +46,8 @@
 		CB79324828D1AD9F00BE136B /* FaceLmAttenExtract.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FaceLmAttenExtract.cpp; sourceTree = "<group>"; };
 		CB79324928D1AD9F00BE136B /* FaceLmAttenExtract.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FaceLmAttenExtract.hpp; sourceTree = "<group>"; };
 		CB79324B28D1B07400BE136B /* libtensorflow-lite.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libtensorflow-lite.a"; path = "SkinAnaMPBase/intel_lib/libtensorflow-lite.a"; sourceTree = "<group>"; };
+		CBAF932D28D3291000469F91 /* DetectRegion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DetectRegion.cpp; sourceTree = "<group>"; };
+		CBAF932E28D3291000469F91 /* DetectRegion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DetectRegion.hpp; sourceTree = "<group>"; };
 		CBDA5B2128D2F0DD002A35E2 /* TinyEXIF.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TinyEXIF.cpp; sourceTree = "<group>"; };
 		CBDA5B2228D2F0DD002A35E2 /* tinyxml2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxml2.cpp; sourceTree = "<group>"; };
 		CBDA5B2328D2F0DD002A35E2 /* tinyxml2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tinyxml2.h; sourceTree = "<group>"; };
@@ -100,6 +103,8 @@
 				CBDA5B2A28D2F4CD002A35E2 /* EXIF_Extractor.hpp */,
 				CB79324828D1AD9F00BE136B /* FaceLmAttenExtract.cpp */,
 				CB79324928D1AD9F00BE136B /* FaceLmAttenExtract.hpp */,
+				CBAF932D28D3291000469F91 /* DetectRegion.cpp */,
+				CBAF932E28D3291000469F91 /* DetectRegion.hpp */,
 				26F7BE6428CDE49500A83344 /* Common.hpp */,
 				263B540428CD8B34004CF77D /* Utils.cpp */,
 				263B540328CD8B34004CF77D /* Utils.hpp */,
@@ -209,6 +214,7 @@
 				263B540528CD8B34004CF77D /* Utils.cpp in Sources */,
 				CB79324A28D1AD9F00BE136B /* FaceLmAttenExtract.cpp in Sources */,
 				CBDA5B2628D2F0DD002A35E2 /* tinyxml2.cpp in Sources */,
+				CBAF932F28D3291000469F91 /* DetectRegion.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -29,6 +29,9 @@ using namespace tflite;
 typedef unique_ptr<tflite::Interpreter> INTERPRETER;
 typedef unique_ptr<FlatBufferModel> TF_LITE_MODEL;
 
+typedef vector<Point2i> POLYGON;
+
+
 enum EyeID
 {
     LeftEyeID,
