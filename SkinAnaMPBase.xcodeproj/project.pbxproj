@@ -13,6 +13,9 @@
 		CB255A9628C7237A005C8A81 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB255A9528C7237A005C8A81 /* main.cpp */; };
 		CB79324A28D1AD9F00BE136B /* FaceLmAttenExtract.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB79324828D1AD9F00BE136B /* FaceLmAttenExtract.cpp */; };
 		CB79324D28D1CF0400BE136B /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CB3C248E28D00BA300804E6E /* libtensorflowlite.so */; };
+		CBDA5B2528D2F0DD002A35E2 /* TinyEXIF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA5B2128D2F0DD002A35E2 /* TinyEXIF.cpp */; };
+		CBDA5B2628D2F0DD002A35E2 /* tinyxml2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA5B2228D2F0DD002A35E2 /* tinyxml2.cpp */; };
+		CBDA5B2928D2F327002A35E2 /* EXIF_Extractor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA5B2828D2F327002A35E2 /* EXIF_Extractor.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -42,6 +45,12 @@
 		CB79324828D1AD9F00BE136B /* FaceLmAttenExtract.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FaceLmAttenExtract.cpp; sourceTree = "<group>"; };
 		CB79324928D1AD9F00BE136B /* FaceLmAttenExtract.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FaceLmAttenExtract.hpp; sourceTree = "<group>"; };
 		CB79324B28D1B07400BE136B /* libtensorflow-lite.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libtensorflow-lite.a"; path = "SkinAnaMPBase/intel_lib/libtensorflow-lite.a"; sourceTree = "<group>"; };
+		CBDA5B2128D2F0DD002A35E2 /* TinyEXIF.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TinyEXIF.cpp; sourceTree = "<group>"; };
+		CBDA5B2228D2F0DD002A35E2 /* tinyxml2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxml2.cpp; sourceTree = "<group>"; };
+		CBDA5B2328D2F0DD002A35E2 /* tinyxml2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tinyxml2.h; sourceTree = "<group>"; };
+		CBDA5B2428D2F0DD002A35E2 /* TinyEXIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TinyEXIF.h; sourceTree = "<group>"; };
+		CBDA5B2828D2F327002A35E2 /* EXIF_Extractor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EXIF_Extractor.cpp; sourceTree = "<group>"; };
+		CBDA5B2A28D2F4CD002A35E2 /* EXIF_Extractor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EXIF_Extractor.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +95,9 @@
 		CB255A9428C7237A005C8A81 /* SkinAnaMPBase */ = {
 			isa = PBXGroup;
 			children = (
+				CBDA5B2028D2F055002A35E2 /* EXIF */,
+				CBDA5B2828D2F327002A35E2 /* EXIF_Extractor.cpp */,
+				CBDA5B2A28D2F4CD002A35E2 /* EXIF_Extractor.hpp */,
 				CB79324828D1AD9F00BE136B /* FaceLmAttenExtract.cpp */,
 				CB79324928D1AD9F00BE136B /* FaceLmAttenExtract.hpp */,
 				26F7BE6428CDE49500A83344 /* Common.hpp */,
@@ -98,6 +110,17 @@
 				CB255A9528C7237A005C8A81 /* main.cpp */,
 			);
 			path = SkinAnaMPBase;
+			sourceTree = "<group>";
+		};
+		CBDA5B2028D2F055002A35E2 /* EXIF */ = {
+			isa = PBXGroup;
+			children = (
+				CBDA5B2128D2F0DD002A35E2 /* TinyEXIF.cpp */,
+				CBDA5B2428D2F0DD002A35E2 /* TinyEXIF.h */,
+				CBDA5B2228D2F0DD002A35E2 /* tinyxml2.cpp */,
+				CBDA5B2328D2F0DD002A35E2 /* tinyxml2.h */,
+			);
+			path = EXIF;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -180,9 +203,12 @@
 			files = (
 				CB255A9628C7237A005C8A81 /* main.cpp in Sources */,
 				263B540228CD861C004CF77D /* AnnoImage.cpp in Sources */,
+				CBDA5B2928D2F327002A35E2 /* EXIF_Extractor.cpp in Sources */,
 				2602327628CCBFB100B11D7A /* HeadPoseEst.cpp in Sources */,
+				CBDA5B2528D2F0DD002A35E2 /* TinyEXIF.cpp in Sources */,
 				263B540528CD8B34004CF77D /* Utils.cpp in Sources */,
 				CB79324A28D1AD9F00BE136B /* FaceLmAttenExtract.cpp in Sources */,
+				CBDA5B2628D2F0DD002A35E2 /* tinyxml2.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

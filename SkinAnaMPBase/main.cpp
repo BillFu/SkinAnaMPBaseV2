@@ -10,6 +10,7 @@
 #include "HeadPoseEst.hpp"
 #include "FaceLmAttenExtract.hpp"
 #include "AnnoImage.hpp"
+//#include "EXIF_Extractor.hpp"
 
 using namespace tflite;
 using namespace std;
@@ -41,6 +42,8 @@ int main(int argc, char **argv)
     string faceMeshAttenModelFile = config_json.at("FaceMeshAttenModelFile");
     string srcImgFile = config_json.at("SourceImage");
     string annoPoseImgFile = config_json.at("AnnoPoseImage");
+    
+    //ExtractEXIF(srcImgFile.c_str());
     
     TF_LITE_MODEL faceMeshModel = LoadFaceMeshAttenModel(faceMeshAttenModelFile.c_str());
     if(faceMeshModel == nullptr)
