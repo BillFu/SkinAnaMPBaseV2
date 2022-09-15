@@ -13,22 +13,22 @@ Date:   2022/9/11
 #define COMMON_HPP
 
 #include<opencv2/opencv.hpp>
-
+/*
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/string_util.h"
 #include "tensorflow/lite/examples/label_image/get_top_n.h"
 #include "tensorflow/lite/model.h"
-
+*/
 
 using namespace std;
 using namespace cv;
-using namespace tflite;
+//using namespace tflite;
 
-
+/*
 typedef unique_ptr<tflite::Interpreter> INTERPRETER;
 typedef unique_ptr<FlatBufferModel> TF_LITE_MODEL;
-
+*/
 typedef vector<Point2i> POLYGON;
 
 

@@ -113,3 +113,9 @@ http://phototour.cs.washington.edu/focal.html
 Estimating the focal length of a photo from EXIF tags
 --------------------------------------------------------------------------
 
+https://github.com/tensorflow/tfjs-models/blob/838611c02f51159afdd77469ce67f0e26b7bbb23/face-landmarks-detection/src/mediapipe-facemesh/keypoints.ts
+
+https://github.com/google/mediapipe/issues/1615
+
+
+

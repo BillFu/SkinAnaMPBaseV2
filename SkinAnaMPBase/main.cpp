@@ -8,11 +8,13 @@
 #include "nlohmann/json.hpp"
 
 #include "HeadPoseEst.hpp"
-#include "FaceLmAttenExtract.hpp"
+//#include "FaceLmAttenExtract.hpp"
 #include "AnnoImage.hpp"
 //#include "EXIF_Extractor.hpp"
+#include "LM_loader.hpp"
+#include "DetectRegion.hpp"
 
-using namespace tflite;
+//using namespace tflite;
 using namespace std;
 
 /*************************************************************************
@@ -45,6 +47,7 @@ int main(int argc, char **argv)
     
     //ExtractEXIF(srcImgFile.c_str());
     
+    /*
     TF_LITE_MODEL faceMeshModel = LoadFaceMeshAttenModel(faceMeshAttenModelFile.c_str());
     if(faceMeshModel == nullptr)
     {
@@ -55,7 +58,7 @@ int main(int argc, char **argv)
     else
         cout << "Succeeded to load face mesh with attention model file: "
             << faceMeshAttenModelFile << endl;
-
+    */
     string errorMsg;
     
     // Load Input Image
@@ -72,27 +75,15 @@ int main(int argc, char **argv)
     int srcImgHeight = srcImage.rows;
 
     FaceInfo faceInfo;
+    FillData(faceInfo);
 
-    float confThresh = 0.75;
-    bool hasFace = false;
-    float confidence = 0.0;
-    bool isOK = ExtractFaceLmAtten(faceMeshModel, srcImage,
-                              confThresh, hasFace, confidence,
-                                   faceInfo, errorMsg);
-    if(!isOK)
-    {
-        cout << "Error Happened to extract face LM: " << errorMsg << endl;
-        return 0;
-    }
-    else
-        cout << "Succeeded to extract lm!" << endl;
-
-    EstHeadPose(srcImgWidht, srcImgHeight, faceInfo);
+    //EstHeadPose(srcImgWidht, srcImgHeight, faceInfo);
     
     Mat annoImage = srcImage.clone();
 
-    // AnnoGeneralKeyPoints(annoImage, faceInfo);
+    AnnoGeneralKeyPoints(annoImage, faceInfo);
     
+    /*
     Scalar yellowColor(0, 255, 255);
     AnnoTwoEyeRefinePts(annoImage, faceInfo, yellowColor);
 
@@ -100,8 +91,16 @@ int main(int argc, char **argv)
     AnnoLipRefinePts(annoImage, faceInfo, pinkColor);
 
     AnnoHeadPoseEst(annoImage, faceInfo);
-
+    */
     imwrite(annoPoseImgFile, annoImage);
     
+    Mat outMask;
+    ForgeSkinMask(srcImgWidht, srcImgHeight, faceInfo, outMask);
+    
+    string faceMaskImgFile = config_json.at("FaceContourImage");
+
+    OverlayMaskOnImage(srcImage, outMask,
+                        "face_contour", faceMaskImgFile.c_str());
+
     return 0;
 }
