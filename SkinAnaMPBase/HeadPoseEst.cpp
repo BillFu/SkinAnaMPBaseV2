@@ -40,8 +40,8 @@ lm_2d: as the input argument, extracted from the source image, and measured in
 the coordinate system of the source image. 
 pitch, yaw, roll: are output arguments, measured in degrees.
 *******************************************************************************************/
-void EstHeadPose(int srcImgWidht, int srcImgHeight, 
-    int lm_2d[468][2], float& pitch, float& yaw, float& roll)
+void EstHeadPose(int srcImgWidht, int srcImgHeight,
+                 FaceInfo& faceInfo)
 {
     // 对应Dlib上点的序号为18, 22, 23, 27, 37, 40, 43, 46, 32, 36, 49, 55, 58, 9
     int face_2d_pts_indices[] = {46, 55, 285, 276, 33, 173, 
@@ -52,7 +52,9 @@ void EstHeadPose(int srcImgWidht, int srcImgHeight,
     for(int i=0; i<14; i++)
     {
         int lm_index = face_2d_pts_indices[i];
-        face_2d_pts.push_back(Point2d(lm_2d[lm_index][0], lm_2d[lm_index][1]));
+        double x = faceInfo.lm_2d[lm_index][0];
+        double y = faceInfo.lm_2d[lm_index][1];
+        face_2d_pts.push_back(Point2d(x, y));
     }
 
     vector<Point3d> face_3d_pts;
@@ -97,11 +99,11 @@ void EstHeadPose(int srcImgWidht, int srcImgHeight,
     Vec3d eluer_angles= cv::RQDecomp3x3(rot_mat, mtxR, mtxQ);
     cout << "RQDecomp3x3() is Done!" << std::endl;
 
-    pitch = eluer_angles[0];
-    yaw = eluer_angles[1];
-    roll = eluer_angles[2];
+    faceInfo.pitch = eluer_angles[0];
+    faceInfo.yaw = eluer_angles[1];
+    faceInfo.roll = eluer_angles[2];
     
-    cout << "pitch: " << pitch << std::endl;
-    cout << "yaw: " << yaw << std::endl;
-    cout << "roll: " << roll << std::endl;
+    cout << "pitch: " << faceInfo.pitch << std::endl;
+    cout << "yaw: " << faceInfo.yaw << std::endl;
+    cout << "roll: " << faceInfo.roll << std::endl;
 }

@@ -1,0 +1,5 @@
+{
+	"FaceMeshAttenModelFile": 		"models/face_landmark_with_attention.tflite",
+	"SourceImage":					"images/Leo.jpg",
+	"AnnoPoseImage": 				"result/anno_Leo.png"
+}

@@ -29,14 +29,27 @@ using namespace tflite;
 typedef unique_ptr<tflite::Interpreter> INTERPRETER;
 typedef unique_ptr<FlatBufferModel> TF_LITE_MODEL;
 
+enum EyeID
+{
+    LeftEyeID,
+    RightEyeID
+};
+
 struct FaceInfo
 {
     //[n][0] for x, [n][1] for y
+    // measured in source iamge coordinate system
     float lm_3d[468][3];  // x, y, z
     int   lm_2d[468][2];  // x, y，与上面的lm_3d中相同，只是数据类型不同
     
-    float leftEyeBowPts[71][2];
-    float rightEyeBowPts[71][2];
+    int leftEyeRefinePts[71][2];
+    int rightEyeRefinePts[71][2];
+    
+    int lipRefinePts[80][2];
+    
+    float pitch;  // rotate with x-axis
+    float yaw;    // rotate with y-axis
+    float roll;   // rotate with z-axis
 
 };
 

@@ -106,3 +106,10 @@ tflite2onnx - Convert TensorFlow Lite models to ONNX
 
 https://leimao.github.io/blog/ONNX-Runtime-CPP-Inference/
 
+--------------------------------------------------------------------------
+https://github.com/cdcseacave/TinyEXIF
+
+http://phototour.cs.washington.edu/focal.html
+Estimating the focal length of a photo from EXIF tags
+--------------------------------------------------------------------------
+

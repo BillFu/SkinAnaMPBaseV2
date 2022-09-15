@@ -41,8 +41,8 @@ void extractOutputAttenLM(int origImgWidth, int origImgHeight,
     }
 }
 
-void extractEyebow(int origImgWidth, int origImgHeight,
-                   float* outBufEyeBow, float EyeBowPts[71][2])
+void extractEyeRefinePts(int origImgWidth, int origImgHeight,
+                   float* outBufEyeBow, int EyeBowPts[71][2])
 {
     float scale_x = origImgWidth / 192.0f;
     float scale_y = origImgHeight / 192.0f;
@@ -56,6 +56,27 @@ void extractEyebow(int origImgWidth, int origImgHeight,
         EyeBowPts[i][1] = (int)(y*scale_y);
     }
 }
+
+/*
+ outBufLipRefinePts: Input
+ lipRefinePts: Output
+ */
+void extractLipRefinePts(int origImgWidth, int origImgHeight,
+                         float* outBufLipRefinePts, int lipRefinePts[80][2])
+{
+    float scale_x = origImgWidth / 192.0f;
+    float scale_y = origImgHeight / 192.0f;
+
+    for(int i=0; i<80; i++)
+    {
+        float x = outBufLipRefinePts[i*2];
+        float y = outBufLipRefinePts[i*2+1];
+
+        lipRefinePts[i][0] = (int)(x*scale_x);
+        lipRefinePts[i][1] = (int)(y*scale_y);
+    }
+}
+
 //-----------------------------------------------------------------------------------------
 
 /******************************************************************************************
@@ -77,8 +98,8 @@ TF_LITE_MODEL LoadFaceMeshAttenModel(const char* faceMeshModelFileName)
  以后要让前半段的结果长期存活，用于连续推理，以提高效率。
 *******************************************************************************************/
 bool ExtractFaceLmAtten(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
-                   float confThresh, bool& hasFace, float& confidence,
-                   float lm_3d[468][3], int lm_2d[468][2], string& errorMsg)
+                    float confThresh, bool& hasFace, float& confidence,
+                    FaceInfo& faceInfo, string& errorMsg)
 {
     // Initiate Interpreter
     INTERPRETER interpreter;
@@ -139,9 +160,6 @@ bool ExtractFaceLmAtten(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
 
     int output_lm_ID = interpreter->outputs()[0];
     cout << "output_landmarks ID: " << output_lm_ID << endl;
-    int d1 = interpreter->tensor(output_lm_ID)->dims->data[1];
-    int d2 = interpreter->tensor(output_lm_ID)->dims->data[2];
-    int d3 = interpreter->tensor(output_lm_ID)->dims->data[3];
     
     float* LMOutBuffer = interpreter->typed_output_tensor<float>(0);
 
@@ -150,18 +168,20 @@ bool ExtractFaceLmAtten(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     i.e., the values are in the range: [0.0, 192.0].
     The values in lm_2d are measured in the coordinate system of the source image!
     */
-    extractOutputAttenLM(srcImage.cols, srcImage.rows, LMOutBuffer, lm_3d, lm_2d);
+    extractOutputAttenLM(srcImage.cols, srcImage.rows, LMOutBuffer,
+                         faceInfo.lm_3d, faceInfo.lm_2d);
 
     cout << "extractOutputLM() is well done!" << endl;
     
-    float leftEyeBowPts[71][2];
-    float* outBuf_LeftEyeBow = interpreter->typed_output_tensor<float>(2);
-    extractEyebow(srcImage.cols, srcImage.rows, outBuf_LeftEyeBow, leftEyeBowPts);
+    float* outBufLeftEyeRefinePts = interpreter->typed_output_tensor<float>(2);
+    extractEyeRefinePts(srcImage.cols, srcImage.rows, outBufLeftEyeRefinePts, faceInfo.leftEyeRefinePts);
     
-    float rightEyeBowPts[71][2];
-    float* outBuf_RightEyeBow = interpreter->typed_output_tensor<float>(3);
-    extractEyebow(srcImage.cols, srcImage.rows, outBuf_RightEyeBow, rightEyeBowPts);
+    float* outBufRightEyeRefinePts = interpreter->typed_output_tensor<float>(3);
+    extractEyeRefinePts(srcImage.cols, srcImage.rows, outBufRightEyeRefinePts, faceInfo.rightEyeRefinePts);
     
+    float* outBufLipRefinePts = interpreter->typed_output_tensor<float>(1);
+
+    extractLipRefinePts(srcImage.cols, srcImage.rows, outBufLipRefinePts, faceInfo.lipRefinePts);
     
     errorMsg = "OK";
     return true;

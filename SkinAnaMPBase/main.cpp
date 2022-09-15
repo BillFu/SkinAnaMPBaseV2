@@ -56,8 +56,8 @@ int main(int argc, char **argv)
     string errorMsg;
     
     // Load Input Image
-    auto srcImg = cv::imread(srcImgFile.c_str());
-    if(srcImg.empty())
+    auto srcImage = cv::imread(srcImgFile.c_str());
+    if(srcImage.empty())
     {
         cout << "Failed to load input iamge: " << srcImgFile << endl;
         return 0;
@@ -65,18 +65,17 @@ int main(int argc, char **argv)
     else
         cout << "Succeeded to load image: " << srcImgFile << endl;
     
-    int srcImgWidht = srcImg.cols;
-    int srcImgHeight = srcImg.rows;
+    int srcImgWidht = srcImage.cols;
+    int srcImgHeight = srcImage.rows;
 
-    float lm_3d[468][3];
-    int lm_2d[468][2];
+    FaceInfo faceInfo;
 
     float confThresh = 0.75;
     bool hasFace = false;
     float confidence = 0.0;
-    bool isOK = ExtractFaceLmAtten(faceMeshModel, srcImg,
+    bool isOK = ExtractFaceLmAtten(faceMeshModel, srcImage,
                               confThresh, hasFace, confidence,
-                              lm_3d,  lm_2d, errorMsg);
+                                   faceInfo, errorMsg);
     if(!isOK)
     {
         cout << "Error Happened to extract face LM: " << errorMsg << endl;
@@ -85,13 +84,21 @@ int main(int argc, char **argv)
     else
         cout << "Succeeded to extract lm!" << endl;
 
-    float pitch, yaw, roll;
-    EstHeadPose(srcImgWidht, srcImgHeight, lm_2d, pitch, yaw, roll);
+    EstHeadPose(srcImgWidht, srcImgHeight, faceInfo);
     
-    Mat PoseAnnoImage;
-    AnnoHeadPoseEst(srcImg, PoseAnnoImage, lm_2d, pitch, yaw, roll);
+    Mat annoImage = srcImage.clone();
 
-    imwrite(annoPoseImgFile, PoseAnnoImage);
+    // AnnoGeneralKeyPoints(annoImage, faceInfo);
+    
+    Scalar yellowColor(0, 255, 255);
+    AnnoTwoEyeRefinePts(annoImage, faceInfo, yellowColor);
+
+    Scalar pinkColor(255, 0, 255);
+    AnnoLipRefinePts(annoImage, faceInfo, pinkColor);
+
+    AnnoHeadPoseEst(annoImage, faceInfo);
+
+    imwrite(annoPoseImgFile, annoImage);
     
     return 0;
 }

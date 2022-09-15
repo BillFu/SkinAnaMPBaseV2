@@ -21,14 +21,16 @@ Date:   2022/9/10
 using namespace std;
 using namespace cv;
 
+#include "Common.hpp"
 
 /******************************************************************************************
 srcImgWidht, srcImgHeight: the width and height of the input source image.
 lm_2d: as the input argument, extracted from the source image, and measured in 
-the coordinate system of the source image. 
+the coordinate system of the source image.
+计算出pitch, yaw, roll，填充到FaceInfo中。
 pitch, yaw, roll: are output arguments, measured in degrees.
+
 *******************************************************************************************/
-void EstHeadPose(int srcImgWidht, int srcImgHeight, 
-	int lm_2d[468][2], float& pitch, float& yaw, float& roll);
+void EstHeadPose(int srcImgWidht, int srcImgHeight, FaceInfo& faceInfo);
 
 #endif /* end of HEAD_POSE_EST_HPP */

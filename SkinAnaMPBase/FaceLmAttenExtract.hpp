@@ -40,7 +40,7 @@ TF_LITE_MODEL LoadFaceMeshAttenModel(const char* faceMeshModelFileName);
 if confidence >= confThresh, then a face will be confirmed, hasFace will be assigned with true.
 *******************************************************************************************/
 bool ExtractFaceLmAtten(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
-                   float confThresh, bool& hasFace, float& confidence,
-                   float lm_3d[468][3], int lm_2d[468][2], string& errorMsg);
+                    float confThresh, bool& hasFace, float& confidence,
+                    FaceInfo& faceInfo, string& errorMsg);
 
 #endif /* end of FACE_LM_ATTEN_EXTRACT_HPP */
