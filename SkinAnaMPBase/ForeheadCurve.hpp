@@ -17,8 +17,8 @@ Date:   2022/9/16
 using namespace std;
 using namespace cv;
 
-// determine whether one Point(represented by index) on forehead curve
-bool isPtOnForeheadCurve(int ptIndex);
+// 如果点在前额顶部轮廓线上，返回它在轮廓线点集中的index；否则返回-1
+int getPtIndexOfFHCurve(int ptIndex);
 
 /**********************************************************************************************
 前额顶部轮廓线由9个lm点组成。

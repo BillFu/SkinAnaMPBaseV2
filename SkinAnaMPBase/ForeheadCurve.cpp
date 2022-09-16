@@ -15,21 +15,12 @@ Date:   2022/9/16
 // 前额顶部轮廓线由9个lm点组成。这9个点组成第0排点集，比它们低一些的9个点组成第1排点集。
 // 抬高后获得的9个点组成-1排点集。
 vector<int> one_row_indices{68, 104, 69, 108, 151, 337, 299, 333, 298};
-vector<int> zero_row_indices{54, 103, 67, 109, 10,  338, 297, 332, 284};
-
-/*
-bool isPtOnForeheadCurve(int ptIndex)
-{
-    vector<int>& vec = one_row_indices;
-    bool isOn = std::find(vec.begin(), vec.end(), ptIndex) != vec.end();
-    return isOn;
-}
-*/
+vector<int> zero_row_indices{54, 103, 67, 109, 10,  338, 297, 332, 284};  // 第0排才是MP提取出的前额顶部轮廓线
 
 // 如果点在前额顶部轮廓线上，返回它在轮廓线点集中的index；否则返回-1
 int getPtIndexOfFHCurve(int ptIndex)
 {
-    vector<int>& vec = one_row_indices;
+    vector<int>& vec = zero_row_indices; // 第0排才是MP提取出的前额顶部轮廓线
     
     auto it = std::find(vec.begin(), vec.end(), ptIndex);
     if (it != vec.end())

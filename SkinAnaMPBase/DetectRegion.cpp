@@ -40,7 +40,7 @@ Mat ContourGroup2Mask(int img_width, int img_height, const POLYGON_GROUP& contou
 //-------------------------------------------------------------------------------------------
 
 /**********************************************************************************************
-
+额头顶部轮廓得到了提升。
 ***********************************************************************************************/
 void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon)
 {
@@ -62,19 +62,24 @@ void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon)
     for(int i = 0; i<num_pts; i++)
     {
         int index = silhouette[i];
-        newSilhouPts[i][0] = faceInfo.lm_2d[index][0];
-        newSilhouPts[i][1] = faceInfo.lm_2d[index][1];
+        int indexInFHC = getPtIndexOfFHCurve(index);
+        
+        if(indexInFHC == -1) // Not on Forehead Curve
+        {
+            newSilhouPts[i][0] = faceInfo.lm_2d[index][0];
+            newSilhouPts[i][1] = faceInfo.lm_2d[index][1];
+        }
+        else // on Forehead Curve, need update the coordinates, i.e. raising up
+        {
+            newSilhouPts[i][0] = raisedFhCurve[indexInFHC][0];
+            newSilhouPts[i][1] = raisedFhCurve[indexInFHC][1];
+        }
     }
-    // bool isPtOnForeheadCurve(int ptIndex);
-    int getPtIndexOfFHCurve(int ptIndex)
-
     
     for(int i = 0; i<num_pts; i++)
     {
-        int index = silhouette[i];
-        
-        int x = faceInfo.lm_2d[index][0];
-        int y = faceInfo.lm_2d[index][1];
+        int x = newSilhouPts[i][0];
+        int y = newSilhouPts[i][1];
         skinPolygon.push_back(Point2i(x, y));
     }
 }
