@@ -13,6 +13,7 @@
 		26E506B228D3665B000059DA /* LM_Loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E506B028D3665B000059DA /* LM_Loader.cpp */; };
 		CB14D51828D3F4E80095E321 /* FaceLmAttenExtract.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB14D51628D3F4E80095E321 /* FaceLmAttenExtract.cpp */; };
 		CB255A9628C7237A005C8A81 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB255A9528C7237A005C8A81 /* main.cpp */; };
+		CB4312AA28D41DDD006D71DA /* ParametricBSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB4312A828D41DDD006D71DA /* ParametricBSpline.cpp */; };
 		CB79324D28D1CF0400BE136B /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CB3C248E28D00BA300804E6E /* libtensorflowlite.so */; };
 		CBAF932F28D3291000469F91 /* DetectRegion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBAF932D28D3291000469F91 /* DetectRegion.cpp */; };
 		CBDA5B2528D2F0DD002A35E2 /* TinyEXIF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA5B2128D2F0DD002A35E2 /* TinyEXIF.cpp */; };
@@ -48,6 +49,9 @@
 		CB255A9228C7237A005C8A81 /* SkinAnaMPBase */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SkinAnaMPBase; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB255A9528C7237A005C8A81 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		CB3C248E28D00BA300804E6E /* libtensorflowlite.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtensorflowlite.so; path = SkinAnaMPBase/intel_lib/libtensorflowlite.so; sourceTree = "<group>"; };
+		CB4312A728D41A36006D71DA /* spline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spline.h; sourceTree = "<group>"; };
+		CB4312A828D41DDD006D71DA /* ParametricBSpline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParametricBSpline.cpp; sourceTree = "<group>"; };
+		CB4312A928D41DDD006D71DA /* ParametricBSpline.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ParametricBSpline.hpp; sourceTree = "<group>"; };
 		CB79324B28D1B07400BE136B /* libtensorflow-lite.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libtensorflow-lite.a"; path = "SkinAnaMPBase/intel_lib/libtensorflow-lite.a"; sourceTree = "<group>"; };
 		CBAF932D28D3291000469F91 /* DetectRegion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DetectRegion.cpp; sourceTree = "<group>"; };
 		CBAF932E28D3291000469F91 /* DetectRegion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DetectRegion.hpp; sourceTree = "<group>"; };
@@ -101,13 +105,14 @@
 		CB255A9428C7237A005C8A81 /* SkinAnaMPBase */ = {
 			isa = PBXGroup;
 			children = (
-				CB14D51628D3F4E80095E321 /* FaceLmAttenExtract.cpp */,
-				CB14D51728D3F4E80095E321 /* FaceLmAttenExtract.hpp */,
-				26E506B028D3665B000059DA /* LM_Loader.cpp */,
-				26E506B128D3665B000059DA /* LM_loader.hpp */,
+				CB4312A628D419A0006D71DA /* BSpline */,
 				CBDA5B2028D2F055002A35E2 /* EXIF */,
 				CBDA5B2828D2F327002A35E2 /* EXIF_Extractor.cpp */,
 				CBDA5B2A28D2F4CD002A35E2 /* EXIF_Extractor.hpp */,
+				26E506B028D3665B000059DA /* LM_Loader.cpp */,
+				26E506B128D3665B000059DA /* LM_loader.hpp */,
+				CB14D51628D3F4E80095E321 /* FaceLmAttenExtract.cpp */,
+				CB14D51728D3F4E80095E321 /* FaceLmAttenExtract.hpp */,
 				CBAF932D28D3291000469F91 /* DetectRegion.cpp */,
 				CBAF932E28D3291000469F91 /* DetectRegion.hpp */,
 				26F7BE6428CDE49500A83344 /* Common.hpp */,
@@ -120,6 +125,16 @@
 				CB255A9528C7237A005C8A81 /* main.cpp */,
 			);
 			path = SkinAnaMPBase;
+			sourceTree = "<group>";
+		};
+		CB4312A628D419A0006D71DA /* BSpline */ = {
+			isa = PBXGroup;
+			children = (
+				CB4312A828D41DDD006D71DA /* ParametricBSpline.cpp */,
+				CB4312A928D41DDD006D71DA /* ParametricBSpline.hpp */,
+				CB4312A728D41A36006D71DA /* spline.h */,
+			);
+			path = BSpline;
 			sourceTree = "<group>";
 		};
 		CBDA5B2028D2F055002A35E2 /* EXIF */ = {
@@ -218,6 +233,7 @@
 				CBDA5B2928D2F327002A35E2 /* EXIF_Extractor.cpp in Sources */,
 				2602327628CCBFB100B11D7A /* HeadPoseEst.cpp in Sources */,
 				CBDA5B2528D2F0DD002A35E2 /* TinyEXIF.cpp in Sources */,
+				CB4312AA28D41DDD006D71DA /* ParametricBSpline.cpp in Sources */,
 				263B540528CD8B34004CF77D /* Utils.cpp in Sources */,
 				CBDA5B2628D2F0DD002A35E2 /* tinyxml2.cpp in Sources */,
 				CBAF932F28D3291000469F91 /* DetectRegion.cpp in Sources */,

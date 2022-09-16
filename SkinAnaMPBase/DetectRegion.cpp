@@ -8,7 +8,7 @@ Date:   2022/9/15
 ********************************************************************************/
 
 #include "DetectRegion.hpp"
-
+#include "BSpline/ParametricBSpline.hpp"
 
 //-------------------------------------------------------------------------------------------
 
@@ -96,13 +96,13 @@ void ForgeMouthPolygon(const FaceInfo& faceInfo, POLYGON& mouthPolygon)
     }
 }
 
-void ForgeOneEyeBowPolygon(const FaceInfo& faceInfo, EyeID eyeID, POLYGON& eyeBowPolygon)
+void ForgeOneEyebowPolygon(const FaceInfo& faceInfo, EyeID eyeID, POLYGON& eyebowPolygon)
 {
     // 采用Eye Refine Region的点，左眉毛、右眉毛的坐标索引是相同的！
     int eyeBowPtIndices[] = {69, 68, 67, 66, 65, 64, 50, 43, 44, 45};
     
+    POLYGON coarseEyebowPolygon;
     int num_pts = sizeof(eyeBowPtIndices) / sizeof(int);
-    
     for(int i = 0; i<num_pts; i++)
     {
         int index = eyeBowPtIndices[i];
@@ -120,8 +120,12 @@ void ForgeOneEyeBowPolygon(const FaceInfo& faceInfo, EyeID eyeID, POLYGON& eyeBo
             y = faceInfo.rightEyeRefinePts[index][1];
         }
         
-        eyeBowPolygon.push_back(Point2i(x, y));
+        coarseEyebowPolygon.push_back(Point2i(x, y));
     }
+    
+    // then convert the corse to the refined
+    int csNumPoint = 200;
+    ForgeClosedSmoothPolygon(coarseEyebowPolygon, csNumPoint, eyebowPolygon);
 }
 
 //-------------------------------------------------------------------------------------------
@@ -147,8 +151,8 @@ void ForgeTwoEyebowsMask(int img_width, int img_height,
                     const FaceInfo& faceInfo, Mat& outMask)
 {
     POLYGON leftEyeBowPolygon, rightEyeBowPolygon;
-    ForgeOneEyeBowPolygon(faceInfo, LeftEyeID, leftEyeBowPolygon);
-    ForgeOneEyeBowPolygon(faceInfo, RightEyeID, rightEyeBowPolygon);
+    ForgeOneEyebowPolygon(faceInfo, LeftEyeID, leftEyeBowPolygon);
+    ForgeOneEyebowPolygon(faceInfo, RightEyeID, rightEyeBowPolygon);
     
     POLYGON_GROUP polygonGroup;
     polygonGroup.push_back(leftEyeBowPolygon);
