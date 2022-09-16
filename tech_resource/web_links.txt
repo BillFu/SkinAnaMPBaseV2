@@ -117,5 +117,14 @@ https://github.com/tensorflow/tfjs-models/blob/838611c02f51159afdd77469ce67f0e26
 
 https://github.com/google/mediapipe/issues/1615
 
+--------------------------------------------------------------------------
+
+https://kluge.in-chemnitz.de/opensource/spline/
+Cubic Spline interpolation in C++
+
+https://github.com/ttk592/spline
+
+--------------------------------------------------------------------------
+
 
 

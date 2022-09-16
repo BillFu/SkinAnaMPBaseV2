@@ -70,7 +70,7 @@ void AnnoGeneralKeyPoints(Mat& annoImage, const FaceInfo& faceInfo)
 本函数的功能是，将一个眉毛处的71个关键点的结果打印在标注影像上。
 *******************************************************************************************/
 void AnnoOneEyeRefinePts(Mat& annoImage, const FaceInfo& faceInfo, EyeID eyeID,
-                         const Scalar& drawColor)
+                         const Scalar& drawColor, bool showIndices)
 {
     for(int i = 0; i < 71; i++)
     {
@@ -86,7 +86,14 @@ void AnnoOneEyeRefinePts(Mat& annoImage, const FaceInfo& faceInfo, EyeID eyeID,
             y = faceInfo.rightEyeRefinePts[i][1];
         }
         cv::Point center(x, y);
-        cv::circle(annoImage, center, 5, drawColor, cv::FILLED);
+        cv::circle(annoImage, center, 1, drawColor, cv::FILLED);
+        
+        if(showIndices)
+        {
+            //Scalar redColor(0, 0, 255);  // BGR
+            cv::putText(annoImage, to_string(i), Point(x, y),
+                        FONT_HERSHEY_SIMPLEX, 0.5, drawColor, 1);
+        }
     }
 }
 
@@ -95,10 +102,11 @@ void AnnoOneEyeRefinePts(Mat& annoImage, const FaceInfo& faceInfo, EyeID eyeID,
 /******************************************************************************************
 本函数的功能是，将眉毛处的172个关键点的结果打印在标注影像上。
 *******************************************************************************************/
-void AnnoTwoEyeRefinePts(Mat& annoImage, const FaceInfo& faceInfo, const Scalar& drawColor)
+void AnnoTwoEyeRefinePts(Mat& annoImage, const FaceInfo& faceInfo,
+                         const Scalar& drawColor, bool showIndices)
 {
-    AnnoOneEyeRefinePts(annoImage, faceInfo, LeftEyeID, drawColor);
-    AnnoOneEyeRefinePts(annoImage, faceInfo, RightEyeID, drawColor);
+    AnnoOneEyeRefinePts(annoImage, faceInfo, LeftEyeID, drawColor, showIndices);
+    AnnoOneEyeRefinePts(annoImage, faceInfo, RightEyeID, drawColor, showIndices);
 }
 
 //-----------------------------------------------------------------------------------------
@@ -106,7 +114,8 @@ void AnnoTwoEyeRefinePts(Mat& annoImage, const FaceInfo& faceInfo, const Scalar&
 /******************************************************************************************
 本函数的功能是，将嘴唇处80个精细关键点的结果打印在标注影像上。
 *******************************************************************************************/
-void AnnoLipRefinePts(Mat& annoImage, const FaceInfo& faceInfo, const Scalar& drawColor)
+void AnnoLipRefinePts(Mat& annoImage, const FaceInfo& faceInfo,
+                      const Scalar& drawColor, bool showIndices)
 {
     for(int i = 0; i < 80; i++)
     {
@@ -114,6 +123,13 @@ void AnnoLipRefinePts(Mat& annoImage, const FaceInfo& faceInfo, const Scalar& dr
         int y = faceInfo.lipRefinePts[i][1];
         
         cv::Point center(x, y);
-        cv::circle(annoImage, center, 5, drawColor, cv::FILLED);
+        cv::circle(annoImage, center, 1, drawColor, cv::FILLED);
+        
+        if(showIndices)
+        {
+            Scalar redColor(0, 0, 255);  // BGR
+            cv::putText(annoImage, to_string(i), Point(x, y),
+                        FONT_HERSHEY_SIMPLEX, 0.5, redColor, 1);
+        }
     }
 }

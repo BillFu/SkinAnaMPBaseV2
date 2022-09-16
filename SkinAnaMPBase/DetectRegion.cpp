@@ -24,6 +24,18 @@ Mat contour2mask(int img_width, int img_height, const POLYGON& contours)
     return mask;
 }
 
+Mat ContourGroup2Mask(int img_width, int img_height, const POLYGON_GROUP& contoursGroup)
+{
+    cv::Mat mask(img_height, img_width, CV_8UC1, cv::Scalar(0));
+    
+    for(auto contours: contoursGroup)
+    {
+        cv::fillPoly(mask, contours, cv::Scalar(255));
+    }
+    
+    return mask;
+}
+
 //-------------------------------------------------------------------------------------------
 
 /**********************************************************************************************
@@ -66,15 +78,11 @@ void ForgeMouthPolygon(const FaceInfo& faceInfo, POLYGON& mouthPolygon)
     // the indices for lm in meadiapipe mesh from
     //https://github.com/tensorflow/tfjs-models/blob/838611c02f51159afdd77469ce67f0e26b7bbb23/face-landmarks-detection/src/mediapipe-facemesh/keypoints.ts
     
-    /*
-    lipsUpperOuter: [61, 185, 40, 39, 37, 0, 267, 269, 270, 409, 291],
-    lipsLowerOuter: [146, 91, 181, 84, 17, 314, 405, 321, 375, 291],
-    lipsUpperInner: [78, 191, 80, 81, 82, 13, 312, 311, 310, 415, 308],
-    lipsLowerInner: [78, 95, 88, 178, 87, 14, 317, 402, 318, 324, 308],
-    */
-    
-    int lipsOuterPtIndices[] = {61, 185, 40, 39, 37, 0, 267, 269, 270, 409, 291,
-        375, 321, 405, 314, 17, 84, 181, 91, 146};
+    // 采用Lip Refine Region的点！
+    int lipsOuterPtIndices[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,  // 下外轮廓线，从左到右
+        19, 18, 17, 16, 15, 14, 13, 12, 11 // 上外轮廓线，从右到左
+    };
     
     int num_pts = sizeof(lipsOuterPtIndices) / sizeof(int);
     
@@ -82,11 +90,40 @@ void ForgeMouthPolygon(const FaceInfo& faceInfo, POLYGON& mouthPolygon)
     {
         int index = lipsOuterPtIndices[i];
         
-        int x = faceInfo.lm_2d[index][0];
-        int y = faceInfo.lm_2d[index][1];
+        int x = faceInfo.lipRefinePts[index][0];
+        int y = faceInfo.lipRefinePts[index][1];
         mouthPolygon.push_back(Point2i(x, y));
     }
 }
+
+void ForgeOneEyeBowPolygon(const FaceInfo& faceInfo, EyeID eyeID, POLYGON& eyeBowPolygon)
+{
+    // 采用Eye Refine Region的点，左眉毛、右眉毛的坐标索引是相同的！
+    int eyeBowPtIndices[] = {69, 68, 67, 66, 65, 64, 50, 43, 44, 45};
+    
+    int num_pts = sizeof(eyeBowPtIndices) / sizeof(int);
+    
+    for(int i = 0; i<num_pts; i++)
+    {
+        int index = eyeBowPtIndices[i];
+        
+        int x, y;
+        
+        if(eyeID == LeftEyeID)
+        {
+            x = faceInfo.leftEyeRefinePts[index][0];
+            y = faceInfo.leftEyeRefinePts[index][1];
+        }
+        else  //RightEyeID
+        {
+            x = faceInfo.rightEyeRefinePts[index][0];
+            y = faceInfo.rightEyeRefinePts[index][1];
+        }
+        
+        eyeBowPolygon.push_back(Point2i(x, y));
+    }
+}
+
 //-------------------------------------------------------------------------------------------
 void ForgeSkinMask(int img_width, int img_height,
                    const FaceInfo& faceInfo, Mat& outMask)
@@ -104,6 +141,22 @@ void ForgeMouthMask(int img_width, int img_height,
     ForgeMouthPolygon(faceInfo, polygon);
     outMask = contour2mask(img_width, img_height, polygon);
 }
+
+
+void ForgeTwoEyebowsMask(int img_width, int img_height,
+                    const FaceInfo& faceInfo, Mat& outMask)
+{
+    POLYGON leftEyeBowPolygon, rightEyeBowPolygon;
+    ForgeOneEyeBowPolygon(faceInfo, LeftEyeID, leftEyeBowPolygon);
+    ForgeOneEyeBowPolygon(faceInfo, RightEyeID, rightEyeBowPolygon);
+    
+    POLYGON_GROUP polygonGroup;
+    polygonGroup.push_back(leftEyeBowPolygon);
+    polygonGroup.push_back(rightEyeBowPolygon);
+    
+    outMask = ContourGroup2Mask(img_width, img_height, polygonGroup);
+}
+
 //-------------------------------------------------------------------------------------------
 
 void OverlayMaskOnImage(const Mat& srcImg, const Mat& mask,

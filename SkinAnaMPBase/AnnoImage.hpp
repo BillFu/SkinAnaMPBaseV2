@@ -31,19 +31,21 @@ void AnnoGeneralKeyPoints(Mat& annoImage, const FaceInfo& faceInfo);
 本函数的功能是，将一个眉毛处的71个关键点的结果打印在标注影像上。
 *******************************************************************************************/
 void AnnoOneEyeRefinePts(Mat& annoImage, const FaceInfo& faceInfo,
-                         EyeID eyeID, const Scalar& drawColor);
+                         EyeID eyeID, const Scalar& drawColor, bool showIndices);
 
 /******************************************************************************************
 本函数的功能是，将眉毛处的142个关键点的结果打印在标注影像上。
 *******************************************************************************************/
-void AnnoTwoEyeRefinePts(Mat& annoImage, const FaceInfo& faceInfo, const Scalar& drawColor);
+void AnnoTwoEyeRefinePts(Mat& annoImage, const FaceInfo& faceInfo,
+                         const Scalar& drawColor, bool showIndices);
 
 //-----------------------------------------------------------------------------------------
 
 /******************************************************************************************
 本函数的功能是，将嘴唇处80个精细关键点的结果打印在标注影像上。
 *******************************************************************************************/
-void AnnoLipRefinePts(Mat& annoImage, const FaceInfo& faceInfo, const Scalar& drawColor);
+void AnnoLipRefinePts(Mat& annoImage, const FaceInfo& faceInfo,
+                      const Scalar& drawColor, bool showIndices);
 
 //-----------------------------------------------------------------------------------------
 
