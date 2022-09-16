@@ -9,6 +9,7 @@ Date:   2022/9/15
 
 #include "DetectRegion.hpp"
 #include "BSpline/ParametricBSpline.hpp"
+#include "ForeheadCurve.hpp"
 
 //-------------------------------------------------------------------------------------------
 
@@ -43,16 +44,6 @@ Mat ContourGroup2Mask(int img_width, int img_height, const POLYGON_GROUP& contou
 ***********************************************************************************************/
 void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon)
 {
-    // the outer contour of face in front view.
-    /*
-    int face_contour_pts_indices[] = {103, 67, 109, 10, 338, 297,
-        332, 298, 300, 383, 372, 345, 352, 376, 433, 416, 364,
-        430, 431, 369, 400, 396, 175, 171, 176, 140, 149,
-        170, 150, 169, 136, 135, 138, 215, 177, 137, 227,
-        234, 156, 46, 53, 52, 65, 107, 66, 105, 63, 70, 71, 68
-    };
-    */
-    
     // the indices for lm in meadiapipe mesh from
     // https://github.com/tensorflow/tfjs-models/blob/838611c02f51159afdd77469ce67f0e26b7bbb23/face-landmarks-detection/src/mediapipe-facemesh/keypoints.ts
     
@@ -62,6 +53,21 @@ void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon)
         172, 58,  132, 93,  234, 127, 162, 21,  54,  103, 67,  109};
     
     int num_pts = sizeof(silhouette) / sizeof(int);
+    
+    int raisedFhCurve[9][2];
+    RaiseupForeheadCurve(faceInfo.lm_2d, raisedFhCurve, 0.8);
+
+    // calculate the new version of coordinates of Points on face silhouette.
+    int newSilhouPts[36][2];
+    for(int i = 0; i<num_pts; i++)
+    {
+        int index = silhouette[i];
+        newSilhouPts[i][0] = faceInfo.lm_2d[index][0];
+        newSilhouPts[i][1] = faceInfo.lm_2d[index][1];
+    }
+    // bool isPtOnForeheadCurve(int ptIndex);
+    int getPtIndexOfFHCurve(int ptIndex)
+
     
     for(int i = 0; i<num_pts; i++)
     {
