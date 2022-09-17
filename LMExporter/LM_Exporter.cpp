@@ -97,6 +97,7 @@ void ExportLM_FullData(FaceInfo& faceInfo, const char* outFileName)
     ofstream outFile;
     outFile.open (outFileName);
 
+    outFile << "lm_3d, 468" << endl;
     for(int i = 0; i<468; i++)
     {
         outFile << faceInfo.lm_3d[i][0] << "  ";
@@ -105,6 +106,7 @@ void ExportLM_FullData(FaceInfo& faceInfo, const char* outFileName)
         outFile << endl;
     }
     
+    outFile << "lm_2d, 468" << endl;
     for(int i = 0; i<468; i++)
     {
         outFile << faceInfo.lm_2d[i][0] << "  ";
@@ -112,6 +114,7 @@ void ExportLM_FullData(FaceInfo& faceInfo, const char* outFileName)
         outFile << endl;
     }
     
+    outFile << "leftEyeRefinePts, 71" << endl;
     for(int i = 0; i<71; i++)
     {
         outFile << faceInfo.leftEyeRefinePts[i][0] << "  ";
@@ -119,6 +122,7 @@ void ExportLM_FullData(FaceInfo& faceInfo, const char* outFileName)
         outFile << endl;
     }
     
+    outFile << "rightEyeRefinePts, 71" << endl;
     for(int i = 0; i<71; i++)
     {
         outFile << faceInfo.rightEyeRefinePts[i][0] << "  ";
@@ -126,6 +130,7 @@ void ExportLM_FullData(FaceInfo& faceInfo, const char* outFileName)
         outFile << endl;
     }
     
+    outFile << "lipRefinePts, 80" << endl;
     for(int i = 0; i<80; i++)
     {
         outFile << faceInfo.lipRefinePts[i][0] << "  ";
@@ -133,6 +138,11 @@ void ExportLM_FullData(FaceInfo& faceInfo, const char* outFileName)
         outFile << endl;
     }
     
+    outFile << "pose, 1 line" << endl;
+    HeadPose& pose = faceInfo.headPose;
+    outFile << pose.pitch << "  ";
+    outFile << pose.yaw <<  "  ";
+    outFile << pose.roll <<  "  " << endl;
     
     outFile.close();
 }
