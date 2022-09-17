@@ -10,11 +10,11 @@
 		2602327628CCBFB100B11D7A /* HeadPoseEst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2602327528CCBFB100B11D7A /* HeadPoseEst.cpp */; };
 		263B540228CD861C004CF77D /* AnnoImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540028CD861C004CF77D /* AnnoImage.cpp */; };
 		263B540528CD8B34004CF77D /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540428CD8B34004CF77D /* Utils.cpp */; };
+		26871D6928D631E200D299E4 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 2602327828CCC52E00B11D7A /* libtensorflowlite.so */; };
 		26E506B228D3665B000059DA /* LM_Loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E506B028D3665B000059DA /* LM_Loader.cpp */; };
 		CB14D51828D3F4E80095E321 /* FaceLmAttenExtract.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB14D51628D3F4E80095E321 /* FaceLmAttenExtract.cpp */; };
 		CB255A9628C7237A005C8A81 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB255A9528C7237A005C8A81 /* main.cpp */; };
 		CB4312AA28D41DDD006D71DA /* ParametricBSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB4312A828D41DDD006D71DA /* ParametricBSpline.cpp */; };
-		CB79324D28D1CF0400BE136B /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CB3C248E28D00BA300804E6E /* libtensorflowlite.so */; };
 		CBAF932F28D3291000469F91 /* DetectRegion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBAF932D28D3291000469F91 /* DetectRegion.cpp */; };
 		CBCB697B28D450A400CE9E91 /* ForeheadCurve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBCB697928D450A400CE9E91 /* ForeheadCurve.cpp */; };
 		CBDA5B2528D2F0DD002A35E2 /* TinyEXIF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA5B2128D2F0DD002A35E2 /* TinyEXIF.cpp */; };
@@ -90,7 +90,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CB79324D28D1CF0400BE136B /* libtensorflowlite.so in Frameworks */,
+				26871D6928D631E200D299E4 /* libtensorflowlite.so in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -454,13 +454,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				EXCLUDED_ARCHS = "";
 				HEADER_SEARCH_PATHS = (
-					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
+					/opt/homebrew/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/SkinAnaMPBase/include",
-					/Users/meicet/nlohmann_json/include,
+					/Users/fuliye/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					/usr/local/Cellar/opencv/4.6.0/lib,
+					/opt/homebrew/Cellar/opencv/4.6.0/lib,
 					"$(PROJECT_DIR)/SkinAnaMPBase/intel_lib",
+					"$(PROJECT_DIR)/SkinAnaMPBase/m1_lib",
 				);
 				OTHER_LDFLAGS = (
 					"-lopencv_core",
@@ -479,13 +480,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				EXCLUDED_ARCHS = "";
 				HEADER_SEARCH_PATHS = (
-					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
+					/opt/homebrew/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/SkinAnaMPBase/include",
-					/Users/meicet/nlohmann_json/include,
+					/Users/fuliye/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					/usr/local/Cellar/opencv/4.6.0/lib,
+					/opt/homebrew/Cellar/opencv/4.6.0/lib,
 					"$(PROJECT_DIR)/SkinAnaMPBase/intel_lib",
+					"$(PROJECT_DIR)/SkinAnaMPBase/m1_lib",
 				);
 				OTHER_LDFLAGS = (
 					"-lopencv_core",
