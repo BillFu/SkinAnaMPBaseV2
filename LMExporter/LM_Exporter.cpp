@@ -20,27 +20,6 @@ using namespace std;
 
  ******************************************************************************************/
 
-/*
- 
- struct FaceInfo
- {
-     //[n][0] for x, [n][1] for y
-     // measured in source iamge coordinate system
-     float lm_3d[468][3];  // x, y, z
-     int   lm_2d[468][2];  // x, y，与上面的lm_3d中相同，只是数据类型不同
-     
-     int leftEyeRefinePts[71][2];
-     int rightEyeRefinePts[71][2];
-     
-     int lipRefinePts[80][2];
-     
-     float pitch;  // rotate with x-axis
-     float yaw;    // rotate with y-axis
-     float roll;   // rotate with z-axis
- };
- 
- */
-
 void Export_lm_3d(FaceInfo& faceInfo, const char* outFileName)
 {
     ofstream outFile;
@@ -87,10 +66,6 @@ void Export_LipRefinePts(FaceInfo& faceInfo, const char* outFileName)
     outFile.close();
 }
 
-
-//int leftEyeRefinePts[71][2];
-//int rightEyeRefinePts[71][2];
-
 void Export_TwoEyes_RefinePts(FaceInfo& faceInfo, const char* outFileName)
 {
     ofstream outFile;
@@ -98,24 +73,68 @@ void Export_TwoEyes_RefinePts(FaceInfo& faceInfo, const char* outFileName)
 
     for(int i = 0; i<71; i++)
     {
-        outFile << faceInfo.lipRefinePts[i][0] << "  ";
-        outFile << faceInfo.lipRefinePts[i][1] << "  ";
+        outFile << faceInfo.leftEyeRefinePts[i][0] << "  ";
+        outFile << faceInfo.leftEyeRefinePts[i][1] << "  ";
+        outFile << endl;
+    }
+    
+    for(int i = 0; i<71; i++)
+    {
+        outFile << faceInfo.rightEyeRefinePts[i][0] << "  ";
+        outFile << faceInfo.rightEyeRefinePts[i][1] << "  ";
         outFile << endl;
     }
     
     outFile.close();
 }
 
-
-/*
-void FillData(FaceInfo& faceInfo)
+// 将目前的所有数据（也包含位姿数据）导出到一个文本文件中
+// 数据在导出文件中分布的安排如下：
+// 1. 按在FaceInfo定义时的数据成员先后来排序。
+// 2. 每段数据前加一行文本标题，便于人工浏览。
+void ExportLM_FullData(FaceInfo& faceInfo, const char* outFileName)
 {
+    ofstream outFile;
+    outFile.open (outFileName);
+
     for(int i = 0; i<468; i++)
     {
-        faceInfo.lm_2d[i][0] = general_lm[i][0];
-        faceInfo.lm_2d[i][1] = general_lm[i][1];
+        outFile << faceInfo.lm_3d[i][0] << "  ";
+        outFile << faceInfo.lm_3d[i][1] << "  ";
+        outFile << faceInfo.lm_3d[i][2] << "  ";
+        outFile << endl;
     }
+    
+    for(int i = 0; i<468; i++)
+    {
+        outFile << faceInfo.lm_2d[i][0] << "  ";
+        outFile << faceInfo.lm_2d[i][1] << "  ";
+        outFile << endl;
+    }
+    
+    for(int i = 0; i<71; i++)
+    {
+        outFile << faceInfo.leftEyeRefinePts[i][0] << "  ";
+        outFile << faceInfo.leftEyeRefinePts[i][1] << "  ";
+        outFile << endl;
+    }
+    
+    for(int i = 0; i<71; i++)
+    {
+        outFile << faceInfo.rightEyeRefinePts[i][0] << "  ";
+        outFile << faceInfo.rightEyeRefinePts[i][1] << "  ";
+        outFile << endl;
+    }
+    
+    for(int i = 0; i<80; i++)
+    {
+        outFile << faceInfo.lipRefinePts[i][0] << "  ";
+        outFile << faceInfo.lipRefinePts[i][1] << "  ";
+        outFile << endl;
+    }
+    
+    
+    outFile.close();
 }
-*/
 
 //-------------------------------------------------------------------------------------------

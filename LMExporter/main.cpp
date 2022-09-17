@@ -54,7 +54,7 @@ int main(int argc, const char * argv[])
     cout << "srcImgFile: " << srcImgFile << endl;
     cout << "outLmFile: " << outLmFile << endl;
 
-    
+    //--------------First Stage: Extraction--------------------------------------------------
     TF_LITE_MODEL faceMeshModel = LoadFaceMeshAttenModel(faceMeshAttenModelFile.c_str());
     if(faceMeshModel == nullptr)
     {
@@ -99,5 +99,9 @@ int main(int argc, const char * argv[])
     
     EstHeadPose(srcImgWidht, srcImgHeight, faceInfo);
     
+    cout << "Succeeded to invoke EstHeadPose()" << endl;
+
+    //--------------Second Stage: Export--------------------------------------------------
+
     return 0;
 }
