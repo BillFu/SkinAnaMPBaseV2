@@ -25,6 +25,7 @@ Date:   2022/9/17
 #include "../SkinAnaMPBase/HeadPoseEst.hpp"
 #include "../SkinAnaMPBase/FaceLmAttenExtract.hpp"
 
+#include "LM_Exporter.hpp"
 
 using json = nlohmann::json;
 
@@ -102,6 +103,9 @@ int main(int argc, const char * argv[])
     cout << "Succeeded to invoke EstHeadPose()" << endl;
 
     //--------------Second Stage: Export--------------------------------------------------
+    
+    ExportLM_FullData(faceInfo, outLmFile.c_str());
+    cout << "Succeeded to export LM data into file: " << outLmFile << endl;
 
     return 0;
 }
