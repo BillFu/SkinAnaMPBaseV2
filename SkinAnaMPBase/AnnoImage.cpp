@@ -15,9 +15,9 @@ Date:   2022/9/11
 *******************************************************************************************/
 void AnnoHeadPoseEst(Mat& annoImage, const FaceInfo& faceInfo)
 {
-    string pitch_str = convertFloatToStr2DeciDigits(faceInfo.pitch);
-    string yaw_str = convertFloatToStr2DeciDigits(faceInfo.yaw);
-    string roll_str = convertFloatToStr2DeciDigits(faceInfo.roll);
+    string pitch_str = convertFloatToStr2DeciDigits(faceInfo.headPose.pitch);
+    string yaw_str = convertFloatToStr2DeciDigits(faceInfo.headPose.yaw);
+    string roll_str = convertFloatToStr2DeciDigits(faceInfo.headPose.roll);
 
     // Print inference ms in input image
     //cv::putText(frame, "Infernce Time in ms: " + std::to_string(inference_time), cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(0, 0, 255), 2);

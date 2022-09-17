@@ -39,6 +39,13 @@ enum EyeID
     RightEyeID
 };
 
+struct HeadPose
+{
+    float pitch;  // rotate with x-axis
+    float yaw;    // rotate with y-axis
+    float roll;   // rotate with z-axis
+};
+
 struct FaceInfo
 {
     //[n][0] for x, [n][1] for y
@@ -51,9 +58,7 @@ struct FaceInfo
     
     int lipRefinePts[80][2];
     
-    float pitch;  // rotate with x-axis
-    float yaw;    // rotate with y-axis
-    float roll;   // rotate with z-axis
+    HeadPose headPose;
 };
 
 #endif /* end of COMMON_HPP */

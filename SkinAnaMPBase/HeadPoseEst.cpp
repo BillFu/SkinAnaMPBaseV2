@@ -99,11 +99,11 @@ void EstHeadPose(int srcImgWidht, int srcImgHeight,
     Vec3d eluer_angles= cv::RQDecomp3x3(rot_mat, mtxR, mtxQ);
     cout << "RQDecomp3x3() is Done!" << std::endl;
 
-    faceInfo.pitch = eluer_angles[0];
-    faceInfo.yaw = eluer_angles[1];
-    faceInfo.roll = eluer_angles[2];
+    faceInfo.headPose.pitch = eluer_angles[0];
+    faceInfo.headPose.yaw = eluer_angles[1];
+    faceInfo.headPose.roll = eluer_angles[2];
     
-    cout << "pitch: " << faceInfo.pitch << std::endl;
-    cout << "yaw: " << faceInfo.yaw << std::endl;
-    cout << "roll: " << faceInfo.roll << std::endl;
+    cout << "pitch: " << faceInfo.headPose.pitch << std::endl;
+    cout << "yaw: " << faceInfo.headPose.yaw << std::endl;
+    cout << "roll: " << faceInfo.headPose.roll << std::endl;
 }

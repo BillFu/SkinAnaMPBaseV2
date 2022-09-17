@@ -20,10 +20,25 @@
 		CBDA5B2528D2F0DD002A35E2 /* TinyEXIF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA5B2128D2F0DD002A35E2 /* TinyEXIF.cpp */; };
 		CBDA5B2628D2F0DD002A35E2 /* tinyxml2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA5B2228D2F0DD002A35E2 /* tinyxml2.cpp */; };
 		CBDA5B2928D2F327002A35E2 /* EXIF_Extractor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA5B2828D2F327002A35E2 /* EXIF_Extractor.cpp */; };
+		CBDA6B9728D5550B00BE0756 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA6B9628D5550B00BE0756 /* main.cpp */; };
+		CBDA6B9C28D55F6000BE0756 /* FaceLmAttenExtract.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB14D51628D3F4E80095E321 /* FaceLmAttenExtract.cpp */; };
+		CBDA6B9E28D55FDC00BE0756 /* HeadPoseEst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2602327528CCBFB100B11D7A /* HeadPoseEst.cpp */; };
+		CBDA6BA028D5603600BE0756 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540428CD8B34004CF77D /* Utils.cpp */; };
+		CBDA6BA128D560AD00BE0756 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CB3C248E28D00BA300804E6E /* libtensorflowlite.so */; };
+		CBDBD7B128D561FF00F3AD03 /* LM_Exporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDBD7AF28D561FF00F3AD03 /* LM_Exporter.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		CB255A9028C7237A005C8A81 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		CBDA6B9228D5550B00BE0756 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -64,6 +79,10 @@
 		CBDA5B2428D2F0DD002A35E2 /* TinyEXIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TinyEXIF.h; sourceTree = "<group>"; };
 		CBDA5B2828D2F327002A35E2 /* EXIF_Extractor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EXIF_Extractor.cpp; sourceTree = "<group>"; };
 		CBDA5B2A28D2F4CD002A35E2 /* EXIF_Extractor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EXIF_Extractor.hpp; sourceTree = "<group>"; };
+		CBDA6B9428D5550B00BE0756 /* LMExporter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LMExporter; sourceTree = BUILT_PRODUCTS_DIR; };
+		CBDA6B9628D5550B00BE0756 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		CBDBD7AF28D561FF00F3AD03 /* LM_Exporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LM_Exporter.cpp; sourceTree = "<group>"; };
+		CBDBD7B028D561FF00F3AD03 /* LM_Exporter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LM_Exporter.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +91,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CB79324D28D1CF0400BE136B /* libtensorflowlite.so in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CBDA6B9128D5550B00BE0756 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CBDA6BA128D560AD00BE0756 /* libtensorflowlite.so in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,6 +119,7 @@
 			isa = PBXGroup;
 			children = (
 				CB255A9428C7237A005C8A81 /* SkinAnaMPBase */,
+				CBDA6B9528D5550B00BE0756 /* LMExporter */,
 				CB255A9328C7237A005C8A81 /* Products */,
 				2602327728CCC52E00B11D7A /* Frameworks */,
 			);
@@ -101,6 +129,7 @@
 			isa = PBXGroup;
 			children = (
 				CB255A9228C7237A005C8A81 /* SkinAnaMPBase */,
+				CBDA6B9428D5550B00BE0756 /* LMExporter */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -153,6 +182,16 @@
 			path = EXIF;
 			sourceTree = "<group>";
 		};
+		CBDA6B9528D5550B00BE0756 /* LMExporter */ = {
+			isa = PBXGroup;
+			children = (
+				CBDBD7AF28D561FF00F3AD03 /* LM_Exporter.cpp */,
+				CBDBD7B028D561FF00F3AD03 /* LM_Exporter.hpp */,
+				CBDA6B9628D5550B00BE0756 /* main.cpp */,
+			);
+			path = LMExporter;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -174,6 +213,24 @@
 			productReference = CB255A9228C7237A005C8A81 /* SkinAnaMPBase */;
 			productType = "com.apple.product-type.tool";
 		};
+		CBDA6B9328D5550B00BE0756 /* LMExporter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CBDA6B9828D5550B00BE0756 /* Build configuration list for PBXNativeTarget "LMExporter" */;
+			buildPhases = (
+				CBDA6B9028D5550B00BE0756 /* Sources */,
+				CBDA6B9128D5550B00BE0756 /* Frameworks */,
+				CBDA6B9228D5550B00BE0756 /* CopyFiles */,
+				CBDA6B9B28D557D600BE0756 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LMExporter;
+			productName = LMExporter;
+			productReference = CBDA6B9428D5550B00BE0756 /* LMExporter */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -185,6 +242,9 @@
 				TargetAttributes = {
 					CB255A9128C7237A005C8A81 = {
 						CreatedOnToolsVersion = 13.4.1;
+					};
+					CBDA6B9328D5550B00BE0756 = {
+						CreatedOnToolsVersion = 14.0;
 					};
 				};
 			};
@@ -202,12 +262,30 @@
 			projectRoot = "";
 			targets = (
 				CB255A9128C7237A005C8A81 /* SkinAnaMPBase */,
+				CBDA6B9328D5550B00BE0756 /* LMExporter */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		2602327A28CCCB7000B11D7A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncp ${TARGET_BUILD_DIR}/${TARGET_NAME} ${PROJECT_DIR}/bin/${TARGET_NAME}\n";
+		};
+		CBDA6B9B28D557D600BE0756 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -243,6 +321,18 @@
 				263B540528CD8B34004CF77D /* Utils.cpp in Sources */,
 				CBDA5B2628D2F0DD002A35E2 /* tinyxml2.cpp in Sources */,
 				CBAF932F28D3291000469F91 /* DetectRegion.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CBDA6B9028D5550B00BE0756 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CBDA6BA028D5603600BE0756 /* Utils.cpp in Sources */,
+				CBDA6B9E28D55FDC00BE0756 /* HeadPoseEst.cpp in Sources */,
+				CBDA6B9C28D55F6000BE0756 /* FaceLmAttenExtract.cpp in Sources */,
+				CBDA6B9728D5550B00BE0756 /* main.cpp in Sources */,
+				CBDBD7B128D561FF00F3AD03 /* LM_Exporter.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -408,6 +498,56 @@
 			};
 			name = Release;
 		};
+		CBDA6B9928D5550B00BE0756 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
+					"${PROJECT_DIR}/SkinAnaMPBase/include",
+					/Users/meicet/nlohmann_json/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/Cellar/opencv/4.6.0/lib,
+					"$(PROJECT_DIR)/SkinAnaMPBase/intel_lib",
+				);
+				OTHER_LDFLAGS = (
+					"-lopencv_core",
+					"-lopencv_imgcodecs",
+					"-lopencv_calib3d",
+					"-lopencv_highgui",
+					"-lopencv_imgproc",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		CBDA6B9A28D5550B00BE0756 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
+					"${PROJECT_DIR}/SkinAnaMPBase/include",
+					/Users/meicet/nlohmann_json/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/Cellar/opencv/4.6.0/lib,
+					"$(PROJECT_DIR)/SkinAnaMPBase/intel_lib",
+				);
+				OTHER_LDFLAGS = (
+					"-lopencv_core",
+					"-lopencv_imgcodecs",
+					"-lopencv_calib3d",
+					"-lopencv_highgui",
+					"-lopencv_imgproc",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -425,6 +565,15 @@
 			buildConfigurations = (
 				CB255A9A28C7237A005C8A81 /* Debug */,
 				CB255A9B28C7237A005C8A81 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CBDA6B9828D5550B00BE0756 /* Build configuration list for PBXNativeTarget "LMExporter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CBDA6B9928D5550B00BE0756 /* Debug */,
+				CBDA6B9A28D5550B00BE0756 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
