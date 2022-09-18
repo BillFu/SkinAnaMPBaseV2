@@ -10,13 +10,13 @@
 		2602327628CCBFB100B11D7A /* HeadPoseEst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2602327528CCBFB100B11D7A /* HeadPoseEst.cpp */; };
 		263B540228CD861C004CF77D /* AnnoImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540028CD861C004CF77D /* AnnoImage.cpp */; };
 		263B540528CD8B34004CF77D /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540428CD8B34004CF77D /* Utils.cpp */; };
-		264E012228D6BE2B00CB94D1 /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264E012128D6BE2B00CB94D1 /* Geometry.cpp */; };
 		264E012628D6C45B00CB94D1 /* EyebowMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264E012528D6C45B00CB94D1 /* EyebowMask.cpp */; };
 		264E012928D6C88A00CB94D1 /* DetectRegion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264E012728D6C88A00CB94D1 /* DetectRegion.cpp */; };
 		264E012C28D6C89200CB94D1 /* ForeheadCurve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264E012B28D6C89200CB94D1 /* ForeheadCurve.cpp */; };
 		26871D6928D631E200D299E4 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 2602327828CCC52E00B11D7A /* libtensorflowlite.so */; };
 		26DB15F528D69DEE00F195CF /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 2602327828CCC52E00B11D7A /* libtensorflowlite.so */; };
 		26E506B228D3665B000059DA /* LM_Loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E506B028D3665B000059DA /* LM_Loader.cpp */; };
+		26F952DC28D6EAB600B837CB /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F952DB28D6EAB600B837CB /* Geometry.cpp */; };
 		CB14D51828D3F4E80095E321 /* FaceLmAttenExtract.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB14D51628D3F4E80095E321 /* FaceLmAttenExtract.cpp */; };
 		CB255A9628C7237A005C8A81 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB255A9528C7237A005C8A81 /* main.cpp */; };
 		CB4312AA28D41DDD006D71DA /* ParametricBSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB4312A828D41DDD006D71DA /* ParametricBSpline.cpp */; };
@@ -59,8 +59,6 @@
 		263B540128CD861C004CF77D /* AnnoImage.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AnnoImage.hpp; sourceTree = "<group>"; };
 		263B540328CD8B34004CF77D /* Utils.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Utils.hpp; sourceTree = "<group>"; };
 		263B540428CD8B34004CF77D /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utils.cpp; sourceTree = "<group>"; };
-		264E012028D6BE2B00CB94D1 /* Geometry.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Geometry.hpp; sourceTree = "<group>"; };
-		264E012128D6BE2B00CB94D1 /* Geometry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Geometry.cpp; sourceTree = "<group>"; };
 		264E012428D6C45B00CB94D1 /* EyebowMask.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EyebowMask.hpp; sourceTree = "<group>"; };
 		264E012528D6C45B00CB94D1 /* EyebowMask.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EyebowMask.cpp; sourceTree = "<group>"; };
 		264E012728D6C88A00CB94D1 /* DetectRegion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DetectRegion.cpp; sourceTree = "<group>"; };
@@ -70,6 +68,8 @@
 		26E506B028D3665B000059DA /* LM_Loader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LM_Loader.cpp; sourceTree = "<group>"; };
 		26E506B128D3665B000059DA /* LM_loader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LM_loader.hpp; sourceTree = "<group>"; };
 		26F7BE6428CDE49500A83344 /* Common.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Common.hpp; sourceTree = "<group>"; };
+		26F952DA28D6EAB600B837CB /* Geometry.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Geometry.hpp; sourceTree = "<group>"; };
+		26F952DB28D6EAB600B837CB /* Geometry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Geometry.cpp; sourceTree = "<group>"; };
 		CB14D51628D3F4E80095E321 /* FaceLmAttenExtract.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FaceLmAttenExtract.cpp; sourceTree = "<group>"; };
 		CB14D51728D3F4E80095E321 /* FaceLmAttenExtract.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FaceLmAttenExtract.hpp; sourceTree = "<group>"; };
 		CB255A9228C7237A005C8A81 /* SkinAnaMPBase */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SkinAnaMPBase; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -124,6 +124,8 @@
 		264E012328D6C1DF00CB94D1 /* Mask */ = {
 			isa = PBXGroup;
 			children = (
+				26F952DB28D6EAB600B837CB /* Geometry.cpp */,
+				26F952DA28D6EAB600B837CB /* Geometry.hpp */,
 				264E012B28D6C89200CB94D1 /* ForeheadCurve.cpp */,
 				264E012A28D6C89200CB94D1 /* ForeheadCurve.hpp */,
 				264E012728D6C88A00CB94D1 /* DetectRegion.cpp */,
@@ -165,8 +167,6 @@
 				26E506B128D3665B000059DA /* LM_loader.hpp */,
 				CB14D51628D3F4E80095E321 /* FaceLmAttenExtract.cpp */,
 				CB14D51728D3F4E80095E321 /* FaceLmAttenExtract.hpp */,
-				264E012128D6BE2B00CB94D1 /* Geometry.cpp */,
-				264E012028D6BE2B00CB94D1 /* Geometry.hpp */,
 				26F7BE6428CDE49500A83344 /* Common.hpp */,
 				263B540428CD8B34004CF77D /* Utils.cpp */,
 				263B540328CD8B34004CF77D /* Utils.hpp */,
@@ -331,7 +331,6 @@
 				CB255A9628C7237A005C8A81 /* main.cpp in Sources */,
 				26E506B228D3665B000059DA /* LM_Loader.cpp in Sources */,
 				263B540228CD861C004CF77D /* AnnoImage.cpp in Sources */,
-				264E012228D6BE2B00CB94D1 /* Geometry.cpp in Sources */,
 				264E012628D6C45B00CB94D1 /* EyebowMask.cpp in Sources */,
 				CBDA5B2928D2F327002A35E2 /* EXIF_Extractor.cpp in Sources */,
 				2602327628CCBFB100B11D7A /* HeadPoseEst.cpp in Sources */,
@@ -339,6 +338,7 @@
 				CB4312AA28D41DDD006D71DA /* ParametricBSpline.cpp in Sources */,
 				263B540528CD8B34004CF77D /* Utils.cpp in Sources */,
 				264E012C28D6C89200CB94D1 /* ForeheadCurve.cpp in Sources */,
+				26F952DC28D6EAB600B837CB /* Geometry.cpp in Sources */,
 				CBDA5B2628D2F0DD002A35E2 /* tinyxml2.cpp in Sources */,
 				264E012928D6C88A00CB94D1 /* DetectRegion.cpp in Sources */,
 			);
