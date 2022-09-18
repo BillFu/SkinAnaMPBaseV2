@@ -174,8 +174,7 @@ Mat ForgeTwoEyesFullMask(const FaceInfo& faceInfo)
     ForgeOneEyeFullMask(faceInfo, LEFT_EYE, outMask);
     ForgeOneEyeFullMask(faceInfo, RIGHT_EYE, outMask);
     
-    /*
-    int dila_size = 30;
+    int dila_size = 20;
     Mat element = getStructuringElement(MORPH_ELLIPSE,
                            Size(2*dila_size + 1, 2*dila_size+1),
                            Point(dila_size, dila_size));
@@ -184,8 +183,8 @@ Mat ForgeTwoEyesFullMask(const FaceInfo& faceInfo)
     dilate(outMask, outExpandedMask, element);
     
     return outExpandedMask;
-    */
-    return outMask;
+    
+    //return outMask;
 }
 
 //-------------------------------------------------------------------------------------------
