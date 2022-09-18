@@ -97,6 +97,9 @@ void ExportLM_FullData(FaceInfo& faceInfo, const char* outFileName)
     ofstream outFile;
     outFile.open (outFileName);
 
+    outFile << "width, height" << endl;
+    outFile << faceInfo.imgWidth << "  " << faceInfo.imgHeight << endl;
+
     outFile << "lm_3d, 468" << endl;
     for(int i = 0; i<468; i++)
     {

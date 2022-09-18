@@ -1,2 +1,2 @@
-bin/SkinAnaMPBase config.json
+./bin/SkinAnaMPBase config.json
 

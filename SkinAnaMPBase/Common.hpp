@@ -30,13 +30,12 @@ typedef unique_ptr<tflite::Interpreter> INTERPRETER;
 typedef unique_ptr<FlatBufferModel> TF_LITE_MODEL;
 
 typedef vector<Point2i> POLYGON;
-
 typedef vector<POLYGON> POLYGON_GROUP;
 
 enum EyeID
 {
-    LeftEyeID,
-    RightEyeID
+    LEFT_EYE,
+    RIGHT_EYE
 };
 
 struct HeadPose
@@ -48,6 +47,9 @@ struct HeadPose
 
 struct FaceInfo
 {
+    int imgWidth;  // source image
+    int imgHeight;
+    
     //[n][0] for x, [n][1] for y
     // measured in source iamge coordinate system
     float lm_3d[468][3];  // x, y, z

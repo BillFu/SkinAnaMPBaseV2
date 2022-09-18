@@ -25,6 +25,11 @@ Mat contour2mask(int img_width, int img_height, const POLYGON& contours)
     return mask;
 }
 
+void Contour2Mask(int img_width, int img_height, const POLYGON& contours, Mat& outMask)
+{
+    cv::fillPoly(outMask, contours, cv::Scalar(255));
+}
+
 Mat ContourGroup2Mask(int img_width, int img_height, const POLYGON_GROUP& contoursGroup)
 {
     cv::Mat mask(img_height, img_width, CV_8UC1, cv::Scalar(0));
@@ -120,7 +125,7 @@ void ForgeOneEyebowPolygon(const FaceInfo& faceInfo, EyeID eyeID, POLYGON& eyebo
         
         int x, y;
         
-        if(eyeID == LeftEyeID)
+        if(eyeID == LEFT_EYE)
         {
             x = faceInfo.leftEyeRefinePts[index][0];
             y = faceInfo.leftEyeRefinePts[index][1];
@@ -140,36 +145,95 @@ void ForgeOneEyebowPolygon(const FaceInfo& faceInfo, EyeID eyeID, POLYGON& eyebo
 }
 
 //-------------------------------------------------------------------------------------------
-void ForgeSkinMask(int img_width, int img_height,
-                   const FaceInfo& faceInfo, Mat& outMask)
+void ForgeSkinMask(const FaceInfo& faceInfo, Mat& outMask)
 {
     POLYGON skinPolygon;
     ForgeSkinPolygon(faceInfo, skinPolygon);
-    outMask = contour2mask(img_width, img_height, skinPolygon);
+    outMask = contour2mask(faceInfo.imgWidth, faceInfo.imgHeight, skinPolygon);
 }
 
 
-void ForgeMouthMask(int img_width, int img_height,
-                   const FaceInfo& faceInfo, Mat& outMask)
+void ForgeMouthMask(const FaceInfo& faceInfo, Mat& outMask)
 {
     POLYGON polygon;
     ForgeMouthPolygon(faceInfo, polygon);
-    outMask = contour2mask(img_width, img_height, polygon);
+    outMask = contour2mask(faceInfo.imgWidth, faceInfo.imgHeight, polygon);
 }
 
 
-void ForgeTwoEyebowsMask(int img_width, int img_height,
-                    const FaceInfo& faceInfo, Mat& outMask)
+void ForgeTwoEyebowsMask(const FaceInfo& faceInfo, Mat& outMask)
 {
     POLYGON leftEyeBowPolygon, rightEyeBowPolygon;
-    ForgeOneEyebowPolygon(faceInfo, LeftEyeID, leftEyeBowPolygon);
-    ForgeOneEyebowPolygon(faceInfo, RightEyeID, rightEyeBowPolygon);
+    ForgeOneEyebowPolygon(faceInfo, LEFT_EYE, leftEyeBowPolygon);
+    ForgeOneEyebowPolygon(faceInfo, RIGHT_EYE, rightEyeBowPolygon);
     
     POLYGON_GROUP polygonGroup;
     polygonGroup.push_back(leftEyeBowPolygon);
     polygonGroup.push_back(rightEyeBowPolygon);
     
-    outMask = ContourGroup2Mask(img_width, img_height, polygonGroup);
+    outMask = ContourGroup2Mask(faceInfo.imgWidth, faceInfo.imgHeight, polygonGroup);
+}
+
+//-------------------------------------------------------------------------------------------
+
+void ForgeOneEyeFullPolygon(const int eyeRefinePts[71][2], POLYGON& outPolygon)
+{
+    // 采用Lip Refine Region的点！
+    int fullEyeOuterPtIndices[] = {
+        // 顺时针计数
+        70, 68, 67, 66, 65, 64, 63, 54,  // 下外轮廓线，从左到右
+        55, 56, 57, 58, 59, 60, 61, 62   // 上外轮廓线，从右到左
+    };
+    
+    int num_pts = sizeof(fullEyeOuterPtIndices) / sizeof(int);
+    
+    for(int i = 0; i<num_pts; i++)
+    {
+        int index = fullEyeOuterPtIndices[i];
+        
+        int x = eyeRefinePts[index][0];
+        int y = eyeRefinePts[index][1];
+        outPolygon.push_back(Point2i(x, y));
+    }
+}
+
+// EeyeFullMask包含眼睛、眉毛、眼袋的大范围区域
+void ForgeOneEyeFullMask(const FaceInfo& faceInfo, EyeID eyeID, Mat& outMask)
+{
+    POLYGON coarsePolygon, refinedPolygon;
+    
+    if(eyeID == LEFT_EYE)
+        ForgeOneEyeFullPolygon(faceInfo.leftEyeRefinePts, coarsePolygon);
+    else
+        ForgeOneEyeFullPolygon(faceInfo.rightEyeRefinePts, coarsePolygon);
+    
+    
+    
+    int csNumPoint = 50; //200;
+    ForgeClosedSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+
+    Contour2Mask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
+}
+
+Mat ForgeTwoEyesFullMask(const FaceInfo& faceInfo)
+{
+    cv::Mat outMask(faceInfo.imgHeight, faceInfo.imgWidth, CV_8UC1, cv::Scalar(0));
+
+    ForgeOneEyeFullMask(faceInfo, LEFT_EYE, outMask);
+    ForgeOneEyeFullMask(faceInfo, RIGHT_EYE, outMask);
+    
+    /*
+    int dila_size = 30;
+    Mat element = getStructuringElement(MORPH_ELLIPSE,
+                           Size(2*dila_size + 1, 2*dila_size+1),
+                           Point(dila_size, dila_size));
+    
+    cv::Mat outExpandedMask(faceInfo.imgHeight, faceInfo.imgWidth, CV_8UC1, cv::Scalar(0));
+    dilate(outMask, outExpandedMask, element);
+    
+    return outExpandedMask;
+    */
+    return outMask;
 }
 
 //-------------------------------------------------------------------------------------------

@@ -106,28 +106,27 @@ int main(int argc, char **argv)
     imwrite(annoPoseImgFile, annoImage);
     
     Mat skinMask;
-    ForgeSkinMask(srcImgWidht, srcImgHeight, faceInfo, skinMask);
-    
     string faceMaskImgFile = config_json.at("FaceContourImage");
-
+    ForgeSkinMask(faceInfo, skinMask);
     OverlayMaskOnImage(srcImage, skinMask,
                         "face_contour", faceMaskImgFile.c_str());
 
     Mat mouthMask;
-    ForgeMouthMask(srcImgWidht, srcImgHeight, faceInfo, mouthMask);
-    
     string mouthMaskImgFile = config_json.at("MouthContourImage");
-
+    ForgeMouthMask(faceInfo, mouthMask);
     OverlayMaskOnImage(srcImage, mouthMask,
                         "mouth_contour", mouthMaskImgFile.c_str());
     
     Mat eyebowsMask;
-    ForgeTwoEyebowsMask(srcImgWidht, srcImgHeight, faceInfo, eyebowsMask);
-    
     string eyebowsMaskImgFile = config_json.at("EyebowsContourImage"); // 注意复数形式表示双眉
-
+    ForgeTwoEyebowsMask(faceInfo, eyebowsMask);
     OverlayMaskOnImage(srcImage, eyebowsMask,
                         "eyebows_contour", eyebowsMaskImgFile.c_str());
+    
+    string eyeFullMaskImgFile = config_json.at("EyeFullContourImage");
+    Mat eyesFullMask = ForgeTwoEyesFullMask(faceInfo);
+    OverlayMaskOnImage(annoImage, eyesFullMask,
+                        "eye_full_contour", eyeFullMaskImgFile.c_str());
     
     return 0;
 }

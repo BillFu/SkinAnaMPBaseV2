@@ -27,21 +27,23 @@ using namespace cv;
 ***********************************************************************************************/
 
 Mat Contour2Mask(int img_width, int img_height, const POLYGON& contours);
+void Contour2Mask(int img_width, int img_height, const POLYGON& contours, Mat& outMask);
 
 Mat ContourGroup2Mask(int img_width, int img_height, const POLYGON_GROUP& contoursGroup);
 
 void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon);
 //-------------------------------------------------------------------------------------------
 
-void ForgeSkinMask(int img_width, int img_height,
-                   const FaceInfo& faceInfo, Mat& outMask);
+void ForgeSkinMask(const FaceInfo& faceInfo, Mat& outMask);
 
-void ForgeMouthMask(int img_width, int img_height,
-                    const FaceInfo& faceInfo, Mat& outMask);
+void ForgeMouthMask(const FaceInfo& faceInfo, Mat& outMask);
 
-void ForgeTwoEyebowsMask(int img_width, int img_height,
-                    const FaceInfo& faceInfo, Mat& outMask);
+void ForgeTwoEyebowsMask(const FaceInfo& faceInfo, Mat& outMask);
 
+// EeyeFullMask包含眼睛、眉毛、眼袋的大范围区域
+void ForgeOneEyeFullMask(const FaceInfo& faceInfo, EyeID eyeID, Mat& outMask);
+
+Mat ForgeTwoEyesFullMask(const FaceInfo& faceInfo);
 //-------------------------------------------------------------------------------------------
 void OverlayMaskOnImage(const Mat& srcImg, const Mat& mask,
                         const string& maskName,

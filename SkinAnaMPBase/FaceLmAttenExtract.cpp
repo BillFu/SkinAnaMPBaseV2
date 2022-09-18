@@ -101,6 +101,9 @@ bool ExtractFaceLmAtten(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
                     float confThresh, bool& hasFace, float& confidence,
                     FaceInfo& faceInfo, string& errorMsg)
 {
+    faceInfo.imgWidth = srcImage.cols;
+    faceInfo.imgHeight = srcImage.rows;
+
     // Initiate Interpreter
     INTERPRETER interpreter;
     tflite::ops::builtin::BuiltinOpResolver resolver;

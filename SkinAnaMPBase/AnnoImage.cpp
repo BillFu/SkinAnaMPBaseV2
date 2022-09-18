@@ -75,7 +75,7 @@ void AnnoOneEyeRefinePts(Mat& annoImage, const FaceInfo& faceInfo, EyeID eyeID,
     for(int i = 0; i < 71; i++)
     {
         int x, y;
-        if(eyeID == LeftEyeID)
+        if(eyeID == LEFT_EYE)
         {
             x = faceInfo.leftEyeRefinePts[i][0];
             y = faceInfo.leftEyeRefinePts[i][1];
@@ -105,8 +105,8 @@ void AnnoOneEyeRefinePts(Mat& annoImage, const FaceInfo& faceInfo, EyeID eyeID,
 void AnnoTwoEyeRefinePts(Mat& annoImage, const FaceInfo& faceInfo,
                          const Scalar& drawColor, bool showIndices)
 {
-    AnnoOneEyeRefinePts(annoImage, faceInfo, LeftEyeID, drawColor, showIndices);
-    AnnoOneEyeRefinePts(annoImage, faceInfo, RightEyeID, drawColor, showIndices);
+    AnnoOneEyeRefinePts(annoImage, faceInfo, LEFT_EYE, drawColor, showIndices);
+    AnnoOneEyeRefinePts(annoImage, faceInfo, RIGHT_EYE, drawColor, showIndices);
 }
 
 //-----------------------------------------------------------------------------------------

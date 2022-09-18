@@ -11,6 +11,7 @@
 		263B540228CD861C004CF77D /* AnnoImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540028CD861C004CF77D /* AnnoImage.cpp */; };
 		263B540528CD8B34004CF77D /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540428CD8B34004CF77D /* Utils.cpp */; };
 		26871D6928D631E200D299E4 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 2602327828CCC52E00B11D7A /* libtensorflowlite.so */; };
+		26DB15F528D69DEE00F195CF /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 2602327828CCC52E00B11D7A /* libtensorflowlite.so */; };
 		26E506B228D3665B000059DA /* LM_Loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E506B028D3665B000059DA /* LM_Loader.cpp */; };
 		CB14D51828D3F4E80095E321 /* FaceLmAttenExtract.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB14D51628D3F4E80095E321 /* FaceLmAttenExtract.cpp */; };
 		CB255A9628C7237A005C8A81 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB255A9528C7237A005C8A81 /* main.cpp */; };
@@ -24,7 +25,6 @@
 		CBDA6B9C28D55F6000BE0756 /* FaceLmAttenExtract.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB14D51628D3F4E80095E321 /* FaceLmAttenExtract.cpp */; };
 		CBDA6B9E28D55FDC00BE0756 /* HeadPoseEst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2602327528CCBFB100B11D7A /* HeadPoseEst.cpp */; };
 		CBDA6BA028D5603600BE0756 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540428CD8B34004CF77D /* Utils.cpp */; };
-		CBDA6BA128D560AD00BE0756 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CB3C248E28D00BA300804E6E /* libtensorflowlite.so */; };
 		CBDBD7B128D561FF00F3AD03 /* LM_Exporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDBD7AF28D561FF00F3AD03 /* LM_Exporter.cpp */; };
 /* End PBXBuildFile section */
 
@@ -98,7 +98,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CBDA6BA128D560AD00BE0756 /* libtensorflowlite.so in Frameworks */,
+				26DB15F528D69DEE00F195CF /* libtensorflowlite.so in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -506,13 +506,14 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = (
-					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
+					/opt/homebrew/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/SkinAnaMPBase/include",
-					/Users/meicet/nlohmann_json/include,
+					/Users/fuliye/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					/usr/local/Cellar/opencv/4.6.0/lib,
+					/opt/homebrew/Cellar/opencv/4.6.0/lib,
 					"$(PROJECT_DIR)/SkinAnaMPBase/intel_lib",
+					"$(PROJECT_DIR)/SkinAnaMPBase/m1_lib",
 				);
 				OTHER_LDFLAGS = (
 					"-lopencv_core",
@@ -531,13 +532,14 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = (
-					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
+					/opt/homebrew/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/SkinAnaMPBase/include",
-					/Users/meicet/nlohmann_json/include,
+					/Users/fuliye/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					/usr/local/Cellar/opencv/4.6.0/lib,
+					/opt/homebrew/Cellar/opencv/4.6.0/lib,
 					"$(PROJECT_DIR)/SkinAnaMPBase/intel_lib",
+					"$(PROJECT_DIR)/SkinAnaMPBase/m1_lib",
 				);
 				OTHER_LDFLAGS = (
 					"-lopencv_core",
