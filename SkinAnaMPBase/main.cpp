@@ -12,7 +12,8 @@
 #include "AnnoImage.hpp"
 //#include "EXIF_Extractor.hpp"
 #include "LM_loader.hpp"
-#include "DetectRegion.hpp"
+#include "Mask/DetectRegion.hpp"
+#include "Mask/EyebowMask.hpp"
 
 //using namespace tflite;
 using namespace std;

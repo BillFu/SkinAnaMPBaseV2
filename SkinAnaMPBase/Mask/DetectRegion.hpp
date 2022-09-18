@@ -38,7 +38,6 @@ void ForgeSkinMask(const FaceInfo& faceInfo, Mat& outMask);
 
 void ForgeMouthMask(const FaceInfo& faceInfo, Mat& outMask);
 
-void ForgeTwoEyebowsMask(const FaceInfo& faceInfo, Mat& outMask);
 
 // EeyeFullMask包含眼睛、眉毛、眼袋的大范围区域
 void ForgeOneEyeFullMask(const FaceInfo& faceInfo, EyeID eyeID, Mat& outMask);
