@@ -115,8 +115,9 @@ void ForgeMouthPolygon(const FaceInfo& faceInfo, POLYGON& mouthPolygon)
 void ForgeOneEyebowPolygon(const FaceInfo& faceInfo, EyeID eyeID, POLYGON& eyebowPolygon)
 {
     // 采用Eye Refine Region的点，左眉毛、右眉毛的坐标索引是相同的！
-    int eyeBowPtIndices[] = {69, 68, 67, 66, 65, 64, 50, 43, 44, 45};
-    
+    int eyeBowPtIndices[] = {69, 68, 66, 65, 64, 50, 43, 45};
+    //int eyeBowPtIndices[] = {69, 68, 67, 66, 65, 64, 50, 43, 44, 45};
+
     POLYGON coarseEyebowPolygon;
     int num_pts = sizeof(eyeBowPtIndices) / sizeof(int);
     for(int i = 0; i<num_pts; i++)
@@ -179,15 +180,8 @@ void ForgeTwoEyebowsMask(const FaceInfo& faceInfo, Mat& outMask)
 void ForgeOneEyeFullPolygon(const int eyeRefinePts[71][2], POLYGON& outPolygon)
 {
     // 采用Lip Refine Region的点！
-    int fullEyeOuterPtIndices[] = {
-        // 顺时针计数
-        // 下外轮廓线，从左到右
-        70, 68,
-        // 67,
-        66, 65, 64,
-        //63,
-        54,  // 下外轮廓线，从左到右
-        //55,
+    int fullEyeOuterPtIndices[] = { // 顺时针计数
+        70, 68, 66, 65, 64, 54,  // 下外轮廓线，从左到右
         56, 57, 58, 59, 60, 61, 62   // 上外轮廓线，从右到左
     };
     

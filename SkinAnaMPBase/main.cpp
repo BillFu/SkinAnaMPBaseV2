@@ -120,7 +120,7 @@ int main(int argc, char **argv)
     Mat eyebowsMask;
     string eyebowsMaskImgFile = config_json.at("EyebowsContourImage"); // 注意复数形式表示双眉
     ForgeTwoEyebowsMask(faceInfo, eyebowsMask);
-    OverlayMaskOnImage(srcImage, eyebowsMask,
+    OverlayMaskOnImage(annoImage, eyebowsMask,
                         "eyebows_contour", eyebowsMaskImgFile.c_str());
     
     string eyeFullMaskImgFile = config_json.at("EyeFullContourImage");
