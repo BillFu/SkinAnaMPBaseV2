@@ -181,8 +181,14 @@ void ForgeOneEyeFullPolygon(const int eyeRefinePts[71][2], POLYGON& outPolygon)
     // 采用Lip Refine Region的点！
     int fullEyeOuterPtIndices[] = {
         // 顺时针计数
-        70, 68, 67, 66, 65, 64, 63, 54,  // 下外轮廓线，从左到右
-        55, 56, 57, 58, 59, 60, 61, 62   // 上外轮廓线，从右到左
+        // 下外轮廓线，从左到右
+        70, 68,
+        // 67,
+        66, 65, 64,
+        //63,
+        54,  // 下外轮廓线，从左到右
+        //55,
+        56, 57, 58, 59, 60, 61, 62   // 上外轮廓线，从右到左
     };
     
     int num_pts = sizeof(fullEyeOuterPtIndices) / sizeof(int);
@@ -258,5 +264,6 @@ void OverlayMaskOnImage(const Mat& srcImg, const Mat& mask,
     Scalar blueColor(255, 0, 0);  // BGR
     putText(outImg, "SkinAnaMPBase: " + maskName, Point(100, 100),
                     FONT_HERSHEY_SIMPLEX, 2, blueColor, 2);
-    bool isSucceeded = imwrite(out_filename, outImg);
+    //bool isSucceeded =
+    imwrite(out_filename, outImg);
 }
