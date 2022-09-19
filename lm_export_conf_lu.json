@@ -1,5 +1,0 @@
-{
-	"FaceMeshAttenModelFile": 		"models/face_landmark_with_attention.tflite",
-	"SourceImage":					"images/Lu/cross_35.jpg",
-	"OutLmFile": 				    "export_lm/Lu/lm_cross_35.txt"
-}

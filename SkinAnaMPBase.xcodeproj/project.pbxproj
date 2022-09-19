@@ -13,12 +13,12 @@
 		264E012628D6C45B00CB94D1 /* EyebowMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264E012528D6C45B00CB94D1 /* EyebowMask.cpp */; };
 		264E012928D6C88A00CB94D1 /* DetectRegion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264E012728D6C88A00CB94D1 /* DetectRegion.cpp */; };
 		264E012C28D6C89200CB94D1 /* ForeheadCurve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264E012B28D6C89200CB94D1 /* ForeheadCurve.cpp */; };
-		26871D6928D631E200D299E4 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 2602327828CCC52E00B11D7A /* libtensorflowlite.so */; };
 		26DB15F528D69DEE00F195CF /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 2602327828CCC52E00B11D7A /* libtensorflowlite.so */; };
 		26E506B228D3665B000059DA /* LM_Loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E506B028D3665B000059DA /* LM_Loader.cpp */; };
 		26F952DC28D6EAB600B837CB /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F952DB28D6EAB600B837CB /* Geometry.cpp */; };
 		CB14D51828D3F4E80095E321 /* FaceLmAttenExtract.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB14D51628D3F4E80095E321 /* FaceLmAttenExtract.cpp */; };
 		CB255A9628C7237A005C8A81 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB255A9528C7237A005C8A81 /* main.cpp */; };
+		CB3AF83F28D7F21E003772EF /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CB3C248E28D00BA300804E6E /* libtensorflowlite.so */; };
 		CB4312AA28D41DDD006D71DA /* ParametricBSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB4312A828D41DDD006D71DA /* ParametricBSpline.cpp */; };
 		CBDA5B2528D2F0DD002A35E2 /* TinyEXIF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA5B2128D2F0DD002A35E2 /* TinyEXIF.cpp */; };
 		CBDA5B2628D2F0DD002A35E2 /* tinyxml2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA5B2228D2F0DD002A35E2 /* tinyxml2.cpp */; };
@@ -96,7 +96,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26871D6928D631E200D299E4 /* libtensorflowlite.so in Frameworks */,
+				CB3AF83F28D7F21E003772EF /* libtensorflowlite.so in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -474,12 +474,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				EXCLUDED_ARCHS = "";
 				HEADER_SEARCH_PATHS = (
-					/opt/homebrew/Cellar/opencv/4.6.0/include/opencv4,
+					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/SkinAnaMPBase/include",
-					/Users/fuliye/nlohmann_json/include,
+					/Users/meicet/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					/opt/homebrew/Cellar/opencv/4.6.0/lib,
+					/usr/local/Cellar/opencv/4.6.0/lib,
 					"$(PROJECT_DIR)/SkinAnaMPBase/intel_lib",
 					"$(PROJECT_DIR)/SkinAnaMPBase/m1_lib",
 				);
@@ -500,12 +500,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				EXCLUDED_ARCHS = "";
 				HEADER_SEARCH_PATHS = (
-					/opt/homebrew/Cellar/opencv/4.6.0/include/opencv4,
+					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/SkinAnaMPBase/include",
-					/Users/fuliye/nlohmann_json/include,
+					/Users/meicet/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					/opt/homebrew/Cellar/opencv/4.6.0/lib,
+					/usr/local/Cellar/opencv/4.6.0/lib,
 					"$(PROJECT_DIR)/SkinAnaMPBase/intel_lib",
 					"$(PROJECT_DIR)/SkinAnaMPBase/m1_lib",
 				);
@@ -526,9 +526,9 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = (
-					/opt/homebrew/Cellar/opencv/4.6.0/include/opencv4,
+					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/SkinAnaMPBase/include",
-					/Users/fuliye/nlohmann_json/include,
+					/Users/meicet/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/homebrew/Cellar/opencv/4.6.0/lib,
@@ -552,9 +552,9 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = (
-					/opt/homebrew/Cellar/opencv/4.6.0/include/opencv4,
+					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/SkinAnaMPBase/include",
-					/Users/fuliye/nlohmann_json/include,
+					/Users/meicet/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/homebrew/Cellar/opencv/4.6.0/lib,

@@ -1,5 +1,0 @@
-{
-	"FaceMeshAttenModelFile": 		"models/face_landmark_with_attention.tflite",
-	"SourceImage":					"images/ISEMECO/cross_2.jpg",
-	"OutLmFile": 				    "export_lm/ISEMECO/lm_cross_2.txt"
-}
