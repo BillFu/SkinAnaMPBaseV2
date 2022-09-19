@@ -1,0 +1,3 @@
+/usr/local/Cellar/opencv/4.6.0/include/opencv4 ${PROJECT_DIR}/SkinAnaMPBase/include /Users/meicet/nlohmann_json/include
+
+/usr/local/Cellar/opencv/4.6.0/lib $(PROJECT_DIR)/SkinAnaMPBase/intel_lib $(PROJECT_DIR)/SkinAnaMPBase/m1_lib
