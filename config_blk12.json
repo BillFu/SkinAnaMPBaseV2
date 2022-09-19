@@ -1,0 +1,9 @@
+{
+	"FaceMeshAttenModelFile": 			"models/face_landmark_with_attention.tflite",
+	"SourceImage":						"images/Black/cross_12.jpg",
+	"AnnoPoseImage": 					"result/Black/anno_cross_12.png",
+	"FaceContourImage": 				"result/Black/fc_cross_12.png",
+	"MouthContourImage": 				"result/Black/mc_cross_12.png",
+	"EyebowsContourImage": 				"result/Black/ebc_cross_12.png",
+	"EyeFullContourImage": 				"result/Black/efc_cross_12.png"
+}
