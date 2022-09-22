@@ -37,10 +37,11 @@ TF_LITE_MODEL LoadFaceMeshAttenModel(const char* faceMeshModelFileName);
  目前的推理是一次性的，即从模型加载到解释器创建，到推理，到结果提取，这一流程只负责完成一副人脸的LM提取。
  以后要让前半段的结果长期存活，用于连续推理，以提高效率。
  
-if confidence >= confThresh, then a face will be confirmed, hasFace will be assigned with true.
+if confidence >= confTh, then a face will be confirmed, hasFace will be assigned with true.
+Note: after invoking this function, return value and hasFace must be check!
 *******************************************************************************************/
 bool ExtractFaceLmAtten(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
-                    float confThresh, bool& hasFace, float& confidence,
+                    float confTh, bool& hasFace, float& confidence,
                     FaceInfo& faceInfo, string& errorMsg);
 
 #endif /* end of FACE_LM_ATTEN_EXTRACT_HPP */
