@@ -44,4 +44,18 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
                     float confTh, bool& hasFace, float& confidence,
                     FaceInfo& faceInfo, string& errorMsg);
 
+
+
+//-----------------------------------------------------------------------------------------
+
+/******************************************************************************************
+convert the coordinates of LM extracted from the Padded image into the coordinates
+of source image space.
+dummyFI: the coordiantes measured in padded image space.
+srcSpaceFI: the coordinates measured in the source iamge space.
+alpha: deltaH / srcH
+*******************************************************************************************/
+void padCoord2SrcCoord(int srcW, int srcH, float alpha,
+                       const FaceInfo& dummyFI, FaceInfo& srcSpaceFI);
+
 #endif /* end of FACE_LM_EXTRACT_HPP */

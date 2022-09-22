@@ -102,13 +102,13 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
                     float confTh, bool& hasFace, float& confidence,
                     FaceInfo& faceInfo, string& errorMsg)
 {
-    faceInfo.imgWidth = srcImage.cols;
-    faceInfo.imgHeight = srcImage.rows;
+    
 
     //------------------******preprocessing******-----------------------------------------------------------------
     // padding the source image to get better performance
     Mat paddedSrcImg;
-    MakeSquareImageV2(srcImage, 0.4, // 0.3 for deltaH / srcH
+    float alpha = 0.4; // deltaH / srcH
+    MakeSquareImageV2(srcImage, alpha,
                       paddedSrcImg);
 
     int padImgWidht = paddedSrcImg.cols;
@@ -165,8 +165,7 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     // Inference
     interpreter->Invoke();  // perform the inference
     
-    int output_conf_ID = interpreter->outputs()[6];  // confidence
-    //cout << "output confidence ID: " << output_conf_ID << endl;
+    //int output_conf_ID = interpreter->outputs()[6];  // confidence
     float* sigmoidConfPtr = interpreter->typed_output_tensor<float>(1);
     
     float sigmoidConf = *sigmoidConfPtr;
@@ -191,27 +190,86 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     i.e., the values are in the range: [0.0, 192.0].
     The values in lm_2d are measured in the coordinate system of the source image!
     */
-    extractOutputLM(srcImage.cols, srcImage.rows, LMOutBuffer,
-                         faceInfo.lm_3d, faceInfo.lm_2d);
+    FaceInfo dummyFaceInfo;
+    dummyFaceInfo.imgWidth = padImgWidht;
+    dummyFaceInfo.imgHeight = padImgHeight;
+    
+    extractOutputLM(padImgWidht, padImgHeight, LMOutBuffer,
+                    dummyFaceInfo.lm_3d, dummyFaceInfo.lm_2d);
 
     cout << "extractOutputLM() is well done!" << endl;
     
     float* outBufLeftEyeRefinePts = interpreter->typed_output_tensor<float>(2);
-    extractEyeRefinePts(srcImage.cols, srcImage.rows, outBufLeftEyeRefinePts, faceInfo.leftEyeRefinePts);
+    extractEyeRefinePts(padImgWidht, padImgHeight, outBufLeftEyeRefinePts, dummyFaceInfo.leftEyeRefinePts);
     
     float* outBufRightEyeRefinePts = interpreter->typed_output_tensor<float>(3);
-    extractEyeRefinePts(srcImage.cols, srcImage.rows, outBufRightEyeRefinePts, faceInfo.rightEyeRefinePts);
+    extractEyeRefinePts(padImgWidht, padImgHeight, outBufRightEyeRefinePts, dummyFaceInfo.rightEyeRefinePts);
     
     float* outBufLipRefinePts = interpreter->typed_output_tensor<float>(1);
 
-    extractLipRefinePts(srcImage.cols, srcImage.rows, outBufLipRefinePts, faceInfo.lipRefinePts);
+    extractLipRefinePts(padImgWidht, padImgHeight, outBufLipRefinePts, dummyFaceInfo.lipRefinePts);
     
     //-------------------------*****exit inference*****---------------------------------------------------------
 
     //-------------------------*****postprocessing*****---------------------------------------------------------
     // reverse coordinate transform
+    faceInfo.imgWidth = srcImage.cols;
+    faceInfo.imgHeight = srcImage.rows;
     
-    
+    padCoord2SrcCoord(srcImage.cols, srcImage.rows, alpha,
+                           dummyFaceInfo, faceInfo);
+
     errorMsg = "OK";
     return true;
+}
+
+//-----------------------------------------------------------------------------------------------
+// dH: alpha * H
+// dX: 0.5*(H + dH - W)
+// H: the height of the source image
+// W: the width of the source image
+// dHH: 0.5 * dH
+void padCoord2SrcCoord(int srcW, int srcH, int dX, int dHH,
+                       int padX, int padY, int& srcX, int& srcY)
+{
+    srcX = padX - dX;
+    srcY = padY - dHH;
+}
+
+void padCoord2SrcCoord(int srcW, int srcH, int dX, int dHH,
+                       const int padPt[][2], int numPt, int srcPt[][2])
+{
+    for(int i=0; i<numPt; i++)
+    {
+        padCoord2SrcCoord(srcW, srcH, dX, dHH,
+                          padPt[i][0], padPt[i][1],
+                          srcPt[i][0], srcPt[i][1]);
+    }
+}
+/**************************************************************************************************
+convert the coordinates of LM extracted from the Padded image into the coordinates
+of source image space.
+dummyFI: the coordiantes measured in padded image space.
+srcSpaceFI: the coordinates measured in the source iamge space.
+alpha: deltaH / srcH
+***************************************************************************************************/
+void padCoord2SrcCoord(int srcW, int srcH, float alpha,
+                       const FaceInfo& dummyFI, FaceInfo& srcSpaceFI)
+{
+    int dH = (int)(alpha * srcH);
+    int dX = (srcH + dH - srcW)/2;
+    int dHH = dH/2;
+    
+    padCoord2SrcCoord(srcW, srcH, dX, dHH,
+                      dummyFI.lm_2d, NUM_PT_GENERAL_LM, srcSpaceFI.lm_2d);
+
+    padCoord2SrcCoord(srcW, srcH, dX, dHH,
+                      dummyFI.leftEyeRefinePts, NUM_PT_EYE_REFINE_GROUP, srcSpaceFI.leftEyeRefinePts);
+    
+    padCoord2SrcCoord(srcW, srcH, dX, dHH,
+                      dummyFI.rightEyeRefinePts, NUM_PT_EYE_REFINE_GROUP, srcSpaceFI.rightEyeRefinePts);
+    
+    padCoord2SrcCoord(srcW, srcH, dX, dHH,
+                      dummyFI.lipRefinePts, NUM_PT_LIP_REFINE_GROUP, srcSpaceFI.lipRefinePts);
+
 }

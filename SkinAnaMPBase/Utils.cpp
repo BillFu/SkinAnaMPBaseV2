@@ -134,7 +134,7 @@ void MakeSquareImageV2(const Mat& srcImg, float deltaHRatio, Mat& squareImg)
             newH += 1;
         
         int padVertW = (newH - srcH) / 2;  // padding at top and bottom
-        int padSideW = (newH - srcW)/ 2;
+        int padSideW = (newH - srcW) / 2;
         
         copyMakeBorder( srcImg, squareImg,
                         padVertW, padVertW, //

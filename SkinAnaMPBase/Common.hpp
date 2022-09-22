@@ -45,6 +45,10 @@ struct HeadPose
     float roll;   // rotate with z-axis
 };
 
+#define NUM_PT_GENERAL_LM       468
+#define NUM_PT_EYE_REFINE_GROUP  71
+#define NUM_PT_LIP_REFINE_GROUP  80
+
 struct FaceInfo
 {
     int imgWidth;  // source image
@@ -52,13 +56,13 @@ struct FaceInfo
     
     //[n][0] for x, [n][1] for y
     // measured in source iamge coordinate system
-    float lm_3d[468][3];  // x, y, z
-    int   lm_2d[468][2];  // x, y，与上面的lm_3d中相同，只是数据类型不同
+    float lm_3d[NUM_PT_GENERAL_LM][3];  // x, y, z, Not used
+    int   lm_2d[NUM_PT_GENERAL_LM][2];  // x, y，与上面的lm_3d中相同，只是数据类型不同
     
-    int leftEyeRefinePts[71][2];
-    int rightEyeRefinePts[71][2];
+    int leftEyeRefinePts[NUM_PT_EYE_REFINE_GROUP][2];
+    int rightEyeRefinePts[NUM_PT_EYE_REFINE_GROUP][2];
     
-    int lipRefinePts[80][2];
+    int lipRefinePts[NUM_PT_LIP_REFINE_GROUP][2];
     
     HeadPose headPose;
 };
