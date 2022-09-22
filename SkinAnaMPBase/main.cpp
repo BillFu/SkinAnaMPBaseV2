@@ -8,9 +8,8 @@
 #include "nlohmann/json.hpp"
 
 #include "HeadPoseEst.hpp"
-#include "FaceLmAttenExtract.hpp"
+#include "FaceLmExtract.hpp"
 #include "AnnoImage.hpp"
-//#include "EXIF_Extractor.hpp"
 #include "LM_loader.hpp"
 #include "Mask/DetectRegion.hpp"
 #include "Mask/EyebowMask.hpp"
@@ -87,7 +86,7 @@ int main(int argc, char **argv)
     float confThresh = 0.75;
     bool hasFace = false;
     float confidence = 0.0;
-    bool isOK = ExtractFaceLmAtten(faceMeshModel, paddedSrcImg,
+    bool isOK = ExtractFaceLm(faceMeshModel, paddedSrcImg,
                               confThresh, hasFace, confidence,
                                    faceInfo, errorMsg);
     if(!isOK)

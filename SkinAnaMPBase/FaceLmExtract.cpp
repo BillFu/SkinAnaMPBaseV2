@@ -1,9 +1,9 @@
 //
-//  FaceLmExtract.cpp
+//  FaceLmAttenExtract.cpp
 
 /*******************************************************************************
 Author: Fu Xiaoqiang
-Date:   2022/9/11
+Date:   2022/9/13
 
 ********************************************************************************/
 
@@ -41,6 +41,42 @@ void extractOutputLM(int origImgWidth, int origImgHeight,
     }
 }
 
+void extractEyeRefinePts(int origImgWidth, int origImgHeight,
+                   float* outBufEyeBow, int EyeBowPts[71][2])
+{
+    float scale_x = origImgWidth / 192.0f;
+    float scale_y = origImgHeight / 192.0f;
+
+    for(int i=0; i<71; i++)
+    {
+        float x = outBufEyeBow[i*2];
+        float y = outBufEyeBow[i*2+1];
+
+        EyeBowPts[i][0] = (int)(x*scale_x);
+        EyeBowPts[i][1] = (int)(y*scale_y);
+    }
+}
+
+/*
+ outBufLipRefinePts: Input
+ lipRefinePts: Output
+ */
+void extractLipRefinePts(int origImgWidth, int origImgHeight,
+                         float* outBufLipRefinePts, int lipRefinePts[80][2])
+{
+    float scale_x = origImgWidth / 192.0f;
+    float scale_y = origImgHeight / 192.0f;
+
+    for(int i=0; i<80; i++)
+    {
+        float x = outBufLipRefinePts[i*2];
+        float y = outBufLipRefinePts[i*2+1];
+
+        lipRefinePts[i][0] = (int)(x*scale_x);
+        lipRefinePts[i][1] = (int)(y*scale_y);
+    }
+}
+
 //-----------------------------------------------------------------------------------------
 
 /******************************************************************************************
@@ -49,7 +85,7 @@ return True if all is well done, otherwise reurn False and give the error reason
 numThreads: 解释器推理时可以使用的线程数量，最低为1.
 *******************************************************************************************/
 
-TF_LITE_MODEL LoadFaceMeshModel(const char* faceMeshModelFileName)
+TF_LITE_MODEL LoadFaceMeshAttenModel(const char* faceMeshModelFileName)
 {
     unique_ptr<FlatBufferModel> face_lm_model = FlatBufferModel::BuildFromFile(faceMeshModelFileName);
     return face_lm_model;
@@ -60,11 +96,15 @@ TF_LITE_MODEL LoadFaceMeshModel(const char* faceMeshModelFileName)
 /******************************************************************************************
  目前的推理是一次性的，即从模型加载到解释器创建，到推理，到结果提取，这一流程只负责完成一副人脸的LM提取。
  以后要让前半段的结果长期存活，用于连续推理，以提高效率。
+ Note: after invoking this function, return value and hasFace must be check!
 *******************************************************************************************/
 bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
-                   float confThresh, bool& hasFace, float& confidence,
-                   float lm_3d[468][3], int lm_2d[468][2], string& errorMsg)
+                    float confTh, bool& hasFace, float& confidence,
+                    FaceInfo& faceInfo, string& errorMsg)
 {
+    faceInfo.imgWidth = srcImage.cols;
+    faceInfo.imgHeight = srcImage.rows;
+
     // Initiate Interpreter
     INTERPRETER interpreter;
     tflite::ops::builtin::BuiltinOpResolver resolver;
@@ -107,34 +147,52 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     cout << "ProcessInputWithFloatModel() is executed successfully!" << endl;
 
     // Inference
-    std::chrono::steady_clock::time_point start, end;
-    start = chrono::steady_clock::now();
+    //std::chrono::steady_clock::time_point start, end;
+    //start = chrono::steady_clock::now();
     interpreter->Invoke();  // perform the inference
-    end = chrono::steady_clock::now();
-    auto inference_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    //end = chrono::steady_clock::now();
+    //auto inference_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-    int output_conf_ID = interpreter->outputs()[1];  // confidence
+    int output_conf_ID = interpreter->outputs()[6];  // confidence
     //cout << "output confidence ID: " << output_conf_ID << endl;
-    float* confidencePtr = interpreter->typed_output_tensor<float>(1);
+    float* sigmoidConfPtr = interpreter->typed_output_tensor<float>(1);
     
-    float sigmaConf = *confidencePtr;
+    float sigmoidConf = *sigmoidConfPtr;
     
-    confidence = 1.0 / (1.0 + exp(-sigmaConf));
+    confidence = 1.0 / (1.0 + exp(-sigmoidConf));
     cout << "face confidence: " << confidence << endl;
+    if(confidence < confTh) // if confidence is too low, return immediately.
+    {
+        hasFace = false;
+        return true;
+    }
+    
+    hasFace = true;
 
     int output_lm_ID = interpreter->outputs()[0];
-    //cout << "output_landmarks ID: " << output_lm_ID << endl;
+    cout << "output_landmarks ID: " << output_lm_ID << endl;
     
-    float* netLMOutBuffer = interpreter->typed_output_tensor<float>(0);
+    float* LMOutBuffer = interpreter->typed_output_tensor<float>(0);
 
     /*
     The values in lm_3d are measured in the input coordinate system of our tf lite model,
     i.e., the values are in the range: [0.0, 192.0].
     The values in lm_2d are measured in the coordinate system of the source image!
     */
-    extractOutputLM(srcImage.cols, srcImage.rows, netLMOutBuffer, lm_3d, lm_2d);
+    extractOutputLM(srcImage.cols, srcImage.rows, LMOutBuffer,
+                         faceInfo.lm_3d, faceInfo.lm_2d);
 
     cout << "extractOutputLM() is well done!" << endl;
+    
+    float* outBufLeftEyeRefinePts = interpreter->typed_output_tensor<float>(2);
+    extractEyeRefinePts(srcImage.cols, srcImage.rows, outBufLeftEyeRefinePts, faceInfo.leftEyeRefinePts);
+    
+    float* outBufRightEyeRefinePts = interpreter->typed_output_tensor<float>(3);
+    extractEyeRefinePts(srcImage.cols, srcImage.rows, outBufRightEyeRefinePts, faceInfo.rightEyeRefinePts);
+    
+    float* outBufLipRefinePts = interpreter->typed_output_tensor<float>(1);
+
+    extractLipRefinePts(srcImage.cols, srcImage.rows, outBufLipRefinePts, faceInfo.lipRefinePts);
     
     errorMsg = "OK";
     return true;
