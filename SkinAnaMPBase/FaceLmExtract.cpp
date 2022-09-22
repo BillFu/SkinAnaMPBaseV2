@@ -105,6 +105,26 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     faceInfo.imgWidth = srcImage.cols;
     faceInfo.imgHeight = srcImage.rows;
 
+    //------------------******preprocessing******-----------------------------------------------------------------
+    // padding the source image to get better performance
+    Mat paddedSrcImg;
+    MakeSquareImageV2(srcImage, 0.4, // 0.3 for deltaH / srcH
+                      paddedSrcImg);
+
+    int padImgWidht = paddedSrcImg.cols;
+    int padImgHeight = paddedSrcImg.rows;
+    
+    int netInputWidth = 256;
+    int netInputHeight = 256;
+    // Copy image to input tensor
+    cv::Mat resized_image;  //, normal_image;
+    // Not need to perform the convertion from BGR to RGB by the noticeable statements,
+    // later it would be done in one trick way.
+    cv::resize(paddedSrcImg, resized_image, cv::Size(netInputWidth, netInputHeight), cv::INTER_NEAREST);
+
+    paddedSrcImg.release();
+    
+    //-------------------------*****enter inference*****---------------------------------------------------------
     // Initiate Interpreter
     INTERPRETER interpreter;
     tflite::ops::builtin::BuiltinOpResolver resolver;
@@ -131,28 +151,20 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     
     // Get Input Tensor Dimensions
     int inTensorIndex = interpreter->inputs()[0];
-    int netInputHeight = interpreter->tensor(inTensorIndex)->dims->data[1];
-    int netInputWidth = interpreter->tensor(inTensorIndex)->dims->data[2];
+    ///int netInputHeight = interpreter->tensor(inTensorIndex)->dims->data[1];
+    ///int netInputWidth = interpreter->tensor(inTensorIndex)->dims->data[2];
     int channels = interpreter->tensor(inTensorIndex)->dims->data[3];
     
-    // Copy image to input tensor
-    cv::Mat resized_image;  //, normal_image;
-    // Not need to perform the convertion from BGR to RGB by the noticeable statements,
-    // later it would be done in one trick way.
-    cv::resize(srcImage, resized_image, cv::Size(netInputWidth, netInputHeight), cv::INTER_NEAREST);
-
+    
     float* inputTensorBuffer = interpreter->typed_input_tensor<float>(inTensorIndex);
     uint8_t* inImgMem = resized_image.ptr<uint8_t>(0);
     FeedInputWithNormalizedImage(inImgMem, inputTensorBuffer, netInputHeight, netInputWidth, channels);
+    resized_image.release();
     cout << "ProcessInputWithFloatModel() is executed successfully!" << endl;
 
     // Inference
-    //std::chrono::steady_clock::time_point start, end;
-    //start = chrono::steady_clock::now();
     interpreter->Invoke();  // perform the inference
-    //end = chrono::steady_clock::now();
-    //auto inference_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-
+    
     int output_conf_ID = interpreter->outputs()[6];  // confidence
     //cout << "output confidence ID: " << output_conf_ID << endl;
     float* sigmoidConfPtr = interpreter->typed_output_tensor<float>(1);
@@ -193,6 +205,12 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     float* outBufLipRefinePts = interpreter->typed_output_tensor<float>(1);
 
     extractLipRefinePts(srcImage.cols, srcImage.rows, outBufLipRefinePts, faceInfo.lipRefinePts);
+    
+    //-------------------------*****exit inference*****---------------------------------------------------------
+
+    //-------------------------*****postprocessing*****---------------------------------------------------------
+    // reverse coordinate transform
+    
     
     errorMsg = "OK";
     return true;

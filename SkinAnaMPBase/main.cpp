@@ -71,22 +71,14 @@ int main(int argc, char **argv)
     else
         cout << "Succeeded to load image: " << srcImgFile << endl;
     
-    // !!! 就目前而言，后面的工作都是在paddedSrcImg上进行的。
-    // 以后加上坐标反变换，回到原始影像的坐标空间下工作。
-    Mat paddedSrcImg;
-
-    MakeSquareImageV2(srcImage, 0.4, // 0.3 for deltaH / srcH
-                      paddedSrcImg);
-
-    int padImgWidht = paddedSrcImg.cols;
-    int padImgHeight = paddedSrcImg.rows;
-
+    int srcImgW = srcImage.cols;
+    int srcImgH = srcImage.rows;
     FaceInfo faceInfo;
 
     float confThresh = 0.75;
     bool hasFace = false;
     float confidence = 0.0;
-    bool isOK = ExtractFaceLm(faceMeshModel, paddedSrcImg,
+    bool isOK = ExtractFaceLm(faceMeshModel, srcImage,
                               confThresh, hasFace, confidence,
                                    faceInfo, errorMsg);
     if(!isOK)
@@ -103,9 +95,9 @@ int main(int argc, char **argv)
         return 0;
     }
     
-    EstHeadPose(padImgWidht, padImgHeight, faceInfo);
+    EstHeadPose(srcImgW, srcImgH, faceInfo);
     
-    Mat annoImage = paddedSrcImg.clone();
+    Mat annoImage = srcImage.clone();
     
     //AnnoGeneralKeyPoints(annoImage, faceInfo);
 
@@ -122,13 +114,13 @@ int main(int argc, char **argv)
     Mat skinMask;
     string faceMaskImgFile = config_json.at("FaceContourImage");
     ForgeSkinMask(faceInfo, skinMask);
-    OverlayMaskOnImage(paddedSrcImg, skinMask,
+    OverlayMaskOnImage(srcImage, skinMask,
                         "face_contour", faceMaskImgFile.c_str());
 
     Mat mouthMask;
     string mouthMaskImgFile = config_json.at("MouthContourImage");
     ForgeMouthMask(faceInfo, mouthMask);
-    OverlayMaskOnImage(paddedSrcImg, mouthMask,
+    OverlayMaskOnImage(srcImage, mouthMask,
                         "mouth_contour", mouthMaskImgFile.c_str());
     
     Mat eyebowsMask;
