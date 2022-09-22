@@ -20,11 +20,12 @@ Date:   2022/9/13
 
     The returned argument, lm_2d, is measured in the coordinate system of the source image!
 */
+/*
 void extractOutputLM(int origImgWidth, int origImgHeight,
     float* netLMOutBuffer, float lm_3d[468][3], int lm_2d[468][2])
 {
-    float scale_x = origImgWidth / 192.0f;
-    float scale_y = origImgHeight / 192.0f;
+    float scale_x = origImgWidth / (float)FACE_MESH_NET_INPUT_W;
+    float scale_y = origImgHeight / (float)FACE_MESH_NET_INPUT_H;
 
     for(int i=0; i<468; i++)
     {
@@ -40,12 +41,35 @@ void extractOutputLM(int origImgWidth, int origImgHeight,
         lm_2d[i][1] = (int)(y*scale_y);
     }
 }
+*/
 
+// Normal here means the coordinate value lies in [0.0 1.0]
+void extractOutputLM(float* netLMOutBuffer, float lm_3d[468][3], double normal_lm_2d[468][2])
+{
+    double scale_x = 1.0 / (double)FACE_MESH_NET_INPUT_W;
+    double scale_y = 1.0 / (double)FACE_MESH_NET_INPUT_H;
+
+    for(int i=0; i<468; i++)
+    {
+        float x = netLMOutBuffer[i*3];
+        float y = netLMOutBuffer[i*3+1];
+        float z = netLMOutBuffer[i*3+2];
+
+        lm_3d[i][0] = x;
+        lm_3d[i][1] = y;
+        lm_3d[i][2] = z;
+
+        normal_lm_2d[i][0] = x*scale_x;
+        normal_lm_2d[i][1] = y*scale_y;
+    }
+}
+
+/*
 void extractEyeRefinePts(int origImgWidth, int origImgHeight,
                    float* outBufEyeBow, int EyeBowPts[71][2])
 {
-    float scale_x = origImgWidth / 192.0f;
-    float scale_y = origImgHeight / 192.0f;
+    float scale_x = origImgWidth / (float)FACE_MESH_NET_INPUT_W;
+    float scale_y = origImgHeight / (float)FACE_MESH_NET_INPUT_H;
 
     for(int i=0; i<71; i++)
     {
@@ -56,16 +80,34 @@ void extractEyeRefinePts(int origImgWidth, int origImgHeight,
         EyeBowPts[i][1] = (int)(y*scale_y);
     }
 }
+*/
+
+// Normal here means the coordinate value lies in [0.0 1.0]
+void extractEyeRefinePts(float* outBufEyeBow, double NormalEyeBowPts[71][2])
+{
+    double scale_x = 1.0 / (double)FACE_MESH_NET_INPUT_W;
+    double scale_y = 1.0 / (double)FACE_MESH_NET_INPUT_H;
+
+    for(int i=0; i<71; i++)
+    {
+        float x = outBufEyeBow[i*2];
+        float y = outBufEyeBow[i*2+1];
+
+        NormalEyeBowPts[i][0] = x*scale_x;
+        NormalEyeBowPts[i][1] = y*scale_y;
+    }
+}
 
 /*
  outBufLipRefinePts: Input
  lipRefinePts: Output
  */
+/*
 void extractLipRefinePts(int origImgWidth, int origImgHeight,
                          float* outBufLipRefinePts, int lipRefinePts[80][2])
 {
-    float scale_x = origImgWidth / 192.0f;
-    float scale_y = origImgHeight / 192.0f;
+    float scale_x = origImgWidth / (float)FACE_MESH_NET_INPUT_W;
+    float scale_y = origImgHeight / (float)FACE_MESH_NET_INPUT_H;
 
     for(int i=0; i<80; i++)
     {
@@ -74,6 +116,22 @@ void extractLipRefinePts(int origImgWidth, int origImgHeight,
 
         lipRefinePts[i][0] = (int)(x*scale_x);
         lipRefinePts[i][1] = (int)(y*scale_y);
+    }
+}
+*/
+
+void extractLipRefinePts(float* outBufLipRefinePts, double NormalLipRefinePts[80][2])
+{
+    double scale_x = 1.0 / (double)FACE_MESH_NET_INPUT_W;
+    double scale_y = 1.0 / (double)FACE_MESH_NET_INPUT_H;
+
+    for(int i=0; i<80; i++)
+    {
+        float x = outBufLipRefinePts[i*2];
+        float y = outBufLipRefinePts[i*2+1];
+
+        NormalLipRefinePts[i][0] = x*scale_x;
+        NormalLipRefinePts[i][1] = y*scale_y;
     }
 }
 
@@ -191,24 +249,29 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     i.e., the values are in the range: [0.0, 192.0].
     The values in lm_2d are measured in the coordinate system of the source image!
     */
-    FaceInfo dummyFaceInfo;
-    dummyFaceInfo.imgWidth = padImgWidht;
-    dummyFaceInfo.imgHeight = padImgHeight;
+    //FaceInfo dummyFaceInfo;
+    //dummyFaceInfo.imgWidth = padImgWidht;
+    //dummyFaceInfo.imgHeight = padImgHeight;
     
-    extractOutputLM(padImgWidht, padImgHeight, LMOutBuffer,
-                    dummyFaceInfo.lm_3d, dummyFaceInfo.lm_2d);
+    float lm_3d[NUM_PT_GENERAL_LM][3];
+    double normal_lm_2d[NUM_PT_GENERAL_LM][2];
+    
+    extractOutputLM(LMOutBuffer,
+                    lm_3d, normal_lm_2d);
 
     cout << "extractOutputLM() is well done!" << endl;
     
+    double LNorEyeBowPts[NUM_PT_EYE_REFINE_GROUP][2];
     float* outBufLeftEyeRefinePts = interpreter->typed_output_tensor<float>(2);
-    extractEyeRefinePts(padImgWidht, padImgHeight, outBufLeftEyeRefinePts, dummyFaceInfo.leftEyeRefinePts);
+    extractEyeRefinePts(outBufLeftEyeRefinePts, LNorEyeBowPts);
     
+    double RNorEyeBowPts[NUM_PT_EYE_REFINE_GROUP][2];
     float* outBufRightEyeRefinePts = interpreter->typed_output_tensor<float>(3);
-    extractEyeRefinePts(padImgWidht, padImgHeight, outBufRightEyeRefinePts, dummyFaceInfo.rightEyeRefinePts);
+    extractEyeRefinePts(outBufRightEyeRefinePts, RNorEyeBowPts);
     
+    double NorLipRefinePts[NUM_PT_LIP_REFINE_GROUP][2];
     float* outBufLipRefinePts = interpreter->typed_output_tensor<float>(1);
-
-    extractLipRefinePts(padImgWidht, padImgHeight, outBufLipRefinePts, dummyFaceInfo.lipRefinePts);
+    extractLipRefinePts(outBufLipRefinePts, NorLipRefinePts);
     
     //-------------------------*****exit inference*****---------------------------------------------------------
 
@@ -255,7 +318,11 @@ srcSpaceFI: the coordinates measured in the source iamge space.
 alpha: deltaH / srcH
 ***************************************************************************************************/
 void padCoord2SrcCoord(int srcW, int srcH, float alpha,
-                       const FaceInfo& dummyFI, FaceInfo& srcSpaceFI)
+                       double normal_lm_2d[NUM_PT_GENERAL_LM][2],
+                       double LNorEyeBowPts[NUM_PT_EYE_REFINE_GROUP][2],
+                       double RNorEyeBowPts[NUM_PT_EYE_REFINE_GROUP][2],
+                       double NorLipRefinePts[NUM_PT_LIP_REFINE_GROUP][2],
+                       FaceInfo& srcSpaceFI)
 {
     int dH = (int)(alpha * srcH);
     int dX = (srcH + dH - srcW)/2;
