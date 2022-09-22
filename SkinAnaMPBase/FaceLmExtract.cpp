@@ -114,8 +114,9 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     int padImgWidht = paddedSrcImg.cols;
     int padImgHeight = paddedSrcImg.rows;
     
-    int netInputWidth = 256;
-    int netInputHeight = 256;
+    int netInputWidth = FACE_MESH_NET_INPUT_W;
+    int netInputHeight = FACE_MESH_NET_INPUT_H;
+    
     // Copy image to input tensor
     cv::Mat resized_image;  //, normal_image;
     // Not need to perform the convertion from BGR to RGB by the noticeable statements,

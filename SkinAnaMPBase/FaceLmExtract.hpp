@@ -21,6 +21,9 @@ using namespace std;
 using namespace cv;
 using namespace tflite;
 
+#define FACE_MESH_NET_INPUT_W 192
+#define FACE_MESH_NET_INPUT_H 192
+
 //-----------------------------------------------------------------------------------------
 
 /******************************************************************************************
