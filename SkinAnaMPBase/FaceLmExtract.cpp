@@ -157,15 +157,14 @@ TF_LITE_MODEL LoadFaceMeshAttenModel(const char* faceMeshModelFileName)
  Note: after invoking this function, return value and hasFace must be check!
 *******************************************************************************************/
 bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
-                    float confTh, bool& hasFace, float& confidence,
-                    FaceInfo& faceInfo, string& errorMsg)
+                   float vertPadRatio,
+                   float confTh, bool& hasFace, float& confidence,
+                   FaceInfo& faceInfo, string& errorMsg)
 {
-    
-
     //------------------******preprocessing******-----------------------------------------------------------------
     // padding the source image to get better performance
     Mat paddedSrcImg;
-    float alpha = 0.4; // deltaH / srcH
+    float alpha = vertPadRatio; // deltaH / srcH
     MakeSquareImageV2(srcImage, alpha,
                       paddedSrcImg);
 
@@ -254,24 +253,23 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     //dummyFaceInfo.imgHeight = padImgHeight;
     
     float lm_3d[NUM_PT_GENERAL_LM][3];
-    double normal_lm_2d[NUM_PT_GENERAL_LM][2];
-    
+    NormalLmSet normalLmSet;
     extractOutputLM(LMOutBuffer,
-                    lm_3d, normal_lm_2d);
+                    lm_3d, normalLmSet.normal_lm_2d);
 
     cout << "extractOutputLM() is well done!" << endl;
     
-    double LNorEyeBowPts[NUM_PT_EYE_REFINE_GROUP][2];
+    //double LNorEyeBowPts[NUM_PT_EYE_REFINE_GROUP][2];
     float* outBufLeftEyeRefinePts = interpreter->typed_output_tensor<float>(2);
-    extractEyeRefinePts(outBufLeftEyeRefinePts, LNorEyeBowPts);
+    extractEyeRefinePts(outBufLeftEyeRefinePts, normalLmSet.LNorEyeBowPts);
     
-    double RNorEyeBowPts[NUM_PT_EYE_REFINE_GROUP][2];
+    //double RNorEyeBowPts[NUM_PT_EYE_REFINE_GROUP][2];
     float* outBufRightEyeRefinePts = interpreter->typed_output_tensor<float>(3);
-    extractEyeRefinePts(outBufRightEyeRefinePts, RNorEyeBowPts);
+    extractEyeRefinePts(outBufRightEyeRefinePts, normalLmSet.RNorEyeBowPts);
     
-    double NorLipRefinePts[NUM_PT_LIP_REFINE_GROUP][2];
+    //double NorLipRefinePts[NUM_PT_LIP_REFINE_GROUP][2];
     float* outBufLipRefinePts = interpreter->typed_output_tensor<float>(1);
-    extractLipRefinePts(outBufLipRefinePts, NorLipRefinePts);
+    extractLipRefinePts(outBufLipRefinePts, normalLmSet.NorLipRefinePts);
     
     //-------------------------*****exit inference*****---------------------------------------------------------
 
@@ -280,8 +278,9 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     faceInfo.imgWidth = srcImage.cols;
     faceInfo.imgHeight = srcImage.rows;
     
-    padCoord2SrcCoord(srcImage.cols, srcImage.rows, alpha,
-                           dummyFaceInfo, faceInfo);
+    padCoord2SrcCoord(padImgWidht, padImgHeight,
+                      srcImage.cols, srcImage.rows, alpha,
+                      normalLmSet, faceInfo);
 
     errorMsg = "OK";
     return true;
@@ -293,20 +292,29 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
 // H: the height of the source image
 // W: the width of the source image
 // dHH: 0.5 * dH
-void padCoord2SrcCoord(int srcW, int srcH, int dX, int dHH,
-                       int padX, int padY, int& srcX, int& srcY)
+void padCoord2SrcCoord(//int srcW, int srcH,
+                       int padImgWidht, int padImgHeight,
+                       int dX, int dHH,
+                       double normalX, double normalY, int& srcX, int& srcY)
 {
-    srcX = padX - dX;
-    srcY = padY - dHH;
+    //srcX = normalX * srcW - dX;
+    //srcY = normalY * srcH - dHH;
+    srcX = normalX * padImgWidht - dX;
+    srcY = normalY * padImgHeight - dHH;
+
 }
 
-void padCoord2SrcCoord(int srcW, int srcH, int dX, int dHH,
-                       const int padPt[][2], int numPt, int srcPt[][2])
+void padCoord2SrcCoord(//int srcW, int srcH,
+                       int padImgWidht, int padImgHeight,
+                       int dX, int dHH,
+                       const double normalPt[][2], int numPt, int srcPt[][2])
 {
     for(int i=0; i<numPt; i++)
     {
-        padCoord2SrcCoord(srcW, srcH, dX, dHH,
-                          padPt[i][0], padPt[i][1],
+        padCoord2SrcCoord(//srcW, srcH,
+                          padImgWidht, padImgHeight,
+                          dX, dHH,
+                          normalPt[i][0], normalPt[i][1],
                           srcPt[i][0], srcPt[i][1]);
     }
 }
@@ -317,27 +325,34 @@ dummyFI: the coordiantes measured in padded image space.
 srcSpaceFI: the coordinates measured in the source iamge space.
 alpha: deltaH / srcH
 ***************************************************************************************************/
-void padCoord2SrcCoord(int srcW, int srcH, float alpha,
-                       double normal_lm_2d[NUM_PT_GENERAL_LM][2],
-                       double LNorEyeBowPts[NUM_PT_EYE_REFINE_GROUP][2],
-                       double RNorEyeBowPts[NUM_PT_EYE_REFINE_GROUP][2],
-                       double NorLipRefinePts[NUM_PT_LIP_REFINE_GROUP][2],
+void padCoord2SrcCoord(int padImgWidht, int padImgHeight,
+                       int srcW, int srcH, float alpha,
+                       const NormalLmSet& normalLmSet,
+                       
                        FaceInfo& srcSpaceFI)
 {
     int dH = (int)(alpha * srcH);
     int dX = (srcH + dH - srcW)/2;
     int dHH = dH/2;
     
-    padCoord2SrcCoord(srcW, srcH, dX, dHH,
-                      dummyFI.lm_2d, NUM_PT_GENERAL_LM, srcSpaceFI.lm_2d);
+    padCoord2SrcCoord(//srcW, srcH,
+                      padImgWidht, padImgHeight,
+                      dX, dHH,
+                      normalLmSet.normal_lm_2d, NUM_PT_GENERAL_LM, srcSpaceFI.lm_2d);
 
-    padCoord2SrcCoord(srcW, srcH, dX, dHH,
-                      dummyFI.leftEyeRefinePts, NUM_PT_EYE_REFINE_GROUP, srcSpaceFI.leftEyeRefinePts);
+    padCoord2SrcCoord(//srcW, srcH,
+                      padImgWidht, padImgHeight,
+                      dX, dHH,
+                      normalLmSet.LNorEyeBowPts, NUM_PT_EYE_REFINE_GROUP, srcSpaceFI.leftEyeRefinePts);
     
-    padCoord2SrcCoord(srcW, srcH, dX, dHH,
-                      dummyFI.rightEyeRefinePts, NUM_PT_EYE_REFINE_GROUP, srcSpaceFI.rightEyeRefinePts);
+    padCoord2SrcCoord(//srcW, srcH,
+                      padImgWidht, padImgHeight,
+                      dX, dHH,
+                      normalLmSet.RNorEyeBowPts, NUM_PT_EYE_REFINE_GROUP, srcSpaceFI.rightEyeRefinePts);
     
-    padCoord2SrcCoord(srcW, srcH, dX, dHH,
-                      dummyFI.lipRefinePts, NUM_PT_LIP_REFINE_GROUP, srcSpaceFI.lipRefinePts);
+    padCoord2SrcCoord(//srcW, srcH,
+                      padImgWidht, padImgHeight,
+                      dX, dHH,
+                      normalLmSet.NorLipRefinePts, NUM_PT_LIP_REFINE_GROUP, srcSpaceFI.lipRefinePts);
 
 }

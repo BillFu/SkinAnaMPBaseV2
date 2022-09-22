@@ -1,0 +1,1 @@
+sudo ln -s /opt/homebrew/Cellar/opencv  /usr/local/Cellar/  

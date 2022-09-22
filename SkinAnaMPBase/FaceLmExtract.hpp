@@ -24,6 +24,14 @@ using namespace tflite;
 #define FACE_MESH_NET_INPUT_W 192
 #define FACE_MESH_NET_INPUT_H 192
 
+struct NormalLmSet
+{
+    double normal_lm_2d[NUM_PT_GENERAL_LM][2];
+    double LNorEyeBowPts[NUM_PT_EYE_REFINE_GROUP][2];
+    double RNorEyeBowPts[NUM_PT_EYE_REFINE_GROUP][2];
+    double NorLipRefinePts[NUM_PT_LIP_REFINE_GROUP][2];
+};
+
 //-----------------------------------------------------------------------------------------
 
 /******************************************************************************************
@@ -44,6 +52,7 @@ if confidence >= confTh, then a face will be confirmed, hasFace will be assigned
 Note: after invoking this function, return value and hasFace must be check!
 *******************************************************************************************/
 bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
+                   float vertPadRatio,
                     float confTh, bool& hasFace, float& confidence,
                     FaceInfo& faceInfo, string& errorMsg);
 
@@ -58,7 +67,9 @@ dummyFI: the coordiantes measured in padded image space.
 srcSpaceFI: the coordinates measured in the source iamge space.
 alpha: deltaH / srcH
 *******************************************************************************************/
-void padCoord2SrcCoord(int srcW, int srcH, float alpha,
-                       const FaceInfo& dummyFI, FaceInfo& srcSpaceFI);
+void padCoord2SrcCoord(int padImgWidht, int padImgHeight,
+                       int srcW, int srcH, float alpha,
+                       const NormalLmSet& normalLmSet,
+                       FaceInfo& srcSpaceFI);
 
 #endif /* end of FACE_LM_EXTRACT_HPP */

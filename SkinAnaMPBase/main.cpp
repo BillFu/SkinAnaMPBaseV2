@@ -78,7 +78,8 @@ int main(int argc, char **argv)
     float confThresh = 0.75;
     bool hasFace = false;
     float confidence = 0.0;
-    bool isOK = ExtractFaceLm(faceMeshModel, srcImage,
+    float vertPadRatio = 0.14;
+    bool isOK = ExtractFaceLm(faceMeshModel, srcImage, vertPadRatio,
                               confThresh, hasFace, confidence,
                                    faceInfo, errorMsg);
     if(!isOK)
@@ -99,7 +100,7 @@ int main(int argc, char **argv)
     
     Mat annoImage = srcImage.clone();
     
-    //AnnoGeneralKeyPoints(annoImage, faceInfo);
+    AnnoGeneralKeyPoints(annoImage, faceInfo);
 
     Scalar yellowColor(255, 0, 0);
     AnnoTwoEyeRefinePts(annoImage, faceInfo, yellowColor, true);
