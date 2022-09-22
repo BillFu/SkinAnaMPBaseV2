@@ -167,6 +167,7 @@ bool ExtractFaceLmAtten(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
         return true;
     }
     
+    hasFace = true;
 
     int output_lm_ID = interpreter->outputs()[0];
     cout << "output_landmarks ID: " << output_lm_ID << endl;

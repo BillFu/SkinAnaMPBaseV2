@@ -14,6 +14,7 @@
 #include "LM_loader.hpp"
 #include "Mask/DetectRegion.hpp"
 #include "Mask/EyebowMask.hpp"
+#include "Utils.hpp"
 
 //using namespace tflite;
 using namespace std;
@@ -62,7 +63,7 @@ int main(int argc, char **argv)
     string errorMsg;
     
     // Load Input Image
-    auto srcImage = cv::imread(srcImgFile.c_str());
+    Mat srcImage = cv::imread(srcImgFile.c_str());
     if(srcImage.empty())
     {
         cout << "Failed to load input iamge: " << srcImgFile << endl;
@@ -71,15 +72,22 @@ int main(int argc, char **argv)
     else
         cout << "Succeeded to load image: " << srcImgFile << endl;
     
-    int srcImgWidht = srcImage.cols;
-    int srcImgHeight = srcImage.rows;
+    // !!! 就目前而言，后面的工作都是在paddedSrcImg上进行的。
+    // 以后加上坐标反变换，回到原始影像的坐标空间下工作。
+    Mat paddedSrcImg;
+
+    MakeSquareImageV2(srcImage, 0.4, // 0.3 for deltaH / srcH
+                      paddedSrcImg);
+
+    int padImgWidht = paddedSrcImg.cols;
+    int padImgHeight = paddedSrcImg.rows;
 
     FaceInfo faceInfo;
 
     float confThresh = 0.75;
     bool hasFace = false;
     float confidence = 0.0;
-    bool isOK = ExtractFaceLmAtten(faceMeshModel, srcImage,
+    bool isOK = ExtractFaceLmAtten(faceMeshModel, paddedSrcImg,
                               confThresh, hasFace, confidence,
                                    faceInfo, errorMsg);
     if(!isOK)
@@ -90,9 +98,15 @@ int main(int argc, char **argv)
     else
         cout << "Succeeded to extract lm!" << endl;
     
-    EstHeadPose(srcImgWidht, srcImgHeight, faceInfo);
+    if(!hasFace)
+    {
+        cout << "No face found!" << endl;
+        return 0;
+    }
     
-    Mat annoImage = srcImage.clone();
+    EstHeadPose(padImgWidht, padImgHeight, faceInfo);
+    
+    Mat annoImage = paddedSrcImg.clone();
     
     //AnnoGeneralKeyPoints(annoImage, faceInfo);
 
@@ -109,13 +123,13 @@ int main(int argc, char **argv)
     Mat skinMask;
     string faceMaskImgFile = config_json.at("FaceContourImage");
     ForgeSkinMask(faceInfo, skinMask);
-    OverlayMaskOnImage(srcImage, skinMask,
+    OverlayMaskOnImage(paddedSrcImg, skinMask,
                         "face_contour", faceMaskImgFile.c_str());
 
     Mat mouthMask;
     string mouthMaskImgFile = config_json.at("MouthContourImage");
     ForgeMouthMask(faceInfo, mouthMask);
-    OverlayMaskOnImage(srcImage, mouthMask,
+    OverlayMaskOnImage(paddedSrcImg, mouthMask,
                         "mouth_contour", mouthMaskImgFile.c_str());
     
     Mat eyebowsMask;
