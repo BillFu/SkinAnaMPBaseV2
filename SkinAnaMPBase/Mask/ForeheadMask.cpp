@@ -13,6 +13,9 @@ Date:   2022/9/23
 #include <algorithm>
 #include "ForeheadMask.hpp"
 #include "Geometry.hpp"
+#include "../BSpline/ParametricBSpline.hpp"
+#include "FundamentalMask.hpp"
+
 
 // 前额顶部轮廓线由9个lm点组成。这9个点组成第0排点集，比它们低一些的9个点组成第1排点集。
 // 抬高后获得的9个点组成-1排点集。
@@ -91,6 +94,11 @@ void RaiseupForeheadCurve(const int lm_2d[468][2], Point2i raisedFhCurve[9], flo
         raisedFhCurve[i].y = int(yi_0 - delta_y* alpha);
         raisedFhCurve[i].x = xi_0; // now x just keep unchanged
     }
+    
+    //把10点再升高一点点， 把109和338稍微升一点
+    raisedFhCurve[4].y -= raisedFhCurve[4].y* 0.08;
+    raisedFhCurve[3].y -= raisedFhCurve[3].y* 0.04;
+    raisedFhCurve[5].y -= raisedFhCurve[5].y* 0.04;
 }
 //-------------------------------------------------------------------------------------------
 
@@ -114,8 +122,8 @@ void ForgeForeheadPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
     //Point2i Interpolate(int x1, int y1, int x2, int y2, float t);
     //Point2i Interpolate(const Point2i& p1, const Point2i& p2, float t);
     // asterisk, 星号
-    Point2i pt67a = IpGLmPtWithPair(faceInfo, 67, 103, 0.45);
-    Point2i pt297a = IpGLmPtWithPair(faceInfo, 297, 332, 0.45);
+    Point2i pt67a = IpGLmPtWithPair(faceInfo, 67, 103, 0.60);
+    Point2i pt297a = IpGLmPtWithPair(faceInfo, 297, 332, 0.60);
     
     Point2i raisedFhPts[9];
     RaiseupForeheadCurve(faceInfo.lm_2d, raisedFhPts, 0.8);
@@ -148,5 +156,12 @@ void ForgeForeheadPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
 ***********************************************************************************************/
 void ForgeForeheadMask(const FaceInfo& faceInfo, Mat& outMask)
 {
+    POLYGON coarsePolygon, refinedPolygon;
+
+    ForgeForeheadPg(faceInfo, coarsePolygon);
     
+    int csNumPoint = 80;
+    CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+
+    DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
 }

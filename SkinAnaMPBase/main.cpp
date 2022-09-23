@@ -14,6 +14,7 @@
 #include "Mask/FundamentalMask.hpp"
 #include "Mask/EyebowMask.hpp"
 #include "Mask/SkinFeatureMask.hpp"
+#include "Mask/ForeheadMask.hpp"
 #include "Utils.hpp"
 
 //using namespace tflite;
@@ -148,6 +149,15 @@ int main(int argc, char **argv)
                        poreMask);
     OverlayMaskOnImage(srcImage, poreMask,
                         "pore mask", poreMaskAnnoFile.c_str());
+    
+    string fhMaskAnnoFile = config_json.at("ForeheadMaskImage");
+    Mat fhMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
+    ForgeForeheadMask(faceInfo, fhMask);
+    
+    Mat annoImage2 = srcImage.clone();
+    AnnoGeneralKeyPoints(annoImage2, faceInfo);
+    OverlayMaskOnImage(annoImage2, fhMask,
+                        "forehead mask", fhMaskAnnoFile.c_str());
     
     return 0;
 }
