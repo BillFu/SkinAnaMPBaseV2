@@ -3,7 +3,8 @@
 //
 //
 /*
-本模块目前构建皮肤各类特征的检测区域的矢量版雏形。
+本模块目前构建基础性的Polygon、Mask，也提供辅助型的一些函数。
+本模块为SkinFeatureMask奠定一些基础。
  
 Author: Fu Xiaoqiang
 Date:   2022/9/15

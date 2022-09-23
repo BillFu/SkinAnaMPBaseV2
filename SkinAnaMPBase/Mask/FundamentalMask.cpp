@@ -7,7 +7,7 @@ Date:   2022/9/15
 
 ********************************************************************************/
 
-#include "DetectRegion.hpp"
+#include "FundamentalMask.hpp"
 #include "../BSpline/ParametricBSpline.hpp"
 #include "ForeheadCurve.hpp"
 

@@ -9,7 +9,7 @@ Date:   2022/9/11
 
 #include "EyebowMask.hpp"
 #include "../BSpline/ParametricBSpline.hpp"
-#include "DetectRegion.hpp"
+#include "FundamentalMask.hpp"
 #include "Geometry.hpp"
 
 
