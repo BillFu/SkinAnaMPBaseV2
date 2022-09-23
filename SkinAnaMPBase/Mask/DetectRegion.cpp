@@ -17,7 +17,7 @@ Date:   2022/9/15
 
 ***********************************************************************************************/
 
-Mat contour2mask(int img_width, int img_height, const POLYGON& contours)
+Mat Contour2Mask(int img_width, int img_height, const POLYGON& contours)
 {
     cv::Mat mask(img_height, img_width, CV_8UC1, cv::Scalar(0));
     cv::fillPoly(mask, contours, cv::Scalar(255));
@@ -25,7 +25,8 @@ Mat contour2mask(int img_width, int img_height, const POLYGON& contours)
     return mask;
 }
 
-void Contour2Mask(int img_width, int img_height, const POLYGON& contours, Mat& outMask)
+// !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
+void DrawContOnMask(int img_width, int img_height, const POLYGON& contours, Mat& outMask)
 {
     cv::fillPoly(outMask, contours, cv::Scalar(255));
 }
@@ -115,16 +116,21 @@ void ForgeMouthPolygon(const FaceInfo& faceInfo, POLYGON& mouthPolygon)
 //-------------------------------------------------------------------------------------------
 void ForgeSkinMask(const FaceInfo& faceInfo, Mat& outMask)
 {
-    POLYGON skinPolygon;
-    ForgeSkinPolygon(faceInfo, skinPolygon);
-    outMask = contour2mask(faceInfo.imgWidth, faceInfo.imgHeight, skinPolygon);
+    POLYGON coarsePolygon, refinedPolygon;
+
+    ForgeSkinPolygon(faceInfo, coarsePolygon);
+    
+    int csNumPoint = 200;
+    CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+
+    outMask = Contour2Mask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon);
 }
 
 void ForgeMouthMask(const FaceInfo& faceInfo, Mat& outMask)
 {
     POLYGON polygon;
     ForgeMouthPolygon(faceInfo, polygon);
-    outMask = contour2mask(faceInfo.imgWidth, faceInfo.imgHeight, polygon);
+    outMask = Contour2Mask(faceInfo.imgWidth, faceInfo.imgHeight, polygon);
 }
 
 //-------------------------------------------------------------------------------------------
@@ -162,9 +168,9 @@ void ForgeOneEyeFullMask(const FaceInfo& faceInfo, EyeID eyeID, Mat& outMask)
     
     
     int csNumPoint = 50; //200;
-    ForgeClosedSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+    CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
 
-    Contour2Mask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
+    outMask = Contour2Mask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon);
 }
 
 Mat ForgeTwoEyesFullMask(const FaceInfo& faceInfo)

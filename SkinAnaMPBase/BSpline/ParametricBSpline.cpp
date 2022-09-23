@@ -81,7 +81,7 @@ void create_time_grid(std::vector<double>& T, double& tmin, double& tmax,
  csNumPoint: how many points should be output to present csPolygon
  *******************************************************************************************/
 
-void ForgeClosedSmoothPolygon(const POLYGON& contours, int csNumPoint, POLYGON& csPolygon)
+void CloseSmoothPolygon(const POLYGON& contours, int csNumPoint, POLYGON& csPolygon)
 {
     std::vector<double> inX;
     std::vector<double> inY;

@@ -27,7 +27,9 @@ using namespace cv;
 ***********************************************************************************************/
 
 Mat Contour2Mask(int img_width, int img_height, const POLYGON& contours);
-void Contour2Mask(int img_width, int img_height, const POLYGON& contours, Mat& outMask);
+
+// !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
+void DrawContOnMask(int img_width, int img_height, const POLYGON& contours, Mat& outMask);
 
 Mat ContourGroup2Mask(int img_width, int img_height, const POLYGON_GROUP& contoursGroup);
 

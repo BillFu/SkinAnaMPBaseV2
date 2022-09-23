@@ -26,7 +26,7 @@ using namespace cv;
 csPolygon: closed, opened BSpline polygon
 ***********************************************************************************************/
 
-void ForgeClosedSmoothPolygon(const POLYGON& contours, int csNumPoint, POLYGON& csPolygon);
+void CloseSmoothPolygon(const POLYGON& contours, int csNumPoint, POLYGON& csPolygon);
 
 
 //-------------------------------------------------------------------------------------------

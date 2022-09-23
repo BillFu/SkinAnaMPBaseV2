@@ -102,7 +102,7 @@ void ForgeOneEbPg(const FaceInfo& faceInfo, EyeID eyeID, POLYGON& rightEbPg)
 
     // then convert the corse to the refined
     int csNumPoint = 100;
-    ForgeClosedSmoothPolygon(coarseRbPg, csNumPoint, rightEbPg);
+    CloseSmoothPolygon(coarseRbPg, csNumPoint, rightEbPg);
 }
 
 /******************************************************************************************
