@@ -11,10 +11,10 @@
 		263B540228CD861C004CF77D /* AnnoImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540028CD861C004CF77D /* AnnoImage.cpp */; };
 		263B540528CD8B34004CF77D /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540428CD8B34004CF77D /* Utils.cpp */; };
 		264E012628D6C45B00CB94D1 /* EyebowMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264E012528D6C45B00CB94D1 /* EyebowMask.cpp */; };
-		264E012C28D6C89200CB94D1 /* ForeheadCurve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264E012B28D6C89200CB94D1 /* ForeheadCurve.cpp */; };
 		26DB15F528D69DEE00F195CF /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 2602327828CCC52E00B11D7A /* libtensorflowlite.so */; };
 		26E506B228D3665B000059DA /* LM_Loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E506B028D3665B000059DA /* LM_Loader.cpp */; };
 		26F952DC28D6EAB600B837CB /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F952DB28D6EAB600B837CB /* Geometry.cpp */; };
+		CB1E2AB928DD99AB00F416DF /* ForeheadMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB1E2AB728DD99AB00F416DF /* ForeheadMask.cpp */; };
 		CB255A9628C7237A005C8A81 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB255A9528C7237A005C8A81 /* main.cpp */; };
 		CB2F393028DD36F0002D1CDB /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CB3C248E28D00BA300804E6E /* libtensorflowlite.so */; };
 		CB4312AA28D41DDD006D71DA /* ParametricBSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB4312A828D41DDD006D71DA /* ParametricBSpline.cpp */; };
@@ -61,13 +61,13 @@
 		263B540428CD8B34004CF77D /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utils.cpp; sourceTree = "<group>"; };
 		264E012428D6C45B00CB94D1 /* EyebowMask.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EyebowMask.hpp; sourceTree = "<group>"; };
 		264E012528D6C45B00CB94D1 /* EyebowMask.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EyebowMask.cpp; sourceTree = "<group>"; };
-		264E012A28D6C89200CB94D1 /* ForeheadCurve.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ForeheadCurve.hpp; sourceTree = "<group>"; };
-		264E012B28D6C89200CB94D1 /* ForeheadCurve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ForeheadCurve.cpp; sourceTree = "<group>"; };
 		26E506B028D3665B000059DA /* LM_Loader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LM_Loader.cpp; sourceTree = "<group>"; };
 		26E506B128D3665B000059DA /* LM_loader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LM_loader.hpp; sourceTree = "<group>"; };
 		26F7BE6428CDE49500A83344 /* Common.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Common.hpp; sourceTree = "<group>"; };
 		26F952DA28D6EAB600B837CB /* Geometry.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Geometry.hpp; sourceTree = "<group>"; };
 		26F952DB28D6EAB600B837CB /* Geometry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Geometry.cpp; sourceTree = "<group>"; };
+		CB1E2AB728DD99AB00F416DF /* ForeheadMask.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ForeheadMask.cpp; sourceTree = "<group>"; };
+		CB1E2AB828DD99AB00F416DF /* ForeheadMask.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ForeheadMask.hpp; sourceTree = "<group>"; };
 		CB255A9228C7237A005C8A81 /* SkinAnaMPBase */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SkinAnaMPBase; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB255A9528C7237A005C8A81 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		CB3C248E28D00BA300804E6E /* libtensorflowlite.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtensorflowlite.so; path = SkinAnaMPBase/intel_lib/libtensorflowlite.so; sourceTree = "<group>"; };
@@ -126,14 +126,14 @@
 		264E012328D6C1DF00CB94D1 /* Mask */ = {
 			isa = PBXGroup;
 			children = (
+				CB1E2AB728DD99AB00F416DF /* ForeheadMask.cpp */,
+				CB1E2AB828DD99AB00F416DF /* ForeheadMask.hpp */,
 				CBB5DB3E28DD5E97003CDED3 /* SkinFeatureMask.cpp */,
 				CBB5DB3F28DD5E97003CDED3 /* SkinFeatureMask.hpp */,
 				CBB5DB3C28DD5B3B003CDED3 /* FundamentalMask.cpp */,
 				CBB5DB3B28DD5B3B003CDED3 /* FundamentalMask.hpp */,
 				26F952DB28D6EAB600B837CB /* Geometry.cpp */,
 				26F952DA28D6EAB600B837CB /* Geometry.hpp */,
-				264E012B28D6C89200CB94D1 /* ForeheadCurve.cpp */,
-				264E012A28D6C89200CB94D1 /* ForeheadCurve.hpp */,
 				264E012528D6C45B00CB94D1 /* EyebowMask.cpp */,
 				264E012428D6C45B00CB94D1 /* EyebowMask.hpp */,
 			);
@@ -340,8 +340,8 @@
 				CBDA5B2528D2F0DD002A35E2 /* TinyEXIF.cpp in Sources */,
 				CB4312AA28D41DDD006D71DA /* ParametricBSpline.cpp in Sources */,
 				263B540528CD8B34004CF77D /* Utils.cpp in Sources */,
-				264E012C28D6C89200CB94D1 /* ForeheadCurve.cpp in Sources */,
 				CBB5DB4028DD5E97003CDED3 /* SkinFeatureMask.cpp in Sources */,
+				CB1E2AB928DD99AB00F416DF /* ForeheadMask.cpp in Sources */,
 				26F952DC28D6EAB600B837CB /* Geometry.cpp in Sources */,
 				CBDA5B2628D2F0DD002A35E2 /* tinyxml2.cpp in Sources */,
 				CB74AACF28DC365900EF62F1 /* FaceLmExtract.cpp in Sources */,

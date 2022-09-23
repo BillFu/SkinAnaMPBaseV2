@@ -9,7 +9,7 @@ Date:   2022/9/15
 
 #include "FundamentalMask.hpp"
 #include "../BSpline/ParametricBSpline.hpp"
-#include "ForeheadCurve.hpp"
+#include "ForeheadMask.hpp"
 
 //-------------------------------------------------------------------------------------------
 
