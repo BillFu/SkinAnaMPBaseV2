@@ -48,6 +48,8 @@ void ForgeOneEyeFullMask(const FaceInfo& faceInfo, EyeID eyeID, Mat& outMask);
 
 // the returned mask covers the two eyes, eyebows, the surrounding area, and with somewhat expansion
 void ForgeTwoEyesFullMask(const FaceInfo& faceInfo, Mat& outEyesFullMask);
+
+void ForgeNoseMask(const FaceInfo& faceInfo, Mat& outNoseMask);
 //-------------------------------------------------------------------------------------------
 void OverlayMaskOnImage(const Mat& srcImg, const Mat& mask,
                         const string& maskName,

@@ -29,7 +29,7 @@ int getPtIndexOfFHCurve(int ptIndex)
     
     auto it = std::find(vec.begin(), vec.end(), ptIndex);
     if (it != vec.end())
-        return distance(vec.begin(), it);
+        return (int)distance(vec.begin(), it);
     else
         return -1;
 }

@@ -185,6 +185,38 @@ void ForgeTwoEyesFullMask(const FaceInfo& faceInfo, Mat& outEyesFullMask)
 }
 
 //-------------------------------------------------------------------------------------------
+void ForgeNosePolygon(const FaceInfo& faceInfo, POLYGON& outPolygon)
+{
+    // 采用Lip Refine Region的点！
+    int nosePtIndices[] = { // 逆时针
+    55, 193, 245, 114, 142, 203, 98, 97, // No.55 point near left eye
+        2,
+    326, 327, 423, 371, 343, 465, 417, 285 };
+    
+    int num_pts = sizeof(nosePtIndices) / sizeof(int);
+    
+    for(int i = 0; i<num_pts; i++)
+    {
+        int index = nosePtIndices[i];
+        
+        int x = faceInfo.lm_2d[index][0];
+        int y = faceInfo.lm_2d[index][1];
+        outPolygon.push_back(Point2i(x, y));
+    }
+}
+
+void ForgeNoseMask(const FaceInfo& faceInfo, Mat& outMask)
+{
+    POLYGON coarsePolygon, refinedPolygon;
+
+    ForgeNosePolygon(faceInfo, coarsePolygon);
+    
+    int csNumPoint = 100;
+    CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+
+    DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
+}
+//-------------------------------------------------------------------------------------------
 
 void OverlayMaskOnImage(const Mat& srcImg, const Mat& mask,
                         const string& maskName,
