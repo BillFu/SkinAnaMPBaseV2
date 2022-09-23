@@ -18,5 +18,5 @@ void ForgePoreMask(const FaceInfo& faceInfo,
                    const Mat& mouthMask, // the enlarged mouth mask
                    Mat& outPoreMask)
 {
-    
+    outPoreMask = fullFaceMask & (~eyeFullMask) & (~mouthMask);
 }

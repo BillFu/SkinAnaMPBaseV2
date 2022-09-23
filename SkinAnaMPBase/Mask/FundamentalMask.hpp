@@ -27,7 +27,7 @@ using namespace cv;
 本函数构建皮肤区域的矢量版雏形。
 ***********************************************************************************************/
 
-Mat Contour2Mask(int img_width, int img_height, const POLYGON& contours);
+//Mat Contour2Mask(int img_width, int img_height, const POLYGON& contours);
 
 // !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
 void DrawContOnMask(int img_width, int img_height, const POLYGON& contours, Mat& outMask);
@@ -45,7 +45,9 @@ void ForgeMouthMask(const FaceInfo& faceInfo, Mat& outMask);
 // EeyeFullMask包含眼睛、眉毛、眼袋的大范围区域
 void ForgeOneEyeFullMask(const FaceInfo& faceInfo, EyeID eyeID, Mat& outMask);
 
-Mat ForgeTwoEyesFullMask(const FaceInfo& faceInfo);
+
+// the returned mask covers the two eyes, eyebows, the surrounding area, and with somewhat expansion
+void ForgeTwoEyesFullMask(const FaceInfo& faceInfo, Mat& outEyesFullMask);
 //-------------------------------------------------------------------------------------------
 void OverlayMaskOnImage(const Mat& srcImg, const Mat& mask,
                         const string& maskName,

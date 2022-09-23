@@ -13,10 +13,7 @@ Date:   2022/9/15
 
 //-------------------------------------------------------------------------------------------
 
-/**********************************************************************************************
-
-***********************************************************************************************/
-
+/*
 Mat Contour2Mask(int img_width, int img_height, const POLYGON& contours)
 {
     cv::Mat mask(img_height, img_width, CV_8UC1, cv::Scalar(0));
@@ -24,6 +21,7 @@ Mat Contour2Mask(int img_width, int img_height, const POLYGON& contours)
     
     return mask;
 }
+*/
 
 // !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
 void DrawContOnMask(int img_width, int img_height, const POLYGON& contours, Mat& outMask)
@@ -123,14 +121,14 @@ void ForgeSkinMask(const FaceInfo& faceInfo, Mat& outMask)
     int csNumPoint = 200;
     CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
 
-    outMask = Contour2Mask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon);
+    DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
 }
 
 void ForgeMouthMask(const FaceInfo& faceInfo, Mat& outMask)
 {
     POLYGON polygon;
     ForgeMouthPolygon(faceInfo, polygon);
-    outMask = Contour2Mask(faceInfo.imgWidth, faceInfo.imgHeight, polygon);
+    DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, polygon, outMask);
 }
 
 //-------------------------------------------------------------------------------------------
@@ -165,15 +163,13 @@ void ForgeOneEyeFullMask(const FaceInfo& faceInfo, EyeID eyeID, Mat& outMask)
     else
         ForgeOneEyeFullPolygon(faceInfo.rightEyeRefinePts, coarsePolygon);
     
-    
-    
     int csNumPoint = 50; //200;
     CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
 
-    outMask = Contour2Mask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon);
+    DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
 }
 
-Mat ForgeTwoEyesFullMask(const FaceInfo& faceInfo)
+void ForgeTwoEyesFullMask(const FaceInfo& faceInfo, Mat& outEyesFullMask)
 {
     cv::Mat outMask(faceInfo.imgHeight, faceInfo.imgWidth, CV_8UC1, cv::Scalar(0));
 
@@ -185,12 +181,7 @@ Mat ForgeTwoEyesFullMask(const FaceInfo& faceInfo)
                            Size(2*dila_size + 1, 2*dila_size+1),
                            Point(dila_size, dila_size));
     
-    cv::Mat outExpandedMask(faceInfo.imgHeight, faceInfo.imgWidth, CV_8UC1, cv::Scalar(0));
-    dilate(outMask, outExpandedMask, element);
-    
-    return outExpandedMask;
-    
-    //return outMask;
+    dilate(outMask, outEyesFullMask, element);
 }
 
 //-------------------------------------------------------------------------------------------

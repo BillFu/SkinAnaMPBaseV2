@@ -13,6 +13,7 @@
 #include "LM_loader.hpp"
 #include "Mask/FundamentalMask.hpp"
 #include "Mask/EyebowMask.hpp"
+#include "Mask/SkinFeatureMask.hpp"
 #include "Utils.hpp"
 
 //using namespace tflite;
@@ -114,28 +115,39 @@ int main(int argc, char **argv)
     
     imwrite(annoPoseImgFile, annoImage);
     
-    Mat skinMask;
+    Mat skinMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
     string faceMaskImgFile = config_json.at("FaceContourImage");
     ForgeSkinMask(faceInfo, skinMask);
     OverlayMaskOnImage(srcImage, skinMask,
                         "face_contour", faceMaskImgFile.c_str());
 
-    Mat mouthMask;
+    Mat mouthMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
     string mouthMaskImgFile = config_json.at("MouthContourImage");
     ForgeMouthMask(faceInfo, mouthMask);
     OverlayMaskOnImage(srcImage, mouthMask,
                         "mouth_contour", mouthMaskImgFile.c_str());
     
-    Mat eyebowsMask;
+    Mat eyebowsMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
     string eyebowsMaskImgFile = config_json.at("EyebowsContourImage"); // 注意复数形式表示双眉
     ForgeTwoEyebowsMask(faceInfo, eyebowsMask);
     OverlayMaskOnImage(annoImage, eyebowsMask,
                         "eyebows_contour", eyebowsMaskImgFile.c_str());
     
+    Mat eyesFullMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
     string eyeFullMaskImgFile = config_json.at("EyeFullContourImage");
-    Mat eyesFullMask = ForgeTwoEyesFullMask(faceInfo);
+    ForgeTwoEyesFullMask(faceInfo, eyesFullMask);
     OverlayMaskOnImage(annoImage, eyesFullMask,
                         "eye_full_contour", eyeFullMaskImgFile.c_str());
+    
+    string poreMaskAnnoFile = config_json.at("PoreMask");
+    Mat poreMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
+    ForgePoreMask(faceInfo,
+                       skinMask,
+                       eyesFullMask,  // cover the eyes and eyebows and the surrounding nearby area
+                       mouthMask, // the enlarged mouth mask
+                       poreMask);
+    OverlayMaskOnImage(srcImage, poreMask,
+                        "pore mask", poreMaskAnnoFile.c_str());
     
     return 0;
 }
