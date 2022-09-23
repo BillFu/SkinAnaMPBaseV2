@@ -157,19 +157,28 @@ TF_LITE_MODEL LoadFaceMeshAttenModel(const char* faceMeshModelFileName)
  Note: after invoking this function, return value and hasFace must be check!
 *******************************************************************************************/
 bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
-                   float vertPadRatio,
-                   float confTh, bool& hasFace, float& confidence,
+                   bool needPadding, float vertPadRatio,
+                   float confTh, bool& hasFace,
                    FaceInfo& faceInfo, string& errorMsg)
 {
     //------------------******preprocessing******-----------------------------------------------------------------
     // padding the source image to get better performance
-    Mat paddedSrcImg;
-    float alpha = vertPadRatio; // deltaH / srcH
-    MakeSquareImageV2(srcImage, alpha,
-                      paddedSrcImg);
-
-    int padImgWidht = paddedSrcImg.cols;
-    int padImgHeight = paddedSrcImg.rows;
+    Mat paddedImg;
+    
+    float alpha = 0.0;
+    if(needPadding)
+    {
+        float alpha = vertPadRatio; // deltaH / srcH
+        MakeSquareImageV2(srcImage, alpha,
+                          paddedImg);
+    }
+    else
+    {
+        paddedImg = srcImage.clone();
+    }
+    
+    int padImgWidht = paddedImg.cols;
+    int padImgHeight = paddedImg.rows;
     
     int netInputWidth = FACE_MESH_NET_INPUT_W;
     int netInputHeight = FACE_MESH_NET_INPUT_H;
@@ -178,9 +187,9 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     cv::Mat resized_image;  //, normal_image;
     // Not need to perform the convertion from BGR to RGB by the noticeable statements,
     // later it would be done in one trick way.
-    cv::resize(paddedSrcImg, resized_image, cv::Size(netInputWidth, netInputHeight), cv::INTER_NEAREST);
+    cv::resize(paddedImg, resized_image, cv::Size(netInputWidth, netInputHeight), cv::INTER_NEAREST);
 
-    paddedSrcImg.release();
+    paddedImg.release();
     
     //-------------------------*****enter inference*****---------------------------------------------------------
     // Initiate Interpreter
@@ -228,7 +237,7 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     
     float sigmoidConf = *sigmoidConfPtr;
     
-    confidence = 1.0 / (1.0 + exp(-sigmoidConf));
+    float confidence = 1.0 / (1.0 + exp(-sigmoidConf));
     cout << "face confidence: " << confidence << endl;
     if(confidence < confTh) // if confidence is too low, return immediately.
     {
@@ -236,6 +245,7 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
         return true;
     }
     
+    faceInfo.confidence = confidence;
     hasFace = true;
 
     int output_lm_ID = interpreter->outputs()[0];
@@ -246,12 +256,8 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     /*
     The values in lm_3d are measured in the input coordinate system of our tf lite model,
     i.e., the values are in the range: [0.0, 192.0].
-    The values in lm_2d are measured in the coordinate system of the source image!
+    The values in lm_2d are measured in the coordinate system of the source image! ----???
     */
-    //FaceInfo dummyFaceInfo;
-    //dummyFaceInfo.imgWidth = padImgWidht;
-    //dummyFaceInfo.imgHeight = padImgHeight;
-    
     float lm_3d[NUM_PT_GENERAL_LM][3];
     NormalLmSet normalLmSet;
     extractOutputLM(LMOutBuffer,
@@ -331,9 +337,15 @@ void padCoord2SrcCoord(int padImgWidht, int padImgHeight,
                        
                        FaceInfo& srcSpaceFI)
 {
-    int dH = (int)(alpha * srcH);
-    int dX = (srcH + dH - srcW)/2;
-    int dHH = dH/2;
+    int dX = 0; // applied for the case without padding
+    int dHH = 0; // applied for the case without padding
+    
+    if(padImgWidht == padImgHeight) // is a square, and has padding applied
+    {
+        int dH = (int)(alpha * srcH);
+        dX = (srcH + dH - srcW)/2;
+        dHH = dH/2;
+    }
     
     padCoord2SrcCoord(//srcW, srcH,
                       padImgWidht, padImgHeight,

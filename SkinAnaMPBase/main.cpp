@@ -77,11 +77,13 @@ int main(int argc, char **argv)
 
     float confThresh = 0.75;
     bool hasFace = false;
-    float confidence = 0.0;
-    float vertPadRatio = 0.14;
-    bool isOK = ExtractFaceLm(faceMeshModel, srcImage, vertPadRatio,
-                              confThresh, hasFace, confidence,
-                                   faceInfo, errorMsg);
+    //float confidence = 0.0;
+    bool needPadding = false;
+    float vertPadRatio = 0.0;
+    bool isOK = ExtractFaceLm(faceMeshModel, srcImage,
+                              needPadding, vertPadRatio,
+                              confThresh, hasFace,
+                              faceInfo, errorMsg);
     if(!isOK)
     {
         cout << "Error Happened to extract face LM: " << errorMsg << endl;

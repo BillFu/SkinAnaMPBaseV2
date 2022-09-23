@@ -43,6 +43,13 @@ struct HeadPose
     float pitch;  // rotate with x-axis
     float yaw;    // rotate with y-axis
     float roll;   // rotate with z-axis
+    
+    HeadPose()
+    {
+        pitch = 0.0;
+        yaw = 0.0;
+        roll = 0.0;
+    }
 };
 
 #define NUM_PT_GENERAL_LM       468
@@ -53,6 +60,8 @@ struct FaceInfo
 {
     int imgWidth;  // source image
     int imgHeight;
+    
+    float confidence; // 这张人脸存在的可信度
     
     //[n][0] for x, [n][1] for y
     // measured in source iamge coordinate system
@@ -65,6 +74,14 @@ struct FaceInfo
     int lipRefinePts[NUM_PT_LIP_REFINE_GROUP][2];
     
     HeadPose headPose;
+    
+    FaceInfo()
+    {
+        imgWidth = 0;
+        imgHeight = 0;
+        
+        confidence = 0.0;
+    }
 };
 
 #endif /* end of COMMON_HPP */

@@ -45,17 +45,20 @@ TF_LITE_MODEL LoadFaceMeshAttenModel(const char* faceMeshModelFileName);
 //-----------------------------------------------------------------------------------------
 
 /******************************************************************************************
- 目前的推理是一次性的，即从模型加载到解释器创建，到推理，到结果提取，这一流程只负责完成一副人脸的LM提取。
- 以后要让前半段的结果长期存活，用于连续推理，以提高效率。
+目前的推理是一次性的，即从模型加载到解释器创建，到推理，到结果提取，这一流程只负责完成一副人脸的LM提取。
+以后要让前半段的结果长期存活，用于连续推理，以提高效率。
  
 if confidence >= confTh, then a face will be confirmed, hasFace will be assigned with true.
 Note: after invoking this function, return value and hasFace must be check!
+ 
+if needPadding is true, padding would be applied in this function, and vertPadRatio
+specify how much ratio of height should be expanded vertically.
+More, if padding on, the final padded image would be a square.
 *******************************************************************************************/
 bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
-                   float vertPadRatio,
-                    float confTh, bool& hasFace, float& confidence,
+                   bool needPadding, float vertPadRatio,
+                    float confTh, bool& hasFace,
                     FaceInfo& faceInfo, string& errorMsg);
-
 
 
 //-----------------------------------------------------------------------------------------
