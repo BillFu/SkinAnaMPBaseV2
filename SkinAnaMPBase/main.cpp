@@ -104,8 +104,9 @@ int main(int argc, char **argv)
     
     Mat annoImage = srcImage.clone();
     
-    AnnoGeneralKeyPoints(annoImage, faceInfo);
+    AnnoGeneralKeyPoints(annoImage, faceInfo, true);
 
+    /*
     Scalar yellowColor(255, 0, 0);
     AnnoTwoEyeRefinePts(annoImage, faceInfo, yellowColor, true);
     
@@ -115,11 +116,12 @@ int main(int argc, char **argv)
     AnnoHeadPoseEst(annoImage, faceInfo);
     
     imwrite(annoPoseImgFile, annoImage);
+    */
     
     Mat skinMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
     string faceMaskImgFile = config_json.at("FaceContourImage");
     ForgeSkinMask(faceInfo, skinMask);
-    OverlayMaskOnImage(srcImage, skinMask,
+    OverlayMaskOnImage(annoImage, skinMask,
                         "face_contour", faceMaskImgFile.c_str());
 
     Mat mouthMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));

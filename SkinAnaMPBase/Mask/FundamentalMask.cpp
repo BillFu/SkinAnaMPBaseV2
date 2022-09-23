@@ -88,6 +88,26 @@ void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon)
     }
 }
 
+void ForgeFaceLowThEyePg(const FaceInfo& faceInfo, POLYGON& skinPolygon)
+{
+    // the indices for lm in meadiapipe mesh from
+    int outlinePts[] = { // in reverse clock order
+    234, 93, 132, 58, 172, 136, 150, 149, 176, 148, 152, 377,
+    400, 378, 379, 365, 397, 288, 361, 323, 454};
+    
+    int num_pts = sizeof(outlinePts) / sizeof(int);
+    
+    // calculate the new version of coordinates of Points on face silhouette.
+    for(int i = 0; i<num_pts; i++)
+    {
+        int index = outlinePts[i];
+        int x = faceInfo.lm_2d[index][0];
+        int y = faceInfo.lm_2d[index][1];
+        skinPolygon.push_back(Point2i(x, y));
+    }
+}
+//-------------------------------------------------------------------------------------------
+
 void ForgeMouthPolygon(const FaceInfo& faceInfo, POLYGON& mouthPolygon)
 {
     // the indices for lm in meadiapipe mesh from
@@ -119,6 +139,18 @@ void ForgeSkinMask(const FaceInfo& faceInfo, Mat& outMask)
     ForgeSkinPolygon(faceInfo, coarsePolygon);
     
     int csNumPoint = 200;
+    CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+
+    DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
+}
+
+// face mask below the eyes
+void ForgeFaceLowThEyeMask(const FaceInfo& faceInfo, Mat& outMask)
+{
+    POLYGON coarsePolygon, refinedPolygon;
+
+    ForgeFaceLowThEyePg(faceInfo, coarsePolygon);
+    int csNumPoint = 160;
     CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
 
     DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);

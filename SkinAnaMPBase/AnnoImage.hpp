@@ -23,7 +23,7 @@ using namespace cv;
 /******************************************************************************************
 本函数的功能是，将468个人脸普通关键点的结果打印在输入影像的拷贝上。
 *******************************************************************************************/
-void AnnoGeneralKeyPoints(Mat& annoImage, const FaceInfo& faceInfo);
+void AnnoGeneralKeyPoints(Mat& annoImage, const FaceInfo& faceInfo, bool showIndices=false);
 
 //-----------------------------------------------------------------------------------------
 

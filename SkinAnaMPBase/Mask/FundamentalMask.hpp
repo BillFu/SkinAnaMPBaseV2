@@ -50,6 +50,9 @@ void ForgeOneEyeFullMask(const FaceInfo& faceInfo, EyeID eyeID, Mat& outMask);
 void ForgeTwoEyesFullMask(const FaceInfo& faceInfo, Mat& outEyesFullMask);
 
 void ForgeNoseMask(const FaceInfo& faceInfo, Mat& outNoseMask);
+
+// face mask below the eyes
+void ForgeFaceLowThEyeMask(const FaceInfo& faceInfo, Mat& outMask);
 //-------------------------------------------------------------------------------------------
 void OverlayMaskOnImage(const Mat& srcImg, const Mat& mask,
                         const string& maskName,

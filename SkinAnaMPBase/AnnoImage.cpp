@@ -37,21 +37,26 @@ void AnnoHeadPoseEst(Mat& annoImage, const FaceInfo& faceInfo)
 /******************************************************************************************
 本函数的功能是，将人脸一般关键点(468个)的结果打印在输入影像的拷贝上。
 *******************************************************************************************/
-void AnnoGeneralKeyPoints(Mat& annoImage, const FaceInfo& faceInfo)
+void AnnoGeneralKeyPoints(Mat& annoImage, const FaceInfo& faceInfo, bool showIndices)
 {
-    cv::Scalar colorCircle2(255, 0, 0); // (B, G, R)
+    cv::Scalar yellow(0, 255, 255); // (B, G, R)
+    cv::Scalar blue(255, 0, 0);
     for(int i = 0; i < 468; i++)
     {
         cv::Point center(faceInfo.lm_2d[i][0], faceInfo.lm_2d[i][1]);
-        cv::circle(annoImage, center, 5, colorCircle2, cv::FILLED);
+        cv::circle(annoImage, center, 5, blue, cv::FILLED);
+        
+        if(showIndices)
+        {
+            cv::putText(annoImage, to_string(i), center,
+                        FONT_HERSHEY_SIMPLEX, 0.5, blue, 1);
+        }
     }
     
     // 对应Dlib上点的序号为18, 22, 23, 27, 37, 40, 43, 46, 32, 36, 49, 55, 58, 9
     int face_2d_pts_indices[] = {46, 55, 285, 276, 33, 173,
         398, 263, 48, 278, 61, 291, 17, 199};  // indics in face lms in mediapipe.
         
-    cv::Scalar yellow(0, 255, 255); // (B, G, R)
-
     for(int i=0; i<14; i++)
     {
         int lm_index = face_2d_pts_indices[i];
