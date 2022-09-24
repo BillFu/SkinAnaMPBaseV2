@@ -142,13 +142,26 @@ void ForgeForeheadPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
     outPolygon.push_back(pt297r);
     outPolygon.push_back(pt297a);
 
-    //int botLinePts[] = {333, 334, 296, 336, 9, 107, 66, 105, 104};
-    int botLinePts[] = {333, 334, 296, 285, 8, 55, 66, 105, 104};
-    for(int i: botLinePts)
-    {
-        Point2i pt = getPtOnGLm(faceInfo, i);
-        outPolygon.push_back(pt);
-    }
+    //int botLinePts[] = {333, 334*, 296*, 336, 285, 8, 55, 107, 66*, 105*, 104};
+    outPolygon.push_back(getPtOnGLm(faceInfo, 333));
+
+    Point2i pt334a = IpGLmPtWithPair(faceInfo, 334, 333, 0.65);
+    Point2i pt296a = IpGLmPtWithPair(faceInfo, 296, 299, 0.50);
+    outPolygon.push_back(pt334a);
+    outPolygon.push_back(pt296a);
+
+    outPolygon.push_back(getPtOnGLm(faceInfo, 336));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 285));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 8));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 55));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 107));
+
+    Point2i pt66a = IpGLmPtWithPair(faceInfo, 66, 69, 0.5);
+    Point2i pt105a = IpGLmPtWithPair(faceInfo, 105, 104, 0.65);
+    outPolygon.push_back(pt66a);
+    outPolygon.push_back(pt105a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 104));
 }
 
 /**********************************************************************************************

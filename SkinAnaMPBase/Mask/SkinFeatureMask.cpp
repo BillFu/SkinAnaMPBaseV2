@@ -8,6 +8,7 @@ Date:   2022/9/23
 ********************************************************************************/
 
 #include "SkinFeatureMask.hpp"
+#include "FundamentalMask.hpp"
 
 /**********************************************************************************************
 本函数构建Pore的矢量版Mask雏形。
@@ -30,6 +31,9 @@ void ForgePoreMaskV2(const FaceInfo& faceInfo,
                    const Mat& noseMask,
                    Mat& outPoreMask)
 {
-    outPoreMask = faceLowMask | foreheadMask | noseMask ;
-    outPoreMask = outPoreMask & (~eyeFullMask) & (~mouthMask);
+    Mat outMask = faceLowMask | foreheadMask | noseMask ;
+    outPoreMask = outMask & (~eyeFullMask) & (~mouthMask);
+    
+    //int expandSize = 20;
+    //expanMask(outMask, expandSize, outPoreMask);
 }
