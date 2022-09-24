@@ -126,7 +126,8 @@ int main(int argc, char **argv)
 
     Mat mouthMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
     string mouthMaskImgFile = config_json.at("MouthContourImage");
-    ForgeMouthMask(faceInfo, mouthMask);
+    float expanRatio = 0.3;
+    ForgeMouthMask(faceInfo, expanRatio, mouthMask);
     OverlayMaskOnImage(srcImage, mouthMask,
                         "mouth_contour", mouthMaskImgFile.c_str());
     

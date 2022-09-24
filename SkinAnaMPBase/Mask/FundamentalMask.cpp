@@ -10,18 +10,17 @@ Date:   2022/9/15
 #include "FundamentalMask.hpp"
 #include "../BSpline/ParametricBSpline.hpp"
 #include "ForeheadMask.hpp"
+#include "Geometry.hpp"
 
 //-------------------------------------------------------------------------------------------
-
-/*
-Mat Contour2Mask(int img_width, int img_height, const POLYGON& contours)
+void expanMask(const Mat& inMask, int expandSize, Mat& outMask)
 {
-    cv::Mat mask(img_height, img_width, CV_8UC1, cv::Scalar(0));
-    cv::fillPoly(mask, contours, cv::Scalar(255));
+    Mat element = getStructuringElement(MORPH_ELLIPSE,
+                           Size(2*expandSize + 1, 2*expandSize+1),
+                           Point(expandSize, expandSize));
     
-    return mask;
+    dilate(inMask, outMask, element);
 }
-*/
 
 // !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
 void DrawContOnMask(int img_width, int img_height, const POLYGON& contours, Mat& outMask)
@@ -108,7 +107,9 @@ void ForgeFaceLowThEyePg(const FaceInfo& faceInfo, POLYGON& skinPolygon)
 }
 //-------------------------------------------------------------------------------------------
 
-void ForgeMouthPolygon(const FaceInfo& faceInfo, POLYGON& mouthPolygon)
+void ForgeMouthPolygon(const FaceInfo& faceInfo,
+                       int& mouthWidth, int& mouthHeight,
+                       POLYGON& mouthPolygon)
 {
     // the indices for lm in meadiapipe mesh from
     //https://github.com/tensorflow/tfjs-models/blob/838611c02f51159afdd77469ce67f0e26b7bbb23/face-landmarks-detection/src/mediapipe-facemesh/keypoints.ts
@@ -129,6 +130,19 @@ void ForgeMouthPolygon(const FaceInfo& faceInfo, POLYGON& mouthPolygon)
         int y = faceInfo.lipRefinePts[index][1];
         mouthPolygon.push_back(Point2i(x, y));
     }
+    
+    // the following five points come from the general lms
+    Point2i pt37 = getPtOnGLm(faceInfo, 37);
+    Point2i pt267 = getPtOnGLm(faceInfo, 267) ;
+    Point2i pt57 = getPtOnGLm(faceInfo, 57);
+    Point2i pt287 = getPtOnGLm(faceInfo, 287);
+    Point2i pt17 = getPtOnGLm(faceInfo, 17);
+
+    mouthHeight = pt17.y - (pt37.y + pt267.y) / 2;
+    mouthWidth  = pt287.x - pt57.x;
+    
+    cout << "mouthHeight: " << mouthHeight << endl;
+    cout << "mouthWidth: " << mouthWidth << endl;
 }
 
 //-------------------------------------------------------------------------------------------
@@ -156,11 +170,23 @@ void ForgeFaceLowThEyeMask(const FaceInfo& faceInfo, Mat& outMask)
     DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
 }
 
-void ForgeMouthMask(const FaceInfo& faceInfo, Mat& outMask)
+//expanRatio: expansion width toward outside / half of mouth height
+void ForgeMouthMask(const FaceInfo& faceInfo, float expanRatio, Mat& outFinalMask)
 {
-    POLYGON polygon;
-    ForgeMouthPolygon(faceInfo, polygon);
-    DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, polygon, outMask);
+    POLYGON coarsePolygon, refinedPolygon;
+
+    int mouthW, mouthH;
+    ForgeMouthPolygon(faceInfo, mouthW, mouthH, coarsePolygon);
+    
+    int csNumPoint = 60;
+    CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+
+    // when to construct a Mat, Height first, and then Width!
+    Mat basicMask(faceInfo.imgHeight, faceInfo.imgWidth, CV_8UC1, cv::Scalar(0));
+    DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, basicMask);
+    
+    int expandSize = expanRatio * mouthH / 2;
+    expanMask(basicMask, expandSize, outFinalMask);
 }
 
 //-------------------------------------------------------------------------------------------
@@ -208,12 +234,16 @@ void ForgeTwoEyesFullMask(const FaceInfo& faceInfo, Mat& outEyesFullMask)
     ForgeOneEyeFullMask(faceInfo, LEFT_EYE, outMask);
     ForgeOneEyeFullMask(faceInfo, RIGHT_EYE, outMask);
     
+    /*
     int dila_size = 20;
     Mat element = getStructuringElement(MORPH_ELLIPSE,
                            Size(2*dila_size + 1, 2*dila_size+1),
                            Point(dila_size, dila_size));
     
     dilate(outMask, outEyesFullMask, element);
+    */
+    
+    expanMask(outMask, 20, outEyesFullMask);
 }
 
 //-------------------------------------------------------------------------------------------

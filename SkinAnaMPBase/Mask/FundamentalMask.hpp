@@ -21,25 +21,28 @@ using namespace cv;
 
 
 //-------------------------------------------------------------------------------------------
-
-/**********************************************************************************************
-
-本函数构建皮肤区域的矢量版雏形。
-***********************************************************************************************/
-
-//Mat Contour2Mask(int img_width, int img_height, const POLYGON& contours);
+void expanMask(const Mat& inMask, int expandSize, Mat& outMask);
 
 // !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
 void DrawContOnMask(int img_width, int img_height, const POLYGON& contours, Mat& outMask);
 
 Mat ContourGroup2Mask(int img_width, int img_height, const POLYGON_GROUP& contoursGroup);
 
+
+/**********************************************************************************************
+本函数构建皮肤区域的矢量版雏形。
+***********************************************************************************************/
 void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon);
 //-------------------------------------------------------------------------------------------
 
 void ForgeSkinMask(const FaceInfo& faceInfo, Mat& outMask);
 
-void ForgeMouthMask(const FaceInfo& faceInfo, Mat& outMask);
+void ForgeMouthPolygon(const FaceInfo& faceInfo,
+                       int& mouthWidth, int& mouthHeigh,
+                       POLYGON& mouthPolygon);
+
+//expanRatio: expansion width toward outside / half of mouth height
+void ForgeMouthMask(const FaceInfo& faceInfo, float expanRatio, Mat& outMask);
 
 
 // EeyeFullMask包含眼睛、眉毛、眼袋的大范围区域
