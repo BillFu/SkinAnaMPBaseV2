@@ -87,6 +87,7 @@ void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon)
     }
 }
 
+// face mask below the eyes, 在鼻子部位向上凸出，接近额头
 void ForgeFaceLowThEyePg(const FaceInfo& faceInfo, POLYGON& skinPolygon)
 {
     // the indices for lm in meadiapipe mesh from
@@ -96,7 +97,7 @@ void ForgeFaceLowThEyePg(const FaceInfo& faceInfo, POLYGON& skinPolygon)
         176, 148, 152, 377,
     400, 378, 379, 365, 397, 288, 376, 366, 323, //454,  // 454, the most right and top point
     // top limit line from right to left
-    345, 346, 349, 419, 197, 196, 120, 117
+    346, 349, 453, 417, 336, 107, 193, 233, 120, 117
     };
     
     int num_pts = sizeof(outlinePts) / sizeof(int);
@@ -163,7 +164,7 @@ void ForgeSkinMask(const FaceInfo& faceInfo, Mat& outMask)
     DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
 }
 
-// face mask below the eyes
+// face mask below the eyes, 在鼻子部位向上凸出，接近额头
 void ForgeFaceLowThEyeMask(const FaceInfo& faceInfo, Mat& outMask)
 {
     POLYGON coarsePolygon, refinedPolygon;

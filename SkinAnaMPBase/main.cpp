@@ -173,7 +173,7 @@ int main(int argc, char **argv)
     ForgePoreMaskV2(faceInfo, fleMask, fhMask, eyesFullMask,
                     mouthMask, noseMask,
                     poreMask);
-    OverlayMaskOnImage(srcImage, poreMask,
+    OverlayMaskOnImage(annoImage2, poreMask,
                         "pore mask", poreMaskAnnoFile.c_str());
 
     return 0;
