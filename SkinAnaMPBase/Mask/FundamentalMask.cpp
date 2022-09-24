@@ -90,9 +90,14 @@ void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon)
 void ForgeFaceLowThEyePg(const FaceInfo& faceInfo, POLYGON& skinPolygon)
 {
     // the indices for lm in meadiapipe mesh from
-    int outlinePts[] = { // in reverse clock order
-    234, 93, 132, 58, 172, 136, 150, 149, 176, 148, 152, 377,
-    400, 378, 379, 365, 397, 288, 361, 323, 454};
+    int outlinePts[] = { // in counterclockwise order
+    //234, // 234, the most left and top point
+    116, 137, 177, 147, 172, 136, 150, 149,
+        176, 148, 152, 377,
+    400, 378, 379, 365, 397, 288, 376, 366, 323, //454,  // 454, the most right and top point
+    // top limit line from right to left
+    345, 346, 349, 419, 197, 196, 120, 117
+    };
     
     int num_pts = sizeof(outlinePts) / sizeof(int);
     

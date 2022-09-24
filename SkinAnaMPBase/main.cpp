@@ -150,17 +150,13 @@ int main(int argc, char **argv)
     ForgeForeheadMask(faceInfo, fhMask);
     
     Mat annoImage2 = srcImage.clone();
-    AnnoGeneralKeyPoints(annoImage2, faceInfo);
+    AnnoGeneralKeyPoints(annoImage2, faceInfo, true);
     OverlayMaskOnImage(annoImage2, fhMask,
                         "forehead mask", fhMaskAnnoFile.c_str());
-    //annoImage2.release();
     
     string noseMaskAnnoFile = config_json.at("NoseMaskImage");
     Mat noseMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
     ForgeNoseMask(faceInfo, noseMask);
-    
-    //Mat annoImage3 = srcImage.clone();
-    AnnoGeneralKeyPoints(annoImage2, faceInfo);
     
     Mat combinedMask = noseMask | fhMask;
     OverlayMaskOnImage(annoImage2, combinedMask,
@@ -169,12 +165,8 @@ int main(int argc, char **argv)
     string fleMaskAnnoFile = config_json.at("FaceLowThEyeImage");
     Mat fleMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
     ForgeFaceLowThEyeMask(faceInfo, fleMask);
-    
-    Mat annoImage4 = srcImage.clone();
-    //AnnoGeneralKeyPoints(annoImage4, faceInfo);
-    OverlayMaskOnImage(annoImage4, fleMask,
+    OverlayMaskOnImage(annoImage2, fleMask,
                         "face low th eye", fleMaskAnnoFile.c_str());
-    //annoImage2.release();
     
     string poreMaskAnnoFile = config_json.at("PoreMask");
     Mat poreMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
