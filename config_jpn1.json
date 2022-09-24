@@ -7,6 +7,7 @@
 	"EyebowsContourImage": 				"result/JPN/ebc_cross_1.png",
 	"EyeFullContourImage": 				"result/JPN/efc_cross_1.png",
 	"ForeheadMaskImage": 				"result/JPN/fhm_cross_1.png",
-	"NoseMaskImage": 					"result/JPN/nose_cross_1.png",	
+	"NoseMaskImage": 					"result/JPN/nose_cross_1.png",
+	"FaceLowThEyeImage":			"result/JPN/fle_cross_1.png",	
 	"PoreMask": 						"result/JPN/pore_cross_1.png"
 }

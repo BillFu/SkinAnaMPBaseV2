@@ -174,5 +174,16 @@ int main(int argc, char **argv)
     OverlayMaskOnImage(annoImage2, combinedMask,
                         "combined mask", noseMaskAnnoFile.c_str());
     
+    
+    string fleMaskAnnoFile = config_json.at("FaceLowThEyeImage");
+    Mat fleMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
+    ForgeFaceLowThEyeMask(faceInfo, fleMask);
+    
+    Mat annoImage4 = srcImage.clone();
+    //AnnoGeneralKeyPoints(annoImage4, faceInfo);
+    OverlayMaskOnImage(annoImage4, fleMask,
+                        "face low th eye", fleMaskAnnoFile.c_str());
+    //annoImage2.release();
+    
     return 0;
 }
