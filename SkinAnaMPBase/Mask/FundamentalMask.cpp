@@ -94,8 +94,9 @@ void ForgeFaceLowThEyePg(const FaceInfo& faceInfo, POLYGON& skinPolygon)
     int outlinePts[] = { // in counterclockwise order
     //234, // 234, the most left and top point
     116, 137, 177, 147, 172, 136, 150, 149,
-        176, 148, 152, 377,
-    400, 378, 379, 365, 397, 288, 376, 366, 323, //454,  // 454, the most right and top point
+        176, 148, 199, 428,
+    //400, 378, 379, 365, 397, 288, 376, 366, 323, //454,  // 454, the most right and top point
+    400, 431, 430, 416, 288, 376, 366, 447,  
     // top limit line from right to left
     346, 349, 453, 417, 336, 107, 193, 233, 120, 117
     };
