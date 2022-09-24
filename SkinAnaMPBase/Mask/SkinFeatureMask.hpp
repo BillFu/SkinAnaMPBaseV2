@@ -30,4 +30,11 @@ void ForgePoreMask(const FaceInfo& faceInfo,
                    const Mat& mouthMask, // the enlarged mouth mask
                    Mat& outPoreMask);
 
+void ForgePoreMaskV2(const FaceInfo& faceInfo,
+                   const Mat& faceLowMask,  // lower than eyes
+                   const Mat& foreheadMask,
+                   const Mat& eyeFullMask,  // cover the eyes and eyebows and the surrounding nearby area
+                   const Mat& mouthMask, // the enlarged mouth mask
+                   Mat& outPoreMask);
+
 #endif /* end of SKIN_FEATURE_MASK_HPP */

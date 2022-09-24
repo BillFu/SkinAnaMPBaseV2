@@ -20,3 +20,15 @@ void ForgePoreMask(const FaceInfo& faceInfo,
 {
     outPoreMask = fullFaceMask & (~eyeFullMask) & (~mouthMask);
 }
+
+
+void ForgePoreMaskV2(const FaceInfo& faceInfo,
+                   const Mat& faceLowMask,  // lower than eyes
+                   const Mat& foreheadMask,
+                   const Mat& eyeFullMask,  // cover the eyes and eyebows and the surrounding nearby area
+                   const Mat& mouthMask, // the enlarged mouth mask
+                   Mat& outPoreMask)
+{
+    outPoreMask = faceLowMask | foreheadMask ;
+    outPoreMask = outPoreMask & (~eyeFullMask) & (~mouthMask);
+}
