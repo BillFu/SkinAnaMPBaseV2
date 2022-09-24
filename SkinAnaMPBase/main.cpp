@@ -170,7 +170,9 @@ int main(int argc, char **argv)
     
     string poreMaskAnnoFile = config_json.at("PoreMask");
     Mat poreMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
-    ForgePoreMaskV2(faceInfo, fleMask, fhMask, eyesFullMask, mouthMask, poreMask);
+    ForgePoreMaskV2(faceInfo, fleMask, fhMask, eyesFullMask,
+                    mouthMask, noseMask,
+                    poreMask);
     OverlayMaskOnImage(srcImage, poreMask,
                         "pore mask", poreMaskAnnoFile.c_str());
 
