@@ -64,7 +64,8 @@ BBox: Bounding Box
 CP: center point, i.e., the midway of the line connecting the center points of two eyes.
 ***********************************************************************************************/
 void GeoFixFVSrcImg(const Mat& srcImg, const Rect& faceBBox,
-                    const Point2i& faceCP, float alpha, Mat& outImg);
+                    const Point2i& faceCP, float alpha, Mat& outImg,
+                    int& TP, int& LP);
 //-------------------------------------------------------------------------------------------
 
 

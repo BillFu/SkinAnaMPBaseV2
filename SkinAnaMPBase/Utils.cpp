@@ -155,8 +155,12 @@ void MakeSquareImageV2(const Mat& srcImg, float deltaHRatio, Mat& squareImg)
 FV: front view
 ***********************************************************************************************/
 void GeoFixFVSrcImg(const Mat& srcImg, const Rect& faceBBox,
-                    const Point2i& faceCP, float alpha, Mat& outImg)
+                    const Point2i& faceCP, float alpha, Mat& outImg,
+                    int& TP, int& LP)
 {
+    int H = srcImg.rows;
+    int W = srcImg.cols;
+    
     int BW = faceBBox.width;
     int expandHalfW = (int)(BW * (1+alpha) / 2);
     
@@ -167,5 +171,22 @@ void GeoFixFVSrcImg(const Mat& srcImg, const Rect& faceBBox,
     int Hp = (int)(Wp*1.4); // maybe should be 1.5
     assert(Hp > srcImg.rows);
     
+    if( Wp % 2 != 0)
+        Wp += 1;
+    
+    if( Hp % 2 != 0)
+        Hp += 1;
+        
+    //TP, BP, LP, RP stand for the padding for top, bottom, left, and right side.
+    TP = Hp / 2 - faceCP.y;
+    LP = Wp / 2 - faceCP.x;
+    int BP = Hp / 2 + faceCP.y - H;
+    int RP = Wp / 2 + faceCP.x - W;
+    
+    Scalar blackColor(0, 0, 0);
+
+    copyMakeBorder( srcImg, outImg,
+                    TP, BP, LP, RP,
+                   BORDER_CONSTANT, blackColor);
     
 }

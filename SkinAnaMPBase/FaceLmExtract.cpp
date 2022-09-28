@@ -166,6 +166,8 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     Mat paddedImg;
     
     float alpha = 0.0;
+    int TP = 0; // top padding width
+    int LP = 0; // left padding height
     if(needPadding)
     {
         //float alpha = vertPadRatio; // deltaH / srcH
@@ -176,7 +178,7 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
         Point2i faceCP(1894, 3158);
         
         GeoFixFVSrcImg(srcImage, faceBBox,
-                       faceCP, 0.25, paddedImg);
+                       faceCP, 0.25, paddedImg, TP, LP);
     }
     else
     {
@@ -290,9 +292,12 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     faceInfo.imgWidth = srcImage.cols;
     faceInfo.imgHeight = srcImage.rows;
     
+    /*  this function couples with MakeSquareImageV2()
     padCoord2SrcCoord(padImgWidht, padImgHeight,
                       srcImage.cols, srcImage.rows, alpha,
                       normalLmSet, faceInfo);
+    */
+    FixedCoord2SrcCoord(TP, LP, normalLmSet, faceInfo);
 
     errorMsg = "OK";
     return true;
@@ -373,4 +378,18 @@ void padCoord2SrcCoord(int padImgWidht, int padImgHeight,
                       dX, dHH,
                       normalLmSet.NorLipRefinePts, NUM_PT_LIP_REFINE_GROUP, srcSpaceFI.lipRefinePts);
 
+}
+
+//-----------------------------------------------------------------------------------------------
+
+/******************************************************************************************
+convert the coordinates of LM extracted from the geo-fixed image into the coordinates
+of source image space.
+
+*******************************************************************************************/
+void FixedCoord2SrcCoord(int TP, int LP,
+                         const NormalLmSet& normalLmSet,
+                         FaceInfo& srcSpaceFI)
+{
+    
 }

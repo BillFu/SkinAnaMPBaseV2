@@ -75,4 +75,15 @@ void padCoord2SrcCoord(int padImgWidht, int padImgHeight,
                        const NormalLmSet& normalLmSet,
                        FaceInfo& srcSpaceFI);
 
+//-----------------------------------------------------------------------------------------
+
+/******************************************************************************************
+convert the coordinates of LM extracted from the geo-fixed image into the coordinates
+of source image space.
+
+*******************************************************************************************/
+void FixedCoord2SrcCoord(int TP, int LP,
+                       const NormalLmSet& normalLmSet,
+                       FaceInfo& srcSpaceFI);
+
 #endif /* end of FACE_LM_EXTRACT_HPP */
