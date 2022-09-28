@@ -1,0 +1,152 @@
+meicet@meicetdeiMac FaceBkSeg % ./run_batch.sh
+---------------------------------------------------
+models/seg_model.onnx
+models/classes3.txt
+srcImgRootDir: images
+annoImgRootDir: result
+---------------------------------------------------
+the Model file for segmentation has been Successfully loaded!
+---------------***************************--------------------
+Succeeded to load image: images/JPN/cross_5.jpg
+FacePrimaryInfo{
+faceBBox: [1879 x 2550 from (420, 395)]
+faceCP: [1347, 1669]
+eyeCPs1: [1821, 1663]
+eyeCPs2: [874, 1676]
+isFrontView: 1
+}
+
+Source iamge has been segmented: images/JPN/cross_5.jpg
+Anno iamge saved as File: result/JPN/anno_cross_5.png
+---------------***************************--------------------
+Succeeded to load image: images/JPN/cross_6.jpg
+FacePrimaryInfo{
+faceBBox: [1855 x 2748 from (344, 261)]
+faceCP: [1271, 1753]
+eyeCPs1: [755, 1734]
+eyeCPs2: [1788, 1772]
+isFrontView: 1
+}
+
+Source iamge has been segmented: images/JPN/cross_6.jpg
+Anno iamge saved as File: result/JPN/anno_cross_6.png
+---------------***************************--------------------
+Succeeded to load image: images/JPN/cross_1.jpg
+FacePrimaryInfo{
+faceBBox: [1779 x 2646 from (291, 312)]
+faceCP: [1145, 1749]
+eyeCPs1: [1635, 1765]
+eyeCPs2: [655, 1734]
+isFrontView: 1
+}
+
+Source iamge has been segmented: images/JPN/cross_1.jpg
+Anno iamge saved as File: result/JPN/anno_cross_1.png
+---------------***************************--------------------
+Succeeded to load image: images/ISEMECO/cross_8.jpg
+FacePrimaryInfo{
+faceBBox: [3523 x 4664 from (281, 1171)]
+faceCP: [2093, 3474]
+eyeCPs1: [1234, 3480]
+eyeCPs2: [2953, 3468]
+isFrontView: 1
+}
+
+Source iamge has been segmented: images/ISEMECO/cross_8.jpg
+Anno iamge saved as File: result/ISEMECO/anno_cross_8.png
+---------------***************************--------------------
+Succeeded to load image: images/ISEMECO/cross_2.jpg
+FacePrimaryInfo{
+faceBBox: [3407 x 5039 from (218, 867)]
+faceCP: [1894, 3158]
+eyeCPs1: [984, 3199]
+eyeCPs2: [2804, 3117]
+isFrontView: 1
+}
+
+Source iamge has been segmented: images/ISEMECO/cross_2.jpg
+Anno iamge saved as File: result/ISEMECO/anno_cross_2.png
+---------------***************************--------------------
+Succeeded to load image: images/ISE_Profile/L1.jpg
+FacePrimaryInfo{
+faceBBox: [3383 x 4289 from (437, 1558)]
+faceCP: [1365, 3297]
+eyeCPs1: [820, 3339]
+eyeCPs2: [2375, 3222]
+isFrontView: 0
+}
+
+Source iamge has been segmented: images/ISE_Profile/L1.jpg
+Anno iamge saved as File: result/ISE_Profile/anno_L1.png
+---------------***************************--------------------
+Succeeded to load image: images/ISE_Profile/L3.jpg
+FacePrimaryInfo{
+faceBBox: [3164 x 4418 from (476, 1394)]
+faceCP: [1274, 3550]
+eyeCPs1: [2101, 3785]
+eyeCPs2: [820, 3421]
+isFrontView: 0
+}
+
+Source iamge has been segmented: images/ISE_Profile/L3.jpg
+Anno iamge saved as File: result/ISE_Profile/anno_L3.png
+---------------***************************--------------------
+Succeeded to load image: images/ISE_Profile/R3.jpg
+FacePrimaryInfo{
+faceBBox: [3171 x 4547 from (750, 1312)]
+faceCP: [3194, 3497]
+eyeCPs1: [2406, 3949]
+eyeCPs2: [3492, 3328]
+isFrontView: 0
+}
+
+Source iamge has been segmented: images/ISE_Profile/R3.jpg
+Anno iamge saved as File: result/ISE_Profile/anno_R3.png
+---------------***************************--------------------
+Succeeded to load image: images/ISE_Profile/R1.jpg
+FacePrimaryInfo{
+faceBBox: [3305 x 4500 from (296, 1312)]
+faceCP: [2692, 3314]
+eyeCPs1: [1750, 3210]
+eyeCPs2: [3234, 3375]
+isFrontView: 0
+}
+
+Source iamge has been segmented: images/ISE_Profile/R1.jpg
+Anno iamge saved as File: result/ISE_Profile/anno_R1.png
+---------------***************************--------------------
+Succeeded to load image: images/White/cross_21.jpg
+FacePrimaryInfo{
+faceBBox: [1434 x 2193 from (564, 573)]
+faceCP: [1316, 1669]
+eyeCPs1: [946, 1676]
+eyeCPs2: [1687, 1663]
+isFrontView: 1
+}
+
+Source iamge has been segmented: images/White/cross_21.jpg
+Anno iamge saved as File: result/White/anno_cross_21.png
+---------------***************************--------------------
+Succeeded to load image: images/Black/cross_25.jpg
+FacePrimaryInfo{
+faceBBox: [1766 x 2411 from (363, 463)]
+faceCP: [1296, 1621]
+eyeCPs1: [813, 1615]
+eyeCPs2: [1780, 1627]
+isFrontView: 1
+}
+
+Source iamge has been segmented: images/Black/cross_25.jpg
+Anno iamge saved as File: result/Black/anno_cross_25.png
+---------------***************************--------------------
+Succeeded to load image: images/Black/cross_12.jpg
+FacePrimaryInfo{
+faceBBox: [1885 x 2572 from (253, 231)]
+faceCP: [1207, 1573]
+eyeCPs1: [717, 1568]
+eyeCPs2: [1698, 1579]
+isFrontView: 1
+}
+
+Source iamge has been segmented: images/Black/cross_12.jpg
+Anno iamge saved as File: result/Black/anno_cross_12.png

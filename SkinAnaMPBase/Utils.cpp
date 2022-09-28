@@ -143,3 +143,29 @@ void MakeSquareImageV2(const Mat& srcImg, float deltaHRatio, Mat& squareImg)
     }
 }
 //-------------------------------------------------------------------------------------------
+
+/**********************************************************************************************
+采用Shifting & Padding的方式，将原始图像进行几何方面的修正，使之适合于输入Face Mesh With Attention模型提取关键点。
+基本的要求：
+1. Face CP should be located in the center of the newly forged image.
+2. 25% margin should be remained at both sides of the output image. 25% for each side.
+3. In the output image, the ratio of Height vs Widht should be 1.4.
+4. the raw content of source image should be contained completely in the out image.
+5. scale not changed.
+FV: front view
+***********************************************************************************************/
+void GeoFixFVSrcImg(const Mat& srcImg, const Rect& faceBBox,
+                    const Point2i& faceCP, float alpha, Mat& outImg)
+{
+    int BW = faceBBox.width;
+    int expandHalfW = (int)(BW * (1+alpha) / 2);
+    
+    int t1 = max(faceCP.x, srcImg.cols - faceCP.x);
+    int half_Wp = max(expandHalfW, t1); // p: prime，右上侧的撇号；Wp: width of the out image
+    
+    int Wp = half_Wp * 2;
+    int Hp = (int)(Wp*1.4); // maybe should be 1.5
+    assert(Hp > srcImg.rows);
+    
+    
+}
