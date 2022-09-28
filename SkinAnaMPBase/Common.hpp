@@ -66,12 +66,12 @@ struct FaceInfo
     //[n][0] for x, [n][1] for y
     // measured in source iamge coordinate system
     float lm_3d[NUM_PT_GENERAL_LM][3];  // x, y, z, Not used
-    int   lm_2d[NUM_PT_GENERAL_LM][2];  // x, y，与上面的lm_3d中相同，只是数据类型不同
+    Point2i   lm_2d[NUM_PT_GENERAL_LM];  // x, y，与上面的lm_3d中相同，只是数据类型不同
     
-    int leftEyeRefinePts[NUM_PT_EYE_REFINE_GROUP][2];
-    int rightEyeRefinePts[NUM_PT_EYE_REFINE_GROUP][2];
+    Point2i lEyeRefinePts[NUM_PT_EYE_REFINE_GROUP];
+    Point2i rEyeRefinePts[NUM_PT_EYE_REFINE_GROUP];
     
-    int lipRefinePts[NUM_PT_LIP_REFINE_GROUP][2];
+    Point2i lipRefinePts[NUM_PT_LIP_REFINE_GROUP];
     
     HeadPose headPose;
     

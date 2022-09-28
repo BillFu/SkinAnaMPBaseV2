@@ -169,7 +169,9 @@ void GeoFixFVSrcImg(const Mat& srcImg, const Rect& faceBBox,
     
     int Wp = half_Wp * 2;
     int Hp = (int)(Wp*1.4); // maybe should be 1.5
-    assert(Hp > srcImg.rows);
+    //assert(Hp > srcImg.rows);
+    Hp = max(Hp, srcImg.rows);
+    Wp = max(Wp, srcImg.cols);
     
     if( Wp % 2 != 0)
         Wp += 1;

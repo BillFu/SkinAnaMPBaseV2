@@ -501,8 +501,8 @@ void FillData(FaceInfo& faceInfo)
 {
     for(int i = 0; i<468; i++)
     {
-        faceInfo.lm_2d[i][0] = general_lm[i][0];
-        faceInfo.lm_2d[i][1] = general_lm[i][1];
+        faceInfo.lm_2d[i].x = general_lm[i][0];
+        faceInfo.lm_2d[i].y = general_lm[i][1];
     }
 }
 

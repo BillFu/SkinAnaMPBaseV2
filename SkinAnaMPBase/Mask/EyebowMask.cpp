@@ -22,13 +22,13 @@ Point2i getPtOnEb(const FaceInfo& faceInfo, EyeID eyeID, int ptIndex)
      
     if(eyeID == LEFT_EYE)
     {
-        x = faceInfo.leftEyeRefinePts[ptIndex][0];
-        y = faceInfo.leftEyeRefinePts[ptIndex][1];
+        x = faceInfo.lEyeRefinePts[ptIndex].x;
+        y = faceInfo.lEyeRefinePts[ptIndex].y;
     }
     else  // RIGHT_EYE
     {
-        x = faceInfo.rightEyeRefinePts[ptIndex][0];
-        y = faceInfo.rightEyeRefinePts[ptIndex][1];
+        x = faceInfo.rEyeRefinePts[ptIndex].x;
+        y = faceInfo.rEyeRefinePts[ptIndex].y;
     }
     
     return Point2i(x, y);

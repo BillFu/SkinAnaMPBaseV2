@@ -69,8 +69,8 @@ void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon)
         
         if(indexInFHC == -1) // Not on Forehead Curve
         {
-            newSilhouPts[i][0] = faceInfo.lm_2d[index][0];
-            newSilhouPts[i][1] = faceInfo.lm_2d[index][1];
+            newSilhouPts[i][0] = faceInfo.lm_2d[index].x;
+            newSilhouPts[i][1] = faceInfo.lm_2d[index].y;
         }
         else // on Forehead Curve, need update the coordinates, i.e. raising up
         {
@@ -107,9 +107,7 @@ void ForgeFaceLowThEyePg(const FaceInfo& faceInfo, POLYGON& skinPolygon)
     for(int i = 0; i<num_pts; i++)
     {
         int index = outlinePts[i];
-        int x = faceInfo.lm_2d[index][0];
-        int y = faceInfo.lm_2d[index][1];
-        skinPolygon.push_back(Point2i(x, y));
+        skinPolygon.push_back(faceInfo.lm_2d[index]);
     }
 }
 //-------------------------------------------------------------------------------------------
@@ -132,10 +130,7 @@ void ForgeMouthPolygon(const FaceInfo& faceInfo,
     for(int i = 0; i<num_pts; i++)
     {
         int index = lipsOuterPtIndices[i];
-        
-        int x = faceInfo.lipRefinePts[index][0];
-        int y = faceInfo.lipRefinePts[index][1];
-        mouthPolygon.push_back(Point2i(x, y));
+        mouthPolygon.push_back(faceInfo.lipRefinePts[index]);
     }
     
     // the following five points come from the general lms
@@ -197,8 +192,8 @@ void ForgeMouthMask(const FaceInfo& faceInfo, float expanRatio, Mat& outFinalMas
 }
 
 //-------------------------------------------------------------------------------------------
-
-void ForgeOneEyeFullPolygon(const int eyeRefinePts[71][2], POLYGON& outPolygon)
+// Pg: Polygon
+void ForgeOneEyeFullPg(const Point2i eyeRefinePts[71], POLYGON& outPolygon)
 {
     // 采用Lip Refine Region的点！
     int fullEyeOuterPtIndices[] = { // 顺时针计数
@@ -211,10 +206,7 @@ void ForgeOneEyeFullPolygon(const int eyeRefinePts[71][2], POLYGON& outPolygon)
     for(int i = 0; i<num_pts; i++)
     {
         int index = fullEyeOuterPtIndices[i];
-        
-        int x = eyeRefinePts[index][0];
-        int y = eyeRefinePts[index][1];
-        outPolygon.push_back(Point2i(x, y));
+        outPolygon.push_back(eyeRefinePts[index]);
     }
 }
 
@@ -224,9 +216,9 @@ void ForgeOneEyeFullMask(const FaceInfo& faceInfo, EyeID eyeID, Mat& outMask)
     POLYGON coarsePolygon, refinedPolygon;
     
     if(eyeID == LEFT_EYE)
-        ForgeOneEyeFullPolygon(faceInfo.leftEyeRefinePts, coarsePolygon);
+        ForgeOneEyeFullPg(faceInfo.lEyeRefinePts, coarsePolygon);
     else
-        ForgeOneEyeFullPolygon(faceInfo.rightEyeRefinePts, coarsePolygon);
+        ForgeOneEyeFullPg(faceInfo.rEyeRefinePts, coarsePolygon);
     
     int csNumPoint = 50; //200;
     CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
@@ -267,10 +259,7 @@ void ForgeNosePolygon(const FaceInfo& faceInfo, POLYGON& outPolygon)
     for(int i = 0; i<num_pts; i++)
     {
         int index = nosePtIndices[i];
-        
-        int x = faceInfo.lm_2d[index][0];
-        int y = faceInfo.lm_2d[index][1];
-        outPolygon.push_back(Point2i(x, y));
+        outPolygon.push_back(faceInfo.lm_2d[index]);
     }
 }
 

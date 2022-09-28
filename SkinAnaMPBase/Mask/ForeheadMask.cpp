@@ -40,7 +40,7 @@ int getPtIndexOfFHCurve(int ptIndex)
 
  *******************************************************************************************/
 
-void RaiseupForeheadCurve(const int lm_2d[468][2], int raisedFhCurve[9][2], float alpha)
+void RaiseupForeheadCurve(const Point2i lm_2d[468], int raisedFhCurve[9][2], float alpha)
 {
     // 前额顶部轮廓线由9个lm点组成。这9个点组成第0排点集，比它们低一些的9个点组成第1排点集。
     // 抬高后获得的9个点组成-1排点集。
@@ -54,9 +54,9 @@ void RaiseupForeheadCurve(const int lm_2d[468][2], int raisedFhCurve[9][2], floa
         int id_row0 = zero_row_indices[i];
         int id_row1 = one_row_indices[i];
         
-        int yi_0 = lm_2d[id_row0][1];
-        int xi_0 = lm_2d[id_row0][0];
-        int yi_1 = lm_2d[id_row1][1];
+        int yi_0 = lm_2d[id_row0].y;
+        int xi_0 = lm_2d[id_row0].x;
+        int yi_1 = lm_2d[id_row1].y;
 
         // the difference of y values between the 0 row and the 1 row.
         // delta_y = row1.y - row0.y; and delta_y > 0
@@ -68,7 +68,7 @@ void RaiseupForeheadCurve(const int lm_2d[468][2], int raisedFhCurve[9][2], floa
     }
 }
 
-void RaiseupForeheadCurve(const int lm_2d[468][2], Point2i raisedFhCurve[9], float alpha)
+void RaiseupForeheadCurve(const Point2i lm_2d[468], Point2i raisedFhCurve[9], float alpha)
 {
     // 前额顶部轮廓线由9个lm点组成。这9个点组成第0排点集，比它们低一些的9个点组成第1排点集。
     // 抬高后获得的9个点组成-1排点集。
@@ -82,9 +82,9 @@ void RaiseupForeheadCurve(const int lm_2d[468][2], Point2i raisedFhCurve[9], flo
         int id_row0 = zero_row_indices[i];
         int id_row1 = one_row_indices[i];
         
-        int yi_0 = lm_2d[id_row0][1];
-        int xi_0 = lm_2d[id_row0][0];
-        int yi_1 = lm_2d[id_row1][1];
+        int yi_0 = lm_2d[id_row0].y;
+        int xi_0 = lm_2d[id_row0].x;
+        int yi_1 = lm_2d[id_row1].y;
 
         // the difference of y values between the 0 row and the 1 row.
         // delta_y = row1.y - row0.y; and delta_y > 0

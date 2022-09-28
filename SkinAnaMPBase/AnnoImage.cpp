@@ -43,12 +43,13 @@ void AnnoGeneralKeyPoints(Mat& annoImage, const FaceInfo& faceInfo, bool showInd
     cv::Scalar blue(255, 0, 0);
     for(int i = 0; i < 468; i++)
     {
-        cv::Point center(faceInfo.lm_2d[i][0], faceInfo.lm_2d[i][1]);
-        cv::circle(annoImage, center, 5, blue, cv::FILLED);
+        // cv::Point center(faceInfo.lm_2d[i].x, faceInfo.lm_2d[i].y);
+        cv::circle(annoImage, faceInfo.lm_2d[i], 5, blue, cv::FILLED);
         
+        cout << faceInfo.lm_2d[i] << endl;
         if(showIndices)
         {
-            cv::putText(annoImage, to_string(i), center,
+            cv::putText(annoImage, to_string(i), faceInfo.lm_2d[i],
                         FONT_HERSHEY_SIMPLEX, 0.5, blue, 1);
         }
     }
@@ -60,8 +61,8 @@ void AnnoGeneralKeyPoints(Mat& annoImage, const FaceInfo& faceInfo, bool showInd
     for(int i=0; i<14; i++)
     {
         int lm_index = face_2d_pts_indices[i];
-        int x = faceInfo.lm_2d[lm_index][0];
-        int y = faceInfo.lm_2d[lm_index][1];
+        int x = faceInfo.lm_2d[lm_index].x;
+        int y = faceInfo.lm_2d[lm_index].y;
         
         cv::Point center(x, y);
         cv::circle(annoImage, center, 5, yellow, cv::FILLED);
@@ -82,13 +83,13 @@ void AnnoOneEyeRefinePts(Mat& annoImage, const FaceInfo& faceInfo, EyeID eyeID,
         int x, y;
         if(eyeID == LEFT_EYE)
         {
-            x = faceInfo.leftEyeRefinePts[i][0];
-            y = faceInfo.leftEyeRefinePts[i][1];
+            x = faceInfo.lEyeRefinePts[i].x;
+            y = faceInfo.lEyeRefinePts[i].y;
         }
         else // RightEyeID
         {
-            x = faceInfo.rightEyeRefinePts[i][0];
-            y = faceInfo.rightEyeRefinePts[i][1];
+            x = faceInfo.rEyeRefinePts[i].x;
+            y = faceInfo.rEyeRefinePts[i].y;
         }
         cv::Point center(x, y);
         cv::circle(annoImage, center, 1, drawColor, cv::FILLED);
@@ -124,8 +125,8 @@ void AnnoLipRefinePts(Mat& annoImage, const FaceInfo& faceInfo,
 {
     for(int i = 0; i < 80; i++)
     {
-        int x = faceInfo.lipRefinePts[i][0];
-        int y = faceInfo.lipRefinePts[i][1];
+        int x = faceInfo.lipRefinePts[i].x;
+        int y = faceInfo.lipRefinePts[i].y;
         
         cv::Point center(x, y);
         cv::circle(annoImage, center, 1, drawColor, cv::FILLED);

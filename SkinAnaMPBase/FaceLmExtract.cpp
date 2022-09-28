@@ -185,8 +185,9 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
         paddedImg = srcImage.clone();
     }
     
-    int padImgWidht = paddedImg.cols;
-    int padImgHeight = paddedImg.rows;
+    cv::Size padImgSize = paddedImg.size();
+    //int padImgWidht = paddedImg.cols;
+    //int padImgHeight = paddedImg.rows;
     
     int netInputWidth = FACE_MESH_NET_INPUT_W;
     int netInputHeight = FACE_MESH_NET_INPUT_H;
@@ -285,9 +286,7 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     float* outBufLipRefinePts = interpreter->typed_output_tensor<float>(1);
     extractLipRefinePts(outBufLipRefinePts, normalLmSet.NorLipRefinePts);
     
-    //-------------------------*****exit inference*****---------------------------------------------------------
-
-    //-------------------------*****postprocessing*****---------------------------------------------------------
+    //-------------------------*****exit inference, postprocessing*****---------------------------------------------------------
     // reverse coordinate transform
     faceInfo.imgWidth = srcImage.cols;
     faceInfo.imgHeight = srcImage.rows;
@@ -297,7 +296,7 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
                       srcImage.cols, srcImage.rows, alpha,
                       normalLmSet, faceInfo);
     */
-    FixedCoord2SrcCoord(TP, LP, normalLmSet, faceInfo);
+    FixedCd2SrcCd_All(padImgSize, TP, LP, normalLmSet, faceInfo);
 
     errorMsg = "OK";
     return true;
@@ -342,10 +341,10 @@ dummyFI: the coordiantes measured in padded image space.
 srcSpaceFI: the coordinates measured in the source iamge space.
 alpha: deltaH / srcH
 ***************************************************************************************************/
+/*
 void padCoord2SrcCoord(int padImgWidht, int padImgHeight,
                        int srcW, int srcH, float alpha,
                        const NormalLmSet& normalLmSet,
-                       
                        FaceInfo& srcSpaceFI)
 {
     int dX = 0; // applied for the case without padding
@@ -379,7 +378,7 @@ void padCoord2SrcCoord(int padImgWidht, int padImgHeight,
                       normalLmSet.NorLipRefinePts, NUM_PT_LIP_REFINE_GROUP, srcSpaceFI.lipRefinePts);
 
 }
-
+*/
 //-----------------------------------------------------------------------------------------------
 
 /******************************************************************************************
@@ -387,9 +386,42 @@ convert the coordinates of LM extracted from the geo-fixed image into the coordi
 of source image space.
 
 *******************************************************************************************/
-void FixedCoord2SrcCoord(int TP, int LP,
+// convert the coordinate of one point from fixed image space o the source image space
+// Cd: coordinate
+void FixedCd2SrcCd_OnePt(const cv::Size& fixedImgS,
+                         double normalX, double normalY,
+                         int TP, int LP, Point2i& srcPt)
+{
+    srcPt.x = normalX * fixedImgS.width - LP;
+    srcPt.y = normalY * fixedImgS.height - TP;
+}
+
+
+// convert a set of points
+void FixedCd2SrcCd_Group(const cv::Size& fixedImgS,
+                         int TP, int LP,
+                         const double normalPt[][2], int numPt, Point2i srcPt[])
+{
+    for(int i=0; i<numPt; i++)
+    {
+        FixedCd2SrcCd_OnePt(fixedImgS, TP, LP,
+                normalPt[i][0], normalPt[i][1], srcPt[i]);
+    }
+}
+
+void FixedCd2SrcCd_All(const cv::Size& fixedImgS, int TP, int LP,
                          const NormalLmSet& normalLmSet,
                          FaceInfo& srcSpaceFI)
 {
+    FixedCd2SrcCd_Group(fixedImgS, TP, LP,
+                      normalLmSet.normal_lm_2d, NUM_PT_GENERAL_LM, srcSpaceFI.lm_2d);
+
+    FixedCd2SrcCd_Group(fixedImgS, TP, LP,
+                      normalLmSet.LNorEyeBowPts, NUM_PT_EYE_REFINE_GROUP, srcSpaceFI.lEyeRefinePts);
     
+    FixedCd2SrcCd_Group(fixedImgS, TP, LP,
+                      normalLmSet.RNorEyeBowPts, NUM_PT_EYE_REFINE_GROUP, srcSpaceFI.rEyeRefinePts);
+    
+    FixedCd2SrcCd_Group(fixedImgS, TP, LP,
+                      normalLmSet.NorLipRefinePts, NUM_PT_LIP_REFINE_GROUP, srcSpaceFI.lipRefinePts);
 }

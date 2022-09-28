@@ -14,8 +14,8 @@ Date:   2022/9/18
 
 Point2i getPtOnGLm(const FaceInfo& faceInfo, int pIndex)
 {
-    int x = faceInfo.lm_2d[pIndex][0];
-    int y = faceInfo.lm_2d[pIndex][1];
+    int x = faceInfo.lm_2d[pIndex].x;
+    int y = faceInfo.lm_2d[pIndex].y;
     
     return Point2i(x, y);
 }

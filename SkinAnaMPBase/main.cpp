@@ -80,7 +80,7 @@ int main(int argc, char **argv)
     float confThresh = 0.75;
     bool hasFace = false;
     //float confidence = 0.0;
-    bool needPadding = false;
+    bool needPadding = true;
     float vertPadRatio = 0.0;
     bool isOK = ExtractFaceLm(faceMeshModel, srcImage,
                               needPadding, vertPadRatio,
@@ -105,6 +105,7 @@ int main(int argc, char **argv)
     Mat annoImage = srcImage.clone();
     
     AnnoGeneralKeyPoints(annoImage, faceInfo, true);
+    imwrite(annoPoseImgFile, annoImage);
 
     /*
     Scalar yellowColor(255, 0, 0);
@@ -117,7 +118,7 @@ int main(int argc, char **argv)
     
     imwrite(annoPoseImgFile, annoImage);
     */
-    
+    /*
     Mat skinMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
     string faceMaskImgFile = config_json.at("FaceContourImage");
     ForgeSkinMask(faceInfo, skinMask);
@@ -175,6 +176,6 @@ int main(int argc, char **argv)
                     poreMask);
     OverlayMaskOnImage(annoImage2, poreMask,
                         "pore mask", poreMaskAnnoFile.c_str());
-
+    */
     return 0;
 }

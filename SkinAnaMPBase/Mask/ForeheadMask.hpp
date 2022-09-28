@@ -29,10 +29,10 @@ Input: lm_2d
 Output: raisedForeheadCurve
  alpha: [0.0 1.0]，the greater this value is, the more raised up
 ***********************************************************************************************/
-void RaiseupForeheadCurve(const int lm_2d[468][2], int raisedFhCurve[9][2],
+void RaiseupForeheadCurve(const Point2i lm_2d[468], int raisedFhCurve[9][2],
                           float alpha);
 
-void RaiseupForeheadCurve(const int lm_2d[468][2], Point2i raisedFhCurve[9], float alpha);
+void RaiseupForeheadCurve(const Point2i lm_2d[468], Point2i raisedFhCurve[9], float alpha);
 
 //-------------------------------------------------------------------------------------------
 /**********************************************************************************************

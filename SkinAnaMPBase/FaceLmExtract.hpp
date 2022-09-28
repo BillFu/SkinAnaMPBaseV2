@@ -80,9 +80,10 @@ void padCoord2SrcCoord(int padImgWidht, int padImgHeight,
 /******************************************************************************************
 convert the coordinates of LM extracted from the geo-fixed image into the coordinates
 of source image space.
-
+Cd: coordinate
 *******************************************************************************************/
-void FixedCoord2SrcCoord(int TP, int LP,
+void FixedCd2SrcCd_All(const cv::Size& fixedImgS,
+                         int TP, int LP,
                        const NormalLmSet& normalLmSet,
                        FaceInfo& srcSpaceFI);
 

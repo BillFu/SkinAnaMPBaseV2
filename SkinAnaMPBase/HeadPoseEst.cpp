@@ -52,8 +52,8 @@ void EstHeadPose(int srcImgWidht, int srcImgHeight,
     for(int i=0; i<14; i++)
     {
         int lm_index = face_2d_pts_indices[i];
-        double x = faceInfo.lm_2d[lm_index][0];
-        double y = faceInfo.lm_2d[lm_index][1];
+        double x = faceInfo.lm_2d[lm_index].x;
+        double y = faceInfo.lm_2d[lm_index].y;
         face_2d_pts.push_back(Point2d(x, y));
     }
 
