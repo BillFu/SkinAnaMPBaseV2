@@ -157,7 +157,6 @@ TF_LITE_MODEL LoadFaceMeshAttenModel(const char* faceMeshModelFileName)
  Note: after invoking this function, return value and hasFace must be check!
 *******************************************************************************************/
 bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
-                   bool needPadding, float vertPadRatio,
                    float confTh, bool& hasFace,
                    FaceInfo& faceInfo, string& errorMsg)
 {
@@ -165,33 +164,25 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     // padding the source image to get better performance
     Mat paddedImg;
     
-    float alpha = 0.0;
     int TP = 0; // top padding width
     int LP = 0; // left padding height
-    if(needPadding)
-    {
-        //float alpha = vertPadRatio; // deltaH / srcH
-        //MakeSquareImageV2(srcImage, alpha,
-        //                  paddedImg);
-        // the values of faceBBox & faceCP taken from ISEMECO/cross_2.jpg
-        // Rect faceBBox(218, 867, 3407, 5039);
-        // Point2i faceCP(1894, 3158);
+    
+    //float alpha = vertPadRatio; // deltaH / srcH
+    //MakeSquareImageV2(srcImage, alpha,
+    //                  paddedImg);
+    // the values of faceBBox & faceCP taken from ISEMECO/cross_2.jpg
+    // Rect faceBBox(218, 867, 3407, 5039);
+    // Point2i faceCP(1894, 3158);
         
-        // the values of faceBBox & faceCP taken from ISEMECO/cross_2.jpg
-        Rect faceBBox(281, 1171, 3523, 4664);
-        Point2i faceCP(2093, 3474);
+    // the values of faceBBox & faceCP taken from ISEMECO/cross_2.jpg
+    Rect faceBBox(281, 1171, 3523, 4664);
+    Point2i faceCP(2093, 3474);
         
-        GeoFixFVSrcImg(srcImage, faceBBox,
-                       faceCP, 0.25, paddedImg, TP, LP);
-    }
-    else
-    {
-        paddedImg = srcImage.clone();
-    }
+    float alpha = 0.25;
+    GeoFixFVSrcImg(srcImage, faceBBox,
+                       faceCP, alpha, paddedImg, TP, LP);
     
     cv::Size padImgSize = paddedImg.size();
-    //int padImgWidht = paddedImg.cols;
-    //int padImgHeight = paddedImg.rows;
     
     int netInputWidth = FACE_MESH_NET_INPUT_W;
     int netInputHeight = FACE_MESH_NET_INPUT_H;
@@ -295,11 +286,6 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     faceInfo.imgWidth = srcImage.cols;
     faceInfo.imgHeight = srcImage.rows;
     
-    /*  this function couples with MakeSquareImageV2()
-    padCoord2SrcCoord(padImgWidht, padImgHeight,
-                      srcImage.cols, srcImage.rows, alpha,
-                      normalLmSet, faceInfo);
-    */
     FixedCd2SrcCd_All(padImgSize, TP, LP, normalLmSet, faceInfo);
 
     errorMsg = "OK";
@@ -307,92 +293,12 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
 }
 
 //-----------------------------------------------------------------------------------------------
-// dH: alpha * H
-// dX: 0.5*(H + dH - W)
-// H: the height of the source image
-// W: the width of the source image
-// dHH: 0.5 * dH
-void padCoord2SrcCoord(//int srcW, int srcH,
-                       int padImgWidht, int padImgHeight,
-                       int dX, int dHH,
-                       double normalX, double normalY, int& srcX, int& srcY)
-{
-    //srcX = normalX * srcW - dX;
-    //srcY = normalY * srcH - dHH;
-    srcX = normalX * padImgWidht - dX;
-    srcY = normalY * padImgHeight - dHH;
-
-}
-
-void padCoord2SrcCoord(//int srcW, int srcH,
-                       int padImgWidht, int padImgHeight,
-                       int dX, int dHH,
-                       const double normalPt[][2], int numPt, int srcPt[][2])
-{
-    for(int i=0; i<numPt; i++)
-    {
-        padCoord2SrcCoord(//srcW, srcH,
-                          padImgWidht, padImgHeight,
-                          dX, dHH,
-                          normalPt[i][0], normalPt[i][1],
-                          srcPt[i][0], srcPt[i][1]);
-    }
-}
-/**************************************************************************************************
-convert the coordinates of LM extracted from the Padded image into the coordinates
-of source image space.
-dummyFI: the coordiantes measured in padded image space.
-srcSpaceFI: the coordinates measured in the source iamge space.
-alpha: deltaH / srcH
-***************************************************************************************************/
-/*
-void padCoord2SrcCoord(int padImgWidht, int padImgHeight,
-                       int srcW, int srcH, float alpha,
-                       const NormalLmSet& normalLmSet,
-                       FaceInfo& srcSpaceFI)
-{
-    int dX = 0; // applied for the case without padding
-    int dHH = 0; // applied for the case without padding
-    
-    if(padImgWidht == padImgHeight) // is a square, and has padding applied
-    {
-        int dH = (int)(alpha * srcH);
-        dX = (srcH + dH - srcW)/2;
-        dHH = dH/2;
-    }
-    
-    padCoord2SrcCoord(//srcW, srcH,
-                      padImgWidht, padImgHeight,
-                      dX, dHH,
-                      normalLmSet.normal_lm_2d, NUM_PT_GENERAL_LM, srcSpaceFI.lm_2d);
-
-    padCoord2SrcCoord(//srcW, srcH,
-                      padImgWidht, padImgHeight,
-                      dX, dHH,
-                      normalLmSet.LNorEyeBowPts, NUM_PT_EYE_REFINE_GROUP, srcSpaceFI.leftEyeRefinePts);
-    
-    padCoord2SrcCoord(//srcW, srcH,
-                      padImgWidht, padImgHeight,
-                      dX, dHH,
-                      normalLmSet.RNorEyeBowPts, NUM_PT_EYE_REFINE_GROUP, srcSpaceFI.rightEyeRefinePts);
-    
-    padCoord2SrcCoord(//srcW, srcH,
-                      padImgWidht, padImgHeight,
-                      dX, dHH,
-                      normalLmSet.NorLipRefinePts, NUM_PT_LIP_REFINE_GROUP, srcSpaceFI.lipRefinePts);
-
-}
-*/
-//-----------------------------------------------------------------------------------------------
 
 /******************************************************************************************
 convert the coordinates of LM extracted from the geo-fixed image into the coordinates
 of source image space.
-
+Cd: coordinate
 *******************************************************************************************/
-// convert the coordinate of one point from fixed image space o the source image space
-// Cd: coordinate
-//
 void FixedCd2SrcCd_OnePt(const cv::Size& fixedImgS,
                          double normalX, double normalY,
                          int TP, int LP, Point2i& srcPt)
@@ -400,7 +306,6 @@ void FixedCd2SrcCd_OnePt(const cv::Size& fixedImgS,
     srcPt.x = normalX * fixedImgS.width - LP;
     srcPt.y = normalY * fixedImgS.height - TP;
 }
-
 
 // convert a set of points
 void FixedCd2SrcCd_Group(const cv::Size& fixedImgS,

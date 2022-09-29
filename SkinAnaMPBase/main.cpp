@@ -79,11 +79,7 @@ int main(int argc, char **argv)
 
     float confThresh = 0.75;
     bool hasFace = false;
-    //float confidence = 0.0;
-    bool needPadding = true;
-    float vertPadRatio = 0.0;
     bool isOK = ExtractFaceLm(faceMeshModel, srcImage,
-                              needPadding, vertPadRatio,
                               confThresh, hasFace,
                               faceInfo, errorMsg);
     if(!isOK)

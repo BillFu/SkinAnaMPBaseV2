@@ -1,0 +1,92 @@
+
+/******************************************************************************************
+convert the coordinates of LM extracted from the Padded image into the coordinates
+of source image space.
+dummyFI: the coordiantes measured in padded image space.
+srcSpaceFI: the coordinates measured in the source iamge space.
+alpha: deltaH / srcH
+*******************************************************************************************/
+void padCoord2SrcCoord(int padImgWidht, int padImgHeight,
+                       int srcW, int srcH, float alpha,
+                       const NormalLmSet& normalLmSet,
+                       FaceInfo& srcSpaceFI);
+
+//-----------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------
+// dH: alpha * H
+// dX: 0.5*(H + dH - W)
+// H: the height of the source image
+// W: the width of the source image
+// dHH: 0.5 * dH
+void padCoord2SrcCoord(//int srcW, int srcH,
+                       int padImgWidht, int padImgHeight,
+                       int dX, int dHH,
+                       double normalX, double normalY, int& srcX, int& srcY)
+{
+    //srcX = normalX * srcW - dX;
+    //srcY = normalY * srcH - dHH;
+    srcX = normalX * padImgWidht - dX;
+    srcY = normalY * padImgHeight - dHH;
+
+}
+
+void padCoord2SrcCoord(//int srcW, int srcH,
+                       int padImgWidht, int padImgHeight,
+                       int dX, int dHH,
+                       const double normalPt[][2], int numPt, int srcPt[][2])
+{
+    for(int i=0; i<numPt; i++)
+    {
+        padCoord2SrcCoord(//srcW, srcH,
+                          padImgWidht, padImgHeight,
+                          dX, dHH,
+                          normalPt[i][0], normalPt[i][1],
+                          srcPt[i][0], srcPt[i][1]);
+    }
+}
+/**************************************************************************************************
+convert the coordinates of LM extracted from the Padded image into the coordinates
+of source image space.
+dummyFI: the coordiantes measured in padded image space.
+srcSpaceFI: the coordinates measured in the source iamge space.
+alpha: deltaH / srcH
+***************************************************************************************************/
+/*
+void padCoord2SrcCoord(int padImgWidht, int padImgHeight,
+                       int srcW, int srcH, float alpha,
+                       const NormalLmSet& normalLmSet,
+                       FaceInfo& srcSpaceFI)
+{
+    int dX = 0; // applied for the case without padding
+    int dHH = 0; // applied for the case without padding
+    
+    if(padImgWidht == padImgHeight) // is a square, and has padding applied
+    {
+        int dH = (int)(alpha * srcH);
+        dX = (srcH + dH - srcW)/2;
+        dHH = dH/2;
+    }
+    
+    padCoord2SrcCoord(//srcW, srcH,
+                      padImgWidht, padImgHeight,
+                      dX, dHH,
+                      normalLmSet.normal_lm_2d, NUM_PT_GENERAL_LM, srcSpaceFI.lm_2d);
+
+    padCoord2SrcCoord(//srcW, srcH,
+                      padImgWidht, padImgHeight,
+                      dX, dHH,
+                      normalLmSet.LNorEyeBowPts, NUM_PT_EYE_REFINE_GROUP, srcSpaceFI.leftEyeRefinePts);
+    
+    padCoord2SrcCoord(//srcW, srcH,
+                      padImgWidht, padImgHeight,
+                      dX, dHH,
+                      normalLmSet.RNorEyeBowPts, NUM_PT_EYE_REFINE_GROUP, srcSpaceFI.rightEyeRefinePts);
+    
+    padCoord2SrcCoord(//srcW, srcH,
+                      padImgWidht, padImgHeight,
+                      dX, dHH,
+                      normalLmSet.NorLipRefinePts, NUM_PT_LIP_REFINE_GROUP, srcSpaceFI.lipRefinePts);
+
+}
+*/
