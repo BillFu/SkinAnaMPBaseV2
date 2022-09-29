@@ -10,7 +10,7 @@ Date:   2022/9/15
 #include "FundamentalMask.hpp"
 #include "../BSpline/ParametricBSpline.hpp"
 #include "ForeheadMask.hpp"
-#include "Geometry.hpp"
+#include "../Geometry.hpp"
 
 //-------------------------------------------------------------------------------------------
 void expanMask(const Mat& inMask, int expandSize, Mat& outMask)
