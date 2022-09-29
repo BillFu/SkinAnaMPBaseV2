@@ -18,6 +18,10 @@ Date:   2022/9/23
 using namespace std;
 using namespace cv;
 
+#include <filesystem>
+#include <algorithm>
+
+namespace fs = std::filesystem;
 
 //-------------------------------------------------------------------------------------------
 
@@ -37,5 +41,11 @@ void ForgePoreMaskV2(const FaceInfo& faceInfo,
                    const Mat& mouthMask, // the enlarged mouth mask
                    const Mat& noseMask,
                    Mat& outPoreMask);
+
+//-------------------------------------------------------------------------------------------
+
+// 一揽子函数，生成各类Mask和它们的Anno Image
+void ForgeMaskAnnoPack(const Mat& srcImage, const fs::path& outDir,
+                       const string& fileNameBone);
 
 #endif /* end of SKIN_FEATURE_MASK_HPP */

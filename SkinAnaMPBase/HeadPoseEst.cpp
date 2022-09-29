@@ -40,7 +40,7 @@ lm_2d: as the input argument, extracted from the source image, and measured in
 the coordinate system of the source image. 
 pitch, yaw, roll: are output arguments, measured in degrees.
 *******************************************************************************************/
-void EstHeadPose(int srcImgWidht, int srcImgHeight,
+void EstHeadPose(const cv::Size2i& srcImgS,
                  FaceInfo& faceInfo)
 {
     // 对应Dlib上点的序号为18, 22, 23, 27, 37, 40, 43, 46, 32, 36, 49, 55, 58, 9
@@ -66,11 +66,11 @@ void EstHeadPose(int srcImgWidht, int srcImgHeight,
     // The camera intrinsic matrix
     float theta_30_in_rad = 0.5236; //60.0 / 2 * np.pi / 180.0, half of horizontal FOV (here is 60 degree)
     float tan_theta_30 = 0.57735;  
-    float focal_length = srcImgWidht / (2.0 * tan_theta_30);
+    float focal_length = srcImgS.width / (2.0 * tan_theta_30);
 
     double camera_matrix[3][3] = {
-        {focal_length, 0, srcImgWidht / 2.0}, 
-        {0, focal_length, srcImgHeight / 2.0}, 
+        {focal_length, 0, srcImgS.width / 2.0},
+        {0, focal_length, srcImgS.height / 2.0},
         {0.0, 0.0, 1.0}};
 
     cv::Mat cameraMatrix(3, 3, cv::DataType<double>::type, camera_matrix);

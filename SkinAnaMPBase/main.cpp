@@ -19,7 +19,6 @@
 
 #include "FaceBgSeg/FaceBgSeg.hpp"
 
-//using namespace tflite;
 using namespace std;
 
 /*************************************************************************
@@ -46,6 +45,7 @@ int main(int argc, char **argv)
         return 0;
     }
     
+    string errorMsg;
     json config_json;            // 创建 json 对象
     ifstream jfile(argv[1]);
     jfile >> config_json;        // 以文件流形式读取 json 文件
@@ -55,8 +55,7 @@ int main(int argc, char **argv)
     
     string faceMeshAttenModelFile = config_json.at("FaceMeshAttenModel");
     string srcImgFile = config_json.at("SourceImage");
-    string annoPoseImgFile = config_json.at("AnnoPoseImage");
-    string segAnnoImage = config_json.at("SegAnnoImage");
+    string outDir = config_json.at("OutDir");
     
     // 这个函数在程序初始化时要调用一次，并确保返回true之后，才能往下进行
     bool isOK = FaceBgSegmentor::Initialize(segModelFile, classColorFile);
@@ -66,19 +65,14 @@ int main(int argc, char **argv)
         return 0;
     }
     
-    TF_LITE_MODEL faceMeshModel = LoadFaceMeshAttenModel(faceMeshAttenModelFile.c_str());
-    if(faceMeshModel == nullptr)
+    isOK = LoadFaceMeshModel(faceMeshAttenModelFile.c_str(), errorMsg);
+    if(!isOK)
     {
         cout << "Failed to load face mesh model file: "
             << faceMeshAttenModelFile << endl;
         return 0;
     }
-    else
-        cout << "Succeeded to load face mesh with attention model file: "
-            << faceMeshAttenModelFile << endl;
-    
-    string errorMsg;
-    
+        
     // Load Input Image
     Mat srcImage = cv::imread(srcImgFile.c_str());
     if(srcImage.empty())
@@ -93,6 +87,12 @@ int main(int argc, char **argv)
     int srcImgH = srcImage.rows;
      
     FaceSegResult segResult;
+    
+    fs::path outParePath(outDir);
+    fs::path segAnnoImgFullPath = 
+    //string annoPoseImgFile = config_json.at("AnnoPoseImage");
+    //string segAnnoImage = config_json.at("SegAnnoImage");
+    
     SegImage(srcImage, segResult, true, segAnnoImage);
 
     cout << "source image has been segmented!" << endl;
@@ -101,8 +101,7 @@ int main(int argc, char **argv)
 
     float confThresh = 0.75;
     bool hasFace = false;
-    isOK = ExtractFaceLm(faceMeshModel, srcImage,
-                              confThresh, segResult, hasFace,
+    isOK = ExtractFaceLm(srcImage, confThresh, segResult, hasFace,
                               faceInfo, errorMsg);
     if(!isOK)
     {
@@ -118,79 +117,13 @@ int main(int argc, char **argv)
         return 0;
     }
     
-    EstHeadPose(srcImgW, srcImgH, faceInfo);
+    EstHeadPose(srcImage.size(), faceInfo);
     
     Mat annoImage = srcImage.clone();
     
-    AnnoGeneralKeyPoints(annoImage, faceInfo, true);
-    imwrite(annoPoseImgFile, annoImage);
-    
-    Scalar yellowColor(255, 0, 0);
-    AnnoTwoEyeRefinePts(annoImage, faceInfo, yellowColor, true);
-    
-    Scalar pinkColor(255, 0, 255);
-    AnnoLipRefinePts(annoImage, faceInfo, pinkColor, true);
-    
-    AnnoHeadPoseEst(annoImage, faceInfo);
-    
-    imwrite(annoPoseImgFile, annoImage);
-    
-    Mat skinMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
-    string faceMaskImgFile = config_json.at("FaceContourImage");
-    ForgeSkinMask(faceInfo, skinMask);
-    OverlayMaskOnImage(annoImage, skinMask,
-                        "face_contour", faceMaskImgFile.c_str());
+    AnnoAllLmInfo(annoImage, faceInfo, annoPoseImgFile);
 
-    Mat mouthMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
-    string mouthMaskImgFile = config_json.at("MouthContourImage");
-    float expanRatio = 0.3;
-    ForgeMouthMask(faceInfo, expanRatio, mouthMask);
-    OverlayMaskOnImage(srcImage, mouthMask,
-                        "mouth_contour", mouthMaskImgFile.c_str());
-    
-    Mat eyebowsMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
-    string eyebowsMaskImgFile = config_json.at("EyebowsContourImage"); // 注意复数形式表示双眉
-    ForgeTwoEyebowsMask(faceInfo, eyebowsMask);
-    OverlayMaskOnImage(annoImage, eyebowsMask,
-                        "eyebows_contour", eyebowsMaskImgFile.c_str());
-    
-    Mat eyesFullMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
-    string eyeFullMaskImgFile = config_json.at("EyeFullContourImage");
-    ForgeTwoEyesFullMask(faceInfo, eyesFullMask);
-    OverlayMaskOnImage(annoImage, eyesFullMask,
-                        "eye_full_contour", eyeFullMaskImgFile.c_str());
-    annoImage.release();
-
-    //string fhMaskAnnoFile = config_json.at("ForeheadMaskImage");
-    Mat fhMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
-    ForgeForeheadMask(faceInfo, fhMask);
-    
-    Mat annoImage2 = srcImage.clone();
-    AnnoGeneralKeyPoints(annoImage2, faceInfo, true);
-    //OverlayMaskOnImage(annoImage2, fhMask,
-    //                    "forehead mask", fhMaskAnnoFile.c_str());
-
-    //string noseMaskAnnoFile = config_json.at("NoseMaskImage");
-    Mat noseMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
-    ForgeNoseMask(faceInfo, noseMask);
-    
-    //Mat combinedMask = noseMask | fhMask;
-    //OverlayMaskOnImage(annoImage2, combinedMask,
-    //                    "combined mask", noseMaskAnnoFile.c_str());
-    
-    //string fleMaskAnnoFile = config_json.at("FaceLowThEyeImage");
-    Mat fleMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
-    ForgeFaceLowThEyeMask(faceInfo, fleMask);
-    //OverlayMaskOnImage(annoImage2, fleMask,
-    //                    "face low th eye", fleMaskAnnoFile.c_str());
-    
-    string poreMaskAnnoFile = config_json.at("PoreMask");
-    Mat poreMask(srcImgH, srcImgW, CV_8UC1, cv::Scalar(0));
-    ForgePoreMaskV2(faceInfo, fleMask, fhMask, eyesFullMask,
-                    mouthMask, noseMask,
-                    poreMask);
-    OverlayMaskOnImage(annoImage2, poreMask,
-                        "pore mask", poreMaskAnnoFile.c_str());
+    ForgeMaskAnnoPack(srcImage);
     
     return 0;
 }

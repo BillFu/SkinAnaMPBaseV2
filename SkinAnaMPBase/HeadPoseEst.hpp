@@ -31,6 +31,6 @@ the coordinate system of the source image.
 pitch, yaw, roll: are output arguments, measured in degrees.
 
 *******************************************************************************************/
-void EstHeadPose(int srcImgWidht, int srcImgHeight, FaceInfo& faceInfo);
+void EstHeadPose(const cv::Size2i& srcImgS, FaceInfo& faceInfo);
 
 #endif /* end of HEAD_POSE_EST_HPP */

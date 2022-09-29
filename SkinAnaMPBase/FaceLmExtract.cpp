@@ -10,6 +10,7 @@ Date:   2022/9/13
 #include "FaceLmExtract.hpp"
 #include "Utils.hpp"
 
+TF_LITE_MODEL tfLiteFMMoel = nullptr;  // FM: face mesh
 
 /*
     Note: in the landmarks outputed by the tf lite model, the raw coordinate values
@@ -20,28 +21,7 @@ Date:   2022/9/13
 
     The returned argument, lm_2d, is measured in the coordinate system of the source image!
 */
-/*
-void extractOutputLM(int origImgWidth, int origImgHeight,
-    float* netLMOutBuffer, float lm_3d[468][3], int lm_2d[468][2])
-{
-    float scale_x = origImgWidth / (float)FACE_MESH_NET_INPUT_W;
-    float scale_y = origImgHeight / (float)FACE_MESH_NET_INPUT_H;
 
-    for(int i=0; i<468; i++)
-    {
-        float x = netLMOutBuffer[i*3];
-        float y = netLMOutBuffer[i*3+1];
-        float z = netLMOutBuffer[i*3+2];
-
-        lm_3d[i][0] = x;
-        lm_3d[i][1] = y;
-        lm_3d[i][2] = z;
-
-        lm_2d[i][0] = (int)(x*scale_x);
-        lm_2d[i][1] = (int)(y*scale_y);
-    }
-}
-*/
 
 // Normal here means the coordinate value lies in [0.0 1.0]
 void extractOutputLM(float* netLMOutBuffer, float lm_3d[468][3], double normal_lm_2d[468][2])
@@ -64,24 +44,6 @@ void extractOutputLM(float* netLMOutBuffer, float lm_3d[468][3], double normal_l
     }
 }
 
-/*
-void extractEyeRefinePts(int origImgWidth, int origImgHeight,
-                   float* outBufEyeBow, int EyeBowPts[71][2])
-{
-    float scale_x = origImgWidth / (float)FACE_MESH_NET_INPUT_W;
-    float scale_y = origImgHeight / (float)FACE_MESH_NET_INPUT_H;
-
-    for(int i=0; i<71; i++)
-    {
-        float x = outBufEyeBow[i*2];
-        float y = outBufEyeBow[i*2+1];
-
-        EyeBowPts[i][0] = (int)(x*scale_x);
-        EyeBowPts[i][1] = (int)(y*scale_y);
-    }
-}
-*/
-
 // Normal here means the coordinate value lies in [0.0 1.0]
 void extractEyeRefinePts(float* outBufEyeBow, double NormalEyeBowPts[71][2])
 {
@@ -97,28 +59,6 @@ void extractEyeRefinePts(float* outBufEyeBow, double NormalEyeBowPts[71][2])
         NormalEyeBowPts[i][1] = y*scale_y;
     }
 }
-
-/*
- outBufLipRefinePts: Input
- lipRefinePts: Output
- */
-/*
-void extractLipRefinePts(int origImgWidth, int origImgHeight,
-                         float* outBufLipRefinePts, int lipRefinePts[80][2])
-{
-    float scale_x = origImgWidth / (float)FACE_MESH_NET_INPUT_W;
-    float scale_y = origImgHeight / (float)FACE_MESH_NET_INPUT_H;
-
-    for(int i=0; i<80; i++)
-    {
-        float x = outBufLipRefinePts[i*2];
-        float y = outBufLipRefinePts[i*2+1];
-
-        lipRefinePts[i][0] = (int)(x*scale_x);
-        lipRefinePts[i][1] = (int)(y*scale_y);
-    }
-}
-*/
 
 void extractLipRefinePts(float* outBufLipRefinePts, double NormalLipRefinePts[80][2])
 {
@@ -143,10 +83,21 @@ return True if all is well done, otherwise reurn False and give the error reason
 numThreads: 解释器推理时可以使用的线程数量，最低为1.
 *******************************************************************************************/
 
-TF_LITE_MODEL LoadFaceMeshAttenModel(const char* faceMeshModelFileName)
+bool LoadFaceMeshModel(const char* faceMeshModelFile, string& errorMsg)
 {
-    unique_ptr<FlatBufferModel> face_lm_model = FlatBufferModel::BuildFromFile(faceMeshModelFileName);
-    return face_lm_model;
+    tfLiteFMMoel = FlatBufferModel::BuildFromFile(faceMeshModelFile);
+    
+    if(tfLiteFMMoel == nullptr)
+    {
+        errorMsg = "Failed to load face mesh model file: " + string(faceMeshModelFile);
+        return false;
+    }
+    else
+    {
+        //cout << "Succeeded to load face mesh with attention model file: "
+        //        << faceMeshModelFileName << endl;
+        return true;
+    }
 }
  
 //-----------------------------------------------------------------------------------------
@@ -156,7 +107,7 @@ TF_LITE_MODEL LoadFaceMeshAttenModel(const char* faceMeshModelFileName)
  以后要让前半段的结果长期存活，用于连续推理，以提高效率。
  Note: after invoking this function, return value and hasFace must be check!
 *******************************************************************************************/
-bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
+bool ExtractFaceLm(const Mat& srcImage,
                    float confTh, const FaceSegResult& segResult,
                    bool& hasFace,
                    FaceInfo& faceInfo, string& errorMsg)
@@ -189,7 +140,7 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     // Initiate Interpreter
     INTERPRETER interpreter;
     tflite::ops::builtin::BuiltinOpResolver resolver;
-    tflite::InterpreterBuilder(*face_lm_model.get(), resolver)(&interpreter);
+    tflite::InterpreterBuilder(*tfLiteFMMoel.get(), resolver)(&interpreter);
     if (interpreter == nullptr)
     {
         errorMsg = string("failed to initiate the face lm interpreter.");

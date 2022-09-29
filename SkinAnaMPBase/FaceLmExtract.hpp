@@ -34,13 +34,15 @@ struct NormalLmSet
 
 //-----------------------------------------------------------------------------------------
 
+extern TF_LITE_MODEL tfLiteFMMoel;  // FM: face mesh
+
 /******************************************************************************************
 该函数的功能是，加载Face Mesh Attention模型，生成深度网络，创建解释器并配置它。
 return true if all is well done, otherwise reurn false and give the error reason.
 numThreads: 解释器推理时可以使用的线程数量，最低为1.
 *******************************************************************************************/
 
-TF_LITE_MODEL LoadFaceMeshAttenModel(const char* faceMeshModelFileName);
+bool LoadFaceMeshModel(const char* faceMeshModelFileName, string& errorMsg);
 
 //-----------------------------------------------------------------------------------------
 
@@ -55,7 +57,7 @@ if needPadding is true, padding would be applied in this function, and vertPadRa
 specify how much ratio of height should be expanded vertically.
 More, if padding on, the final padded image would be a square.
 *******************************************************************************************/
-bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
+bool ExtractFaceLm(const Mat& srcImage,
                     float confTh, const FaceSegResult& segResult,
                     bool& hasFace,
                     FaceInfo& faceInfo, string& errorMsg);

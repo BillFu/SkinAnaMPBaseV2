@@ -20,6 +20,8 @@ Date:   2022/9/27
 #include "../SkinAnaMPBase/Common.hpp"
 #include "../SkinAnaMPBase/FaceBgSeg/FaceBgSeg.hpp"
 #include "../SkinAnaMPBase/FaceLmExtract.hpp"
+#include "../SkinAnaMPBase/HeadPoseEst.hpp"
+#include "../SkinAnaMPBase/AnnoImage.hpp"
 
 namespace fs = std::filesystem;
 
@@ -49,8 +51,12 @@ void ScanSrcImagesInDir(const fs::path imgRootDir, vector<string>& jpgImgSet, in
 
 //-------------------------------------------------------------------------------------------
 
-void ProOneImg(const string& srcImgFile)
+void ProOneImg(const string& srcImgFile,
+               const fs::path& outDir,
+               const string& fileNameBone)
 {
+    string errorMsg;
+
     // Load Input Image
     Mat srcImage = cv::imread(srcImgFile.c_str());
     if(srcImage.empty())
@@ -62,16 +68,15 @@ void ProOneImg(const string& srcImgFile)
         cout << "Succeeded to load image: " << srcImgFile << endl;
     
     FaceSegResult segResult;
-    string segAnnoImgFile;
-    SegImage(srcImage, segResult, true, segAnnoImgFile);
-    
+    string segImgFile = "seg_" + fileNameBone + ".png";
+    fs::path segImgFullPath = outDir / segImgFile;
+    SegImage(srcImage, segResult, true, segImgFullPath.string());
     
     FaceInfo faceInfo;
 
     float confThresh = 0.75;
     bool hasFace = false;
-    string errorMsg;
-    bool isOK = ExtractFaceLm(faceMeshModel, srcImage,
+    bool isOK = ExtractFaceLm(srcImage,
                         confThresh, segResult, hasFace,
                         faceInfo, errorMsg);
     if(!isOK)
@@ -87,50 +92,66 @@ void ProOneImg(const string& srcImgFile)
         cout << "No face found!" << endl;
         return;
     }
+    
+    EstHeadPose(srcImage.size(), faceInfo);
+    
+    Mat annoImage = srcImage.clone();
+    
+    string poseImgFile = "pose_" + fileNameBone + ".png";
+    fs::path poseImgFullPath = outDir / poseImgFile;
+        
+    AnnoAllLmInfo(annoImage, faceInfo, poseImgFullPath.string());
+}
+
+void PrepareDirFile(const string& srcImgFullPath,
+                    const fs::path& srcRootDir,
+                    const fs::path& outRootDir,
+                    fs::path& outDir, string& fileNameBone)
+{
+    //cout << srcImgFullPath << endl;
+    fs::path fullpath(srcImgFullPath);
+    
+    //cout << fullpath.parent_path().string() << endl;
+
+    // Create path in target, if not existing.
+    const auto relativeSrc = fs::relative(fullpath, srcRootDir); // rel: relative
+    outDir = outRootDir / relativeSrc.parent_path();
+    
+    //cout << "relative path: " << relativeSrc.string() << endl;
+    //cout << "target parent path: " << targetParePath.string() << endl;
+
+    if(fs::exists(outDir) == false)
+    {
+        cout << "Not Existed: " << outDir << endl;
+        bool isOK = fs::create_directories(outDir);
+        if(!isOK)
+            cout << "failed to create fold: " << outDir << endl;
+        else
+            cout << "succeeded to create fold: " << outDir << endl;
+    }
+    
+    string basicFileName = fullpath.filename().string();
+    //cout << "Basic File Name: " << basicFileName << endl;
+    
+    size_t lastindex = basicFileName.find_last_of(".");
+    fileNameBone = basicFileName.substr(0, lastindex);
 }
 
 // focus is saving the anno files
 void ProImgInBatch(const vector<string>& jpgImgSet,
-                      const fs::path& srcRootDir, const fs::path& outRootDir)
+                   const fs::path& srcRootDir, const fs::path& outRootDir)
 {
     for(string srcImgFullPath: jpgImgSet)
     {
         cout << "---------------***************************--------------------" << endl;
         
-        //cout << srcImgFullPath << endl;
-        fs::path fullpath(srcImgFullPath);
-        
-        //cout << fullpath.parent_path().string() << endl;
-
-        // Create path in target, if not existing.
-        const auto relativeSrc = fs::relative(fullpath, srcRootDir); // rel: relative
-        const auto targetParePath = outRootDir / relativeSrc.parent_path();
-        
-        //cout << "relative path: " << relativeSrc.string() << endl;
-        //cout << "target parent path: " << targetParePath.string() << endl;
-
-        if(fs::exists(targetParePath) == false)
-        {
-            cout << "Not Existed: " << targetParePath << endl;
-            bool isOK = fs::create_directories(targetParePath);
-            if(!isOK)
-                cout << "failed to create fold: " << targetParePath << endl;
-            else
-                cout << "succeeded to create fold: " << targetParePath << endl;
-        }
-        
-        string basicFileName = fullpath.filename().string();
-        //cout << "Basic File Name: " << basicFileName << endl;
-        
-        size_t lastindex = basicFileName.find_last_of(".");
-        string rawFileName = basicFileName.substr(0, lastindex);
-        //cout << "Raw File Name: " << rawFileName << endl;
-        
-        string outFileName = "anno_" + rawFileName + ".png";
-        //cout << "out File Name: " << outFileName << endl;
+        fs::path outDir;
+        string fileNameBone;
+        PrepareDirFile(srcImgFullPath, srcRootDir, outRootDir,
+                       outDir, fileNameBone);
         
         //auto outFullFilePath = targetParePath / outFileName;
-        ProOneImg(srcImgFullPath);
+        ProOneImg(srcImgFullPath, outDir, fileNameBone);
     }
 }
 

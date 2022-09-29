@@ -36,6 +36,7 @@ int main(int argc, const char * argv[])
         cout << "{target} config_file" << endl;
         return 0;
     }
+    string errorMsg;
     
     json config_json;
     ifstream jConfFile(argv[1]);
@@ -63,11 +64,10 @@ int main(int argc, const char * argv[])
         return 0;
     }
     
-    TF_LITE_MODEL faceMeshModel = LoadFaceMeshAttenModel(faceMeshModelFile.c_str());
-    if(faceMeshModel == nullptr)
+    isOK = LoadFaceMeshModel(faceMeshModelFile.c_str(), errorMsg);
+    if(!isOK)
     {
-        cout << "Failed to load face mesh model file: "
-            << faceMeshModelFile << endl;
+        cout << errorMsg << endl;
         return 0;
     }
     else

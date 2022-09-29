@@ -137,3 +137,25 @@ void AnnoLipRefinePts(Mat& annoImage, const FaceInfo& faceInfo,
         }
     }
 }
+
+//-----------------------------------------------------------------------------------------
+/******************************************************************************************
+本函数的功能是，将所有信息（包括人脸关键点提取和位姿估计的结果）打印在输入影像的拷贝上。
+*******************************************************************************************/
+void AnnoAllLmInfo(Mat& annoImage, const FaceInfo& faceInfo,
+                   const string& annoFile)
+{
+    AnnoGeneralKeyPoints(annoImage, faceInfo, true);
+    
+    Scalar yellowColor(255, 0, 0);
+    AnnoTwoEyeRefinePts(annoImage, faceInfo, yellowColor, true);
+    
+    Scalar pinkColor(255, 0, 255);
+    AnnoLipRefinePts(annoImage, faceInfo, pinkColor, true);
+    
+    AnnoHeadPoseEst(annoImage, faceInfo);
+    
+    //string poseImgFile = "pose_" + fileNameBone + ".png";
+    //fs::path poseImgFullPath = outDir / poseImgFile;
+    imwrite(annoFile, annoImage);
+}
