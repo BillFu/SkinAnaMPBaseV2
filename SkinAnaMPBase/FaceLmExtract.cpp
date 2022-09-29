@@ -173,9 +173,13 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
         //float alpha = vertPadRatio; // deltaH / srcH
         //MakeSquareImageV2(srcImage, alpha,
         //                  paddedImg);
-        // the values of faceBBox & faceCP taken from ISEMECO/cross_1.jpg
-        Rect faceBBox(218, 867, 3407, 5039);
-        Point2i faceCP(1894, 3158);
+        // the values of faceBBox & faceCP taken from ISEMECO/cross_2.jpg
+        // Rect faceBBox(218, 867, 3407, 5039);
+        // Point2i faceCP(1894, 3158);
+        
+        // the values of faceBBox & faceCP taken from ISEMECO/cross_2.jpg
+        Rect faceBBox(281, 1171, 3523, 4664);
+        Point2i faceCP(2093, 3474);
         
         GeoFixFVSrcImg(srcImage, faceBBox,
                        faceCP, 0.25, paddedImg, TP, LP);

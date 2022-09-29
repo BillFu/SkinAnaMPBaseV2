@@ -1,0 +1,10 @@
+{
+	"FaceMeshAttenModelFile": 			"models/face_landmark_with_attention.tflite",
+	"SourceImage":						"images/ISEMECO/cross_8.jpg",
+	"AnnoPoseImage": 					"result/ISEMECO/anno_cross_8.png",
+	"FaceContourImage": 				"result/ISEMECO/fc_cross_8.png",
+	"MouthContourImage": 				"result/ISEMECO/mc_cross_8.png",
+	"EyebowsContourImage": 				"result/ISEMECO/ebc_cross_8.png",
+	"EyeFullContourImage": 				"result/ISEMECO/efc_cross_8.png",
+	"PoreMask": 						"result/ISEMECO/pore_cross_2.png"
+}
