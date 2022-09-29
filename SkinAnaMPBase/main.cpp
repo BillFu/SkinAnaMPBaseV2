@@ -17,6 +17,8 @@
 #include "Mask/ForeheadMask.hpp"
 #include "Utils.hpp"
 
+#include "FaceBgSeg/FaceBgSeg.hpp"
+
 //using namespace tflite;
 using namespace std;
 
@@ -24,9 +26,13 @@ using namespace std;
 This is a experiment program to use the tensorflow lite model to
 extract the face landmarks from the input image, and then to estimate the
 head pose.
+Now before extracting the Lms, the face/background segmentation would be invoked
+fristly, and by exploiting the face primary info to shift and pad the input image
+, which would be feeded into the face mesh net for inference, to improve
+the outcome of the net.
  
 Author: Fu Xiaoqiang
-Date:   2022/9/10
+Date:   2022/9/29
 **************************************************************************/
 
 using json = nlohmann::json;
@@ -44,16 +50,34 @@ int main(int argc, char **argv)
     ifstream jfile(argv[1]);
     jfile >> config_json;        // 以文件流形式读取 json 文件
         
-    string faceMeshAttenModelFile = config_json.at("FaceMeshAttenModelFile");
+    string segModelFile = config_json.at("SegModelFile");
+    string classColorFile = config_json.at("ClassColorFile");
+    
+    string faceMeshAttenModelFile = config_json.at("FaceMeshAttenModel");
     string srcImgFile = config_json.at("SourceImage");
     string annoPoseImgFile = config_json.at("AnnoPoseImage");
+    string segAnnoImage = config_json.at("SegAnnoImage");
     
-    //ExtractEXIF(srcImgFile.c_str());
+    // return true if OK; otherwise return false
+    bool isOK = FaceBgSegmentor::LoadClassColorTable(classColorFile);
+    if(!isOK)
+    {
+        cout << "Failed to load Class Color Table: " << classColorFile << endl;
+        return 0;
+    }
+    
+    // 这个函数在程序初始化时要调用一次，并确保返回true之后，才能往下进行
+    isOK = FaceBgSegmentor::LoadSegModel(segModelFile);
+    if(!isOK)
+    {
+        cout << "Failed to load Image Segment Model: " << segModelFile << endl;
+        return 0;
+    }
     
     TF_LITE_MODEL faceMeshModel = LoadFaceMeshAttenModel(faceMeshAttenModelFile.c_str());
     if(faceMeshModel == nullptr)
     {
-        cout << "Failed to load face mesh with attention model file: "
+        cout << "Failed to load face mesh model file: "
             << faceMeshAttenModelFile << endl;
         return 0;
     }
@@ -72,15 +96,21 @@ int main(int argc, char **argv)
     }
     else
         cout << "Succeeded to load image: " << srcImgFile << endl;
-    
+
     int srcImgW = srcImage.cols;
     int srcImgH = srcImage.rows;
+     
+    FaceSegResult segResult;
+    SegImage(srcImage, segResult, true, segAnnoImage);
+
+    cout << "source image has been segmented!" << endl;
+
     FaceInfo faceInfo;
 
     float confThresh = 0.75;
     bool hasFace = false;
-    bool isOK = ExtractFaceLm(faceMeshModel, srcImage,
-                              confThresh, hasFace,
+    isOK = ExtractFaceLm(faceMeshModel, srcImage,
+                              confThresh, segResult, hasFace,
                               faceInfo, errorMsg);
     if(!isOK)
     {
@@ -102,7 +132,7 @@ int main(int argc, char **argv)
     
     AnnoGeneralKeyPoints(annoImage, faceInfo, true);
     imwrite(annoPoseImgFile, annoImage);
-
+    
     Scalar yellowColor(255, 0, 0);
     AnnoTwoEyeRefinePts(annoImage, faceInfo, yellowColor, true);
     

@@ -157,7 +157,8 @@ TF_LITE_MODEL LoadFaceMeshAttenModel(const char* faceMeshModelFileName)
  Note: after invoking this function, return value and hasFace must be check!
 *******************************************************************************************/
 bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
-                   float confTh, bool& hasFace,
+                   float confTh, const FaceSegResult& segResult,
+                   bool& hasFace,
                    FaceInfo& faceInfo, string& errorMsg)
 {
     //------------------******preprocessing******-----------------------------------------------------------------
@@ -166,21 +167,10 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     
     int TP = 0; // top padding width
     int LP = 0; // left padding height
-    
-    //float alpha = vertPadRatio; // deltaH / srcH
-    //MakeSquareImageV2(srcImage, alpha,
-    //                  paddedImg);
-    // the values of faceBBox & faceCP taken from ISEMECO/cross_2.jpg
-    // Rect faceBBox(218, 867, 3407, 5039);
-    // Point2i faceCP(1894, 3158);
-        
-    // the values of faceBBox & faceCP taken from ISEMECO/cross_2.jpg
-    Rect faceBBox(281, 1171, 3523, 4664);
-    Point2i faceCP(2093, 3474);
         
     float alpha = 0.25;
-    GeoFixFVSrcImg(srcImage, faceBBox,
-                       faceCP, alpha, paddedImg, TP, LP);
+    GeoFixFVSrcImg(srcImage, segResult.faceBBox,
+                   segResult.faceCP, alpha, paddedImg, TP, LP);
     
     cv::Size padImgSize = paddedImg.size();
     
@@ -218,14 +208,11 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
 
     // Configure the interpreter
     interpreter->SetAllowFp16PrecisionForFp32(true);
-    interpreter->SetNumThreads(1);
+    interpreter->SetNumThreads(4);
     
     // Get Input Tensor Dimensions
     int inTensorIndex = interpreter->inputs()[0];
-    ///int netInputHeight = interpreter->tensor(inTensorIndex)->dims->data[1];
-    ///int netInputWidth = interpreter->tensor(inTensorIndex)->dims->data[2];
     int channels = interpreter->tensor(inTensorIndex)->dims->data[3];
-    
     
     float* inputTensorBuffer = interpreter->typed_input_tensor<float>(inTensorIndex);
     uint8_t* inImgMem = resized_image.ptr<uint8_t>(0);
@@ -281,7 +268,7 @@ bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
     float* outBufLipRefinePts = interpreter->typed_output_tensor<float>(1);
     extractLipRefinePts(outBufLipRefinePts, normalLmSet.NorLipRefinePts);
     
-    //-------------------------*****exit inference, postprocessing*****---------------------------------------------------------
+    //----------------------***exit inference, postprocessing***----------------------------------
     // reverse coordinate transform
     faceInfo.imgWidth = srcImage.cols;
     faceInfo.imgHeight = srcImage.rows;

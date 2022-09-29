@@ -56,7 +56,8 @@ specify how much ratio of height should be expanded vertically.
 More, if padding on, the final padded image would be a square.
 *******************************************************************************************/
 bool ExtractFaceLm(const TF_LITE_MODEL& face_lm_model, const Mat& srcImage,
-                    float confTh, bool& hasFace,
+                    float confTh, const FaceSegResult& segResult,
+                    bool& hasFace,
                     FaceInfo& faceInfo, string& errorMsg);
 
 

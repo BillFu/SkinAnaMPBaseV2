@@ -52,6 +52,33 @@ struct HeadPose
     }
 };
 
+
+// store the information about face which has been refined out from the segment labels
+struct FaceSegResult
+{
+    // all the coordinates and sizes are measured in the space of the source image.
+    Rect        faceBBox;
+    Point2i     faceCP; // CP: Center Point;
+    Point2i     eyeCPs[2]; // the area size of No.0 in image is bigger than No.1
+    int         eyeAreas[2]; // in pixels in source image space
+    float       eyeAreaDiffRatio;  // ratio = abs(a1-a2) / max(a1, a2)
+    bool        isFrontView;
+    
+    friend ostream &operator<<(ostream &output, const FaceSegResult &fpi )
+    {
+        output << "FacePrimaryInfo{" << endl;
+        
+        output << "faceBBox: " << fpi.faceBBox << endl;
+        output << "faceCP: " << fpi.faceCP << endl;
+        output << "eyeCPs1: " << fpi.eyeCPs[0] << endl;
+        output << "eyeCPs2: " << fpi.eyeCPs[1] << endl;
+        output << "isFrontView: " << fpi.isFrontView << endl;
+
+        output << "}" << endl;
+        return output;
+    }
+};
+
 #define NUM_PT_GENERAL_LM       468
 #define NUM_PT_EYE_REFINE_GROUP  71
 #define NUM_PT_LIP_REFINE_GROUP  80

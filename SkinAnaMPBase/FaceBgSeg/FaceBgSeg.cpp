@@ -193,7 +193,7 @@ void OverlaySegOnImageV2(const Mat& segLabel, const Mat& srcImg,
 }
 
 void DrawSegOnImage(const Mat& segLabel, const Mat& srcImg,
-                       float alpha, const FacePrimaryInfo& facePriInfo,
+                       float alpha, const FaceSegResult& facePriInfo,
                        const char* outImgFileName)
 {
     Mat outImg;
@@ -285,7 +285,7 @@ void FaceBgSegmentor::CalcFaceBBox(Rect& faceBBox)
     ScaleUpBBox(smallBBox, faceBBox);
 }
 
-void FaceBgSegmentor::CalcFaceBBox(FacePrimaryInfo& facePriInfo)
+void FaceBgSegmentor::CalcFaceBBox(FaceSegResult& facePriInfo)
 {
     CalcFaceBBox(facePriInfo.faceBBox);
 }
@@ -307,7 +307,7 @@ float FaceBgSegmentor::calcEyeAreaDiffRatio(int a1, int a2)
 // or profile view.
 // The center point of face refers to the center of the line connecting the centers of wo eyes.
 // in the profile view, the CP of face esitmated cannot be used for the bad precision.
-void FaceBgSegmentor::CalcEyePts(FacePrimaryInfo& facePriInfo)
+void FaceBgSegmentor::CalcEyePts(FaceSegResult& facePriInfo)
 {
     // roadmap:
     // 1. calculate the beard mask
@@ -382,4 +382,48 @@ void FaceBgSegmentor::CalcEyePts(FacePrimaryInfo& facePriInfo)
         facePriInfo.faceCP = (eyeCP1 + eyeCP2) / 2;
     }
 }
+/*
+void SegImage(const string& srcImgFile, const string& annoImgFile)
+{
+    // Load Input Image
+    Mat srcImage = cv::imread(srcImgFile.c_str());
+    if(srcImage.empty())
+    {
+        cout << "Failed to load input iamge: " << srcImgFile << endl;
+        return;
+    }
+    else
+        cout << "Succeeded to load image: " << srcImgFile << endl;
+    
+    FaceBgSegmentor segmentor;
+    segmentor.Segment(srcImage);
+    Mat segLabel = segmentor.RenderSegLabels();
+    
+    FacePrimaryInfo facePriInfo;
+    segmentor.CalcFaceBBox(facePriInfo);
 
+    segmentor.CalcEyePts(facePriInfo);
+    
+    DrawSegOnImage(segLabel, srcImage, 0.5,
+                   facePriInfo, annoImgFile.c_str());
+    
+    cout << facePriInfo << endl;
+}
+*/
+
+void SegImage(const Mat& srcImage, FaceSegResult& facePriInfo,
+              bool needToSaveAnno, const string& annoImgFile)
+{
+    FaceBgSegmentor segmentor;
+    segmentor.Segment(srcImage);
+    Mat segLabel = segmentor.RenderSegLabels();
+    
+    segmentor.CalcFaceBBox(facePriInfo);
+    segmentor.CalcEyePts(facePriInfo);
+    
+    if(needToSaveAnno)
+        DrawSegOnImage(segLabel, srcImage, 0.5,
+                   facePriInfo, annoImgFile.c_str());
+    
+    cout << facePriInfo << endl;
+}

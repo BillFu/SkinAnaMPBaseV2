@@ -1,6 +1,10 @@
 {
-	"FaceMeshAttenModelFile": 			"models/face_landmark_with_attention.tflite",
+	"SegModelFile": 				    "models/seg_model.onnx",
+	"ClassColorFile":					"models/classes3.txt",
+	"FaceMeshAttenModel": 			    "models/face_lm_attent.tflite",
+	
 	"SourceImage":						"images/ISEMECO/cross_2.jpg",
+	"SegAnnoImage": 					"result/ISEMECO/seg_cross_2.png",
 	"AnnoPoseImage": 					"result/ISEMECO/anno_cross_2.png",
 	"FaceContourImage": 				"result/ISEMECO/fc_cross_2.png",
 	"MouthContourImage": 				"result/ISEMECO/mc_cross_2.png",

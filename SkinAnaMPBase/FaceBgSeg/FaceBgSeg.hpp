@@ -14,6 +14,7 @@
 #define FACE_BG_SEG_HPP
 
 #include "opencv2/opencv.hpp"
+#include "../Common.hpp"
 
 using namespace std;
 using namespace cv;
@@ -33,31 +34,6 @@ enum SEG_FACE_BG_LABELS
     SEG_BEARD_LABEL
 };
 
-// store the information about face which has been refined out from the segment labels
-struct FacePrimaryInfo
-{
-    // all the coordinates and sizes are measured in the space of the source image.
-    Rect        faceBBox;
-    Point2i     faceCP; // CP: Center Point;
-    Point2i     eyeCPs[2]; // the area size of No.0 in image is bigger than No.1
-    int         eyeAreas[2]; // in pixels in source image space
-    float       eyeAreaDiffRatio;  // ratio = abs(a1-a2) / max(a1, a2)
-    bool        isFrontView;
-    
-    friend ostream &operator<<(ostream &output, const FacePrimaryInfo &fpi )
-    {
-        output << "FacePrimaryInfo{" << endl;
-        
-        output << "faceBBox: " << fpi.faceBBox << endl;
-        output << "faceCP: " << fpi.faceCP << endl;
-        output << "eyeCPs1: " << fpi.eyeCPs[0] << endl;
-        output << "eyeCPs2: " << fpi.eyeCPs[1] << endl;
-        output << "isFrontView: " << fpi.isFrontView << endl;
-
-        output << "}" << endl;
-        return output;
-    }
-};
 
 // if FacePrimaryInfo.eyeAreaDiffRatio > EyeAreaDiffRation_TH, then this face will be
 // considered as in the profile view.
@@ -86,14 +62,14 @@ public:
     // 将分割结果以彩色Table渲染出来，并放大到原始图像尺度
     Mat RenderSegLabels();
     
-    void CalcFaceBBox(FacePrimaryInfo& facePriInfo);
+    void CalcFaceBBox(FaceSegResult& facePriInfo);
 
     // this function includes: calcuate the center point of two eys, area of two eyes,
     // and the ratio of area difference, final determine the face is in front view
     // or profile view.
     // The center point of face refers to the center of the line connecting the centers of wo eyes.
     // in the profile view, the CP of face esitmated cannot be used for the bad precision.
-    void CalcEyePts(FacePrimaryInfo& facePriInfo);
+    void CalcEyePts(FaceSegResult& facePriInfo);
     
 private:
     // convert BBox in net output space into the space of source image
@@ -130,7 +106,14 @@ void OverlaySegOnImageV2(const Mat& segLabel, const Mat& srcImg,
 
 
 void DrawSegOnImage(const Mat& segLabel, const Mat& srcImg,
-                    float alpha, const FacePrimaryInfo& facePriInfo,
+                    float alpha, const FaceSegResult& facePriInfo,
                     const char* outImgFileName);
+
+
+// call this function outside this module
+// if needToSaveAnno is true, then annoImgFile must to be a valid
+// image file name, otherwise a empty string is a good choice.
+void SegImage(const Mat& srcImage, FaceSegResult& facePriInfo,
+              bool needToSaveAnno, const string& annoImgFile);
 
 #endif /* end of FACE_BG_SEG_HPP */
