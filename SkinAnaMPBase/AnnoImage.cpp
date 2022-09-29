@@ -45,8 +45,6 @@ void AnnoGeneralKeyPoints(Mat& annoImage, const FaceInfo& faceInfo, bool showInd
     {
         // cv::Point center(faceInfo.lm_2d[i].x, faceInfo.lm_2d[i].y);
         cv::circle(annoImage, faceInfo.lm_2d[i], 5, blue, cv::FILLED);
-        
-        cout << faceInfo.lm_2d[i] << endl;
         if(showIndices)
         {
             cv::putText(annoImage, to_string(i), faceInfo.lm_2d[i],

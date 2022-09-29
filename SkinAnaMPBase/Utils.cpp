@@ -154,6 +154,7 @@ void MakeSquareImageV2(const Mat& srcImg, float deltaHRatio, Mat& squareImg)
 5. scale not changed.
 FV: front view
 ***********************************************************************************************/
+/*
 void GeoFixFVSrcImg(const Mat& srcImg, const Rect& faceBBox,
                     const Point2i& faceCP, float alpha, Mat& outImg,
                     int& TP, int& LP)
@@ -190,5 +191,55 @@ void GeoFixFVSrcImg(const Mat& srcImg, const Rect& faceBBox,
     copyMakeBorder( srcImg, outImg,
                     TP, BP, LP, RP,
                    BORDER_CONSTANT, blackColor);
+}
+*/
+void GeoFixFVSrcImg(const Mat& srcImg, const Rect& faceBBox,
+                    const Point2i& faceCP, float alpha, Mat& outImg,
+                    int& TP, int& LP)
+{
+    //TP, BP, LP, RP stand for the padding for top, bottom, left, and right side.
+
+    int H = srcImg.rows;
+    int W = srcImg.cols;
     
+    int BW = faceBBox.width;
+    int expandHalfW = (int)(BW * (1+alpha) / 2);
+    
+    int t1 = max(faceCP.x, srcImg.cols - faceCP.x);
+    int half_Wp = max(expandHalfW, t1); // p: prime，右上侧的撇号；Wp: width of the out image
+    
+    int Wp = half_Wp * 2;
+    Wp = max(Wp, srcImg.cols);
+
+    int Hp;
+    int BP;
+    // 根据9月28日晚间的推导，目前将Hp与Wp脱离关系
+    if(2*faceCP.y <= H)  // faceCp.y <= 1/2*H
+    {
+        // padding at top side
+        Hp = 2*(H - faceCP.y);
+        TP = H - 2*faceCP.y;
+        BP = 0;
+    }
+    else
+    {
+        // padding at bottom side
+        Hp = 2*faceCP.y;
+        TP = 0;
+        BP = 2*faceCP.y - H;
+    }
+        
+    assert(Hp > srcImg.rows);
+    
+    if( Wp % 2 != 0)
+        Wp += 1;
+    
+    int RP = Wp / 2 + faceCP.x - W;
+    LP = Wp / 2 - faceCP.x;
+
+    Scalar blackColor(0, 0, 0);
+
+    copyMakeBorder( srcImg, outImg,
+                    TP, BP, LP, RP,
+                   BORDER_CONSTANT, blackColor);
 }

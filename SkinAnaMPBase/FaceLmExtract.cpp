@@ -388,6 +388,7 @@ of source image space.
 *******************************************************************************************/
 // convert the coordinate of one point from fixed image space o the source image space
 // Cd: coordinate
+//
 void FixedCd2SrcCd_OnePt(const cv::Size& fixedImgS,
                          double normalX, double normalY,
                          int TP, int LP, Point2i& srcPt)
@@ -404,8 +405,10 @@ void FixedCd2SrcCd_Group(const cv::Size& fixedImgS,
 {
     for(int i=0; i<numPt; i++)
     {
-        FixedCd2SrcCd_OnePt(fixedImgS, TP, LP,
-                normalPt[i][0], normalPt[i][1], srcPt[i]);
+        // !!! 注意参数的顺序与定义时相同
+        // int与double在编译器看来是兼容的，人家不报错！
+        FixedCd2SrcCd_OnePt(fixedImgS, normalPt[i][0], normalPt[i][1],
+                            TP, LP, srcPt[i]);
     }
 }
 
