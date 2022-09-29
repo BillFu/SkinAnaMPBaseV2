@@ -58,19 +58,11 @@ int main(int argc, char **argv)
     string annoPoseImgFile = config_json.at("AnnoPoseImage");
     string segAnnoImage = config_json.at("SegAnnoImage");
     
-    // return true if OK; otherwise return false
-    bool isOK = FaceBgSegmentor::LoadClassColorTable(classColorFile);
-    if(!isOK)
-    {
-        cout << "Failed to load Class Color Table: " << classColorFile << endl;
-        return 0;
-    }
-    
     // 这个函数在程序初始化时要调用一次，并确保返回true之后，才能往下进行
-    isOK = FaceBgSegmentor::LoadSegModel(segModelFile);
+    bool isOK = FaceBgSegmentor::Initialize(segModelFile, classColorFile);
     if(!isOK)
     {
-        cout << "Failed to load Image Segment Model: " << segModelFile << endl;
+        cout << "Failed to Initialize FaceBgSegmentor: " << endl;
         return 0;
     }
     

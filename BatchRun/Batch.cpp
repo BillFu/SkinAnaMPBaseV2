@@ -1,0 +1,138 @@
+//
+//  Utils.cpp
+
+/*******************************************************************************
+Author: Fu Xiaoqiang
+Date:   2022/9/27
+
+********************************************************************************/
+
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <vector>
+
+#include <filesystem>
+#include <algorithm>
+
+#include "Batch.hpp"
+#include "../SkinAnaMPBase/Common.hpp"
+#include "../SkinAnaMPBase/FaceBgSeg/FaceBgSeg.hpp"
+#include "../SkinAnaMPBase/FaceLmExtract.hpp"
+
+namespace fs = std::filesystem;
+
+// collect all the .jpg image files under the specified directory and its sub-directories recursively
+// This function will invoke itself recursively.
+void ScanSrcImagesInDir(const fs::path imgRootDir, vector<string>& jpgImgSet, int level)
+{
+    for (const auto& entry : fs::directory_iterator(imgRootDir))
+    {
+        const auto filenameStr = entry.path().filename().string();
+        const auto fullPath = entry.path().string();
+        if (entry.is_directory())
+        {
+            //std::cout << std::setw(level * 3) << "" << filenameStr << '\n';
+            ScanSrcImagesInDir(entry, jpgImgSet, level + 1);
+        }
+        else if (entry.is_regular_file())
+        {
+            string fileExt =  entry.path().extension();
+            if(fileExt == ".jpg")
+                jpgImgSet.push_back(fullPath);
+        }
+        //else
+            //std::cout << std::setw(level * 3) << "" << " [?]" << filenameStr << '\n';
+    }
+}
+
+//-------------------------------------------------------------------------------------------
+
+void ProOneImg(const string& srcImgFile)
+{
+    // Load Input Image
+    Mat srcImage = cv::imread(srcImgFile.c_str());
+    if(srcImage.empty())
+    {
+        cout << "Failed to load input iamge: " << srcImgFile << endl;
+        return;
+    }
+    else
+        cout << "Succeeded to load image: " << srcImgFile << endl;
+    
+    FaceSegResult segResult;
+    string segAnnoImgFile;
+    SegImage(srcImage, segResult, true, segAnnoImgFile);
+    
+    
+    FaceInfo faceInfo;
+
+    float confThresh = 0.75;
+    bool hasFace = false;
+    string errorMsg;
+    bool isOK = ExtractFaceLm(faceMeshModel, srcImage,
+                        confThresh, segResult, hasFace,
+                        faceInfo, errorMsg);
+    if(!isOK)
+    {
+        cout << "Error Happened to extract face LM: " << errorMsg << endl;
+        return;
+    }
+    else
+        cout << "Succeeded to extract lm!" << endl;
+    
+    if(!hasFace)
+    {
+        cout << "No face found!" << endl;
+        return;
+    }
+}
+
+// focus is saving the anno files
+void ProImgInBatch(const vector<string>& jpgImgSet,
+                      const fs::path& srcRootDir, const fs::path& outRootDir)
+{
+    for(string srcImgFullPath: jpgImgSet)
+    {
+        cout << "---------------***************************--------------------" << endl;
+        
+        //cout << srcImgFullPath << endl;
+        fs::path fullpath(srcImgFullPath);
+        
+        //cout << fullpath.parent_path().string() << endl;
+
+        // Create path in target, if not existing.
+        const auto relativeSrc = fs::relative(fullpath, srcRootDir); // rel: relative
+        const auto targetParePath = outRootDir / relativeSrc.parent_path();
+        
+        //cout << "relative path: " << relativeSrc.string() << endl;
+        //cout << "target parent path: " << targetParePath.string() << endl;
+
+        if(fs::exists(targetParePath) == false)
+        {
+            cout << "Not Existed: " << targetParePath << endl;
+            bool isOK = fs::create_directories(targetParePath);
+            if(!isOK)
+                cout << "failed to create fold: " << targetParePath << endl;
+            else
+                cout << "succeeded to create fold: " << targetParePath << endl;
+        }
+        
+        string basicFileName = fullpath.filename().string();
+        //cout << "Basic File Name: " << basicFileName << endl;
+        
+        size_t lastindex = basicFileName.find_last_of(".");
+        string rawFileName = basicFileName.substr(0, lastindex);
+        //cout << "Raw File Name: " << rawFileName << endl;
+        
+        string outFileName = "anno_" + rawFileName + ".png";
+        //cout << "out File Name: " << outFileName << endl;
+        
+        //auto outFullFilePath = targetParePath / outFileName;
+        ProOneImg(srcImgFullPath);
+    }
+}
+
+//-------------------------------------------------------------------------------------------
+

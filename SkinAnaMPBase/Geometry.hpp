@@ -17,7 +17,7 @@ Date:   2022/9/18
 using namespace std;
 using namespace cv;
 
-#include "../Common.hpp"
+#include "Common.hpp"
 
 /**********************************************************************************************
 (x3, y3) is the inner interpolated result.

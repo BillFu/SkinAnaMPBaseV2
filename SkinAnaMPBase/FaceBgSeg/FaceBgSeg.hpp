@@ -45,11 +45,7 @@ class FaceBgSegmentor
 public:
     static bool isNetLoaded;
         
-    // 这个函数在程序初始化时要调用一次，并确保返回true之后，才能往下进行
-    static bool LoadSegModel(const string& modelFileName);
-    
-    // return true if OK; otherwise return false
-    static bool LoadClassColorTable(const string& classColorFileName);
+    static bool Initialize(const string& modelFileName, const string& classColorFileName);
     
     FaceBgSegmentor(); //,int width,int height);
     ~FaceBgSegmentor();
@@ -72,6 +68,13 @@ public:
     void CalcEyePts(FaceSegResult& facePriInfo);
     
 private:
+    
+    // 这个函数在程序初始化时要调用一次，并确保返回true之后，才能往下进行
+    static bool LoadSegModel(const string& modelFileName);
+
+    // return true if OK; otherwise return false
+    static bool LoadClassColorTable(const string& classColorFileName);
+    
     // convert BBox in net output space into the space of source image
     void ScaleUpBBox(const Rect& inBBox, Rect& outBBox);
     void ScaleUpPoint(const Point2i& inPt, Point2i& outPt);

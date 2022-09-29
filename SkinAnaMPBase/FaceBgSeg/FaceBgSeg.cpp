@@ -81,6 +81,27 @@ bool FaceBgSegmentor::LoadClassColorTable(const string& classColorFileName)
     return true;
 }
 
+bool FaceBgSegmentor::Initialize(const string& segModelFile, const string& classColorFile)
+{
+    // return true if OK; otherwise return false
+    bool isOK = LoadClassColorTable(classColorFile);
+    if(!isOK)
+    {
+        cout << "Failed to load Class Color Table: " << classColorFile << endl;
+        return false;
+    }
+    
+    // 这个函数在程序初始化时要调用一次，并确保返回true之后，才能往下进行
+    isOK = LoadSegModel(segModelFile);
+    if(!isOK)
+    {
+        cout << "Failed to load Image Segment Model: " << segModelFile << endl;
+        return false;
+    }
+    
+    return true;
+}
+
 //-------------------------------------------------------------------------------------------
 
 FaceBgSegmentor::FaceBgSegmentor()
