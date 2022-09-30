@@ -155,7 +155,5 @@ void AnnoAllLmInfo(Mat& annoImage, const FaceInfo& faceInfo,
     
     AnnoHeadPoseEst(annoImage, faceInfo);
     
-    //string poseImgFile = "pose_" + fileNameBone + ".png";
-    //fs::path poseImgFullPath = outDir / poseImgFile;
-    imwrite(annoFile, annoImage);
+    //imwrite(annoFile, annoImage);
 }

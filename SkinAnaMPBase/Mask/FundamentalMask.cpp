@@ -88,27 +88,45 @@ void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon)
 }
 
 // face mask below the eyes, 在鼻子部位向上凸出，接近额头
-void ForgeFaceLowThEyePg(const FaceInfo& faceInfo, POLYGON& skinPolygon)
+void ForgeLowFacePg(const FaceInfo& faceInfo, POLYGON& skinPolygon)
 {
-    // the indices for lm in meadiapipe mesh from
-    int outlinePts[] = { // in counterclockwise order
-    //234, // 234, the most left and top point
-    116, 137, 147, 172, 136, 150, 149,
-        176, 148, 175, 428,
-    //400, 378, 379, 365, 397, 288, 376, 366, 323, //454,  // 454, the most right and top point
-    400, 431, 430, 416, 288, 376, 366, 447,  
-    // top limit line from right to left
-    346, 349, 453, 417, 336, 107, 193, 233, 120, 117
-    };
+    // the indices in counterclockwise order
+
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 116));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 123));
     
-    int num_pts = sizeof(outlinePts) / sizeof(int);
+    Point2i IPt147 = IpGLmPtWithPair(faceInfo, 213, 187, 0.3);
+    skinPolygon.push_back(IPt147);
+
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 192));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 136));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 150));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 149));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 176));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 171));
     
-    // calculate the new version of coordinates of Points on face silhouette.
-    for(int i = 0; i<num_pts; i++)
-    {
-        int index = outlinePts[i];
-        skinPolygon.push_back(faceInfo.lm_2d[index]);
-    }
+    Point2i IPt175 = IpGLmPtWithPair(faceInfo, 175, 199, 0.4);
+    skinPolygon.push_back(IPt175);
+    
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 396));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 400));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 395));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 394));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 416));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 376));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 345));
+    
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 346));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 349));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 453));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 417));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 336));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 107));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 193));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 233));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 120));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 117));
+
 }
 //-------------------------------------------------------------------------------------------
 
@@ -161,12 +179,12 @@ void ForgeSkinMask(const FaceInfo& faceInfo, Mat& outMask)
 }
 
 // face mask below the eyes, 在鼻子部位向上凸出，接近额头
-void ForgeFaceLowThEyeMask(const FaceInfo& faceInfo, Mat& outMask)
+void ForgeLowFaceMask(const FaceInfo& faceInfo, Mat& outMask)
 {
     POLYGON coarsePolygon, refinedPolygon;
 
-    ForgeFaceLowThEyePg(faceInfo, coarsePolygon);
-    int csNumPoint = 160;
+    ForgeLowFacePg(faceInfo, coarsePolygon);
+    int csNumPoint = 100;
     CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
 
     DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);

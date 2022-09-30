@@ -73,7 +73,8 @@ void ProOneImg(const string& srcImgFile,
     FaceSegResult segResult;
     string segImgFile = "seg_" + fileNameBone + ".png";
     fs::path segImgFullPath = outDir / segImgFile;
-    SegImage(srcImage, segResult, true, segImgFullPath.string());
+    //SegImage(srcImage, segResult, true, segImgFullPath.string());
+    SegImage(srcImage, segResult, false, "");
     
     FaceInfo faceInfo;
 
@@ -102,7 +103,6 @@ void ProOneImg(const string& srcImgFile,
     
     string lmImgFile = "pose_" + fileNameBone + ".png";
     fs::path lmImgFullPath = outDir / lmImgFile;
-        
     AnnoAllLmInfo(annoLmImage, faceInfo, lmImgFullPath.string());
     
     string fileBoneName = GetFileBoneName(srcImgFile);

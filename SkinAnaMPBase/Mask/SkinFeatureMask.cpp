@@ -111,7 +111,7 @@ void ForgeMaskAnnoPack(const Mat& srcImage, const Mat& annoLmImage,
 
     //string fleMaskAnnoFile = config_json.at("FaceLowThEyeImage");
     Mat fleMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    ForgeFaceLowThEyeMask(faceInfo, fleMask);
+    ForgeLowFaceMask(faceInfo, fleMask);
     //OverlayMaskOnImage(annoImage2, fleMask,
     //                    "face low th eye", fleMaskAnnoFile.c_str());
 

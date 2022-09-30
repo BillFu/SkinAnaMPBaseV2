@@ -74,7 +74,7 @@ void EstHeadPose(const cv::Size2i& srcImgS,
         {0.0, 0.0, 1.0}};
 
     cv::Mat cameraMatrix(3, 3, cv::DataType<double>::type, camera_matrix);
-    cout << "cameraMatrix: " << cameraMatrix << std::endl;
+    //cout << "cameraMatrix: " << cameraMatrix << std::endl;
 
     double zeros_four[] = {0.0, 0.0, 0.0, 0.0};
     cv::Mat distCoeffs(4, 1, cv::DataType<double>::type, zeros_four);
@@ -84,15 +84,15 @@ void EstHeadPose(const cv::Size2i& srcImgS,
  
     cv::solvePnP(face_3d_pts, face_2d_pts, cameraMatrix, distCoeffs, rot_vec, trans_vec);
 
-    cout << "solvePnP() is Done!" << std::endl;
+    //cout << "solvePnP() is Done!" << std::endl;
 
     // get rotation matrix
     Mat rot_mat; 
     cv::Rodrigues(rot_vec, rot_mat);
-    cout << "Rodrigues() is Done!" << std::endl;
+    //cout << "Rodrigues() is Done!" << std::endl;
     
-    cout << "rot_vec: " << rot_vec << std::endl;
-    cout << "rot_mat: " << rot_mat << std::endl;
+    //cout << "rot_vec: " << rot_vec << std::endl;
+    //cout << "rot_mat: " << rot_mat << std::endl;
 
     Mat mtxR, mtxQ;
     // the values in eluer_angles are measured in degree. 
