@@ -154,45 +154,6 @@ void MakeSquareImageV2(const Mat& srcImg, float deltaHRatio, Mat& squareImg)
 5. scale not changed.
 FV: front view
 ***********************************************************************************************/
-/*
-void GeoFixFVSrcImg(const Mat& srcImg, const Rect& faceBBox,
-                    const Point2i& faceCP, float alpha, Mat& outImg,
-                    int& TP, int& LP)
-{
-    int H = srcImg.rows;
-    int W = srcImg.cols;
-    
-    int BW = faceBBox.width;
-    int expandHalfW = (int)(BW * (1+alpha) / 2);
-    
-    int t1 = max(faceCP.x, srcImg.cols - faceCP.x);
-    int half_Wp = max(expandHalfW, t1); // p: prime，右上侧的撇号；Wp: width of the out image
-    
-    int Wp = half_Wp * 2;
-    int Hp = (int)(Wp*1.4); // maybe should be 1.5
-    //assert(Hp > srcImg.rows);
-    Hp = max(Hp, srcImg.rows);
-    Wp = max(Wp, srcImg.cols);
-    
-    if( Wp % 2 != 0)
-        Wp += 1;
-    
-    if( Hp % 2 != 0)
-        Hp += 1;
-        
-    //TP, BP, LP, RP stand for the padding for top, bottom, left, and right side.
-    TP = Hp / 2 - faceCP.y;
-    LP = Wp / 2 - faceCP.x;
-    int BP = Hp / 2 + faceCP.y - H;
-    int RP = Wp / 2 + faceCP.x - W;
-    
-    Scalar blackColor(0, 0, 0);
-
-    copyMakeBorder( srcImg, outImg,
-                    TP, BP, LP, RP,
-                   BORDER_CONSTANT, blackColor);
-}
-*/
 void GeoFixFVSrcImg(const Mat& srcImg, const Rect& faceBBox,
                     const Point2i& faceCP, float alpha, Mat& outImg,
                     int& TP, int& LP)
@@ -243,3 +204,32 @@ void GeoFixFVSrcImg(const Mat& srcImg, const Rect& faceBBox,
                     TP, BP, LP, RP,
                    BORDER_CONSTANT, blackColor);
 }
+
+//-------------------------------------------------------------------------------------------
+
+string BuildOutImgFileName(const fs::path& outDir,
+                         const string& fileNameBone,
+                         const string& outPrefix)
+{
+    string outImgFile = outPrefix + fileNameBone + ".png";
+    fs::path outImgFullPath = outDir / outImgFile;
+    string outFileName_FP = outImgFullPath.string();
+    
+    return outFileName_FP;
+}
+
+
+// File Bone Name: no path and no extension
+// the bone name of "images/JPN/cross_2.jpg" is "cross_2"
+string GetFileBoneName(string fileNameFP)
+{
+    fs::path fp(fileNameFP);
+    string basicFileName = fp.filename().string();
+    //cout << "Basic File Name: " << basicFileName << endl;
+    
+    size_t lastindex = basicFileName.find_last_of(".");
+    string fileBoneName = basicFileName.substr(0, lastindex);
+    return fileBoneName;
+}
+
+//-------------------------------------------------------------------------------------------

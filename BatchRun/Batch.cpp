@@ -22,6 +22,9 @@ Date:   2022/9/27
 #include "../SkinAnaMPBase/FaceLmExtract.hpp"
 #include "../SkinAnaMPBase/HeadPoseEst.hpp"
 #include "../SkinAnaMPBase/AnnoImage.hpp"
+#include "../SkinAnaMPBase/Utils.hpp"
+#include "../SkinAnaMPBase/Mask/SkinFeatureMask.hpp"
+
 
 namespace fs = std::filesystem;
 
@@ -95,12 +98,16 @@ void ProOneImg(const string& srcImgFile,
     
     EstHeadPose(srcImage.size(), faceInfo);
     
-    Mat annoImage = srcImage.clone();
+    Mat annoLmImage = srcImage.clone();
     
-    string poseImgFile = "pose_" + fileNameBone + ".png";
-    fs::path poseImgFullPath = outDir / poseImgFile;
+    string lmImgFile = "pose_" + fileNameBone + ".png";
+    fs::path lmImgFullPath = outDir / lmImgFile;
         
-    AnnoAllLmInfo(annoImage, faceInfo, poseImgFullPath.string());
+    AnnoAllLmInfo(annoLmImage, faceInfo, lmImgFullPath.string());
+    
+    string fileBoneName = GetFileBoneName(srcImgFile);
+    ForgeMaskAnnoPack(srcImage, annoLmImage,
+                    outDir, fileBoneName, faceInfo);
 }
 
 void PrepareDirFile(const string& srcImgFullPath,

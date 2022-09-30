@@ -82,18 +82,15 @@ int main(int argc, char **argv)
     }
     else
         cout << "Succeeded to load image: " << srcImgFile << endl;
-
-    int srcImgW = srcImage.cols;
-    int srcImgH = srcImage.rows;
-     
-    FaceSegResult segResult;
     
+    string fileBoneName = GetFileBoneName(srcImgFile);
     fs::path outParePath(outDir);
-    fs::path segAnnoImgFullPath = 
-    //string annoPoseImgFile = config_json.at("AnnoPoseImage");
-    //string segAnnoImage = config_json.at("SegAnnoImage");
     
-    SegImage(srcImage, segResult, true, segAnnoImage);
+    // FP: full path
+    string segAnnoImgFP = BuildOutImgFileName(
+            outParePath, fileBoneName, "seg_");
+    FaceSegResult segResult;
+    SegImage(srcImage, segResult, true, segAnnoImgFP);
 
     cout << "source image has been segmented!" << endl;
 
@@ -119,11 +116,14 @@ int main(int argc, char **argv)
     
     EstHeadPose(srcImage.size(), faceInfo);
     
-    Mat annoImage = srcImage.clone();
+    Mat annoLmImage = srcImage.clone();
     
-    AnnoAllLmInfo(annoImage, faceInfo, annoPoseImgFile);
+    string annoLmImgFile = BuildOutImgFileName(
+            outParePath, fileBoneName, "lm_");
+    AnnoAllLmInfo(annoLmImage, faceInfo, annoLmImgFile);
 
-    ForgeMaskAnnoPack(srcImage);
+    ForgeMaskAnnoPack(srcImage, annoLmImage,
+                      outParePath, fileBoneName, faceInfo);
     
     return 0;
 }

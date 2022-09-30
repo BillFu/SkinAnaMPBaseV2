@@ -19,6 +19,11 @@ Date:   2022/9/23
 #include <filesystem>
 #include <algorithm>
 
+#include "../Utils.hpp"
+#include "EyebowMask.hpp"
+#include "ForeheadMask.hpp"
+#include "../AnnoImage.hpp"
+
 namespace fs = std::filesystem;
 
 /**********************************************************************************************
@@ -52,36 +57,40 @@ void ForgePoreMaskV2(const FaceInfo& faceInfo,
 //-------------------------------------------------------------------------------------------
 
 // 一揽子函数，生成各类Mask和它们的Anno Image
-void ForgeMaskAnnoPack(const Mat& srcImage, const fs::path& outDir,
-                       const string& fileNameBone)
+void ForgeMaskAnnoPack(const Mat& srcImage, const Mat& annoLmImage,
+                       const fs::path& outDir, const string& fileNameBone,
+                       const FaceInfo& faceInfo)
 {
     cv::Size2i srcImgS = srcImage.size();
     
     Mat skinMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    string faceMaskImgFile = config_json.at("FaceContourImage");
+    string faceMaskImgFile = BuildOutImgFileName(outDir,
+                             fileNameBone, "fc_");
     ForgeSkinMask(faceInfo, skinMask);
-    OverlayMaskOnImage(annoImage, skinMask,
+    OverlayMaskOnImage(annoLmImage, skinMask,
                         "face_contour", faceMaskImgFile.c_str());
 
     Mat mouthMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    string mouthMaskImgFile = config_json.at("MouthContourImage");
+    string mouthMaskImgFile = BuildOutImgFileName(outDir,
+                             fileNameBone, "mc_");
     float expanRatio = 0.3;
     ForgeMouthMask(faceInfo, expanRatio, mouthMask);
     OverlayMaskOnImage(srcImage, mouthMask,
                         "mouth_contour", mouthMaskImgFile.c_str());
 
     Mat eyebowsMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    string eyebowsMaskImgFile = config_json.at("EyebowsContourImage"); // 注意复数形式表示双眉
+    string ebsMaskImgFile = BuildOutImgFileName(outDir,
+                             fileNameBone, "ebc_");
     ForgeTwoEyebowsMask(faceInfo, eyebowsMask);
-    OverlayMaskOnImage(annoImage, eyebowsMask,
-                        "eyebows_contour", eyebowsMaskImgFile.c_str());
+    OverlayMaskOnImage(annoLmImage, eyebowsMask,
+                        "eyebows_contour", ebsMaskImgFile.c_str());
 
     Mat eyesFullMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    string eyeFullMaskImgFile = config_json.at("EyeFullContourImage");
+    string eyeFullMaskImgFile = BuildOutImgFileName(outDir,
+                             fileNameBone, "efc_");
     ForgeTwoEyesFullMask(faceInfo, eyesFullMask);
-    OverlayMaskOnImage(annoImage, eyesFullMask,
+    OverlayMaskOnImage(annoLmImage, eyesFullMask,
                         "eye_full_contour", eyeFullMaskImgFile.c_str());
-    annoImage.release();
 
     //string fhMaskAnnoFile = config_json.at("ForeheadMaskImage");
     Mat fhMask(srcImgS, CV_8UC1, cv::Scalar(0));
@@ -106,7 +115,8 @@ void ForgeMaskAnnoPack(const Mat& srcImage, const fs::path& outDir,
     //OverlayMaskOnImage(annoImage2, fleMask,
     //                    "face low th eye", fleMaskAnnoFile.c_str());
 
-    string poreMaskAnnoFile = config_json.at("PoreMask");
+    string poreMaskAnnoFile = BuildOutImgFileName(outDir,
+                             fileNameBone, "pore_");
     Mat poreMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgePoreMaskV2(faceInfo, fleMask, fhMask, eyesFullMask,
                     mouthMask, noseMask,

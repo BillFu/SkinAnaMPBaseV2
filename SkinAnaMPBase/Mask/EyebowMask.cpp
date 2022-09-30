@@ -33,24 +33,6 @@ Point2i getPtOnEb(const FaceInfo& faceInfo, EyeID eyeID, int ptIndex)
     
     return Point2i(x, y);
 }
-/*
-// return new interpolated No.69 and No.68 points, near the right eye!
-void CalcRightInter69_and68Pt(const FaceInfo& faceInfo,
-                              Point2i& iRP69, Point2i& iRP68)
-{
-    // iRP69 means the Interpolated right point 69 by interpolating
-    // between original lefe 69 and right 69 piont.
-    Point2i lP69 = getPtOnEb(faceInfo, LEFT_EYE, 69);
-    Point2i rP69 = getPtOnEb(faceInfo, RIGHT_EYE, 69);
-    // be careful with the Point order and the value of t when to invoke InnerInterpolate()
-    iRP69 = Interpolate(rP69, lP69, 0.20);
-    
-    Point2i lP68 = getPtOnEb(faceInfo, LEFT_EYE, 68);
-    Point2i rP68 = getPtOnEb(faceInfo, RIGHT_EYE, 68);
-    // be careful with the Point order and the value of t when to invoke InnerInterpolate()
-    iRP68 = Interpolate(rP68, lP68, 0.15);
-}
-*/
 
 // return new interpolated No.64 point, can be applied to two eyes!
 // make No.64 moved toward the outside of face a bit.

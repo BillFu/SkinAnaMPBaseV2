@@ -12,10 +12,14 @@ Date:   2022/9/11
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
+#include <filesystem>
+
 #include "opencv2/opencv.hpp"
 
 using namespace std;
 using namespace cv;
+
+namespace fs = std::filesystem;
 
 /**********************************************************************************************
 将缩小版(大小为H*W)的影像“喂”给TF Lite网络的输入端，图像采用BGR通道次序。
@@ -68,6 +72,13 @@ void GeoFixFVSrcImg(const Mat& srcImg, const Rect& faceBBox,
                     int& TP, int& LP);
 //-------------------------------------------------------------------------------------------
 
+// FP: full path
+string BuildOutImgFileName(const fs::path& outDir,
+                         const string& fileNameBone,
+                         const string& outPrefix);
 
+// File Bone Name: no path and no extension
+// the bone name of "images/JPN/cross_2.jpg" is "cross_2"
+string GetFileBoneName(string fileName);
 
 #endif /* end of UTILS_HPP */

@@ -45,7 +45,8 @@ void ForgePoreMaskV2(const FaceInfo& faceInfo,
 //-------------------------------------------------------------------------------------------
 
 // 一揽子函数，生成各类Mask和它们的Anno Image
-void ForgeMaskAnnoPack(const Mat& srcImage, const fs::path& outDir,
-                       const string& fileNameBone);
+void ForgeMaskAnnoPack(const Mat& srcImage, const Mat& annoLmImage,
+                       const fs::path& outDir, const string& fileNameBone,
+                       const FaceInfo& faceInfo);
 
 #endif /* end of SKIN_FEATURE_MASK_HPP */
