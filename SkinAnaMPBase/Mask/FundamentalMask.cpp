@@ -99,8 +99,14 @@ void ForgeLowFacePg(const FaceInfo& faceInfo, POLYGON& skinPolygon)
     skinPolygon.push_back(IPt147);
 
     skinPolygon.push_back(getPtOnGLm(faceInfo, 192));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 136));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 150));
+    
+    Point2i IPt136 = IpGLmPtWithPair(faceInfo, 136, 212, 0.3);
+    skinPolygon.push_back(IPt136);
+
+    //skinPolygon.push_back(getPtOnGLm(faceInfo, 150));
+    Point2i IPt150 = IpGLmPtWithPair(faceInfo, 150, 43, 0.15);
+    skinPolygon.push_back(IPt150);
+    
     skinPolygon.push_back(getPtOnGLm(faceInfo, 149));
     skinPolygon.push_back(getPtOnGLm(faceInfo, 176));
     skinPolygon.push_back(getPtOnGLm(faceInfo, 171));
@@ -113,7 +119,11 @@ void ForgeLowFacePg(const FaceInfo& faceInfo, POLYGON& skinPolygon)
     skinPolygon.push_back(getPtOnGLm(faceInfo, 395));
     skinPolygon.push_back(getPtOnGLm(faceInfo, 394));
     skinPolygon.push_back(getPtOnGLm(faceInfo, 416));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 376));
+        
+    Point2i IPt376 = IpGLmPtWithPair(faceInfo, 376, 280, 0.15);
+    skinPolygon.push_back(IPt376);
+    
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 352));
     skinPolygon.push_back(getPtOnGLm(faceInfo, 345));
     
     skinPolygon.push_back(getPtOnGLm(faceInfo, 346));
