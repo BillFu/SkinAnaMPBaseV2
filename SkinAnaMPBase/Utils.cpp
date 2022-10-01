@@ -47,27 +47,6 @@ string openCVType2str(int type)
     return r;
 }
 
-/*
-Mat BlendImages(const Mat& src1, const Mat& src2, float alpha)
-{
-    Mat dst = Mat::zeros(src1.size(), CV_8UC3);
-    float beta = 1.0 - alpha;
-    //float gama = 0.0;
-    for (int i=0; i<src1.rows; i++)
-    {
-        const uchar* src1_ptr = src1.ptr<uchar>(i);
-        const uchar* src2_ptr = src2.ptr<uchar>(i);
-        uchar* dst_ptr  = dst.ptr<uchar>(i);
-        for (int j=0; j<src1.cols*3; j++)
-        {
-            dst_ptr[j] = saturate_cast<uchar>(src1_ptr[j]*alpha + src2_ptr[j]*beta);
-        }
-    }
-    
-    return dst;
-}
-*/
-
 /**********************************************************************************************
 RC: rows and cols
 ***********************************************************************************************/

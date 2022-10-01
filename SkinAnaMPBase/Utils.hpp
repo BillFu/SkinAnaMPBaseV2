@@ -23,8 +23,6 @@ namespace fs = std::filesystem;
 
 string openCVType2str(int type);
 
-// Mat BlendImages(const Mat& src1, const Mat& src2, float alpha);
-
 /**********************************************************************************************
 RC: rows and cols
 the rows and cols of the out image can be divied by 4
