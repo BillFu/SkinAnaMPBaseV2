@@ -21,6 +21,18 @@ using namespace cv;
 
 namespace fs = std::filesystem;
 
+string openCVType2str(int type);
+
+Mat BlendImages(const Mat& src1, const Mat& src2, float alpha);
+
+
+/**********************************************************************************************
+RC: rows and cols
+the rows and cols of the out image can be divied by 4
+***********************************************************************************************/
+void PadImgWithRC4Div(Mat& srcImg); //, Mat& outImg);
+
+
 /**********************************************************************************************
 将缩小版(大小为H*W)的影像“喂”给TF Lite网络的输入端，图像采用BGR通道次序。
 同时，在“喂”之前，对像素值Normalization，使之变为Float，取值范围为[0.0 1.0]。
@@ -35,9 +47,11 @@ void FeedInputWithNormalizedImage(uint8_t* imgDataPtr, float* netInputBuffer, in
 同时，在“喂”之前，对像素值Quantization，使之变为Float，取值范围为[-1.0 1.0]。
 imgDataPtr已经是缩小版的输入影像了。
 ***********************************************************************************************/
-void FeedInputWithQuantizedImage(uint8_t* imgDataPtr, float* netInputBuffer, int H, int W, int C);
+void FeedInWithQuanImage(uint8_t* imgDataPtr, float* netInputBuffer, int H, int W, int C);
 
 //-------------------------------------------------------------------------------------------
+// another implementation of FeedInWithQuanImage()
+void FeedPadImgToNet(const cv::Mat& resizedPadImg, float* inTensorBuf);
 
 // return a string that present a float with 2 decimal digits.
 // for example, return "3.14" for 3.1415927

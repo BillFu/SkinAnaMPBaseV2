@@ -171,8 +171,8 @@ void ForgeMouthPolygon(const FaceInfo& faceInfo,
     mouthHeight = pt17.y - (pt37.y + pt267.y) / 2;
     mouthWidth  = pt287.x - pt57.x;
     
-    cout << "mouthHeight: " << mouthHeight << endl;
-    cout << "mouthWidth: " << mouthWidth << endl;
+    //cout << "mouthHeight: " << mouthHeight << endl;
+    //cout << "mouthWidth: " << mouthWidth << endl;
 }
 
 //-------------------------------------------------------------------------------------------

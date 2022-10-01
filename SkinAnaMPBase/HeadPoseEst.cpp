@@ -97,7 +97,7 @@ void EstHeadPose(const cv::Size2i& srcImgS,
     Mat mtxR, mtxQ;
     // the values in eluer_angles are measured in degree. 
     Vec3d eluer_angles= cv::RQDecomp3x3(rot_mat, mtxR, mtxQ);
-    cout << "RQDecomp3x3() is Done!" << std::endl;
+    //cout << "RQDecomp3x3() is Done!" << std::endl;
 
     faceInfo.headPose.pitch = eluer_angles[0];
     faceInfo.headPose.yaw = eluer_angles[1];

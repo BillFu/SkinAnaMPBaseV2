@@ -128,13 +128,6 @@ bool ExtractFaceLm(const Mat& srcImage,
     int netInputWidth = FACE_MESH_NET_INPUT_W;
     int netInputHeight = FACE_MESH_NET_INPUT_H;
     
-    // Copy image to input tensor
-    cv::Mat resized_image;  //, normal_image;
-    // Not need to perform the convertion from BGR to RGB by the noticeable statements,
-    // later it would be done in one trick way.
-    cv::resize(paddedImg, resized_image, cv::Size(netInputWidth, netInputHeight), cv::INTER_NEAREST);
-
-    paddedImg.release();
     
     //-------------------------*****enter inference*****---------------------------------------------------------
     // Initiate Interpreter
@@ -154,8 +147,8 @@ bool ExtractFaceLm(const Mat& srcImage,
         errorMsg = string("Failed to allocate tensor.");
         return false;
     }
-    else
-        cout << "Succeeded to allocate tensor!" << endl;
+    //else
+        //cout << "Succeeded to allocate tensor!" << endl;
 
     // Configure the interpreter
     interpreter->SetAllowFp16PrecisionForFp32(true);
@@ -165,11 +158,21 @@ bool ExtractFaceLm(const Mat& srcImage,
     int inTensorIndex = interpreter->inputs()[0];
     int channels = interpreter->tensor(inTensorIndex)->dims->data[3];
     
-    float* inputTensorBuffer = interpreter->typed_input_tensor<float>(inTensorIndex);
+    
+    // Copy image to input tensor
+    cv::Mat resized_image;  //, normal_image;
+    // Not need to perform the convertion from BGR to RGB by the noticeable statements,
+    // later it would be done in one trick way.
+    cv::resize(paddedImg, resized_image, cv::Size(netInputWidth, netInputHeight), cv::INTER_NEAREST);
+    paddedImg.release();
+    
+    float* inTensorBuf = interpreter->typed_input_tensor<float>(inTensorIndex);
     uint8_t* inImgMem = resized_image.ptr<uint8_t>(0);
-    FeedInputWithNormalizedImage(inImgMem, inputTensorBuffer, netInputHeight, netInputWidth, channels);
+    //FeedInWithNormImage(inImgMem, inTensorBuf, netInputHeight, netInputWidth, channels);
+    FeedInWithQuanImage(inImgMem, inTensorBuf, netInputHeight, netInputWidth, channels);
+    //FeedPadImgToNet(resized_image, inTensorBuf);
     resized_image.release();
-    cout << "ProcessInputWithFloatModel() is executed successfully!" << endl;
+    //cout << "ProcessInputWithFloatModel() is executed successfully!" << endl;
 
     // Inference
     interpreter->Invoke();  // perform the inference
@@ -191,7 +194,7 @@ bool ExtractFaceLm(const Mat& srcImage,
     hasFace = true;
 
     int output_lm_ID = interpreter->outputs()[0];
-    cout << "output_landmarks ID: " << output_lm_ID << endl;
+    //cout << "output_landmarks ID: " << output_lm_ID << endl;
     
     float* LMOutBuffer = interpreter->typed_output_tensor<float>(0);
 
@@ -205,7 +208,7 @@ bool ExtractFaceLm(const Mat& srcImage,
     extractOutputLM(LMOutBuffer,
                     lm_3d, normalLmSet.normal_lm_2d);
 
-    cout << "extractOutputLM() is well done!" << endl;
+    //cout << "extractOutputLM() is well done!" << endl;
     
     //double LNorEyeBowPts[NUM_PT_EYE_REFINE_GROUP][2];
     float* outBufLeftEyeRefinePts = interpreter->typed_output_tensor<float>(2);

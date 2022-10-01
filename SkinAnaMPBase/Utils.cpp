@@ -22,6 +22,71 @@ string convertFloatToStr2DeciDigits(float value)
     return out_str;
 }
 
+string openCVType2str(int type)
+{
+    string r;
+
+    uchar depth = type & CV_MAT_DEPTH_MASK;
+    uchar chans = 1 + (type >> CV_CN_SHIFT);
+
+    switch ( depth )
+    {
+        case CV_8U:  r = "8U"; break;
+        case CV_8S:  r = "8S"; break;
+        case CV_16U: r = "16U"; break;
+        case CV_16S: r = "16S"; break;
+        case CV_32S: r = "32S"; break;
+        case CV_32F: r = "32F"; break;
+        case CV_64F: r = "64F"; break;
+        default:     r = "User"; break;
+    }
+
+    r += "C";
+    r += (chans+'0');
+
+    return r;
+}
+
+
+Mat BlendImages(const Mat& src1, const Mat& src2, float alpha)
+{
+    Mat dst = Mat::zeros(src1.size(), CV_8UC3);
+    float beta = 1.0 - alpha;
+    //float gama = 0.0;
+    for (int i=0; i<src1.rows; i++)
+    {
+        const uchar* src1_ptr = src1.ptr<uchar>(i);
+        const uchar* src2_ptr = src2.ptr<uchar>(i);
+        uchar* dst_ptr  = dst.ptr<uchar>(i);
+        for (int j=0; j<src1.cols*3; j++)
+        {
+            dst_ptr[j] = saturate_cast<uchar>(src1_ptr[j]*alpha + src2_ptr[j]*beta);
+        }
+    }
+    
+    return dst;
+}
+
+
+/**********************************************************************************************
+RC: rows and cols
+***********************************************************************************************/
+void PadImgWithRC4Div(Mat& srcImg) //, Mat& outImg)
+{
+    int padR = srcImg.cols % 4;
+    int padB = srcImg.rows % 4;
+    
+    if(padR == 0 && padB == 0)
+        return;
+    
+    Scalar blackColor(0, 0, 0);
+    
+    copyMakeBorder( srcImg, srcImg,
+                    0, padB, //
+                    0, padR,
+                   BORDER_CONSTANT, blackColor);
+}
+
 //-------------------------------------------------------------------------------------------
 
 /******************************************************************************************
@@ -75,7 +140,7 @@ float Quantize(uint8_t gray_value)
 同时，在“喂”之前，对像素值Quantization，使之变为Float，取值范围为[-1.0 1.0]。
 imgDataPtr已经是缩小版的输入影像了。
 ***********************************************************************************************/
-void FeedInputWithQuantizedImage(uint8_t* imgDataPtr, float* netInputBuffer, int H, int W, int C)
+void FeedInWithQuanImage(uint8_t* imgDataPtr, float* netInputBuffer, int H, int W, int C)
 {
     for (int y = 0; y < H; ++y)
     {
@@ -103,6 +168,28 @@ void FeedInputWithQuantizedImage(uint8_t* imgDataPtr, float* netInputBuffer, int
             }
         }
     }
+}
+
+void FeedPadImgToNet(const cv::Mat& resizedPadImg, float* inTensorBuf)
+{
+    Mat rpImgRGB; //rp: resized and padded
+    cv::cvtColor(resizedPadImg, rpImgRGB, cv::COLOR_BGR2RGB);
+
+    /*
+        std::vector<int> inputShape = getInputShape(idx);
+        int H = inputShape[1];
+        int W = inputShape[2];
+
+        cv::Size wantedSize = cv::Size(W, H);
+        cv::resize(out, out, wantedSize);
+    */
+    // Equivalent to (out - mean)/ std
+    Mat quanImg;
+    rpImgRGB.convertTo(quanImg, CV_32FC3, 1.0 / 127.5, -1.0);
+    uint8_t* inImgMem = quanImg.ptr<uint8_t>(0);
+    int sqSize = resizedPadImg.rows * resizedPadImg.cols;
+    long totalBytes = sqSize*3*sizeof(float32_t);
+    memcpy(inTensorBuf, inImgMem, totalBytes);
 }
 
 //-------------------------------------------------------------------------------------------

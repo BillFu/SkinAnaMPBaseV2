@@ -70,11 +70,13 @@ void ProOneImg(const string& srcImgFile,
     else
         cout << "Succeeded to load image: " << srcImgFile << endl;
     
+    PadImgWithRC4Div(srcImage);
+
     FaceSegResult segResult;
     string segImgFile = "seg_" + fileNameBone + ".png";
     fs::path segImgFullPath = outDir / segImgFile;
-    //SegImage(srcImage, segResult, true, segImgFullPath.string());
-    SegImage(srcImage, segResult, false, "");
+    SegImage(srcImage, segResult, true, segImgFullPath.string());
+    //SegImage(srcImage, segResult, false, "");
     
     FaceInfo faceInfo;
 
@@ -88,8 +90,8 @@ void ProOneImg(const string& srcImgFile,
         cout << "Error Happened to extract face LM: " << errorMsg << endl;
         return;
     }
-    else
-        cout << "Succeeded to extract lm!" << endl;
+    //else
+    //    cout << "Succeeded to extract lm!" << endl;
     
     if(!hasFace)
     {

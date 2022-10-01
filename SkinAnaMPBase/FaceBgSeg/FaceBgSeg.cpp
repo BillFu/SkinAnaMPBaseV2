@@ -179,7 +179,7 @@ Mat FaceBgSegmentor::RenderSegLabels()
         }
     }
     
-    resize(segLabelImg, segLabelImg, Size(srcImgW, srcImgH));
+    //resize(segLabelImg, segLabelImg, Size(srcImgW, srcImgH));
     return segLabelImg;
 }
 
@@ -213,13 +213,19 @@ void OverlaySegOnImageV2(const Mat& segLabel, const Mat& srcImg,
     imwrite(outImgFileName, outImg);
 }
 
+
+
 void DrawSegOnImage(const Mat& segLabel, const Mat& srcImg,
                        float alpha, const FaceSegResult& facePriInfo,
                        const char* outImgFileName)
 {
-    Mat outImg;
-    addWeighted(srcImg, 1.0 - alpha, segLabel, alpha, 0.0, outImg);
-    
+    //Mat outImg(srcImg.size(), CV_32FC3);
+    //addWeighted(srcImg, 1.0 - alpha, segLabel, alpha, 0.0, outImg);
+    Mat outImg = BlendImages(srcImg, segLabel, alpha);
+
+    string outImg_DataType = openCVType2str(outImg.type());
+    cout << "outImg_DataType: " << outImg_DataType << endl;
+
     cv::Scalar colorBox(255, 0, 0); // (B, G, R)
     rectangle(outImg, facePriInfo.faceBBox, colorBox, 2, LINE_8);
 
@@ -442,9 +448,12 @@ void SegImage(const Mat& srcImage, FaceSegResult& facePriInfo,
     segmentor.CalcFaceBBox(facePriInfo);
     segmentor.CalcEyePts(facePriInfo);
     
+    /*
     if(needToSaveAnno)
         DrawSegOnImage(segLabel, srcImage, 0.5,
                    facePriInfo, annoImgFile.c_str());
+    */
     
+    imwrite(annoImgFile.c_str(), segLabel);
     cout << facePriInfo << endl;
 }
