@@ -108,7 +108,7 @@ void OverlaySegOnImageV2(const Mat& segLabel, const Mat& srcImg,
                        const char* outImgFileName);
 
 
-void DrawSegOnImage(const Mat& segLabel, const Mat& srcImg,
+void DrawSegOnImage(const Mat& segColorLabel, const Mat& srcImg,
                     float alpha, const FaceSegResult& facePriInfo,
                     const char* outImgFileName);
 

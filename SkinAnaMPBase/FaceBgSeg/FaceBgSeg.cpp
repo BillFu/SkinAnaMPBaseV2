@@ -138,8 +138,8 @@ void FaceBgSegmentor::Segment(const Mat& srcImage)
     const int rows = score.size[2];
     const int cols = score.size[3];
     const int chans = score.size[1]; // the channels here are classes that a pixel belongs to
-    segLabels = Mat(rows, cols, CV_8UC1);
-    Mat maxVal(rows, cols, CV_32FC1);
+    segLabels = Mat(rows, cols, CV_8UC1, Scalar(0));
+    Mat maxVal(rows, cols, CV_32FC1, Scalar(-1.0));
     
     // 推理之后，会计算出每个像素属于每个类别的隶属度
     // 检索出某个像素的最大类别隶属度，就判定这个像素属于这个类别
@@ -168,7 +168,9 @@ void FaceBgSegmentor::Segment(const Mat& srcImage)
 Mat FaceBgSegmentor::RenderSegLabels()
 {
     // mapping from label to corresponding color
+    // 切记：初始化一个Mat时，尽可能提供最多已知的信息！
     cv::Mat segLabelImg = Mat::zeros(SEG_NET_OUTPUT_SIZE, SEG_NET_OUTPUT_SIZE, CV_8UC3);
+    
     for (int row = 0; row < SEG_NET_OUTPUT_SIZE; row++)
     {
         const uchar* ptrMaxCl = segLabels.ptr<uchar>(row);
@@ -179,7 +181,7 @@ Mat FaceBgSegmentor::RenderSegLabels()
         }
     }
     
-    //resize(segLabelImg, segLabelImg, Size(srcImgW, srcImgH));
+    resize(segLabelImg, segLabelImg, Size(srcImgW, srcImgH), INTER_NEAREST);
     return segLabelImg;
 }
 
@@ -215,13 +217,14 @@ void OverlaySegOnImageV2(const Mat& segLabel, const Mat& srcImg,
 
 
 
-void DrawSegOnImage(const Mat& segLabel, const Mat& srcImg,
+void DrawSegOnImage(const Mat& segColorLabel, const Mat& srcImg,
                        float alpha, const FaceSegResult& facePriInfo,
                        const char* outImgFileName)
 {
     //Mat outImg(srcImg.size(), CV_32FC3);
-    //addWeighted(srcImg, 1.0 - alpha, segLabel, alpha, 0.0, outImg);
-    Mat outImg = BlendImages(srcImg, segLabel, alpha);
+    Mat outImg = Mat::zeros(srcImg.size(), CV_8UC3);
+    addWeighted(srcImg, 1.0 - alpha, segColorLabel, alpha, 0.0, outImg);
+    //Mat outImg = BlendImages(srcImg, segLabel, alpha);
 
     string outImg_DataType = openCVType2str(outImg.type());
     cout << "outImg_DataType: " << outImg_DataType << endl;
@@ -438,22 +441,20 @@ void SegImage(const string& srcImgFile, const string& annoImgFile)
 }
 */
 
-void SegImage(const Mat& srcImage, FaceSegResult& facePriInfo,
+void SegImage(const Mat& srcImage, FaceSegResult& faceSegResult,
               bool needToSaveAnno, const string& annoImgFile)
 {
     FaceBgSegmentor segmentor;
     segmentor.Segment(srcImage);
-    Mat segLabel = segmentor.RenderSegLabels();
     
-    segmentor.CalcFaceBBox(facePriInfo);
-    segmentor.CalcEyePts(facePriInfo);
-    
-    /*
+    segmentor.CalcFaceBBox(faceSegResult);
+    segmentor.CalcEyePts(faceSegResult);
+
+    Mat segColorLabel = segmentor.RenderSegLabels();
+
     if(needToSaveAnno)
-        DrawSegOnImage(segLabel, srcImage, 0.5,
-                   facePriInfo, annoImgFile.c_str());
-    */
+        DrawSegOnImage(segColorLabel, srcImage, 0.5,
+                   faceSegResult, annoImgFile.c_str());
     
-    imwrite(annoImgFile.c_str(), segLabel);
-    cout << facePriInfo << endl;
+    cout << faceSegResult << endl;
 }

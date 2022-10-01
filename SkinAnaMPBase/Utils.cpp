@@ -47,7 +47,7 @@ string openCVType2str(int type)
     return r;
 }
 
-
+/*
 Mat BlendImages(const Mat& src1, const Mat& src2, float alpha)
 {
     Mat dst = Mat::zeros(src1.size(), CV_8UC3);
@@ -66,7 +66,7 @@ Mat BlendImages(const Mat& src1, const Mat& src2, float alpha)
     
     return dst;
 }
-
+*/
 
 /**********************************************************************************************
 RC: rows and cols

@@ -1,0 +1,5 @@
+_background_  0 0 0
+face	200 0 0
+rightbrown	0 200 0
+righteye	200 200 0
+beard	0 0 200
