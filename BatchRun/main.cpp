@@ -25,7 +25,7 @@ using json = nlohmann::json;
 namespace fs = std::filesystem;
 
 #include "../SkinAnaMPBase/FaceBgSeg/FaceBgSeg.hpp"
-#include "../SkinAnaMPBase/FaceLmExtract.hpp"
+#include "../SkinAnaMPBase/FaceLmExtractV2.hpp"
 #include "Batch.hpp"
 
 int main(int argc, const char * argv[])

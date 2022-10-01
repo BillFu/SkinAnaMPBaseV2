@@ -284,6 +284,11 @@ void FaceBgSegmentor::ScaleUpBBox(const Rect& inBBox, Rect& outBBox)
     int outX2 = p2.x * srcImgW / SEG_NET_OUTPUT_SIZE;
     int outY2 = p2.y * srcImgH / SEG_NET_OUTPUT_SIZE;
 
+    if((outX2 - outX1) % 2 != 0) //make width a even number
+        outX2 += 1;
+    if((outY2 - outY1) % 2 != 0) //make height a even number
+        outY2 += 1;
+    
     outBBox = Rect(Point(outX1, outY1), Point(outX2, outY2));
 }
 

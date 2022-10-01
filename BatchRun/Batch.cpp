@@ -19,7 +19,7 @@ Date:   2022/9/27
 #include "Batch.hpp"
 #include "../SkinAnaMPBase/Common.hpp"
 #include "../SkinAnaMPBase/FaceBgSeg/FaceBgSeg.hpp"
-#include "../SkinAnaMPBase/FaceLmExtract.hpp"
+#include "../SkinAnaMPBase/FaceLmExtractV2.hpp"
 #include "../SkinAnaMPBase/HeadPoseEst.hpp"
 #include "../SkinAnaMPBase/AnnoImage.hpp"
 #include "../SkinAnaMPBase/Utils.hpp"

@@ -23,7 +23,7 @@ Date:   2022/9/17
 
 #include "../SkinAnaMPBase/Common.hpp"
 #include "../SkinAnaMPBase/HeadPoseEst.hpp"
-#include "../SkinAnaMPBase/FaceLmExtract.hpp"
+#include "../SkinAnaMPBase/FaceLmExtractV2.hpp"
 
 #include "LM_Exporter.hpp"
 
