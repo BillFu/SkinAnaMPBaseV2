@@ -63,6 +63,12 @@ struct FaceSegResult
     int         eyeAreas[2]; // in pixels in source image space
     float       eyeAreaDiffRatio;  // ratio = abs(a1-a2) / max(a1, a2)
     bool        isFrontView;
+    Mat         segLabels;  // 512 * 512, one channel
+    
+    FaceSegResult()
+    {
+        segLabels = Mat(512, 512, CV_8UC1, Scalar(0));
+    }
     
     friend ostream &operator<<(ostream &output, const FaceSegResult &fpi )
     {

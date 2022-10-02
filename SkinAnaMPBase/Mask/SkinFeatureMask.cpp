@@ -97,7 +97,7 @@ void ForgeMaskAnnoPack(const Mat& srcImage, const Mat& annoLmImage,
     ForgeForeheadMask(faceInfo, fhMask);
 
     Mat annoImage2 = srcImage.clone();
-    AnnoGeneralKeyPoints(annoImage2, faceInfo, true);
+    AnnoGenKeyPoints(annoImage2, faceInfo, true);
     //OverlayMaskOnImage(annoImage2, fhMask,
     //                    "forehead mask", fhMaskAnnoFile.c_str());
 

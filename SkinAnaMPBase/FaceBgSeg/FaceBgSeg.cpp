@@ -117,7 +117,8 @@ FaceBgSegmentor::~FaceBgSegmentor()
 /******************************************************************************************
  *******************************************************************************************/
 
-void FaceBgSegmentor::Segment(const Mat& srcImage)
+void FaceBgSegmentor::Segment(const Mat& srcImage,
+                              FaceSegResult& segResult)
 {
     srcImgH = srcImage.rows;
     srcImgW = srcImage.cols;
@@ -138,7 +139,7 @@ void FaceBgSegmentor::Segment(const Mat& srcImage)
     const int rows = score.size[2];
     const int cols = score.size[3];
     const int chans = score.size[1]; // the channels here are classes that a pixel belongs to
-    segLabels = Mat(rows, cols, CV_8UC1, Scalar(0));
+    //segLabels = Mat(rows, cols, CV_8UC1, Scalar(0));
     Mat maxVal(rows, cols, CV_32FC1, Scalar(-1.0));
     
     // 推理之后，会计算出每个像素属于每个类别的隶属度
@@ -149,7 +150,7 @@ void FaceBgSegmentor::Segment(const Mat& srcImage)
         for (int row = 0; row < rows; row++)
         {
             const float* ptrScore = score.ptr<float>(0, c, row);
-            uchar* ptrSegClass = segLabels.ptr<uchar>(row);
+            uchar* ptrSegClass = segResult.segLabels.ptr<uchar>(row);
             float* ptrMaxVal = maxVal.ptr<float>(row);
             for (int col = 0; col < cols; col++)
             {
@@ -165,7 +166,7 @@ void FaceBgSegmentor::Segment(const Mat& srcImage)
 
 
 // 将分割结果以彩色Table渲染出来，并放大到原始图像尺度
-Mat FaceBgSegmentor::RenderSegLabels()
+Mat FaceBgSegmentor::RenderSegLabels(const Mat& segLabels)
 {
     // mapping from label to corresponding color
     // 切记：初始化一个Mat时，尽可能提供最多已知的信息！
@@ -303,7 +304,7 @@ void FaceBgSegmentor::ScaleUpPoint(const Point2i& inPt, Point2i& outPt)
 // Bounding Box and Face Center Point in the coordinate system of the source image.
 // Face Center Point must not be the center of BBox,
 // It refers to the center of the line connecting the centers of wo eyes.
-void FaceBgSegmentor::CalcFaceBBox(Rect& faceBBox)
+void FaceBgSegmentor::CalcFaceBBoxImpl(const Mat& segLabels, Rect& faceBBox)
 {
     // firstly, calculation is carried out in the space of seg labels, i.e., 512*512
     // in the end, the result will be transformed into the space of source image.
@@ -337,9 +338,9 @@ void FaceBgSegmentor::CalcFaceBBox(Rect& faceBBox)
     ScaleUpBBox(smallBBox, faceBBox);
 }
 
-void FaceBgSegmentor::CalcFaceBBox(FaceSegResult& facePriInfo)
+void FaceBgSegmentor::CalcFaceBBox(FaceSegResult& segResult)
 {
-    CalcFaceBBox(facePriInfo.faceBBox);
+    CalcFaceBBoxImpl(segResult.segLabels, segResult.faceBBox);
 }
 
 //-------------------------------------------------------------------------------------------
@@ -359,7 +360,7 @@ float FaceBgSegmentor::calcEyeAreaDiffRatio(int a1, int a2)
 // or profile view.
 // The center point of face refers to the center of the line connecting the centers of wo eyes.
 // in the profile view, the CP of face esitmated cannot be used for the bad precision.
-void FaceBgSegmentor::CalcEyePts(FaceSegResult& facePriInfo)
+void FaceBgSegmentor::CalcEyePts(FaceSegResult& segResult)
 {
     // roadmap:
     // 1. calculate the beard mask
@@ -368,11 +369,11 @@ void FaceBgSegmentor::CalcEyePts(FaceSegResult& facePriInfo)
     
     Mat beardMask;
     // when one pixel meet: label > SEG_EYE_LABEL, then it is accepted as Beard
-    threshold(segLabels, beardMask, SEG_EYE_LABEL, 255, cv::THRESH_BINARY);
+    threshold(segResult.segLabels, beardMask, SEG_EYE_LABEL, 255, cv::THRESH_BINARY);
     
     Mat eyesBeardMask;  // including both eyes and beard
     // when one pixel meet: label > SEG_EYEBROW_LABEL, then it is accepted as eyes or Beard
-    threshold(segLabels, eyesBeardMask, SEG_EYEBROW_LABEL, 255, cv::THRESH_BINARY);
+    threshold(segResult.segLabels, eyesBeardMask, SEG_EYEBROW_LABEL, 255, cv::THRESH_BINARY);
     
     Mat eyesMask = eyesBeardMask & (~beardMask);
     //imwrite("eysMask.png", eyesMask);
@@ -405,8 +406,8 @@ void FaceBgSegmentor::CalcEyePts(FaceSegResult& facePriInfo)
     ScaleUpPoint(mc[0], eyeCP1);
     ScaleUpPoint(mc[1], eyeCP2);
     
-    facePriInfo.eyeCPs[0] = eyeCP1;
-    facePriInfo.eyeCPs[1] = eyeCP2;
+    segResult.eyeCPs[0] = eyeCP1;
+    segResult.eyeCPs[1] = eyeCP2;
     
     double areaEye1 = contourArea(contours[0]);
     double areaEye2 = contourArea(contours[1]);
@@ -414,24 +415,24 @@ void FaceBgSegmentor::CalcEyePts(FaceSegResult& facePriInfo)
     float scaleX = (float)srcImgW / (float)SEG_NET_OUTPUT_SIZE;
     float scaleY = (float)srcImgH / (float)SEG_NET_OUTPUT_SIZE;
     
-    facePriInfo.eyeAreas[0] = (int)(areaEye1 * scaleX * scaleY);
-    facePriInfo.eyeAreas[1] = (int)(areaEye2 * scaleX * scaleY);
+    segResult.eyeAreas[0] = (int)(areaEye1 * scaleX * scaleY);
+    segResult.eyeAreas[1] = (int)(areaEye2 * scaleX * scaleY);
     
-    facePriInfo.eyeAreaDiffRatio = calcEyeAreaDiffRatio(
-            facePriInfo.eyeAreas[0], facePriInfo.eyeAreas[1]);
+    segResult.eyeAreaDiffRatio = calcEyeAreaDiffRatio(
+            segResult.eyeAreas[0], segResult.eyeAreas[1]);
     
-    if(facePriInfo.eyeAreaDiffRatio > EyeAreaDiffRation_TH)
+    if(segResult.eyeAreaDiffRatio > EyeAreaDiffRation_TH)
     {
-        facePriInfo.isFrontView = false;
+        segResult.isFrontView = false;
         // facePriInfo.faceCP = (eyeCP1 + eyeCP2) / 2;
-        int totalEyeArea = facePriInfo.eyeAreas[0] + facePriInfo.eyeAreas[1];
-        float t = (float)facePriInfo.eyeAreas[0] / (float)totalEyeArea;
-        facePriInfo.faceCP =  Interpolate(facePriInfo.eyeCPs[0], facePriInfo.eyeCPs[1], t);
+        int totalEyeArea = segResult.eyeAreas[0] + segResult.eyeAreas[1];
+        float t = (float)segResult.eyeAreas[0] / (float)totalEyeArea;
+        segResult.faceCP =  Interpolate(segResult.eyeCPs[0], segResult.eyeCPs[1], t);
     }
     else
     {
-        facePriInfo.isFrontView = true;
-        facePriInfo.faceCP = (eyeCP1 + eyeCP2) / 2;
+        segResult.isFrontView = true;
+        segResult.faceCP = (eyeCP1 + eyeCP2) / 2;
     }
 }
 /*
@@ -463,20 +464,20 @@ void SegImage(const string& srcImgFile, const string& annoImgFile)
 }
 */
 
-void SegImage(const Mat& srcImage, FaceSegResult& faceSegResult,
+void SegImage(const Mat& srcImage, FaceSegResult& segResult,
               bool needToSaveAnno, const string& annoImgFile)
 {
     FaceBgSegmentor segmentor;
-    segmentor.Segment(srcImage);
+    segmentor.Segment(srcImage, segResult);
     
-    segmentor.CalcFaceBBox(faceSegResult);
-    segmentor.CalcEyePts(faceSegResult);
+    segmentor.CalcFaceBBox(segResult);
+    segmentor.CalcEyePts(segResult);
 
-    Mat segColorLabel = segmentor.RenderSegLabels();
+    Mat segColorLabel = segmentor.RenderSegLabels(segResult.segLabels);
 
     if(needToSaveAnno)
         DrawSegOnImage(segColorLabel, srcImage, 0.5,
-                   faceSegResult, annoImgFile.c_str());
+                       segResult, annoImgFile.c_str());
     
-    cout << faceSegResult << endl;
+    cout << segResult << endl;
 }

@@ -37,7 +37,7 @@ void AnnoHeadPoseEst(Mat& annoImage, const FaceInfo& faceInfo)
 /******************************************************************************************
 本函数的功能是，将人脸一般关键点(468个)的结果打印在输入影像的拷贝上。
 *******************************************************************************************/
-void AnnoGeneralKeyPoints(Mat& annoImage, const FaceInfo& faceInfo, bool showIndices)
+void AnnoGenKeyPoints(Mat& annoImage, const FaceInfo& faceInfo, bool showIndices)
 {
     cv::Scalar yellow(0, 255, 255); // (B, G, R)
     cv::Scalar blue(255, 0, 0);
@@ -145,7 +145,7 @@ void AnnoLipRefinePts(Mat& annoImage, const FaceInfo& faceInfo,
 void AnnoAllLmInfo(Mat& annoImage, const FaceInfo& faceInfo,
                    const string& annoFile)
 {
-    AnnoGeneralKeyPoints(annoImage, faceInfo, true);
+    AnnoGenKeyPoints(annoImage, faceInfo, true);
     
     Scalar yellowColor(255, 0, 0);
     AnnoTwoEyeRefinePts(annoImage, faceInfo, yellowColor, true);
@@ -155,5 +155,4 @@ void AnnoAllLmInfo(Mat& annoImage, const FaceInfo& faceInfo,
     
     AnnoHeadPoseEst(annoImage, faceInfo);
     
-    //imwrite(annoFile, annoImage);
 }

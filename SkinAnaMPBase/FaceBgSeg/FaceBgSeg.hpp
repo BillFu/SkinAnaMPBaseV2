@@ -53,19 +53,19 @@ public:
     //now make this function more thinner,
     //just extract the segmentation labels, a 512*512 matrix with one channel.
     //coloring and resize has been elimated.
-    void Segment(const Mat& srcImage); //, uchar segLabel[SEG_NET_OUTPUT_SIZE][SEG_NET_OUTPUT_SIZE]);
+    void Segment(const Mat& srcImage, FaceSegResult& segResult); //, uchar segLabel[SEG_NET_OUTPUT_SIZE][SEG_NET_OUTPUT_SIZE]);
 
     // 将分割结果以彩色Table渲染出来，并放大到原始图像尺度
-    Mat RenderSegLabels();
+    Mat RenderSegLabels(const Mat& segLabels);
     
-    void CalcFaceBBox(FaceSegResult& facePriInfo);
+    void CalcFaceBBox(FaceSegResult& segResult);
 
     // this function includes: calcuate the center point of two eys, area of two eyes,
     // and the ratio of area difference, final determine the face is in front view
     // or profile view.
     // The center point of face refers to the center of the line connecting the centers of wo eyes.
     // in the profile view, the CP of face esitmated cannot be used for the bad precision.
-    void CalcEyePts(FaceSegResult& facePriInfo);
+    void CalcEyePts(FaceSegResult& segResult);
     
 private:
     
@@ -80,7 +80,7 @@ private:
     void ScaleUpPoint(const Point2i& inPt, Point2i& outPt);
 
     // Bounding Box is in the coordinate system of the source image.
-    void CalcFaceBBox(Rect& BBox);
+    void CalcFaceBBoxImpl(const Mat& segLabels, Rect& BBox);
 
     // formula: ratio = abs(a1-a2) / max(a1, a2)
     float calcEyeAreaDiffRatio(int a1, int a2);
@@ -89,7 +89,7 @@ private:
     int srcImgH;
     int srcImgW;
     
-    Mat segLabels; //after segmentation, would be filled with 512*512, uchar data, only one channel.
+    //Mat segLabels; //after segmentation, would be filled with 512*512, uchar data, only one channel.
     
     static dnn::Net segNet;
     static vector<Vec3b> classColorTable;
