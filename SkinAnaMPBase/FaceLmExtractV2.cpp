@@ -101,6 +101,27 @@ bool LoadFaceMeshModel(const char* faceMeshModelFile, string& errorMsg)
 }
  
 //-----------------------------------------------------------------------------------------
+// padding the source image with such method:
+// crop the srcImg with face bbox, then expand the cropped iamge from the center of bbox
+// toward outside, with 25% margin of width and height.
+Mat PaddingImage(const Mat& srcImage, const Rect& bbox,
+             int& padLeft, int& padTop)
+{
+    float alphaHor = 0.25;
+    float alphaVer = 0.15;
+    Mat croppedImg = srcImage(bbox); // 事先将faceBBox的长宽调整为偶数???
+    padLeft = (int)(bbox.width * alphaHor); // both left and right extend padW outside
+    padTop = (int)(bbox.height * alphaVer); // both top and bottom extend padH outside
+
+    Mat paddedImg;
+    Scalar blackColor(0, 0, 0);
+    copyMakeBorder(croppedImg, paddedImg,
+                   padTop, padTop, padLeft, padLeft,
+                   BORDER_CONSTANT, blackColor);
+    croppedImg.release();
+    
+    return paddedImg;
+}
 
 /******************************************************************************************
  目前的推理是一次性的，即从模型加载到解释器创建，到推理，到结果提取，这一流程只负责完成一副人脸的LM提取。
@@ -113,21 +134,11 @@ bool ExtractFaceLm(const Mat& srcImage,
                    FaceInfo& faceInfo, string& errorMsg)
 {
     //------------------******preprocessing******-----------------------------------------------------------------
+    
     // shifting and padding the source image to get better performance
-        
-    float alpha = 0.25;
-    const Rect& bbox = segResult.faceBBox;
-    Mat croppedImg = srcImage(bbox); // 事先将faceBBox的长宽调整为偶数???
-    int padLeft = (int)(bbox.width * alpha); // both left and right extend padW outside
-    int padTop = (int)(bbox.height * alpha); // both top and bottom extend padH outside
-    
-    Mat paddedImg;
-    Scalar blackColor(0, 0, 0);
-    copyMakeBorder(croppedImg, paddedImg,
-                   padTop, padTop, padLeft, padLeft,
-                   BORDER_CONSTANT, blackColor);
-    croppedImg.release();
-    
+    int padLeft, padTop;
+    Mat paddedImg = PaddingImage(srcImage, segResult.faceBBox,
+                           padLeft, padTop);
     cv::Size padImgSize = paddedImg.size();
     
     //-------------------------*****enter inference*****---------------------------------------------------------
