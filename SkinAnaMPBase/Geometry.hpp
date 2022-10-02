@@ -41,7 +41,14 @@ t: lies in [0.0 1.0], t-->0, out point-->Pt1;
 ***********************************************************************************************/
 Point2i IpGLmPtWithPair(const FaceInfo& faceInfo, int pIndex1, int pIndex2, float t);
 
-
 Point2i getPtOnGLm(const FaceInfo& faceInfo, int pIndex);
+
+//-------------------------------------------------------------------------------------------
+/**********************************************************************************************
+segLabels: 512*512
+the returned Jaw Width measured in the source space
+***********************************************************************************************/
+
+int CalcLowerJawWidth(const FaceInfo& faceInfo, const Mat& segLabels);
 
 #endif /* end of GEOMETRY_HPP */

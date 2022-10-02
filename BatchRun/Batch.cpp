@@ -24,6 +24,7 @@ Date:   2022/9/27
 #include "../SkinAnaMPBase/AnnoImage.hpp"
 #include "../SkinAnaMPBase/Utils.hpp"
 #include "../SkinAnaMPBase/Mask/SkinFeatureMask.hpp"
+#include "../SkinAnaMPBase/Geometry.hpp"
 
 
 namespace fs = std::filesystem;
@@ -75,9 +76,10 @@ void ProOneImg(const string& srcImgFile,
     FaceSegResult segResult;
     string segImgFile = "seg_" + fileNameBone + ".png";
     fs::path segImgFullPath = outDir / segImgFile;
-    SegImage(srcImage, segResult, true, segImgFullPath.string());
-    //SegImage(srcImage, segResult, false, "");
-    
+    SegImage(srcImage, segResult);
+    DrawSegOnImage(srcImage, 0.5,
+        segResult, segImgFile.c_str());
+
     FaceInfo faceInfo;
 
     float confThresh = 0.75;
@@ -101,6 +103,12 @@ void ProOneImg(const string& srcImgFile,
     
     EstHeadPose(srcImage.size(), faceInfo);
     
+    int jawWidth = CalcLowerJawWidth(faceInfo, segResult.segLabels);
+    string jawImgFile = "jaw_" + fileNameBone + ".png";
+    fs::path jawImgFP = outDir / jawImgFile;
+    AnnoLowerJaw(srcImage, faceInfo,
+                 jawWidth, segResult.faceBBox.width, jawImgFP.string());
+
     Mat annoLmImage = srcImage.clone();
     
     string lmImgFile = "pose_" + fileNameBone + ".png";

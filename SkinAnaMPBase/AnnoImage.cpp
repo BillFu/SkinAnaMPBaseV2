@@ -9,6 +9,7 @@ Date:   2022/9/11
 
 #include "AnnoImage.hpp"
 #include "Utils.hpp"
+#include "Geometry.hpp"
 
 /******************************************************************************************
 本函数的功能是，将人脸位姿估计的结果打印在输入影像的拷贝上。
@@ -155,4 +156,31 @@ void AnnoAllLmInfo(Mat& annoImage, const FaceInfo& faceInfo,
     
     AnnoHeadPoseEst(annoImage, faceInfo);
     
+}
+
+//-----------------------------------------------------------------------------------------
+/******************************************************************************************
+本函数的功能是，将Lower Jaw位置线和长度（与脸宽相比较的百分比）打印在输入影像的拷贝上。
+*******************************************************************************************/
+void AnnoLowerJaw(const Mat& srcImage, const FaceInfo& faceInfo,
+                  int jawWidth, int faceBBboxW, const string& annoFile)
+{
+    Point2i pt200 = getPtOnGLm(faceInfo, 200);
+
+    Point2i p1(0, pt200.y);
+    Point2i p2(srcImage.cols-1, pt200.y);
+    Mat canvas = srcImage.clone();
+    
+    cv::line(canvas, p1, p2, Scalar(0, 255, 0),
+             2, LINE_4);
+    
+    Scalar redColor(0, 0, 255);  // BGR
+    
+    float ratio_jaw_faceW = jawWidth / (float)(faceBBboxW);
+
+    string msg = "jaw / faceW: " + to_string(ratio_jaw_faceW);
+    cv::putText(canvas, msg, Point(200, 100),
+                FONT_HERSHEY_SIMPLEX, 2, redColor, 2);
+
+    imwrite(annoFile.c_str(), canvas);
 }

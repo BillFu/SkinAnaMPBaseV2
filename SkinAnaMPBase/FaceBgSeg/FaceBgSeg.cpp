@@ -166,7 +166,7 @@ void FaceBgSegmentor::Segment(const Mat& srcImage,
 
 
 // 将分割结果以彩色Table渲染出来，并放大到原始图像尺度
-Mat FaceBgSegmentor::RenderSegLabels(const Mat& segLabels)
+Mat FaceBgSegmentor::RenderSegLabels(const Size& imgSize, const Mat& segLabels)
 {
     // mapping from label to corresponding color
     // 切记：初始化一个Mat时，尽可能提供最多已知的信息！
@@ -182,93 +182,65 @@ Mat FaceBgSegmentor::RenderSegLabels(const Mat& segLabels)
         }
     }
     
-    resize(segLabelImg, segLabelImg, Size(srcImgW, srcImgH), INTER_NEAREST);
+    resize(segLabelImg, segLabelImg, imgSize, INTER_NEAREST);
     return segLabelImg;
 }
 
 //-------------------------------------------------------------------------------------------
 
-// blend segment labels image with source iamge:
-// result = alpha * segLabels + (1-alpha) * srcImage
-// alpha lies in [0.0 1.0]
-void OverlaySegOnImage(const Mat& segLabel, const Mat& srcImg,
-                       float alpha,
-                       const char* outImgFileName)
+void DrawSegOnImage(const Mat& srcImg, float alpha,
+                    const FaceSegResult& segResult,
+                    const char* outImgFileName)
 {
-    Mat outImg;
-    addWeighted(srcImg, 1.0 - alpha, segLabel, alpha, 0.0, outImg);
-    imwrite(outImgFileName, outImg);
-}
+    Mat segColorLabel = FaceBgSegmentor::RenderSegLabels(
+            srcImg.size(), segResult.segLabels);
 
-// blend segment labels image with source iamge:
-// result = alpha * segLabels + (1-alpha) * srcImage
-// alpha lies in [0.0 1.0]
-void OverlaySegOnImageV2(const Mat& segLabel, const Mat& srcImg,
-                       float alpha, const Rect& faceBBox,
-                       const char* outImgFileName)
-{
-    Mat outImg;
-    addWeighted(srcImg, 1.0 - alpha, segLabel, alpha, 0.0, outImg);
-    
-    cv::Scalar colorBox(255, 0, 0); // (B, G, R)
-    rectangle(outImg, faceBBox, colorBox, 2, LINE_8);
-    
-    imwrite(outImgFileName, outImg);
-}
-
-
-
-void DrawSegOnImage(const Mat& segColorLabel, const Mat& srcImg,
-                       float alpha, const FaceSegResult& facePriInfo,
-                       const char* outImgFileName)
-{
     //Mat outImg(srcImg.size(), CV_32FC3);
     Mat outImg = Mat::zeros(srcImg.size(), CV_8UC3);
     addWeighted(srcImg, 1.0 - alpha, segColorLabel, alpha, 0.0, outImg);
-    //Mat outImg = BlendImages(srcImg, segLabel, alpha);
 
     string outImg_DataType = openCVType2str(outImg.type());
     cout << "outImg_DataType: " << outImg_DataType << endl;
 
     cv::Scalar colorBox(255, 0, 0); // (B, G, R)
-    rectangle(outImg, facePriInfo.faceBBox, colorBox, 2, LINE_8);
+    rectangle(outImg, segResult.faceBBox, colorBox, 2, LINE_8);
 
     cv::Scalar yellow(0, 255, 255); // (B, G, R)
-    for(auto cp: facePriInfo.eyeCPs)
+    for(auto cp: segResult.eyeCPs)
     {
         //cv::Point center(x, y);
         cv::circle(outImg, cp, 10, yellow, cv::FILLED);
     }
     
-    cv::circle(outImg, facePriInfo.faceCP, 12, yellow, cv::FILLED);
+    cv::circle(outImg, segResult.faceCP, 12, yellow, cv::FILLED);
 
     Scalar redColor(0, 0, 255);  // BGR
-    cv::putText(outImg, "eye diff ratio: " + to_string(facePriInfo.eyeAreaDiffRatio),
+    cv::putText(outImg, "eye diff ratio: " + to_string(segResult.eyeAreaDiffRatio),
                 Point(100, 250),
-                FONT_HERSHEY_SIMPLEX, 4, redColor, 2);
+                FONT_HERSHEY_SIMPLEX, 2, redColor, 2);
     
-    string viewStr = (facePriInfo.isFrontView) ? "Front View" : "Profile View";
+    string viewStr = (segResult.isFrontView) ? "Front View" : "Profile View";
     cv::putText(outImg, viewStr,
                 Point(100, 350),
-                FONT_HERSHEY_SIMPLEX, 4, redColor, 2);
+                FONT_HERSHEY_SIMPLEX, 2, redColor, 2);
     
-    Point tlPt = facePriInfo.faceBBox.tl();
+    Point tlPt = segResult.faceBBox.tl();
     stringstream tlPtSS;
     tlPtSS << "BBox.tl: (x=" << tlPt.x << ",y=" << tlPt.y << ")";
     cv::putText(outImg, tlPtSS.str(), Point(100, 450),
-                FONT_HERSHEY_SIMPLEX, 4, redColor, 2);
+                FONT_HERSHEY_SIMPLEX, 2, redColor, 2);
     
-    int BBoxW = facePriInfo.faceBBox.width;
-    int BBoxH = facePriInfo.faceBBox.height;
+    int BBoxW = segResult.faceBBox.width;
+    int BBoxH = segResult.faceBBox.height;
     stringstream bboxWHSS;
     bboxWHSS << "BBox.WH: (w=" << BBoxW << ",h=" << BBoxH << ")";
     cv::putText(outImg, bboxWHSS.str(), Point(100, 550),
-                FONT_HERSHEY_SIMPLEX, 4, redColor, 2);
+                FONT_HERSHEY_SIMPLEX, 2, redColor, 2);
     
     stringstream cpSS;
-    cpSS << "faceCP: (x=" << facePriInfo.faceCP.x << ",y=" << facePriInfo.faceCP.y << ")";
+    cpSS << "faceCP: (x=" << segResult.faceCP.x << ",y=" << segResult.faceCP.y << ")";
     cv::putText(outImg, cpSS.str(), Point(100, 650),
-                FONT_HERSHEY_SIMPLEX, 4, redColor, 2);
+                FONT_HERSHEY_SIMPLEX, 2, redColor, 2);
     
     imwrite(outImgFileName, outImg);
 }
@@ -435,49 +407,27 @@ void FaceBgSegmentor::CalcEyePts(FaceSegResult& segResult)
         segResult.faceCP = (eyeCP1 + eyeCP2) / 2;
     }
 }
-/*
-void SegImage(const string& srcImgFile, const string& annoImgFile)
-{
-    // Load Input Image
-    Mat srcImage = cv::imread(srcImgFile.c_str());
-    if(srcImage.empty())
-    {
-        cout << "Failed to load input iamge: " << srcImgFile << endl;
-        return;
-    }
-    else
-        cout << "Succeeded to load image: " << srcImgFile << endl;
-    
-    FaceBgSegmentor segmentor;
-    segmentor.Segment(srcImage);
-    Mat segLabel = segmentor.RenderSegLabels();
-    
-    FacePrimaryInfo facePriInfo;
-    segmentor.CalcFaceBBox(facePriInfo);
 
-    segmentor.CalcEyePts(facePriInfo);
-    
-    DrawSegOnImage(segLabel, srcImage, 0.5,
-                   facePriInfo, annoImgFile.c_str());
-    
-    cout << facePriInfo << endl;
-}
-*/
-
-void SegImage(const Mat& srcImage, FaceSegResult& segResult,
-              bool needToSaveAnno, const string& annoImgFile)
+void SegImage(const Mat& srcImage, FaceSegResult& segResult)
+              //bool needToSaveAnno, const string& annoImgFile)
 {
     FaceBgSegmentor segmentor;
     segmentor.Segment(srcImage, segResult);
     
     segmentor.CalcFaceBBox(segResult);
     segmentor.CalcEyePts(segResult);
+}
 
-    Mat segColorLabel = segmentor.RenderSegLabels(segResult.segLabels);
+/*
+void Draw
 
     if(needToSaveAnno)
+    {
+        
         DrawSegOnImage(segColorLabel, srcImage, 0.5,
                        segResult, annoImgFile.c_str());
-    
+    }
+            
     cout << segResult << endl;
 }
+*/

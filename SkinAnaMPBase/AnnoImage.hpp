@@ -61,5 +61,12 @@ void AnnoHeadPoseEst(Mat& annoImage, const FaceInfo& faceInfo);
 void AnnoAllLmInfo(Mat& annoImage, const FaceInfo& faceInfo,
                    const string& annoFile);
 
+//-----------------------------------------------------------------------------------------
+/******************************************************************************************
+本函数的功能是，将Lower Jaw位置线和长度（与脸宽相比较的百分比）打印在输入影像的拷贝上。
+*******************************************************************************************/
+void AnnoLowerJaw(const Mat& srcImage, const FaceInfo& faceInfo,
+                  int jawWidth, int faceBBboxW,
+                   const string& annoFile);
 
 #endif /* end of ANNO_IMAGE_HPP */

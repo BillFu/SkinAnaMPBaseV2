@@ -154,14 +154,6 @@ void FeedPadImgToNet(const cv::Mat& resizedPadImg, float* inTensorBuf)
     Mat rpImgRGB; //rp: resized and padded
     cv::cvtColor(resizedPadImg, rpImgRGB, cv::COLOR_BGR2RGB);
 
-    /*
-        std::vector<int> inputShape = getInputShape(idx);
-        int H = inputShape[1];
-        int W = inputShape[2];
-
-        cv::Size wantedSize = cv::Size(W, H);
-        cv::resize(out, out, wantedSize);
-    */
     // Equivalent to (out - mean)/ std
     Mat quanImg;
     rpImgRGB.convertTo(quanImg, CV_32FC3, 1.0 / 127.5, -1.0);
@@ -169,106 +161,6 @@ void FeedPadImgToNet(const cv::Mat& resizedPadImg, float* inTensorBuf)
     int sqSize = resizedPadImg.rows * resizedPadImg.cols;
     long totalBytes = sqSize*3*sizeof(float32_t);
     memcpy(inTensorBuf, inImgMem, totalBytes);
-}
-
-//-------------------------------------------------------------------------------------------
-
-/**********************************************************************************************
-采用Padding的方式，将原始图像扩充为一个正方形。
-上下左右都扩展。
-先扩充上下，newH = srcH * alpha, alpha取[0.2 0.4]
-依据newH，再扩展左右，使之成为一个正方形
-正方形的边长等于newH，原始像素矩阵在正方形中居中。
-填充的像素取黑色。
-***********************************************************************************************/
-void MakeSquareImageV2(const Mat& srcImg, float deltaHRatio, Mat& squareImg)
-{
-    int srcW = srcImg.cols;
-    int srcH = srcImg.rows;
-    
-    assert(srcW % 2 == 0); // must be a even number
-    assert(srcH % 2 == 0); // must be a even number
-
-    if(srcW >= srcH) // this case will not happened in our task
-        squareImg = srcImg.clone();
-    else // srcW < srcH
-    {
-        Scalar blackColor(0, 0, 0);
-        
-        int newH = (int)(srcH*(1 + deltaHRatio));
-        if(newH % 2 == 1) // is odd number, should be converted to a even number
-            newH += 1;
-        
-        int padVertW = (newH - srcH) / 2;  // padding at top and bottom
-        int padSideW = (newH - srcW) / 2;
-        
-        copyMakeBorder( srcImg, squareImg,
-                        padVertW, padVertW, //
-                        padSideW, padSideW,
-                       BORDER_CONSTANT, blackColor);
-    }
-}
-//-------------------------------------------------------------------------------------------
-
-/**********************************************************************************************
-采用Shifting & Padding的方式，将原始图像进行几何方面的修正，使之适合于输入Face Mesh With Attention模型提取关键点。
-基本的要求：
-1. Face CP should be located in the center of the newly forged image.
-2. 25% margin should be remained at both sides of the output image. 25% for each side.
-3. In the output image, the ratio of Height vs Widht should be 1.4.
-4. the raw content of source image should be contained completely in the out image.
-5. scale not changed.
-FV: front view
-***********************************************************************************************/
-void GeoFixFVSrcImg(const Mat& srcImg, const Rect& faceBBox,
-                    const Point2i& faceCP, float alpha, Mat& outImg,
-                    int& TP, int& LP)
-{
-    //TP, BP, LP, RP stand for the padding for top, bottom, left, and right side.
-
-    int H = srcImg.rows;
-    int W = srcImg.cols;
-    
-    int BW = faceBBox.width;
-    int expandHalfW = (int)(BW * (1+alpha) / 2);
-    
-    int t1 = max(faceCP.x, srcImg.cols - faceCP.x);
-    int half_Wp = max(expandHalfW, t1); // p: prime，右上侧的撇号；Wp: width of the out image
-    
-    int Wp = half_Wp * 2;
-    Wp = max(Wp, srcImg.cols);
-
-    int Hp;
-    int BP;
-    // 根据9月28日晚间的推导，目前将Hp与Wp脱离关系
-    if(2*faceCP.y <= H)  // faceCp.y <= 1/2*H
-    {
-        // padding at top side
-        Hp = 2*(H - faceCP.y);
-        TP = H - 2*faceCP.y;
-        BP = 0;
-    }
-    else
-    {
-        // padding at bottom side
-        Hp = 2*faceCP.y;
-        TP = 0;
-        BP = 2*faceCP.y - H;
-    }
-        
-    assert(Hp > srcImg.rows);
-    
-    if( Wp % 2 != 0)
-        Wp += 1;
-    
-    int RP = Wp / 2 + faceCP.x - W;
-    LP = Wp / 2 - faceCP.x;
-
-    Scalar blackColor(0, 0, 0);
-
-    copyMakeBorder( srcImg, outImg,
-                    TP, BP, LP, RP,
-                   BORDER_CONSTANT, blackColor);
 }
 
 //-------------------------------------------------------------------------------------------

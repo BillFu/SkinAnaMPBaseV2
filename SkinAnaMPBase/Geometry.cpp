@@ -10,7 +10,7 @@ Date:   2022/9/18
 ********************************************************************************/
 
 #include "Geometry.hpp"
-
+#include "FaceBgSeg/FaceBgSeg.hpp"
 
 Point2i getPtOnGLm(const FaceInfo& faceInfo, int pIndex)
 {
@@ -64,4 +64,31 @@ Point2i IpGLmPtWithPair(const FaceInfo& faceInfo, int pIndex1, int pIndex2, floa
     // be careful with the Point order and the value of t when to invoke InnerInterpolate()
     Point2i P3 = Interpolate(P1, P2, t);
     return P3;
+}
+
+//-------------------------------------------------------------------------------------------
+/**********************************************************************************************
+ segLabels: 512*512
+***********************************************************************************************/
+int CalcLowerJawWidth(const FaceInfo& faceInfo, const Mat& segLabels)
+{
+    Point2i pt200 = getPtOnGLm(faceInfo, 200);
+    int pt200y = pt200.y;  // in source image space
+    
+    // convert pt200y from the source space into seg net space (512*512)
+    int pt200yp = pt200y * SEG_NET_OUTPUT_SIZE / faceInfo.imgHeight;
+    
+    Mat jawRow = segLabels.row(pt200yp);
+    
+    int jawWidth = 0;
+    for(int i=0; i<SEG_NET_OUTPUT_SIZE; i++)
+    {
+        if(jawRow.at<uchar>(i) == SEG_FACE_LABEL)
+            jawWidth += 1;
+    }
+    
+    // convert to the source image
+    jawWidth = jawWidth * faceInfo.imgWidth / SEG_NET_OUTPUT_SIZE;
+    
+    return jawWidth;
 }

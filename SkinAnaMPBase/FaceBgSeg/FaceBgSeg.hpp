@@ -56,7 +56,7 @@ public:
     void Segment(const Mat& srcImage, FaceSegResult& segResult); //, uchar segLabel[SEG_NET_OUTPUT_SIZE][SEG_NET_OUTPUT_SIZE]);
 
     // 将分割结果以彩色Table渲染出来，并放大到原始图像尺度
-    Mat RenderSegLabels(const Mat& segLabels);
+    static Mat RenderSegLabels(const Size& imgSize, const Mat& segLabels);
     
     void CalcFaceBBox(FaceSegResult& segResult);
 
@@ -98,17 +98,7 @@ private:
 // blend segment labels image with source iamge:
 // result = alpha * segLabels + (1-alpha) * srcImage
 // alpha lies in [0.0 1.0]
-void OverlaySegOnImage(const Mat& segLabel, const Mat& srcImg,
-                       float alpha,
-                       const char* outImgFileName);
-
-
-void OverlaySegOnImageV2(const Mat& segLabel, const Mat& srcImg,
-                       float alpha, const Rect& faceBBox, 
-                       const char* outImgFileName);
-
-
-void DrawSegOnImage(const Mat& segColorLabel, const Mat& srcImg,
+void DrawSegOnImage(const Mat& srcImg,
                     float alpha, const FaceSegResult& facePriInfo,
                     const char* outImgFileName);
 
@@ -116,7 +106,7 @@ void DrawSegOnImage(const Mat& segColorLabel, const Mat& srcImg,
 // call this function outside this module
 // if needToSaveAnno is true, then annoImgFile must to be a valid
 // image file name, otherwise a empty string is a good choice.
-void SegImage(const Mat& srcImage, FaceSegResult& facePriInfo,
-              bool needToSaveAnno, const string& annoImgFile);
+void SegImage(const Mat& srcImage, FaceSegResult& facePriInfo); //,
+              //bool needToSaveAnno, const string& annoImgFile);
 
 #endif /* end of FACE_BG_SEG_HPP */
