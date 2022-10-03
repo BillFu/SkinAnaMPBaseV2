@@ -75,10 +75,10 @@ void ProOneImg(const string& srcImgFile,
 
     FaceSegResult segResult;
     string segImgFile = "seg_" + fileNameBone + ".png";
-    fs::path segImgFullPath = outDir / segImgFile;
+    fs::path segImgFP = outDir / segImgFile;  // FP: full path
     SegImage(srcImage, segResult);
     DrawSegOnImage(srcImage, 0.5,
-        segResult, segImgFile.c_str());
+        segResult, segImgFP.c_str());
 
     FaceInfo faceInfo;
 
@@ -117,7 +117,8 @@ void ProOneImg(const string& srcImgFile,
     
     string fileBoneName = GetFileBoneName(srcImgFile);
     ForgeMaskAnnoPack(srcImage, annoLmImage,
-                    outDir, fileBoneName, faceInfo);
+                      outDir, fileBoneName,
+                      faceInfo, segResult);
 }
 
 void PrepareDirFile(const string& srcImgFullPath,

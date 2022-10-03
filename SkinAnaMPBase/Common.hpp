@@ -32,6 +32,11 @@ typedef unique_ptr<FlatBufferModel> TF_LITE_MODEL;
 typedef vector<Point2i> POLYGON;
 typedef vector<POLYGON> POLYGON_GROUP;
 
+
+#define SEG_NET_INPUT_SIZE   512
+#define SEG_NET_OUTPUT_SIZE  512
+
+
 enum EyeID
 {
     LEFT_EYE,
@@ -57,6 +62,7 @@ struct HeadPose
 struct FaceSegResult
 {
     // all the coordinates and sizes are measured in the space of the source image.
+    Size        srcImgS;
     Rect        faceBBox;
     Point2i     faceCP; // CP: Center Point;
     Point2i     eyeCPs[2]; // the area size of No.0 in image is bigger than No.1

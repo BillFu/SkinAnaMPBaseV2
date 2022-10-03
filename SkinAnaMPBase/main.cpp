@@ -90,8 +90,10 @@ int main(int argc, char **argv)
     string segAnnoImgFP = BuildOutImgFileName(
             outParePath, fileBoneName, "seg_");
     FaceSegResult segResult;
-    SegImage(srcImage, segResult, true, segAnnoImgFP);
-
+    SegImage(srcImage, segResult);
+    DrawSegOnImage(srcImage, 0.5,
+        segResult, segAnnoImgFP.c_str());
+    
     cout << "source image has been segmented!" << endl;
 
     FaceInfo faceInfo;
@@ -123,7 +125,8 @@ int main(int argc, char **argv)
     AnnoAllLmInfo(annoLmImage, faceInfo, annoLmImgFile);
 
     ForgeMaskAnnoPack(srcImage, annoLmImage,
-                      outParePath, fileBoneName, faceInfo);
+                      outParePath, fileBoneName,
+                      faceInfo, segResult);
     
     return 0;
 }

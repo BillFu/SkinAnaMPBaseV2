@@ -22,6 +22,7 @@ Date:   2022/9/23
 #include "../Utils.hpp"
 #include "EyebowMask.hpp"
 #include "ForeheadMask.hpp"
+#include "LowerFaceMask.hpp"
 #include "../AnnoImage.hpp"
 
 namespace fs = std::filesystem;
@@ -59,7 +60,8 @@ void ForgePoreMaskV2(const FaceInfo& faceInfo,
 // 一揽子函数，生成各类Mask和它们的Anno Image
 void ForgeMaskAnnoPack(const Mat& srcImage, const Mat& annoLmImage,
                        const fs::path& outDir, const string& fileNameBone,
-                       const FaceInfo& faceInfo)
+                       const FaceInfo& faceInfo,
+                       const FaceSegResult& segResult)
 {
     cv::Size2i srcImgS = srcImage.size();
     
@@ -110,15 +112,15 @@ void ForgeMaskAnnoPack(const Mat& srcImage, const Mat& annoLmImage,
     //                    "combined mask", noseMaskAnnoFile.c_str());
 
     //string fleMaskAnnoFile = config_json.at("FaceLowThEyeImage");
-    Mat fleMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    ForgeLowFaceMask(faceInfo, fleMask);
+    Mat lowFaceMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    ForgeLowerFaceMask(segResult, lowFaceMask);
     //OverlayMaskOnImage(annoImage2, fleMask,
     //                    "face low th eye", fleMaskAnnoFile.c_str());
 
     string poreMaskAnnoFile = BuildOutImgFileName(outDir,
                              fileNameBone, "pore_");
     Mat poreMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    ForgePoreMaskV2(faceInfo, fleMask, fhMask, eyesFullMask,
+    ForgePoreMaskV2(faceInfo, lowFaceMask, fhMask, eyesFullMask,
                     mouthMask, noseMask,
                     poreMask);
     OverlayMaskOnImage(annoImage2, poreMask,

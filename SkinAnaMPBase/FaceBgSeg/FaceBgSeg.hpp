@@ -19,8 +19,6 @@
 using namespace std;
 using namespace cv;
 
-#define SEG_NET_INPUT_SIZE   512
-#define SEG_NET_OUTPUT_SIZE  512
 
 typedef vector<Point> CONTOUR;
 typedef vector<CONTOUR> CONTOURS;

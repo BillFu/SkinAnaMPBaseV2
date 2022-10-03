@@ -63,4 +63,14 @@ string BuildOutImgFileName(const fs::path& outDir,
 // the bone name of "images/JPN/cross_2.jpg" is "cross_2"
 string GetFileBoneName(string fileName);
 
+//-------------------------------------------------------------------------------------------
+int convSegNetY2SrcY(int srcImgH, int segNetY);
+int convSegNetX2SrcX(int srcImgW, int segNetX);
+
+int convSrcY2SegNetY(int srcImgH, int srcY);
+int convSrcX2SegNetX(int srcImgW, int srcX);
+
+Point2i convSegNetPt2SrcPt(const Size& srcImgS, const Point2i& snPt);
+Point2i convSrcPt2SegNetPt(const Size& srcImgS, const Point2i& srcPt);
+
 #endif /* end of UTILS_HPP */

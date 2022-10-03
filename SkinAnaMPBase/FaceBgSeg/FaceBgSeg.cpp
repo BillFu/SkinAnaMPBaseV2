@@ -122,6 +122,7 @@ void FaceBgSegmentor::Segment(const Mat& srcImage,
 {
     srcImgH = srcImage.rows;
     srcImgW = srcImage.cols;
+    segResult.srcImgS = srcImage.size();
     
     Mat srcImg_RGB;
     cv::cvtColor(srcImage, srcImg_RGB, cv::COLOR_BGR2RGB);

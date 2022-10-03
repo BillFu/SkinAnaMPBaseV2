@@ -87,6 +87,7 @@ void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon)
     }
 }
 
+/*
 // face mask below the eyes, 在鼻子部位向上凸出，接近额头
 void ForgeLowFacePg(const FaceInfo& faceInfo, POLYGON& skinPolygon)
 {
@@ -103,19 +104,26 @@ void ForgeLowFacePg(const FaceInfo& faceInfo, POLYGON& skinPolygon)
     Point2i IPt136 = IpGLmPtWithPair(faceInfo, 136, 212, 0.3);
     skinPolygon.push_back(IPt136);
 
-    //skinPolygon.push_back(getPtOnGLm(faceInfo, 150));
     Point2i IPt150 = IpGLmPtWithPair(faceInfo, 150, 43, 0.15);
     skinPolygon.push_back(IPt150);
     
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 149));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 176));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 171));
+    //skinPolygon.push_back(getPtOnGLm(faceInfo, 149));
+    //skinPolygon.push_back(getPtOnGLm(faceInfo, 176));
+    Point2i IPt170 = IpGLmPtWithPair(faceInfo, 170, 211, 0.3);
+    skinPolygon.push_back(IPt170);
     
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 140));
+
+    Point2i IPt171 = IpGLmPtWithPair(faceInfo, 171, 208, 0.40);
+    skinPolygon.push_back(IPt171);
+
     Point2i IPt175 = IpGLmPtWithPair(faceInfo, 175, 199, 0.4);
     skinPolygon.push_back(IPt175);
+        
+    Point2i IPt396 = IpGLmPtWithPair(faceInfo, 396, 428, 0.40);
+    skinPolygon.push_back(IPt396);
     
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 396));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 400));
+    skinPolygon.push_back(getPtOnGLm(faceInfo, 369));
     skinPolygon.push_back(getPtOnGLm(faceInfo, 395));
     skinPolygon.push_back(getPtOnGLm(faceInfo, 394));
     skinPolygon.push_back(getPtOnGLm(faceInfo, 416));
@@ -138,6 +146,7 @@ void ForgeLowFacePg(const FaceInfo& faceInfo, POLYGON& skinPolygon)
     skinPolygon.push_back(getPtOnGLm(faceInfo, 117));
 
 }
+*/
 //-------------------------------------------------------------------------------------------
 
 void ForgeMouthPolygon(const FaceInfo& faceInfo,
@@ -188,6 +197,7 @@ void ForgeSkinMask(const FaceInfo& faceInfo, Mat& outMask)
     DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
 }
 
+/*
 // face mask below the eyes, 在鼻子部位向上凸出，接近额头
 void ForgeLowFaceMask(const FaceInfo& faceInfo, Mat& outMask)
 {
@@ -199,6 +209,7 @@ void ForgeLowFaceMask(const FaceInfo& faceInfo, Mat& outMask)
 
     DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
 }
+*/
 
 //expanRatio: expansion width toward outside / half of mouth height
 void ForgeMouthMask(const FaceInfo& faceInfo, float expanRatio, Mat& outFinalMask)

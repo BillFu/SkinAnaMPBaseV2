@@ -10,7 +10,7 @@ Date:   2022/9/11
 #include "Utils.hpp"
 #include <array>
 #include <limits>
-
+#include "Common.hpp"
 
 // return a string that present a float with 2 decimal digits.
 // for example, return "3.14" for 3.1415927
@@ -191,3 +191,44 @@ string GetFileBoneName(string fileNameFP)
 }
 
 //-------------------------------------------------------------------------------------------
+
+int convSegNetY2SrcY(int srcImgH, int segNetY)
+{
+    int srcY = segNetY * srcImgH / SEG_NET_OUTPUT_SIZE;
+    return srcY;
+}
+
+int convSegNetX2SrcX(int srcImgW, int segNetX)
+{
+    int srcX = segNetX * srcImgW / SEG_NET_OUTPUT_SIZE;
+    return srcX;
+}
+
+int convSrcY2SegNetY(int srcImgH, int srcY)
+{
+    int segNetY = srcY * SEG_NET_OUTPUT_SIZE / srcImgH;
+    return segNetY;
+}
+
+int convSrcX2SegNetX(int srcImgW, int srcX)
+{
+    int segNetX = srcX * SEG_NET_OUTPUT_SIZE / srcImgW;
+    return segNetX;
+}
+
+
+Point2i convSegNetPt2SrcPt(const Size& srcImgS, const Point2i& snPt)
+{
+    int srcY = snPt.y * srcImgS.height / SEG_NET_OUTPUT_SIZE;
+    int srcX = snPt.x * srcImgS.width / SEG_NET_OUTPUT_SIZE;
+    
+    return Point2i(srcX, srcY);
+}
+
+Point2i convSrcPt2SegNetPt(const Size& srcImgS, const Point2i& srcPt)
+{
+    int segNetY = srcPt.y * SEG_NET_OUTPUT_SIZE / srcImgS.height;
+    int segNetX = srcPt.x * SEG_NET_OUTPUT_SIZE / srcImgS.width;
+
+    return Point2i(segNetX, segNetY);
+}
