@@ -37,6 +37,28 @@ void ForgeLowerFaceMask(const FaceSegResult& segResult, Mat& outMask)
     //imwrite("labelsBi.png", labelsBi);
 
     resize(labelsBi, outMask, segResult.srcImgS, INTER_NEAREST);
+    
+    // finally, outMask should be shrinked a bit
+    int eroSize = segResult.faceBBox.width * 0.02;
+    int eroDm = 2*eroSize + 1; // Dm : diameter
+    Mat element = getStructuringElement(MORPH_ELLIPSE,
+                           Size(eroDm, eroDm),
+                           Point(eroSize, eroSize) );
+    erode(outMask, outMask, element);
+    
+    /*
+    int openSize = segResult.faceBBox.width * 0.02; //1 + 1; // plus one to avoid to be zero
+    int openDm = openSize * 2 + 1;
+    Mat open_ele = getStructuringElement(MORPH_ELLIPSE,
+                           Size(openDm, openDm),
+                           Point(openSize, openSize));
+    morphologyEx(outMask, outMask, MORPH_OPEN, open_ele, Point(-1, -1), 2);
+    */
+    
+    int ksize = segResult.faceBBox.width * 0.01; //1
+    if(ksize % 2 == 0)
+        ksize += 1;
+    medianBlur(outMask, outMask, ksize);
 }
 
 //-------------------------------------------------------------------------------------------

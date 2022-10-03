@@ -215,33 +215,37 @@ void DrawSegOnImage(const Mat& srcImg, float alpha,
     
     cv::circle(outImg, segResult.faceCP, 12, yellow, cv::FILLED);
 
+    double stdScale = 2.0;
+    int    stdWidth = 2000;
+    double fontScale = srcImg.cols * stdScale / stdWidth;
+    
     Scalar redColor(0, 0, 255);  // BGR
     cv::putText(outImg, "eye diff ratio: " + to_string(segResult.eyeAreaDiffRatio),
                 Point(100, 250),
-                FONT_HERSHEY_SIMPLEX, 2, redColor, 2);
+                FONT_HERSHEY_SIMPLEX, fontScale, redColor, 2);
     
     string viewStr = (segResult.isFrontView) ? "Front View" : "Profile View";
     cv::putText(outImg, viewStr,
                 Point(100, 350),
-                FONT_HERSHEY_SIMPLEX, 2, redColor, 2);
+                FONT_HERSHEY_SIMPLEX, fontScale, redColor, 2);
     
     Point tlPt = segResult.faceBBox.tl();
     stringstream tlPtSS;
     tlPtSS << "BBox.tl: (x=" << tlPt.x << ",y=" << tlPt.y << ")";
     cv::putText(outImg, tlPtSS.str(), Point(100, 450),
-                FONT_HERSHEY_SIMPLEX, 2, redColor, 2);
+                FONT_HERSHEY_SIMPLEX, fontScale, redColor, 2);
     
     int BBoxW = segResult.faceBBox.width;
     int BBoxH = segResult.faceBBox.height;
     stringstream bboxWHSS;
     bboxWHSS << "BBox.WH: (w=" << BBoxW << ",h=" << BBoxH << ")";
     cv::putText(outImg, bboxWHSS.str(), Point(100, 550),
-                FONT_HERSHEY_SIMPLEX, 2, redColor, 2);
+                FONT_HERSHEY_SIMPLEX, fontScale, redColor, 2);
     
     stringstream cpSS;
     cpSS << "faceCP: (x=" << segResult.faceCP.x << ",y=" << segResult.faceCP.y << ")";
     cv::putText(outImg, cpSS.str(), Point(100, 650),
-                FONT_HERSHEY_SIMPLEX, 2, redColor, 2);
+                FONT_HERSHEY_SIMPLEX, fontScale, redColor, 2);
     
     imwrite(outImgFileName, outImg);
 }

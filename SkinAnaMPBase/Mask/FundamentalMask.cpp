@@ -332,9 +332,13 @@ void OverlayMaskOnImage(const Mat& srcImg, const Mat& mask,
     Mat outImg = Mat::zeros(srcImg.size(), CV_8UC3);
     addWeighted(srcImg, 0.70, blueMask, 0.3, 0.0, outImg);
     
+    double stdScale = 2.0;
+    int    stdWidth = 2000;
+    double fontScale = srcImg.cols * stdScale / stdWidth;
+    
     Scalar redColor(0, 0, 255);  // BGR
     cv::putText(outImg, "SkinAnaMPBase: " + maskName, Point(100, 100),
-                    FONT_HERSHEY_SIMPLEX, 2, redColor, 2);
+                    FONT_HERSHEY_SIMPLEX, fontScale, redColor, 2);
 
     imwrite(out_filename, outImg);
 }

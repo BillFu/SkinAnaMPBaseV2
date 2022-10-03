@@ -49,6 +49,6 @@ segLabels: 512*512
 the returned Jaw Width measured in the source space
 ***********************************************************************************************/
 
-int CalcLowerJawWidth(const FaceInfo& faceInfo, const Mat& segLabels);
+//int CalcLowerJawWidth(const FaceInfo& faceInfo, const Mat& segLabels);
 
 #endif /* end of GEOMETRY_HPP */

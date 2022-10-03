@@ -70,6 +70,7 @@ Point2i IpGLmPtWithPair(const FaceInfo& faceInfo, int pIndex1, int pIndex2, floa
 /**********************************************************************************************
  segLabels: 512*512
 ***********************************************************************************************/
+/*
 int CalcLowerJawWidth(const FaceInfo& faceInfo, const Mat& segLabels)
 {
     Point2i pt200 = getPtOnGLm(faceInfo, 200);
@@ -92,3 +93,4 @@ int CalcLowerJawWidth(const FaceInfo& faceInfo, const Mat& segLabels)
     
     return jawWidth;
 }
+*/

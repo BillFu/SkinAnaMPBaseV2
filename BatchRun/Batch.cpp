@@ -103,12 +103,14 @@ void ProOneImg(const string& srcImgFile,
     
     EstHeadPose(srcImage.size(), faceInfo);
     
+    /*
     int jawWidth = CalcLowerJawWidth(faceInfo, segResult.segLabels);
     string jawImgFile = "jaw_" + fileNameBone + ".png";
     fs::path jawImgFP = outDir / jawImgFile;
     AnnoLowerJaw(srcImage, faceInfo,
                  jawWidth, segResult.faceBBox.width, jawImgFP.string());
-
+    */
+    
     Mat annoLmImage = srcImage.clone();
     
     string lmImgFile = "pose_" + fileNameBone + ".png";
