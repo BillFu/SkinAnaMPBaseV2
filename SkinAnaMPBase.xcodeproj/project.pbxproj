@@ -33,9 +33,6 @@
 		CBD123FB28E58D12004A42A9 /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB45E23E28E54BA7004E8D25 /* Geometry.cpp */; };
 		CBD1240228E5994E004A42A9 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540428CD8B34004CF77D /* Utils.cpp */; };
 		CBD1240628E59A8C004A42A9 /* Batch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBD1240528E59A8C004A42A9 /* Batch.cpp */; };
-		CBDA5B2528D2F0DD002A35E2 /* TinyEXIF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA5B2128D2F0DD002A35E2 /* TinyEXIF.cpp */; };
-		CBDA5B2628D2F0DD002A35E2 /* tinyxml2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA5B2228D2F0DD002A35E2 /* tinyxml2.cpp */; };
-		CBDA5B2928D2F327002A35E2 /* EXIF_Extractor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA5B2828D2F327002A35E2 /* EXIF_Extractor.cpp */; };
 		CBDA6B9728D5550B00BE0756 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA6B9628D5550B00BE0756 /* main.cpp */; };
 		CBDA6B9E28D55FDC00BE0756 /* HeadPoseEst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2602327528CCBFB100B11D7A /* HeadPoseEst.cpp */; };
 		CBDA6BA028D5603600BE0756 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540428CD8B34004CF77D /* Utils.cpp */; };
@@ -117,12 +114,6 @@
 		CBD123FD28E58EEB004A42A9 /* libtensorflowlite.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtensorflowlite.so; path = intel_lib/libtensorflowlite.so; sourceTree = "<group>"; };
 		CBD1240428E59A8C004A42A9 /* Batch.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Batch.hpp; sourceTree = "<group>"; };
 		CBD1240528E59A8C004A42A9 /* Batch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Batch.cpp; sourceTree = "<group>"; };
-		CBDA5B2128D2F0DD002A35E2 /* TinyEXIF.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TinyEXIF.cpp; sourceTree = "<group>"; };
-		CBDA5B2228D2F0DD002A35E2 /* tinyxml2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxml2.cpp; sourceTree = "<group>"; };
-		CBDA5B2328D2F0DD002A35E2 /* tinyxml2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tinyxml2.h; sourceTree = "<group>"; };
-		CBDA5B2428D2F0DD002A35E2 /* TinyEXIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TinyEXIF.h; sourceTree = "<group>"; };
-		CBDA5B2828D2F327002A35E2 /* EXIF_Extractor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EXIF_Extractor.cpp; sourceTree = "<group>"; };
-		CBDA5B2A28D2F4CD002A35E2 /* EXIF_Extractor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EXIF_Extractor.hpp; sourceTree = "<group>"; };
 		CBDA6B9428D5550B00BE0756 /* LMExporter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LMExporter; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBDA6B9628D5550B00BE0756 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		CBDBD7AF28D561FF00F3AD03 /* LM_Exporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LM_Exporter.cpp; sourceTree = "<group>"; };
@@ -210,14 +201,11 @@
 		CB255A9428C7237A005C8A81 /* SkinAnaMPBase */ = {
 			isa = PBXGroup;
 			children = (
-				2662B02A28E87DCC00EEE543 /* FaceLmExtractV2.cpp */,
-				2662B02928E87DCC00EEE543 /* FaceLmExtractV2.hpp */,
 				CB45E23928E54A09004E8D25 /* FaceBgSeg */,
 				264E012328D6C1DF00CB94D1 /* Mask */,
 				CB4312A628D419A0006D71DA /* BSpline */,
-				CBDA5B2028D2F055002A35E2 /* EXIF */,
-				CBDA5B2828D2F327002A35E2 /* EXIF_Extractor.cpp */,
-				CBDA5B2A28D2F4CD002A35E2 /* EXIF_Extractor.hpp */,
+				2662B02A28E87DCC00EEE543 /* FaceLmExtractV2.cpp */,
+				2662B02928E87DCC00EEE543 /* FaceLmExtractV2.hpp */,
 				CB45E23E28E54BA7004E8D25 /* Geometry.cpp */,
 				CB45E23D28E54BA7004E8D25 /* Geometry.hpp */,
 				26E506B028D3665B000059DA /* LM_Loader.cpp */,
@@ -261,17 +249,6 @@
 				CBD123F328E5880E004A42A9 /* main.cpp */,
 			);
 			path = BatchRun;
-			sourceTree = "<group>";
-		};
-		CBDA5B2028D2F055002A35E2 /* EXIF */ = {
-			isa = PBXGroup;
-			children = (
-				CBDA5B2128D2F0DD002A35E2 /* TinyEXIF.cpp */,
-				CBDA5B2428D2F0DD002A35E2 /* TinyEXIF.h */,
-				CBDA5B2228D2F0DD002A35E2 /* tinyxml2.cpp */,
-				CBDA5B2328D2F0DD002A35E2 /* tinyxml2.h */,
-			);
-			path = EXIF;
 			sourceTree = "<group>";
 		};
 		CBDA6B9528D5550B00BE0756 /* LMExporter */ = {
@@ -445,16 +422,13 @@
 				263B540228CD861C004CF77D /* AnnoImage.cpp in Sources */,
 				264E012628D6C45B00CB94D1 /* EyebowMask.cpp in Sources */,
 				26B65A5E28EA92900019104F /* LowerFaceMask.cpp in Sources */,
-				CBDA5B2928D2F327002A35E2 /* EXIF_Extractor.cpp in Sources */,
 				CB45E23C28E54A77004E8D25 /* FaceBgSeg.cpp in Sources */,
 				2602327628CCBFB100B11D7A /* HeadPoseEst.cpp in Sources */,
-				CBDA5B2528D2F0DD002A35E2 /* TinyEXIF.cpp in Sources */,
 				CB4312AA28D41DDD006D71DA /* ParametricBSpline.cpp in Sources */,
 				CB45E23F28E54BA7004E8D25 /* Geometry.cpp in Sources */,
 				263B540528CD8B34004CF77D /* Utils.cpp in Sources */,
 				CBB5DB4028DD5E97003CDED3 /* SkinFeatureMask.cpp in Sources */,
 				CB1E2AB928DD99AB00F416DF /* ForeheadMask.cpp in Sources */,
-				CBDA5B2628D2F0DD002A35E2 /* tinyxml2.cpp in Sources */,
 				CBB5DB3D28DD5B3B003CDED3 /* FundamentalMask.cpp in Sources */,
 				2662B02B28E87DCC00EEE543 /* FaceLmExtractV2.cpp in Sources */,
 			);
