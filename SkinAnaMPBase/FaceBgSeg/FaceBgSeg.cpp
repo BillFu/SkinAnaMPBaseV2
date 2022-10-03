@@ -413,8 +413,27 @@ void FaceBgSegmentor::CalcEyePts(FaceSegResult& segResult)
     }
 }
 
+//-------------------------------------------------------------------------------------------
+
+// return a binary labels image: 0 for background, and 255 for face
+// (including all its components), with the same size as the source image
+Mat FaceBgSegmentor::CalcFaceBgBiLabel(const FaceSegResult& segResult) 
+{
+    // NOTE: be careful with there are two coordinate system!
+    // 1. binary the seg labels image into two classes:
+    // background and face(including its sub-component)
+    Mat labelsBi;
+    
+    cv::threshold(segResult.segLabels, labelsBi, SEG_BG_LABEL, 255, cv::THRESH_BINARY);
+    
+    resize(labelsBi, labelsBi, segResult.srcImgS, INTER_NEAREST);
+    
+    return labelsBi;
+}
+
+//-------------------------------------------------------------------------------------------
+
 void SegImage(const Mat& srcImage, FaceSegResult& segResult)
-              //bool needToSaveAnno, const string& annoImgFile)
 {
     FaceBgSegmentor segmentor;
     segmentor.Segment(srcImage, segResult);
@@ -422,17 +441,3 @@ void SegImage(const Mat& srcImage, FaceSegResult& segResult)
     segmentor.CalcFaceBBox(segResult);
     segmentor.CalcEyePts(segResult);
 }
-
-/*
-void Draw
-
-    if(needToSaveAnno)
-    {
-        
-        DrawSegOnImage(segColorLabel, srcImage, 0.5,
-                       segResult, annoImgFile.c_str());
-    }
-            
-    cout << segResult << endl;
-}
-*/

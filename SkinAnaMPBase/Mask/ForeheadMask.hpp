@@ -43,7 +43,7 @@ void ForgeForeheadPg(const FaceInfo& faceInfo, POLYGON& outPolygon);
 /**********************************************************************************************
 
 ***********************************************************************************************/
-void ForgeForeheadMask(const FaceInfo& faceInfo, Mat& outMask);
+void ForgeForeheadMask(const FaceInfo& faceInfo, const Mat& fbBiLab, Mat& outMask);
 
 
 #endif /* end of FOREHEAD_MASK_HPP */

@@ -65,6 +65,10 @@ public:
     // in the profile view, the CP of face esitmated cannot be used for the bad precision.
     void CalcEyePts(FaceSegResult& segResult);
     
+    // return a binary labels image: 0 for background, and 255 for face
+    // (including all its components), with the same size as the source image
+    static Mat CalcFaceBgBiLabel(const FaceSegResult& segResult); 
+
 private:
     
     // 这个函数在程序初始化时要调用一次，并确保返回true之后，才能往下进行

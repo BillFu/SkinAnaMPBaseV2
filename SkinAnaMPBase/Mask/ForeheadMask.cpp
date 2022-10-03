@@ -37,9 +37,11 @@ int getPtIndexOfFHCurve(int ptIndex)
 //-------------------------------------------------------------------------------------------
 
 /******************************************************************************************
-
+ 前额顶部轮廓线由9个lm点组成。
+ Input: lm_2d
+ Output: raisedForeheadCurve
+ alpha: [0.0 1.0]，the greater this value is, the more raised up
  *******************************************************************************************/
-
 void RaiseupForeheadCurve(const Point2i lm_2d[468], int raisedFhCurve[9][2], float alpha)
 {
     // 前额顶部轮廓线由9个lm点组成。这9个点组成第0排点集，比它们低一些的9个点组成第1排点集。
@@ -68,6 +70,12 @@ void RaiseupForeheadCurve(const Point2i lm_2d[468], int raisedFhCurve[9][2], flo
     }
 }
 
+/******************************************************************************************
+ 前额顶部轮廓线由9个lm点组成。
+ Input: lm_2d
+ Output: raisedForeheadCurve
+ alpha: [0.0 1.0]，the greater this value is, the more raised up
+ *******************************************************************************************/
 void RaiseupForeheadCurve(const Point2i lm_2d[468], Point2i raisedFhCurve[9], float alpha)
 {
     // 前额顶部轮廓线由9个lm点组成。这9个点组成第0排点集，比它们低一些的9个点组成第1排点集。
@@ -96,9 +104,9 @@ void RaiseupForeheadCurve(const Point2i lm_2d[468], Point2i raisedFhCurve[9], fl
     }
     
     //把10点再升高一点点， 把109和338稍微升一点
-    raisedFhCurve[4].y -= raisedFhCurve[4].y* 0.08;
-    raisedFhCurve[3].y -= raisedFhCurve[3].y* 0.04;
-    raisedFhCurve[5].y -= raisedFhCurve[5].y* 0.04;
+    raisedFhCurve[4].y -= raisedFhCurve[4].y* 0.06;
+    raisedFhCurve[3].y -= raisedFhCurve[3].y* 0.04; // 109
+    raisedFhCurve[5].y -= raisedFhCurve[5].y* 0.04; // 338
 }
 //-------------------------------------------------------------------------------------------
 
@@ -126,7 +134,7 @@ void ForgeForeheadPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
     Point2i pt297a = IpGLmPtWithPair(faceInfo, 297, 332, 0.60);
     
     Point2i raisedFhPts[9];
-    RaiseupForeheadCurve(faceInfo.lm_2d, raisedFhPts, 0.8);
+    RaiseupForeheadCurve(faceInfo.lm_2d, raisedFhPts, 0.7);
 
     Point2i pt67r = raisedFhPts[2];
     Point2i pt109r = raisedFhPts[3];
@@ -145,20 +153,29 @@ void ForgeForeheadPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
     //int botLinePts[] = {333, 334*, 296*, 336, 285, 8, 55, 107, 66*, 105*, 104};
     outPolygon.push_back(getPtOnGLm(faceInfo, 333));
 
-    Point2i pt334a = IpGLmPtWithPair(faceInfo, 334, 333, 0.65);
-    Point2i pt296a = IpGLmPtWithPair(faceInfo, 296, 299, 0.50);
+    Point2i pt334a = IpGLmPtWithPair(faceInfo, 334, 333, 0.4);
+    //Point2i pt296a = IpGLmPtWithPair(faceInfo, 296, 299, 0.15);
     outPolygon.push_back(pt334a);
-    outPolygon.push_back(pt296a);
+    //outPolygon.push_back(pt296a);
+    Point2i pt296 = getPtOnGLm(faceInfo, 296);
+    outPolygon.push_back(pt296);
 
-    outPolygon.push_back(getPtOnGLm(faceInfo, 336));
-    outPolygon.push_back(getPtOnGLm(faceInfo, 285));
+    Point2i pt336a = IpGLmPtWithPair(faceInfo, 336, 151, -0.1);
+    outPolygon.push_back(pt336a);
+    
+    Point2i pt285a = IpGLmPtWithPair(faceInfo, 285, 55, 0.2);
+    outPolygon.push_back(pt285a);
+    
     outPolygon.push_back(getPtOnGLm(faceInfo, 8));
-    outPolygon.push_back(getPtOnGLm(faceInfo, 55));
-    outPolygon.push_back(getPtOnGLm(faceInfo, 107));
+    Point2i pt55a = IpGLmPtWithPair(faceInfo, 55, 285, 0.2);
+    outPolygon.push_back(pt55a);
 
-    Point2i pt66a = IpGLmPtWithPair(faceInfo, 66, 69, 0.5);
-    Point2i pt105a = IpGLmPtWithPair(faceInfo, 105, 104, 0.65);
-    outPolygon.push_back(pt66a);
+    Point2i pt107a = IpGLmPtWithPair(faceInfo, 107, 151, -0.1);
+    outPolygon.push_back(pt107a);
+
+    Point2i pt105a = IpGLmPtWithPair(faceInfo, 105, 104, 0.4);
+    Point2i pt66 = getPtOnGLm(faceInfo, 66);
+    outPolygon.push_back(pt66);
     outPolygon.push_back(pt105a);
     
     outPolygon.push_back(getPtOnGLm(faceInfo, 104));
@@ -167,7 +184,7 @@ void ForgeForeheadPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
 /**********************************************************************************************
 
 ***********************************************************************************************/
-void ForgeForeheadMask(const FaceInfo& faceInfo, Mat& outMask)
+void ForgeForeheadMask(const FaceInfo& faceInfo, const Mat& fbBiLab, Mat& outMask)
 {
     POLYGON coarsePolygon, refinedPolygon;
 
@@ -177,4 +194,6 @@ void ForgeForeheadMask(const FaceInfo& faceInfo, Mat& outMask)
     CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
 
     DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
+    
+    outMask = outMask & fbBiLab;
 }

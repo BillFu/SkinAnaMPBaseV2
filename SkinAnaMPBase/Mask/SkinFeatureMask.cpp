@@ -24,6 +24,7 @@ Date:   2022/9/23
 #include "ForeheadMask.hpp"
 #include "LowerFaceMask.hpp"
 #include "../AnnoImage.hpp"
+#include "../FaceBgSeg/FaceBgSeg.hpp"
 
 namespace fs = std::filesystem;
 
@@ -65,12 +66,17 @@ void ForgeMaskAnnoPack(const Mat& srcImage, const Mat& annoLmImage,
 {
     cv::Size2i srcImgS = srcImage.size();
     
+    // 0 for bg, 255 for face, in source space.
+    Mat fbBiLab = FaceBgSegmentor::CalcFaceBgBiLabel(segResult);
+
+    /*
     Mat skinMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string faceMaskImgFile = BuildOutImgFileName(outDir,
                              fileNameBone, "fc_");
     ForgeSkinMask(faceInfo, skinMask);
     //OverlayMaskOnImage(annoLmImage, skinMask,
      //                   "face_contour", faceMaskImgFile.c_str());
+    */
 
     Mat mouthMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string mouthMaskImgFile = BuildOutImgFileName(outDir,
@@ -91,17 +97,18 @@ void ForgeMaskAnnoPack(const Mat& srcImage, const Mat& annoLmImage,
     string eyeFullMaskImgFile = BuildOutImgFileName(outDir,
                              fileNameBone, "efc_");
     ForgeTwoEyesFullMask(faceInfo, eyesFullMask);
-    //OverlayMaskOnImage(annoLmImage, eyesFullMask,
-      //                  "eye_full_contour", eyeFullMaskImgFile.c_str());
+    OverlayMaskOnImage(annoLmImage, eyesFullMask,
+                        "eye_full_contour", eyeFullMaskImgFile.c_str());
 
-    //string fhMaskAnnoFile = config_json.at("ForeheadMaskImage");
+    //string  = config_json.at("ForeheadMaskImage");
+    string fhMaskAnnoFile = BuildOutImgFileName(outDir,
+                             fileNameBone, "fh_");
     Mat fhMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    ForgeForeheadMask(faceInfo, fhMask);
-
+    ForgeForeheadMask(faceInfo, fbBiLab, fhMask);
     Mat annoImage2 = srcImage.clone();
     AnnoGenKeyPoints(annoImage2, faceInfo, true);
-    //OverlayMaskOnImage(annoImage2, fhMask,
-    //                    "forehead mask", fhMaskAnnoFile.c_str());
+    OverlayMaskOnImage(annoImage2, fhMask,
+                        "forehead mask", fhMaskAnnoFile.c_str());
 
     //string noseMaskAnnoFile = config_json.at("NoseMaskImage");
     Mat noseMask(srcImgS, CV_8UC1, cv::Scalar(0));
@@ -113,7 +120,7 @@ void ForgeMaskAnnoPack(const Mat& srcImage, const Mat& annoLmImage,
 
     //string fleMaskAnnoFile = config_json.at("FaceLowThEyeImage");
     Mat lowFaceMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    ForgeLowerFaceMask(segResult, lowFaceMask);
+    ForgeLowerFaceMask(segResult, fbBiLab, lowFaceMask);
     //OverlayMaskOnImage(annoImage2, fleMask,
     //                    "face low th eye", fleMaskAnnoFile.c_str());
 
