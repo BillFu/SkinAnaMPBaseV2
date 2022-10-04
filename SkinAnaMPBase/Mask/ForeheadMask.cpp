@@ -163,11 +163,15 @@ void ForgeForeheadPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
     Point2i pt336a = IpGLmPtWithPair(faceInfo, 336, 151, -0.1);
     outPolygon.push_back(pt336a);
     
-    Point2i pt285a = IpGLmPtWithPair(faceInfo, 285, 55, 0.2);
+    Point2i pt285a = IpGLmPtWithPair(faceInfo, 285, 55, 0.05);
     outPolygon.push_back(pt285a);
     
-    outPolygon.push_back(getPtOnGLm(faceInfo, 8));
-    Point2i pt55a = IpGLmPtWithPair(faceInfo, 55, 285, 0.2);
+    //outPolygon.push_back(getPtOnGLm(faceInfo, 8));
+    
+    Point2i pt8a = IpGLmPtWithPair(faceInfo, 8, 168, 0.4);
+    outPolygon.push_back(pt8a);
+    
+    Point2i pt55a = IpGLmPtWithPair(faceInfo, 55, 285, 0.05);
     outPolygon.push_back(pt55a);
 
     Point2i pt107a = IpGLmPtWithPair(faceInfo, 107, 151, -0.1);
