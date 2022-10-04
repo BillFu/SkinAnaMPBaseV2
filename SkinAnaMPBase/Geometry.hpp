@@ -44,6 +44,12 @@ Point2i IpGLmPtWithPair(const FaceInfo& faceInfo, int pIndex1, int pIndex2, floa
 Point2i getPtOnGLm(const FaceInfo& faceInfo, int pIndex);
 
 //-------------------------------------------------------------------------------------------
+// return a new point, which with x from p1, y from p2
+Point2i getRectCornerPt(const Point2i& p1, const Point2i& p2);
+
+
+//-------------------------------------------------------------------------------------------
+
 /**********************************************************************************************
 segLabels: 512*512
 the returned Jaw Width measured in the source space

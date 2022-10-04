@@ -315,6 +315,52 @@ void ForgeNoseMask(const FaceInfo& faceInfo, Mat& outMask)
 }
 //-------------------------------------------------------------------------------------------
 
+void ForgeNoseBellPg(const FaceInfo& faceInfo, POLYGON& outPg)
+{
+    // 采用Lip Refine Region的点！
+    int nosePtIDs1[] = {197, 196, 174, 198, 48, 92, 169}; //// 逆时针
+    int num_pts = sizeof(nosePtIDs1) / sizeof(int);
+    for(int i = 0; i<num_pts; i++)
+    {
+        int index = nosePtIDs1[i];
+        outPg.push_back(faceInfo.lm_2d[index]);
+    }
+    
+    // add two special points and 152, the lowest point
+    Point2i pt169 = getPtOnGLm(faceInfo, 169);
+    Point2i pt152 = getPtOnGLm(faceInfo, 152);
+    Point2i pt394 = getPtOnGLm(faceInfo, 394);
+    
+    Point2i sp1 =  getRectCornerPt(pt169, pt152);
+    outPg.push_back(sp1);
+    outPg.push_back(pt152);
+    Point2i sp2 =  getRectCornerPt(pt394, pt152);
+    outPg.push_back(sp2);
+    
+    int nosePtIDs2[] = {394, 410, 278, 420, 399, 419}; //// 逆时针
+    num_pts = sizeof(nosePtIDs2) / sizeof(int);
+    for(int i = 0; i<num_pts; i++)
+    {
+        int index = nosePtIDs2[i];
+        outPg.push_back(faceInfo.lm_2d[index]);
+    }
+    
+}
+
+void ForgeNoseBellMask(const FaceInfo& faceInfo, Mat& outMask)
+{
+    POLYGON coarsePg, refinedPg;
+
+    ForgeNoseBellPg(faceInfo, coarsePg);
+    
+    int csNumPoint = 120;
+    CloseSmoothPolygon(coarsePg, csNumPoint, refinedPg);
+
+    DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPg, outMask);
+}
+
+//-------------------------------------------------------------------------------------------
+
 void OverlayMaskOnImage(const Mat& srcImg, const Mat& mask,
                         const string& maskName,
                         const char* out_filename)

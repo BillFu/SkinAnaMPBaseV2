@@ -42,6 +42,20 @@ void ForgePoreMaskV2(const FaceInfo& faceInfo,
                    const Mat& noseMask,
                    Mat& outPoreMask);
 
+
+//-------------------------------------------------------------------------------------------
+
+/**********************************************************************************************
+本函数构建Wrinkle的矢量版Mask雏形。
+***********************************************************************************************/
+void ForgeWrinkleMask(const FaceInfo& faceInfo,
+                      const Mat& faceLowMask,  // lower than eyes
+                      const Mat& foreheadMask,
+                      const Mat& eyeFullMask,  // cover the eyes and eyebows and the surrounding nearby area
+                      const Mat& noseMask,
+                      const Mat& noseBellMask,
+                      Mat& outWrkMask);
+
 //-------------------------------------------------------------------------------------------
 
 // 一揽子函数，生成各类Mask和它们的Anno Image

@@ -1,5 +1,7 @@
 {
-	"FaceMeshAttenModelFile": 			"models/face_landmark_with_attention.tflite",
+	"SegModelFile": 				    "models/seg_model.onnx",
+	"ClassColorFile":					"models/classes3.txt",
+	"FaceMeshAttenModel": 				"models/face_lm_attent.tflite",
 	"SourceImage":						"images/JPN/cross_1.jpg",
 	"OutDir":							"result/JPN"
 }
