@@ -201,3 +201,84 @@ void ForgeForeheadMask(const FaceInfo& faceInfo, const Mat& fbBiLab, Mat& outMas
     
     outMask = outMask & fbBiLab;
 }
+
+
+//-------------------------------------------------------------------------------------------
+
+/**********************************************************************************************
+扩展版的前额区域，向下扩展到部分鼻梁区域。
+***********************************************************************************************/
+void ForgeExpFhPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
+{
+    // 点的索引针对468个general landmark而言
+    // 顺时针计数
+    
+    // asterisk, 星号
+    Point2i pt67a = IpGLmPtWithPair(faceInfo, 67, 103, 0.60);
+    Point2i pt297a = IpGLmPtWithPair(faceInfo, 297, 332, 0.60);
+    
+    Point2i raisedFhPts[9];
+    RaiseupForeheadCurve(faceInfo.lm_2d, raisedFhPts, 0.7);
+
+    Point2i pt67r = raisedFhPts[2];
+    Point2i pt109r = raisedFhPts[3];
+    Point2i pt10r = raisedFhPts[4];
+    Point2i pt338r = raisedFhPts[5];
+    Point2i pt297r = raisedFhPts[6];
+    
+    outPolygon.push_back(pt67a);
+    outPolygon.push_back(pt67r);
+    outPolygon.push_back(pt109r);
+    outPolygon.push_back(pt10r);
+    outPolygon.push_back(pt338r);
+    outPolygon.push_back(pt297r);
+    outPolygon.push_back(pt297a);
+
+    //int botLinePts[] = {333, 334*, 296*, 336, 285, 8, 55, 107, 66*, 105*, 104};
+    outPolygon.push_back(getPtOnGLm(faceInfo, 333));
+
+    Point2i pt334a = IpGLmPtWithPair(faceInfo, 334, 333, 0.4);
+    outPolygon.push_back(pt334a);
+    Point2i pt296 = getPtOnGLm(faceInfo, 296);
+    outPolygon.push_back(pt296);
+
+    Point2i pt336a = IpGLmPtWithPair(faceInfo, 336, 151, -0.1);
+    outPolygon.push_back(pt336a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 285));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 417));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 465));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 357));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 277));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 437));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 195));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 217));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 47));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 128));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 245));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 193));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 55));
+
+    Point2i pt107a = IpGLmPtWithPair(faceInfo, 107, 151, -0.1);
+    outPolygon.push_back(pt107a);
+
+    Point2i pt105a = IpGLmPtWithPair(faceInfo, 105, 104, 0.4);
+    Point2i pt66 = getPtOnGLm(faceInfo, 66);
+    outPolygon.push_back(pt66);
+    outPolygon.push_back(pt105a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 104));
+}
+
+void ForgeExpFhMask(const FaceInfo& faceInfo, const Mat& fbBiLab, Mat& outMask)
+{
+    POLYGON coarsePg, refinedPg;
+    ForgeExpFhPg(faceInfo, coarsePg);
+    
+    int csNumPoint = 100;
+    CloseSmoothPolygon(coarsePg, csNumPoint, refinedPg);
+
+    DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPg, outMask);
+    
+    outMask = outMask & fbBiLab;
+}

@@ -50,9 +50,9 @@ void ForgePoreMaskV2(const FaceInfo& faceInfo,
 ***********************************************************************************************/
 void ForgeWrinkleMask(const FaceInfo& faceInfo,
                       const Mat& faceLowMask,  // lower than eyes
-                      const Mat& foreheadMask,
+                      const Mat& expFhMask,
                       const Mat& eyeFullMask,  // cover the eyes and eyebows and the surrounding nearby area
-                      const Mat& noseMask,
+                      //const Mat& noseMask,
                       const Mat& noseBellMask,
                       Mat& outWrkMask);
 

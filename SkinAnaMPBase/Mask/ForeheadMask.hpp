@@ -46,4 +46,12 @@ void ForgeForeheadPg(const FaceInfo& faceInfo, POLYGON& outPolygon);
 void ForgeForeheadMask(const FaceInfo& faceInfo, const Mat& fbBiLab, Mat& outMask);
 
 
+/**********************************************************************************************
+扩展版的前额区域，向下扩展到部分鼻梁区域。
+***********************************************************************************************/
+void ForgeExpFheadPg(const FaceInfo& faceInfo, POLYGON& outPolygon);
+
+void ForgeExpFhMask(const FaceInfo& faceInfo, const Mat& fbBiLab, Mat& outMask);
+
+
 #endif /* end of FOREHEAD_MASK_HPP */

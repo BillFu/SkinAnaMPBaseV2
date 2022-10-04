@@ -63,13 +63,14 @@ void ForgePoreMaskV2(const FaceInfo& faceInfo,
 ***********************************************************************************************/
 void ForgeWrinkleMask(const FaceInfo& faceInfo,
                       const Mat& faceLowMask,  // lower than eyes
-                      const Mat& foreheadMask,
+                      // const Mat& foreheadMask,
+                      const Mat& expFhMask,
                       const Mat& eyeFullMask,  // cover the eyes and eyebows and the surrounding nearby area
-                      const Mat& noseMask,
+                      //const Mat& noseMask,
                       const Mat& noseBellMask,
                       Mat& outWrkMask)
 {
-    outWrkMask = faceLowMask | foreheadMask | noseMask ;
+    outWrkMask = faceLowMask | expFhMask ;
     outWrkMask = outWrkMask & (~eyeFullMask) & (~noseBellMask);
 }
 
@@ -159,12 +160,19 @@ void ForgeMaskAnnoPack(const Mat& srcImage, const Mat& annoLmImage,
     OverlayMaskOnImage(annoImage2, poreMask,
                         "pore mask", poreMaskAnnoFile.c_str());
     
+    string expFhMaskFile = BuildOutImgFileName(outDir,
+                             fileNameBone, "efh_");
+    Mat expFhMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    ForgeExpFhMask(faceInfo, fbBiLab, expFhMask);
+    AnnoGenKeyPoints(annoImage2, faceInfo, true);
+    OverlayMaskOnImage(annoImage2, expFhMask,
+                        "expand Fh mask", expFhMaskFile.c_str());
+
     string wrkMaskAnnoFile = BuildOutImgFileName(outDir,
                              fileNameBone, "wrk_");
     Mat wrkMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    ForgeWrinkleMask(faceInfo, lowFaceMask, fhMask, eyesFullMask,
-                    noseMask, noseBellMask,
-                    wrkMask);
+    ForgeWrinkleMask(faceInfo, lowFaceMask, expFhMask, eyesFullMask,
+                    noseBellMask, wrkMask);
     OverlayMaskOnImage(annoImage2, wrkMask,
                         "wrinkle mask", wrkMaskAnnoFile.c_str());
 }
