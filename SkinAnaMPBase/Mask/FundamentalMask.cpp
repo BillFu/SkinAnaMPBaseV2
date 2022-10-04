@@ -272,16 +272,8 @@ void ForgeTwoEyesFullMask(const FaceInfo& faceInfo, Mat& outEyesFullMask)
     ForgeOneEyeFullMask(faceInfo, LEFT_EYE, outMask);
     ForgeOneEyeFullMask(faceInfo, RIGHT_EYE, outMask);
     
-    /*
-    int dila_size = 20;
-    Mat element = getStructuringElement(MORPH_ELLIPSE,
-                           Size(2*dila_size + 1, 2*dila_size+1),
-                           Point(dila_size, dila_size));
-    
-    dilate(outMask, outEyesFullMask, element);
-    */
-    
-    expanMask(outMask, 20, outEyesFullMask);
+    outEyesFullMask = outMask;
+    //expanMask(outMask, 20, outEyesFullMask);
 }
 
 //-------------------------------------------------------------------------------------------
@@ -317,14 +309,14 @@ void ForgeNoseMask(const FaceInfo& faceInfo, Mat& outMask)
 
 void ForgeNoseBellPg(const FaceInfo& faceInfo, POLYGON& outPg)
 {
-    // 采用Lip Refine Region的点！
-    int nosePtIDs1[] = {197, 196, 174, 198, 48, 92, 169}; //// 逆时针
-    int num_pts = sizeof(nosePtIDs1) / sizeof(int);
-    for(int i = 0; i<num_pts; i++)
-    {
-        int index = nosePtIDs1[i];
-        outPg.push_back(faceInfo.lm_2d[index]);
-    }
+    outPg.push_back(getPtOnGLm(faceInfo, 197));
+    outPg.push_back(getPtOnGLm(faceInfo, 196));
+    Point2i pt236a = IpGLmPtWithPair(faceInfo, 236, 217, 0.15);
+    outPg.push_back(pt236a);
+    
+    outPg.push_back(getPtOnGLm(faceInfo, 48));
+    outPg.push_back(getPtOnGLm(faceInfo, 92));
+    outPg.push_back(getPtOnGLm(faceInfo, 169));
     
     // add two special points and 152, the lowest point
     Point2i pt169 = getPtOnGLm(faceInfo, 169);
@@ -337,14 +329,12 @@ void ForgeNoseBellPg(const FaceInfo& faceInfo, POLYGON& outPg)
     Point2i sp2 =  getRectCornerPt(pt394, pt152);
     outPg.push_back(sp2);
     
-    int nosePtIDs2[] = {394, 410, 278, 420, 399, 419}; //// 逆时针
-    num_pts = sizeof(nosePtIDs2) / sizeof(int);
-    for(int i = 0; i<num_pts; i++)
-    {
-        int index = nosePtIDs2[i];
-        outPg.push_back(faceInfo.lm_2d[index]);
-    }
-    
+    outPg.push_back(getPtOnGLm(faceInfo, 394));
+    outPg.push_back(getPtOnGLm(faceInfo, 322));
+    outPg.push_back(getPtOnGLm(faceInfo, 278));
+    Point2i pt456a = IpGLmPtWithPair(faceInfo, 456, 437, 0.15);
+    outPg.push_back(pt456a);
+    outPg.push_back(getPtOnGLm(faceInfo, 419));
 }
 
 void ForgeNoseBellMask(const FaceInfo& faceInfo, Mat& outMask)
@@ -353,7 +343,7 @@ void ForgeNoseBellMask(const FaceInfo& faceInfo, Mat& outMask)
 
     ForgeNoseBellPg(faceInfo, coarsePg);
     
-    int csNumPoint = 120;
+    int csNumPoint = 80;
     CloseSmoothPolygon(coarsePg, csNumPoint, refinedPg);
 
     DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPg, outMask);
