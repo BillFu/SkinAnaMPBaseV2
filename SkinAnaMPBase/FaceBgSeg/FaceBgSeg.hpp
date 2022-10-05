@@ -69,6 +69,9 @@ public:
     // (including all its components), with the same size as the source image
     static Mat CalcFaceBgBiLabel(const FaceSegResult& segResult); 
 
+    // FB: face and background
+    static Mat CalcFBBiLabExBeard(const FaceSegResult& segResult);
+
 private:
     
     // 这个函数在程序初始化时要调用一次，并确保返回true之后，才能往下进行

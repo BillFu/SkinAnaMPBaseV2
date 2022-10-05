@@ -97,8 +97,9 @@ void ForgeMaskAnnoPack(const Mat& srcImage, const Mat& annoLmImage,
     cv::Size2i srcImgS = srcImage.size();
     
     // 0 for bg, 255 for face, in source space.
-    Mat fbBiLab = FaceBgSegmentor::CalcFaceBgBiLabel(segResult);
-
+    //Mat fbBiLab = FaceBgSegmentor::CalcFaceBgBiLabel(segResult);
+    Mat fbBiLab = FaceBgSegmentor::CalcFBBiLabExBeard(segResult);
+    
     /*
     Mat skinMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string faceMaskImgFile = BuildOutImgFileName(outDir,

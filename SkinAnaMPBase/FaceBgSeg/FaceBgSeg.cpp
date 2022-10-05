@@ -423,8 +423,25 @@ Mat FaceBgSegmentor::CalcFaceBgBiLabel(const FaceSegResult& segResult)
     // 1. binary the seg labels image into two classes:
     // background and face(including its sub-component)
     Mat labelsBi;
-    
     cv::threshold(segResult.segLabels, labelsBi, SEG_BG_LABEL, 255, cv::THRESH_BINARY);
+    resize(labelsBi, labelsBi, segResult.srcImgS, INTER_NEAREST);
+    
+    return labelsBi;
+}
+
+
+// FB: face and background
+Mat FaceBgSegmentor::CalcFBBiLabExBeard(const FaceSegResult& segResult)
+{
+    // NOTE: be careful with there are two coordinate system!
+    // 1. binary the seg labels image into two classes:
+    // background and face(including its sub-component)
+    Mat labelsBi;
+    cv::threshold(segResult.segLabels, labelsBi, SEG_BG_LABEL, 255, cv::THRESH_BINARY);
+    
+    Mat beardBilab;
+    cv::threshold(segResult.segLabels, beardBilab, SEG_EYE_LABEL, 255, cv::THRESH_BINARY);
+    labelsBi = labelsBi & (~beardBilab);
     
     resize(labelsBi, labelsBi, segResult.srcImgS, INTER_NEAREST);
     
