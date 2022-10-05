@@ -307,6 +307,8 @@ void ForgeNoseMask(const FaceInfo& faceInfo, Mat& outMask)
 }
 //-------------------------------------------------------------------------------------------
 
+/*
+// 蝙蝠两翼末端本想弄成圆角，但效果不佳
 void ForgeNoseBellPg(const FaceInfo& faceInfo, POLYGON& outPg)
 {
     outPg.push_back(getPtOnGLm(faceInfo, 197));
@@ -314,6 +316,41 @@ void ForgeNoseBellPg(const FaceInfo& faceInfo, POLYGON& outPg)
     Point2i pt236a = IpGLmPtWithPair(faceInfo, 236, 217, 0.15);
     outPg.push_back(pt236a);
     
+    outPg.push_back(getPtOnGLm(faceInfo, 48));
+    outPg.push_back(getPtOnGLm(faceInfo, 92));
+    outPg.push_back(getPtOnGLm(faceInfo, 202));
+    outPg.push_back(getPtOnGLm(faceInfo, 210));
+
+    // add two special points and 152, the lowest point
+    Point2i pt136 = getPtOnGLm(faceInfo, 136);
+    Point2i pt152 = getPtOnGLm(faceInfo, 152);
+    Point2i pt365 = getPtOnGLm(faceInfo, 365);
+    
+    Point2i sp1 =  getRectCornerPt(pt136, pt152);
+    outPg.push_back(sp1);
+    outPg.push_back(pt152);
+    Point2i sp2 =  getRectCornerPt(pt365, pt152);
+    outPg.push_back(sp2);
+    
+    outPg.push_back(getPtOnGLm(faceInfo, 430));
+    outPg.push_back(getPtOnGLm(faceInfo, 422));
+    outPg.push_back(getPtOnGLm(faceInfo, 322));
+    outPg.push_back(getPtOnGLm(faceInfo, 278));
+    Point2i pt456a = IpGLmPtWithPair(faceInfo, 456, 437, 0.15);
+    outPg.push_back(pt456a);
+    outPg.push_back(getPtOnGLm(faceInfo, 419));
+}
+*/
+
+void ForgeNoseBellPg(const FaceInfo& faceInfo, POLYGON& outPg)
+{
+    outPg.push_back(getPtOnGLm(faceInfo, 197));
+    outPg.push_back(getPtOnGLm(faceInfo, 196));
+    //Point2i pt236a = IpGLmPtWithPair(faceInfo, 236, 217, 0.15);
+    //outPg.push_back(pt236a);
+    
+    outPg.push_back(getPtOnGLm(faceInfo, 174));
+    outPg.push_back(getPtOnGLm(faceInfo, 198));
     outPg.push_back(getPtOnGLm(faceInfo, 48));
     outPg.push_back(getPtOnGLm(faceInfo, 92));
     outPg.push_back(getPtOnGLm(faceInfo, 169));
@@ -332,8 +369,11 @@ void ForgeNoseBellPg(const FaceInfo& faceInfo, POLYGON& outPg)
     outPg.push_back(getPtOnGLm(faceInfo, 394));
     outPg.push_back(getPtOnGLm(faceInfo, 322));
     outPg.push_back(getPtOnGLm(faceInfo, 278));
-    Point2i pt456a = IpGLmPtWithPair(faceInfo, 456, 437, 0.15);
-    outPg.push_back(pt456a);
+    //Point2i pt456a = IpGLmPtWithPair(faceInfo, 456, 437, 0.15);
+    //outPg.push_back(pt456a);
+    
+    outPg.push_back(getPtOnGLm(faceInfo, 420));
+    outPg.push_back(getPtOnGLm(faceInfo, 399));
     outPg.push_back(getPtOnGLm(faceInfo, 419));
 }
 
