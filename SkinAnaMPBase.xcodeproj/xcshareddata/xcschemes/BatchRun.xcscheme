@@ -54,7 +54,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "config_batch.json"
+            argument = "config_batch_profile.json"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

@@ -1,5 +1,7 @@
 {
-	"FaceMeshModelFile": 	"models/face_landmark.tflite",
-	"SourceImage":			"images/profile.jpg",
-	"AnnoPoseImage": 		"result/pose_profile.png"
+	"SegModelFile": 				    "models/seg_model.onnx",
+	"ClassColorFile":					"models/classes3.txt",
+	"FaceMeshAttenModel": 				"models/face_lm_attent.tflite",
+	"SourceImage":						"ISE_Profile/R1.jpg",
+	"OutDir":							"result_profile"
 }

@@ -53,7 +53,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "config_jpn2.json"
+            argument = "config_profile.json"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

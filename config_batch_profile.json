@@ -1,0 +1,7 @@
+{
+	"SegModelFile": 				    "models/seg_model.onnx",
+	"ClassColorFile":					"models/classes3.txt",
+	"FaceMeshAttenModel": 				"models/face_lm_attent.tflite",
+	"SrcImgRootDir":					"images_profile",
+	"AnnoImgRootDir": 					"result_profile"
+}
