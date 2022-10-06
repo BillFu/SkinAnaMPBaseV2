@@ -1,0 +1,7 @@
+{
+	"SegModelFile": 				    "models/seg_model.onnx",
+	"ClassColorFile":					"models/classes3.txt",
+	"FaceMeshAttenModel": 				"models/face_lm_attent.tflite",
+	"SourceImage":						"images_profile/ISE/R3.jpg",
+	"OutDir":							"result_profile/ISE_R3"
+}

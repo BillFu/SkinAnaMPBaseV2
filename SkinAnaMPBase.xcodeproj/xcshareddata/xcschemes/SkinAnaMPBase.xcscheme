@@ -53,7 +53,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "config_profile.json"
+            argument = "config_ise_R3.json"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
