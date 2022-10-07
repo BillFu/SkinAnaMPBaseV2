@@ -20,11 +20,13 @@ Date:   2022/9/23
 #include <algorithm>
 
 #include "../Utils.hpp"
-#include "EyebowMask.hpp"
+#include "EyebrowMask.hpp"
 #include "ForeheadMask.hpp"
 #include "LowerFaceMask.hpp"
 #include "../AnnoImage.hpp"
 #include "../FaceBgSeg/FaceBgSeg.hpp"
+#include "../BSpline/ParametricBSpline.hpp"
+
 
 namespace fs = std::filesystem;
 
@@ -89,7 +91,7 @@ void ForgeWrinkleMask(const FaceInfo& faceInfo,
 //-------------------------------------------------------------------------------------------
 
 // 一揽子函数，生成各类Mask和它们的Anno Image
-void ForgeMaskAnnoPack(const Mat& srcImage, const Mat& annoLmImage,
+void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
                        const fs::path& outDir, const string& fileNameBone,
                        const FaceInfo& faceInfo,
                        const FaceSegResult& segResult)
@@ -117,17 +119,24 @@ void ForgeMaskAnnoPack(const Mat& srcImage, const Mat& annoLmImage,
     //OverlayMaskOnImage(srcImage, mouthMask,
      //               "mouth_contour", mouthMaskImgFile.c_str());
 
-    Mat eyebowsMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    Mat eyebrowsMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string ebsMaskImgFile = BuildOutImgFileName(outDir,
                              fileNameBone, "ebc_");
-    ForgeTwoEyebowsMask(faceInfo, eyebowsMask);
+    ForgeEyebrowsMask(faceInfo, eyebrowsMask);
     //OverlayMaskOnImage(annoLmImage, eyebowsMask,
     //                    "eyebows_contour", ebsMaskImgFile.c_str());
+
+    Mat eyesMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    string eyeMaskImgFile = BuildOutImgFileName(outDir,
+                             fileNameBone, "eye_");
+    ForgeEyesMask(faceInfo, eyesMask);
+    OverlayMaskOnImage(annoLmImage, eyesMask,
+                        "eyes_mask", eyeMaskImgFile.c_str());
 
     Mat eyesFullMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string eyeFullMaskImgFile = BuildOutImgFileName(outDir,
                              fileNameBone, "efc_");
-    ForgeTwoEyesFullMask(faceInfo, eyesFullMask);
+    ForgeEyesFullMask(faceInfo, eyesFullMask);
     //OverlayMaskOnImage(annoLmImage, eyesFullMask,
     //                    "eye_full_contour", eyeFullMaskImgFile.c_str());
 
@@ -171,4 +180,112 @@ void ForgeMaskAnnoPack(const Mat& srcImage, const Mat& annoLmImage,
                     noseBellMask, wrkMask);
     OverlayMaskOnImage(annoImage2, wrkMask,
                         "wrinkle mask", wrkMaskAnnoFile.c_str());
+    
+    Mat skinMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    string skinMaskImgFile = BuildOutImgFileName(outDir,
+                             fileNameBone, "skinMask_");
+    
+    ForgeSkinMaskV2(faceInfo, mouthMask,
+                    eyebrowsMask, eyesMask,
+                    skinMask);
+    OverlayMaskOnImage(annoLmImage, skinMask,
+                       "Skin Mask", skinMaskImgFile.c_str());
 }
+
+//-------------------------------------------------------------------------------------------
+
+/**********************************************************************************************
+本函数构建skinMask，挖掉眉毛、嘴唇、眼睛等区域。
+***********************************************************************************************/
+void ForgeSkinMaskV2(const FaceInfo& faceInfo,
+                     const Mat& mouthMask,
+                     const Mat& eyebrowMask,
+                     const Mat& eyeMask,
+                     Mat& outMask)
+{
+    POLYGON coarsePolygon, refinedPolygon;
+
+    ForgeSkinPolygonV2(faceInfo, coarsePolygon);
+    
+    int csNumPoint = 200;
+    CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+
+    DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
+    
+    outMask = outMask & (~mouthMask) & (~eyebrowMask) & (~eyeMask);
+}
+
+//-------------------------------------------------------------------------------------------
+/**********************************************************************************************
+本函数构建各类综合性的Mask。
+***********************************************************************************************/
+// 一揽子函数，生成各类Mask和它们的Anno Image
+// 简洁版
+void ForgeMaskAnnoPackV2(const Mat& srcImage,
+                       const fs::path& outDir, const string& fileNameBone,
+                       const FaceInfo& faceInfo,
+                       const FaceSegResult& segResult)
+{
+    cv::Size2i srcImgS = srcImage.size();
+    
+    // 0 for bg, 255 for face, in source space.
+    //Mat fbBiLab = FaceBgSegmentor::CalcFaceBgBiLabel(segResult);
+    Mat fbBiLab = FaceBgSegmentor::CalcFBBiLabExBeard(segResult);
+    
+    Mat mouthMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    string mouthMaskImgFile = BuildOutImgFileName(outDir,
+                             fileNameBone, "mc_");
+    float expanRatio = 0.3;
+    ForgeMouthMask(faceInfo, expanRatio, mouthMask);
+    
+    Mat eyebrowsMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    ForgeEyebrowsMask(faceInfo, eyebrowsMask);
+    
+    Mat eyesMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    ForgeEyesMask(faceInfo, eyesMask);
+    
+    Mat eyesFullMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    string eyeFullMaskImgFile = BuildOutImgFileName(outDir,
+                             fileNameBone, "efc_");
+    ForgeEyesFullMask(faceInfo, eyesFullMask);
+    
+    string noseBellMaskFile = BuildOutImgFileName(outDir,
+                             fileNameBone, "nb_");
+    Mat noseBellMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    ForgeNoseBellMask(faceInfo, noseBellMask);
+
+    Mat lowFaceMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    ForgeLowerFaceMask(segResult, fbBiLab, lowFaceMask);
+    
+    string expFhMaskFile = BuildOutImgFileName(outDir,
+                             fileNameBone, "efh_");
+    Mat expFhMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    ForgeExpFhMask(faceInfo, fbBiLab, expFhMask);
+    //AnnoGenKeyPoints(annoImage2, faceInfo, true);
+    
+    string poreMaskAnnoFile = BuildOutImgFileName(outDir,
+                             fileNameBone, "pore_");
+    Mat poreMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    ForgePoreMaskV3(faceInfo, lowFaceMask, expFhMask, eyesFullMask,
+                    mouthMask, poreMask);
+    OverlayMaskOnImage(srcImage, poreMask,
+                        "pore mask", poreMaskAnnoFile.c_str());
+    
+    string wrkMaskAnnoFile = BuildOutImgFileName(outDir,
+                             fileNameBone, "wrk_");
+    Mat wrkMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    ForgeWrinkleMask(faceInfo, lowFaceMask, expFhMask, eyesFullMask,
+                    noseBellMask, wrkMask);
+    OverlayMaskOnImage(srcImage, wrkMask,
+                        "wrinkle mask", wrkMaskAnnoFile.c_str());
+    
+    Mat skinMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    string skinMaskImgFile = BuildOutImgFileName(outDir,
+                             fileNameBone, "skinMask_");
+    ForgeSkinMaskV2(faceInfo, mouthMask,
+                    eyebrowsMask, eyesMask,
+                    skinMask);
+    OverlayMaskOnImage(srcImage, skinMask,
+                       "Skin Mask", skinMaskImgFile.c_str());
+}
+

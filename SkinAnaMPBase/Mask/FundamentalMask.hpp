@@ -32,7 +32,10 @@ Mat ContourGroup2Mask(int img_width, int img_height, const POLYGON_GROUP& contou
 /**********************************************************************************************
 本函数构建皮肤区域的矢量版雏形。
 ***********************************************************************************************/
-void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon);
+//void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon);
+
+void ForgeSkinPolygonV2(const FaceInfo& faceInfo, POLYGON& skinPolygon);
+
 //-------------------------------------------------------------------------------------------
 
 void ForgeSkinMask(const FaceInfo& faceInfo, Mat& outMask);
@@ -50,7 +53,7 @@ void ForgeOneEyeFullMask(const FaceInfo& faceInfo, EyeID eyeID, Mat& outMask);
 
 
 // the returned mask covers the two eyes, eyebows, the surrounding area, and with somewhat expansion
-void ForgeTwoEyesFullMask(const FaceInfo& faceInfo, Mat& outEyesFullMask);
+void ForgeEyesFullMask(const FaceInfo& faceInfo, Mat& outEyesFullMask);
 
 void ForgeNoseMask(const FaceInfo& faceInfo, Mat& outNoseMask);
 

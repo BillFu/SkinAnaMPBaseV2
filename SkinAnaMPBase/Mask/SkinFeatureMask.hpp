@@ -42,7 +42,6 @@ void ForgePoreMaskV2(const FaceInfo& faceInfo,
                    const Mat& noseMask,
                    Mat& outPoreMask);
 
-
 void ForgePoreMaskV3(const FaceInfo& faceInfo,
                    const Mat& faceLowMask,  // lower than eyes
                    const Mat& expFhMask,
@@ -65,9 +64,25 @@ void ForgeWrinkleMask(const FaceInfo& faceInfo,
 //-------------------------------------------------------------------------------------------
 
 // 一揽子函数，生成各类Mask和它们的Anno Image
-void ForgeMaskAnnoPack(const Mat& srcImage, const Mat& annoLmImage,
+// Debug版本，打印出许多辅助性结果和信息
+void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
                        const fs::path& outDir, const string& fileNameBone,
                        const FaceInfo& faceInfo,
                        const FaceSegResult& segResult);
+
+
+// 一揽子函数，生成各类Mask和它们的Anno Image
+// 简洁版
+void ForgeMaskAnnoPackV2(const Mat& srcImage,
+                       const fs::path& outDir, const string& fileNameBone,
+                       const FaceInfo& faceInfo,
+                         const FaceSegResult& segResult);
+
+//-------------------------------------------------------------------------------------------
+void ForgeSkinMaskV2(const FaceInfo& faceInfo,
+                     const Mat& mouthMask,
+                     const Mat& eyebrowMask,
+                     const Mat& eyeMask,
+                     Mat& outMask);
 
 #endif /* end of SKIN_FEATURE_MASK_HPP */

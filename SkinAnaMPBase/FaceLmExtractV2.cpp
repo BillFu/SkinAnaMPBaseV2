@@ -107,8 +107,8 @@ bool LoadFaceMeshModel(const char* faceMeshModelFile, string& errorMsg)
 Mat PaddingImage(const Mat& srcImage, const Rect& bbox,
              int& padLeft, int& padTop)
 {
-    float alphaHor = 0.25; //0.25
-    float alphaVer = 0.45;  //0.15
+    float alphaHor = 0.25;  //0.25
+    float alphaVer = 0.15;  //0.15
     Mat croppedImg = srcImage(bbox); // 事先将faceBBox的长宽调整为偶数???
     padLeft = (int)(bbox.width * alphaHor); // both left and right extend padW outside
     padTop = (int)(bbox.height * alphaVer); // both top and bottom extend padH outside

@@ -10,7 +10,8 @@
 		2602327628CCBFB100B11D7A /* HeadPoseEst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2602327528CCBFB100B11D7A /* HeadPoseEst.cpp */; };
 		263B540228CD861C004CF77D /* AnnoImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540028CD861C004CF77D /* AnnoImage.cpp */; };
 		263B540528CD8B34004CF77D /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540428CD8B34004CF77D /* Utils.cpp */; };
-		264E012628D6C45B00CB94D1 /* EyebowMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264E012528D6C45B00CB94D1 /* EyebowMask.cpp */; };
+		2641954928F03716005BF2A1 /* EyebrowMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2641954828F03716005BF2A1 /* EyebrowMask.cpp */; };
+		2641954A28F0373A005BF2A1 /* EyebrowMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2641954828F03716005BF2A1 /* EyebrowMask.cpp */; };
 		265B7B9A28E5C971004F5E49 /* HeadPoseEst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2602327528CCBFB100B11D7A /* HeadPoseEst.cpp */; };
 		265B7B9C28E5C9D2004F5E49 /* AnnoImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540028CD861C004CF77D /* AnnoImage.cpp */; };
 		2680A22E28EFC54B00A305EB /* FaceLmExtractV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2680A22C28EFC54B00A305EB /* FaceLmExtractV2.cpp */; };
@@ -38,7 +39,6 @@
 		CBDA6BA028D5603600BE0756 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540428CD8B34004CF77D /* Utils.cpp */; };
 		CBDBD7B128D561FF00F3AD03 /* LM_Exporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDBD7AF28D561FF00F3AD03 /* LM_Exporter.cpp */; };
 		CBF8FB7928E68DCB002B58B5 /* SkinFeatureMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBB5DB3E28DD5E97003CDED3 /* SkinFeatureMask.cpp */; };
-		CBF8FB7B28E68DE7002B58B5 /* EyebowMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264E012528D6C45B00CB94D1 /* EyebowMask.cpp */; };
 		CBF8FB7D28E68DFC002B58B5 /* ForeheadMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB1E2AB728DD99AB00F416DF /* ForeheadMask.cpp */; };
 		CBF8FB7F28E68DFC002B58B5 /* FundamentalMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBB5DB3C28DD5B3B003CDED3 /* FundamentalMask.cpp */; };
 		CBF8FB8128E68E25002B58B5 /* ParametricBSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB4312A828D41DDD006D71DA /* ParametricBSpline.cpp */; };
@@ -82,8 +82,8 @@
 		263B540128CD861C004CF77D /* AnnoImage.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AnnoImage.hpp; sourceTree = "<group>"; };
 		263B540328CD8B34004CF77D /* Utils.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Utils.hpp; sourceTree = "<group>"; };
 		263B540428CD8B34004CF77D /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utils.cpp; sourceTree = "<group>"; };
-		264E012428D6C45B00CB94D1 /* EyebowMask.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EyebowMask.hpp; sourceTree = "<group>"; };
-		264E012528D6C45B00CB94D1 /* EyebowMask.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EyebowMask.cpp; sourceTree = "<group>"; };
+		2641954728F03716005BF2A1 /* EyebrowMask.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EyebrowMask.hpp; sourceTree = "<group>"; };
+		2641954828F03716005BF2A1 /* EyebrowMask.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EyebrowMask.cpp; sourceTree = "<group>"; };
 		265B7B9728E5B26D004F5E49 /* libtensorflowlite.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtensorflowlite.so; path = m1_lib/libtensorflowlite.so; sourceTree = "<group>"; };
 		2680A22C28EFC54B00A305EB /* FaceLmExtractV2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FaceLmExtractV2.cpp; sourceTree = "<group>"; };
 		2680A22D28EFC54B00A305EB /* FaceLmExtractV2.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FaceLmExtractV2.hpp; sourceTree = "<group>"; };
@@ -163,6 +163,8 @@
 		264E012328D6C1DF00CB94D1 /* Mask */ = {
 			isa = PBXGroup;
 			children = (
+				2641954828F03716005BF2A1 /* EyebrowMask.cpp */,
+				2641954728F03716005BF2A1 /* EyebrowMask.hpp */,
 				26B65A5C28EA92900019104F /* LowerFaceMask.cpp */,
 				26B65A5D28EA92900019104F /* LowerFaceMask.hpp */,
 				CB1E2AB728DD99AB00F416DF /* ForeheadMask.cpp */,
@@ -171,8 +173,6 @@
 				CBB5DB3F28DD5E97003CDED3 /* SkinFeatureMask.hpp */,
 				CBB5DB3C28DD5B3B003CDED3 /* FundamentalMask.cpp */,
 				CBB5DB3B28DD5B3B003CDED3 /* FundamentalMask.hpp */,
-				264E012528D6C45B00CB94D1 /* EyebowMask.cpp */,
-				264E012428D6C45B00CB94D1 /* EyebowMask.hpp */,
 			);
 			path = Mask;
 			sourceTree = "<group>";
@@ -418,10 +418,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				CB255A9628C7237A005C8A81 /* main.cpp in Sources */,
+				2641954928F03716005BF2A1 /* EyebrowMask.cpp in Sources */,
 				26E506B228D3665B000059DA /* LM_Loader.cpp in Sources */,
 				263B540228CD861C004CF77D /* AnnoImage.cpp in Sources */,
 				2680A22E28EFC54B00A305EB /* FaceLmExtractV2.cpp in Sources */,
-				264E012628D6C45B00CB94D1 /* EyebowMask.cpp in Sources */,
 				26B65A5E28EA92900019104F /* LowerFaceMask.cpp in Sources */,
 				CB45E23C28E54A77004E8D25 /* FaceBgSeg.cpp in Sources */,
 				2602327628CCBFB100B11D7A /* HeadPoseEst.cpp in Sources */,
@@ -438,12 +438,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2641954A28F0373A005BF2A1 /* EyebrowMask.cpp in Sources */,
 				2680A22F28EFC55A00A305EB /* FaceLmExtractV2.cpp in Sources */,
 				26B65A5F28EA983E0019104F /* LowerFaceMask.cpp in Sources */,
 				CBF8FB8128E68E25002B58B5 /* ParametricBSpline.cpp in Sources */,
 				CBF8FB7D28E68DFC002B58B5 /* ForeheadMask.cpp in Sources */,
 				CBF8FB7F28E68DFC002B58B5 /* FundamentalMask.cpp in Sources */,
-				CBF8FB7B28E68DE7002B58B5 /* EyebowMask.cpp in Sources */,
 				CBF8FB7928E68DCB002B58B5 /* SkinFeatureMask.cpp in Sources */,
 				265B7B9C28E5C9D2004F5E49 /* AnnoImage.cpp in Sources */,
 				265B7B9A28E5C971004F5E49 /* HeadPoseEst.cpp in Sources */,

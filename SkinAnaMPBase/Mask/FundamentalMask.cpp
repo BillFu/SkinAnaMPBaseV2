@@ -45,6 +45,7 @@ Mat ContourGroup2Mask(int img_width, int img_height, const POLYGON_GROUP& contou
 /**********************************************************************************************
 额头顶部轮廓得到了提升。
 ***********************************************************************************************/
+/*
 void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon)
 {
     // the indices for lm in meadiapipe mesh from
@@ -86,67 +87,45 @@ void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon)
         skinPolygon.push_back(Point2i(x, y));
     }
 }
-
-/*
-// face mask below the eyes, 在鼻子部位向上凸出，接近额头
-void ForgeLowFacePg(const FaceInfo& faceInfo, POLYGON& skinPolygon)
-{
-    // the indices in counterclockwise order
-
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 116));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 123));
-    
-    Point2i IPt147 = IpGLmPtWithPair(faceInfo, 213, 187, 0.3);
-    skinPolygon.push_back(IPt147);
-
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 192));
-    
-    Point2i IPt136 = IpGLmPtWithPair(faceInfo, 136, 212, 0.3);
-    skinPolygon.push_back(IPt136);
-
-    Point2i IPt150 = IpGLmPtWithPair(faceInfo, 150, 43, 0.15);
-    skinPolygon.push_back(IPt150);
-    
-    //skinPolygon.push_back(getPtOnGLm(faceInfo, 149));
-    //skinPolygon.push_back(getPtOnGLm(faceInfo, 176));
-    Point2i IPt170 = IpGLmPtWithPair(faceInfo, 170, 211, 0.3);
-    skinPolygon.push_back(IPt170);
-    
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 140));
-
-    Point2i IPt171 = IpGLmPtWithPair(faceInfo, 171, 208, 0.40);
-    skinPolygon.push_back(IPt171);
-
-    Point2i IPt175 = IpGLmPtWithPair(faceInfo, 175, 199, 0.4);
-    skinPolygon.push_back(IPt175);
-        
-    Point2i IPt396 = IpGLmPtWithPair(faceInfo, 396, 428, 0.40);
-    skinPolygon.push_back(IPt396);
-    
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 369));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 395));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 394));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 416));
-        
-    Point2i IPt376 = IpGLmPtWithPair(faceInfo, 376, 280, 0.15);
-    skinPolygon.push_back(IPt376);
-    
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 352));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 345));
-    
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 346));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 349));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 453));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 417));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 336));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 107));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 193));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 233));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 120));
-    skinPolygon.push_back(getPtOnGLm(faceInfo, 117));
-
-}
 */
+void ForgeSkinPolygonV2(const FaceInfo& faceInfo, POLYGON& skinPolygon)
+{
+    int silhouette[] = {
+        10,  338, 297, 332, 284, 301, 368, 454, 323, 361, 288,
+        397, 365, 379, 378, 400, 428, 199, 208, 176, 149, 150, 136,
+        172, 58,  132, 93,  234, 127, 139, 71, 54,  103, 67,  109};
+    
+    int num_pts = sizeof(silhouette) / sizeof(int);
+    
+    int raisedFhCurve[9][2];
+    RaiseupForeheadCurve(faceInfo.lm_2d, raisedFhCurve, 0.8);
+
+    // calculate the new version of coordinates of Points on face silhouette.
+    int newSilhouPts[36][2];
+    for(int i = 0; i<num_pts; i++)
+    {
+        int index = silhouette[i];
+        int indexInFHC = getPtIndexOfFHCurve(index);
+        
+        if(indexInFHC == -1) // Not on Forehead Curve
+        {
+            newSilhouPts[i][0] = faceInfo.lm_2d[index].x;
+            newSilhouPts[i][1] = faceInfo.lm_2d[index].y;
+        }
+        else // on Forehead Curve, need update the coordinates, i.e. raising up
+        {
+            newSilhouPts[i][0] = raisedFhCurve[indexInFHC][0];
+            newSilhouPts[i][1] = raisedFhCurve[indexInFHC][1];
+        }
+    }
+    
+    for(int i = 0; i<num_pts; i++)
+    {
+        int x = newSilhouPts[i][0];
+        int y = newSilhouPts[i][1];
+        skinPolygon.push_back(Point2i(x, y));
+    }
+}
 //-------------------------------------------------------------------------------------------
 
 void ForgeMouthPolygon(const FaceInfo& faceInfo,
@@ -189,7 +168,7 @@ void ForgeSkinMask(const FaceInfo& faceInfo, Mat& outMask)
 {
     POLYGON coarsePolygon, refinedPolygon;
 
-    ForgeSkinPolygon(faceInfo, coarsePolygon);
+    ForgeSkinPolygonV2(faceInfo, coarsePolygon);
     
     int csNumPoint = 200;
     CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
@@ -265,7 +244,7 @@ void ForgeOneEyeFullMask(const FaceInfo& faceInfo, EyeID eyeID, Mat& outMask)
     DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
 }
 
-void ForgeTwoEyesFullMask(const FaceInfo& faceInfo, Mat& outEyesFullMask)
+void ForgeEyesFullMask(const FaceInfo& faceInfo, Mat& outEyesFullMask)
 {
     cv::Mat outMask(faceInfo.imgHeight, faceInfo.imgWidth, CV_8UC1, cv::Scalar(0));
 

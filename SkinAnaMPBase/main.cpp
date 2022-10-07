@@ -12,7 +12,7 @@
 #include "AnnoImage.hpp"
 #include "LM_loader.hpp"
 #include "Mask/FundamentalMask.hpp"
-#include "Mask/EyebowMask.hpp"
+#include "Mask/EyebrowMask.hpp"
 #include "Mask/SkinFeatureMask.hpp"
 #include "Mask/ForeheadMask.hpp"
 #include "Utils.hpp"
@@ -120,13 +120,28 @@ int main(int argc, char **argv)
     
     Mat annoLmImage = srcImage.clone();
     
+    //string annoLmImgFile = BuildOutImgFileName(
+    //        outParePath, fileBoneName, "lm_");
+    //AnnoAllLmInfo(annoLmImage, faceInfo, annoLmImgFile);
+
+    Scalar yellowColor(255, 0, 0);
+    //AnnoTwoEyeRefinePts(annoLmImage, faceInfo, yellowColor, true);
+    AnnoGenKeyPoints(annoLmImage, faceInfo, true);
+
     string annoLmImgFile = BuildOutImgFileName(
             outParePath, fileBoneName, "lm_");
-    AnnoAllLmInfo(annoLmImage, faceInfo, annoLmImgFile);
+    imwrite(annoLmImgFile.c_str(), annoLmImage);
 
-    ForgeMaskAnnoPack(srcImage, annoLmImage,
+    ForgeMaskAnnoPackDebug(srcImage, annoLmImage,
                       outParePath, fileBoneName,
                       faceInfo, segResult);
+
+    
+    /*
+    ForgeMaskAnnoPackV2(srcImage, 
+                        outParePath, fileBoneName,
+                        faceInfo, segResult);
+    */
     
     return 0;
 }
