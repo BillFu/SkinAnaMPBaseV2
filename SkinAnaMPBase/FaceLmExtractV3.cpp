@@ -1,0 +1,409 @@
+//
+//  FaceLmExtractV2.cpp
+
+/*******************************************************************************
+Author: Fu Xiaoqiang
+Date:   2022/9/13
+
+********************************************************************************/
+
+#include "FaceLmExtractV3.hpp"
+#include "Utils.hpp"
+#include <math.h>
+#include "AnnoImage.hpp"
+
+#define PI 3.14159265
+
+TF_LITE_MODEL tfLiteFMMoel = nullptr;  // FM: face mesh
+
+/*
+    Note: in the landmarks outputed by the tf lite model, the raw coordinate values
+    NOT scaled into [0.0 1.0], instead in the [0.0 192.0].
+
+    The returned lm_3d is measured in the input coordinate system of tf lite model,
+    i.e., the values are in the range: [0.0, 192.0].
+
+    The returned argument, lm_2d, is measured in the coordinate system of the source image!
+*/
+
+
+// Normal here means the coordinate value lies in [0.0 1.0]
+void extractOutputLM(float* netLMOutBuffer, float lm_3d[468][3], double normal_lm_2d[468][2])
+{
+    double scale_x = 1.0 / (double)FACE_MESH_NET_INPUT_W;
+    double scale_y = 1.0 / (double)FACE_MESH_NET_INPUT_H;
+
+    for(int i=0; i<468; i++)
+    {
+        float x = netLMOutBuffer[i*3];
+        float y = netLMOutBuffer[i*3+1];
+        float z = netLMOutBuffer[i*3+2];
+
+        lm_3d[i][0] = x;
+        lm_3d[i][1] = y;
+        lm_3d[i][2] = z;
+
+        normal_lm_2d[i][0] = x*scale_x;
+        normal_lm_2d[i][1] = y*scale_y;
+    }
+}
+
+// Normal here means the coordinate value lies in [0.0 1.0]
+void extractEyeRefinePts(float* outBufEyeBow, double NormalEyeBowPts[71][2])
+{
+    double scale_x = 1.0 / (double)FACE_MESH_NET_INPUT_W;
+    double scale_y = 1.0 / (double)FACE_MESH_NET_INPUT_H;
+
+    for(int i=0; i<71; i++)
+    {
+        float x = outBufEyeBow[i*2];
+        float y = outBufEyeBow[i*2+1];
+
+        NormalEyeBowPts[i][0] = x*scale_x;
+        NormalEyeBowPts[i][1] = y*scale_y;
+    }
+}
+
+void extractLipRefinePts(float* outBufLipRefinePts, double NormalLipRefinePts[80][2])
+{
+    double scale_x = 1.0 / (double)FACE_MESH_NET_INPUT_W;
+    double scale_y = 1.0 / (double)FACE_MESH_NET_INPUT_H;
+
+    for(int i=0; i<80; i++)
+    {
+        float x = outBufLipRefinePts[i*2];
+        float y = outBufLipRefinePts[i*2+1];
+
+        NormalLipRefinePts[i][0] = x*scale_x;
+        NormalLipRefinePts[i][1] = y*scale_y;
+    }
+}
+
+//-----------------------------------------------------------------------------------------
+
+/******************************************************************************************
+该函数的功能是，加载Face Mesh模型，生成深度网络，创建解释器并配置它。
+return True if all is well done, otherwise reurn False and give the error reason.
+numThreads: 解释器推理时可以使用的线程数量，最低为1.
+*******************************************************************************************/
+
+bool LoadFaceMeshModel(const char* faceMeshModelFile, string& errorMsg)
+{
+    tfLiteFMMoel = FlatBufferModel::BuildFromFile(faceMeshModelFile);
+    
+    if(tfLiteFMMoel == nullptr)
+    {
+        errorMsg = "Failed to load face mesh model file: " + string(faceMeshModelFile);
+        return false;
+    }
+    else
+    {
+        //cout << "Succeeded to load face mesh with attention model file: "
+        //        << faceMeshModelFileName << endl;
+        return true;
+    }
+}
+ 
+//-----------------------------------------------------------------------------------------
+// padding the source image with such method:
+// crop the srcImg with face bbox, then expand the cropped iamge from the center of bbox
+// toward outside, with 25% margin of width and height.
+Mat PaddingImage(const Mat& srcImage, const Rect& bbox,
+             int& padLeft, int& padTop)
+{
+    float alphaHor = 0.25; //0.25
+    float alphaVer = 0.45;  //0.15
+    Mat croppedImg = srcImage(bbox); // 事先将faceBBox的长宽调整为偶数???
+    padLeft = (int)(bbox.width * alphaHor); // both left and right extend padW outside
+    padTop = (int)(bbox.height * alphaVer); // both top and bottom extend padH outside
+
+    Mat paddedImg;
+    Scalar blackColor(0, 0, 0);
+    copyMakeBorder(croppedImg, paddedImg,
+                   padTop, padTop, padLeft, padLeft,
+                   BORDER_CONSTANT, blackColor);
+    croppedImg.release();
+    
+    return paddedImg;
+}
+
+// padding the source image with such method:
+// crop the srcImg with face bbox, then expand the cropped iamge from the center of bbox
+// toward outside, with 25% margin of width and height.
+// then rotate the image to make the eye line in mew image to be horizontal
+Mat PadRotateImage(const Mat& srcImage, const FaceSegResult& segResult)
+                   //int& padLeft, int& padTop)
+{
+    const Rect& bbox = segResult.faceBBox;
+    
+    float alphaHor = 0.25; //0.25
+    float alphaVer = 0.15;  //0.15
+    Mat croppedImg = srcImage(bbox); // 事先将faceBBox的长宽调整为偶数???
+    
+    int padLeft = (int)(bbox.width * alphaHor); // both left and right extend padW outside
+    int padTop = (int)(bbox.height * alphaVer); // both top and bottom extend padH outside
+
+    Mat paddedImg;
+    Scalar blackColor(0, 0, 0);
+    copyMakeBorder(croppedImg, paddedImg,
+                   padTop, padTop, padLeft, padLeft,
+                   BORDER_CONSTANT, blackColor);
+    croppedImg.release();
+    
+    Point2i eCP0 = segResult.eyeCPs[0];
+    Point2i eCP1 = segResult.eyeCPs[1];
+
+    int dx = eCP1.x - eCP0.x;
+    int dy = eCP1.y - eCP0.y;
+
+    double thetaRad = atan2(dy, dx);
+    double thetaDeg = thetaRad * 180/ PI + 10.0;
+    
+    // get the center coordinates of the image to create the 2D rotation matrix
+    Point2f center((paddedImg.cols - 1) / 2.0, (paddedImg.rows - 1) / 2.0);
+    
+    // using getRotationMatrix2D() to get the rotation matrix
+    Mat rotM = getRotationMatrix2D(center, thetaDeg, 1.0);
+    // we will save the resulting image in rotated_image matrix
+    
+    Mat rotated_image;
+    // rotate the image using warpAffine
+    
+    //# 2.2 新的宽高，radians(angle) 把角度转为弧度 sin(弧度)
+    int padW = paddedImg.cols;
+    int padH = paddedImg.rows;
+    
+    //int new_H = int(padW * fabs(sin(thetaRad)) + padH * fabs(cos(thetaRad)));
+    //int new_W = int(padH * fabs(sin(thetaRad)) + padW * fabs(cos(thetaRad)));
+    //# 2.3 平移
+    //rotM.at<double>(0, 2) += (new_W - padW) / 2;
+    //rotM.at<double>(1, 2) += (new_H - padH) / 2;
+    
+    warpAffine(paddedImg, rotated_image, rotM, Size(padW, padH));
+    //warpAffine(paddedImg, rotated_image, rotM, Size(new_W, new_H));
+
+    return rotated_image;
+}
+
+/******************************************************************************************
+ 目前的推理是一次性的，即从模型加载到解释器创建，到推理，到结果提取，这一流程只负责完成一副人脸的LM提取。
+ 以后要让前半段的结果长期存活，用于连续推理，以提高效率。
+ Note: after invoking this function, return value and hasFace must be check!
+*******************************************************************************************/
+bool ExtractFaceLm(const Mat& srcImage,
+                   float confTh, const FaceSegResult& segResult,
+                   bool& hasFace,
+                   FaceInfo& faceInfo, string& errorMsg)
+{
+    //------------------******preprocessing******-----------------------------------------------------------------
+    
+    // shifting and padding the source image to get better performance
+    int padLeft, padTop;
+    Mat fixedImg = PadRotateImage(srcImage, segResult);
+                           //padLeft, padTop);
+    
+    imwrite("padR3.png", fixedImg);
+    cv::Size fixImgSize = fixedImg.size();
+    
+    //-------------------------*****enter inference*****---------------------------------------------------------
+    // Initiate Interpreter
+    INTERPRETER interpreter;
+    tflite::ops::builtin::BuiltinOpResolver resolver;
+    tflite::InterpreterBuilder(*tfLiteFMMoel.get(), resolver)(&interpreter);
+    if (interpreter == nullptr)
+    {
+        errorMsg = string("failed to initiate the face lm interpreter.");
+        return false;
+    }
+    else
+        cout << "the face lm interpreter has been initialized Successfully!" << endl;
+
+    if (interpreter->AllocateTensors() != kTfLiteOk)
+    {
+        errorMsg = string("Failed to allocate tensor.");
+        return false;
+    }
+    //else
+        //cout << "Succeeded to allocate tensor!" << endl;
+
+    // Configure the interpreter
+    interpreter->SetAllowFp16PrecisionForFp32(true);
+    interpreter->SetNumThreads(4);
+    
+    // Get Input Tensor Dimensions
+    int inTensorIndex = interpreter->inputs()[0];
+    int channels = interpreter->tensor(inTensorIndex)->dims->data[3];
+    
+    // Copy image to input tensor
+    cv::Mat resized_image;  //, normal_image;
+    // Not need to perform the convertion from BGR to RGB by the noticeable statements,
+    // later it would be done in one trick way.
+    cv::resize(fixedImg, resized_image,
+               cv::Size(FACE_MESH_NET_INPUT_W, FACE_MESH_NET_INPUT_H), cv::INTER_NEAREST);
+    //fixedImg.release(); ???
+    
+    float* inTensorBuf = interpreter->typed_input_tensor<float>(inTensorIndex);
+    uint8_t* inImgMem = resized_image.ptr<uint8_t>(0);
+    FeedInWithQuanImage(inImgMem, inTensorBuf,
+                        FACE_MESH_NET_INPUT_H, FACE_MESH_NET_INPUT_W, channels);
+    resized_image.release();
+    //cout << "ProcessInputWithFloatModel() is executed successfully!" << endl;
+
+    // Inference
+    interpreter->Invoke();  // perform the inference
+    
+    //int output_conf_ID = interpreter->outputs()[6];  // confidence
+    float* sigmoidConfPtr = interpreter->typed_output_tensor<float>(1);
+    
+    float sigmoidConf = *sigmoidConfPtr;
+    
+    float confidence = 1.0 / (1.0 + exp(-sigmoidConf));
+    cout << "face confidence: " << confidence << endl;
+    if(confidence < confTh) // if confidence is too low, return immediately.
+    {
+        hasFace = false;
+        return true;
+    }
+    
+    faceInfo.confidence = confidence;
+    hasFace = true;
+
+    int output_lm_ID = interpreter->outputs()[0];
+    //cout << "output_landmarks ID: " << output_lm_ID << endl;
+    
+    float* LMOutBuffer = interpreter->typed_output_tensor<float>(0);
+
+    
+    //The values in lm_3d are measured in the input coordinate system of our tf lite model,
+    //i.e., the values are in the range: [0.0, 192.0].
+    //The values in lm_2d are measured in the coordinate system of the source image! ----???
+    
+    float lm_3d[NUM_PT_GENERAL_LM][3];
+    NormalLmSet normalLmSet;
+    extractOutputLM(LMOutBuffer,
+                    lm_3d, normalLmSet.normal_lm_2d);
+
+    //cout << "extractOutputLM() is well done!" << endl;
+    
+    //double LNorEyeBowPts[NUM_PT_EYE_REFINE_GROUP][2];
+    float* outBufLeftEyeRefinePts = interpreter->typed_output_tensor<float>(2);
+    extractEyeRefinePts(outBufLeftEyeRefinePts, normalLmSet.LNorEyeBowPts);
+    
+    //double RNorEyeBowPts[NUM_PT_EYE_REFINE_GROUP][2];
+    float* outBufRightEyeRefinePts = interpreter->typed_output_tensor<float>(3);
+    extractEyeRefinePts(outBufRightEyeRefinePts, normalLmSet.RNorEyeBowPts);
+    
+    //double NorLipRefinePts[NUM_PT_LIP_REFINE_GROUP][2];
+    float* outBufLipRefinePts = interpreter->typed_output_tensor<float>(1);
+    extractLipRefinePts(outBufLipRefinePts, normalLmSet.NorLipRefinePts);
+    
+    //----------------------***exit inference, postprocessing***----------------------------------
+    // reverse coordinate transform
+    faceInfo.imgWidth = srcImage.cols;
+    faceInfo.imgHeight = srcImage.rows;
+    
+    FaceInfo fixSpaceFI;
+    
+    CalcLmsInFixSpace(fixImgSize, normalLmSet, fixSpaceFI);
+    
+    AnnoGenKeyPoints(fixedImg, fixSpaceFI, true);
+
+    imwrite("glm_fixsp.png", fixedImg);
+    errorMsg = "OK";
+    
+    return true;
+}
+
+//-----------------------------------------------------------------------------------------------
+
+/******************************************************************************************
+convert the coordinates of LM extracted from the geo-fixed image into the coordinates
+of source image space.
+Cd: coordinate
+*******************************************************************************************/
+/*
+void PadCd2SrcCd_OnePt(const cv::Size& padImgS,
+                         double normalX, double normalY,
+                         int dx, int dy, Point2i& srcPt)
+{
+    srcPt.x = normalX * padImgS.width - dx;
+    srcPt.y = normalY * padImgS.height - dy;
+}
+
+// convert a set of points
+void PadCd2SrcCd_Group(const cv::Size& padImgS,
+                         int dx, int dy,
+                         const double normalPt[][2], int numPt, Point2i srcPt[])
+{
+    for(int i=0; i<numPt; i++)
+    {
+        // !!! 注意参数的顺序与定义时相同
+        // int与double在编译器看来是兼容的，人家不报错！
+        PadCd2SrcCd_OnePt(padImgS, normalPt[i][0], normalPt[i][1],
+                            dx, dy, srcPt[i]);
+    }
+}
+
+//TP, LP: the sizes of Top Padding and Left Padding
+//bboxTL: the top and left corner of face bbox meansured in the source image space.
+void PadCd2SrcCd_All(const cv::Size& padImgS, int TP, int LP,
+                     const Point2i& bboxTL,
+                         const NormalLmSet& normalLmSet,
+                         FaceInfo& srcSpaceFI)
+{
+    int dx = LP - bboxTL.x;
+    int dy = TP - bboxTL.y;
+    
+    PadCd2SrcCd_Group(padImgS, dx, dy,
+                      normalLmSet.normal_lm_2d, NUM_PT_GENERAL_LM, srcSpaceFI.lm_2d);
+
+    PadCd2SrcCd_Group(padImgS, dx, dy,
+                      normalLmSet.LNorEyeBowPts, NUM_PT_EYE_REFINE_GROUP, srcSpaceFI.lEyeRefinePts);
+    
+    PadCd2SrcCd_Group(padImgS, dx, dy,
+                      normalLmSet.RNorEyeBowPts, NUM_PT_EYE_REFINE_GROUP, srcSpaceFI.rEyeRefinePts);
+    
+    PadCd2SrcCd_Group(padImgS, dx, dy,
+                      normalLmSet.NorLipRefinePts, NUM_PT_LIP_REFINE_GROUP, srcSpaceFI.lipRefinePts);
+}
+*/
+
+void CalcLmsFixSp_OnePt(const cv::Size& fixImgS,
+                        double normalX, double normalY,
+                        Point2i& srcPt)
+{
+    srcPt.x = normalX * fixImgS.width;
+    srcPt.y = normalY * fixImgS.height;
+}
+
+// convert a set of points
+void CalcLmsFixSp_Group(const cv::Size& fixImgS,
+                         const double normalPt[][2], int numPt, Point2i srcPt[])
+{
+    for(int i=0; i<numPt; i++)
+    {
+        // !!! 注意参数的顺序与定义时相同
+        // int与double在编译器看来是兼容的，人家不报错！
+        CalcLmsFixSp_OnePt(fixImgS, normalPt[i][0], normalPt[i][1], srcPt[i]);
+    }
+}
+
+//TP, LP: the sizes of Top Padding and Left Padding
+//bboxTL: the top and left corner of face bbox meansured in the source image space.
+void CalcLmsInFixSpace(const cv::Size& fixImgS,
+                         const NormalLmSet& normalLmSet,
+                         FaceInfo& fixSpaceFI)
+{
+    CalcLmsFixSp_Group(fixImgS, normalLmSet.normal_lm_2d, NUM_PT_GENERAL_LM, fixSpaceFI.lm_2d);
+
+    /*
+    PadCd2SrcCd_Group(padImgS, dx, dy,
+                      normalLmSet.LNorEyeBowPts, NUM_PT_EYE_REFINE_GROUP, srcSpaceFI.lEyeRefinePts);
+    
+    PadCd2SrcCd_Group(padImgS, dx, dy,
+                      normalLmSet.RNorEyeBowPts, NUM_PT_EYE_REFINE_GROUP, srcSpaceFI.rEyeRefinePts);
+    
+    PadCd2SrcCd_Group(padImgS, dx, dy,
+                      normalLmSet.NorLipRefinePts, NUM_PT_LIP_REFINE_GROUP, srcSpaceFI.lipRefinePts);
+     */
+}
