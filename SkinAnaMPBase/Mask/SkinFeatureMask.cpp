@@ -188,7 +188,7 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     
     Point2i raisedFhCurve[NUM_PT_TOP_FH];
     int raisedPtIndices[NUM_PT_TOP_FH];
-    ForgeSkinMaskV3(faceInfo, mouthMask,
+    ForgeSkinMaskV4(faceInfo, mouthMask,
                     eyebrowsMask, eyesMask,
                     lowFaceMask,
                     skinMask, raisedFhCurve, raisedPtIndices);

@@ -16,6 +16,8 @@
 		265B7B9C28E5C9D2004F5E49 /* AnnoImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540028CD861C004CF77D /* AnnoImage.cpp */; };
 		2680A22E28EFC54B00A305EB /* FaceLmExtractV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2680A22C28EFC54B00A305EB /* FaceLmExtractV2.cpp */; };
 		2680A22F28EFC55A00A305EB /* FaceLmExtractV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2680A22C28EFC54B00A305EB /* FaceLmExtractV2.cpp */; };
+		2698A57328F19F2D006F3E9D /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 265B7B9728E5B26D004F5E49 /* libtensorflowlite.so */; };
+		2698A57428F19F38006F3E9D /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 265B7B9728E5B26D004F5E49 /* libtensorflowlite.so */; };
 		26B65A5E28EA92900019104F /* LowerFaceMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B65A5C28EA92900019104F /* LowerFaceMask.cpp */; };
 		26B65A5F28EA983E0019104F /* LowerFaceMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B65A5C28EA92900019104F /* LowerFaceMask.cpp */; };
 		26DB15F528D69DEE00F195CF /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 2602327828CCC52E00B11D7A /* libtensorflowlite.so */; };
@@ -38,8 +40,6 @@
 		CBDA6B9E28D55FDC00BE0756 /* HeadPoseEst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2602327528CCBFB100B11D7A /* HeadPoseEst.cpp */; };
 		CBDA6BA028D5603600BE0756 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540428CD8B34004CF77D /* Utils.cpp */; };
 		CBDBD7B128D561FF00F3AD03 /* LM_Exporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDBD7AF28D561FF00F3AD03 /* LM_Exporter.cpp */; };
-		CBE7710128F109FD005DC177 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CBD123FD28E58EEB004A42A9 /* libtensorflowlite.so */; };
-		CBE7710228F1111D005DC177 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CBD123FD28E58EEB004A42A9 /* libtensorflowlite.so */; };
 		CBF8FB7928E68DCB002B58B5 /* SkinFeatureMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBB5DB3E28DD5E97003CDED3 /* SkinFeatureMask.cpp */; };
 		CBF8FB7D28E68DFC002B58B5 /* ForeheadMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB1E2AB728DD99AB00F416DF /* ForeheadMask.cpp */; };
 		CBF8FB7F28E68DFC002B58B5 /* FundamentalMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBB5DB3C28DD5B3B003CDED3 /* FundamentalMask.cpp */; };
@@ -129,7 +129,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CBE7710128F109FD005DC177 /* libtensorflowlite.so in Frameworks */,
+				2698A57328F19F2D006F3E9D /* libtensorflowlite.so in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,7 +137,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CBE7710228F1111D005DC177 /* libtensorflowlite.so in Frameworks */,
+				2698A57428F19F38006F3E9D /* libtensorflowlite.so in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -589,12 +589,14 @@
 		CB255A9A28C7237A005C8A81 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 92XGFP9RCT;
 				EXCLUDED_ARCHS = "";
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/include",
-					/Users/meicet/nlohmann_json/include,
+					/Users/fuliye/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/lib,
@@ -616,12 +618,14 @@
 		CB255A9B28C7237A005C8A81 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 92XGFP9RCT;
 				EXCLUDED_ARCHS = "";
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/include",
-					/Users/meicet/nlohmann_json/include,
+					/Users/fuliye/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/lib,
@@ -648,7 +652,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/include",
-					/Users/meicet/nlohmann_json/include,
+					/Users/fuliye/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/lib,
@@ -675,7 +679,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/include",
-					/Users/meicet/nlohmann_json/include,
+					/Users/fuliye/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/lib,

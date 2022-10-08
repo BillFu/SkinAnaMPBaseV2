@@ -113,10 +113,52 @@ void ForgeSkinMaskV3(const FaceInfo& faceInfo,
 
 //-------------------------------------------------------------------------------------------
 
-void raise3PtsONJaw()
+bool isPtInMask(const Point2i& pt,
+                const Mat& mask)
 {
-    
+    if(mask.at<uchar>(pt) == 255)
+        return true;
+    else
+        return false;
 }
+
+void raisePtONJaw(Point2i& oriPt,
+                  const Mat& faceMask,
+                  int step)
+{
+    while(!isPtInMask(oriPt, faceMask))
+    {
+        oriPt.y -= step;
+    }
+}
+
+/*
+Point2i raisePtONJaw(const Point2i& oriPt,
+                  const Mat& faceMask,
+                  int step)
+{
+    Point2i raisePt(oriPt);
+    
+    while(!isPtInMask(raisePt, faceMask))
+    {
+        raisePt.y -= step;
+    }
+    
+    return raisePt;
+}
+
+void raise3PtsONJaw(const vector<Point2i> oriPts,
+                    const Mat& faceMask,
+                    int step,
+                    vector<Point2i> raisedPts)
+{
+    for(Point2i oriPt: oriPts)
+    {
+        Point2i raisedPt = raisePtONJaw(oriPt, faceMask, step);
+        raisedPts.push_back(raisedPt);
+    }
+}
+*/
 
 void ForgeSkinPgV4(const FaceInfo& faceInfo,
                    const Mat& lowFaceMask,
@@ -128,8 +170,9 @@ void ForgeSkinPgV4(const FaceInfo& faceInfo,
     // 36 points in silhouette
     int silhouette[] = {
         10,  338, 297, 332, 301, 368, 454, 323, 361, 288,
-        397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136,
-        172, 58,  132, 93,  234, 139, 71,  54,  103, 67,  109
+        397, 365, 379, 378, 369, 377, 152, 148, 176, 149,
+        150, 136, 172, 58,  132, 93,  234, 139, 71,  54,
+        103, 67,  109
     };
     
     int num_pts = sizeof(silhouette) / sizeof(int);
@@ -154,7 +197,14 @@ void ForgeSkinPgV4(const FaceInfo& faceInfo,
         }
     }
     
+    int upStep = faceInfo.imgWidth / 1000;
     // 修正下巴底缘的三点：377, 152, 148, 使其坐标位于脸部之内
+    raisePtONJaw(newSilhouPts[15], // pt377
+                 lowFaceMask, upStep);
+    raisePtONJaw(newSilhouPts[16], // pt152
+                 lowFaceMask, upStep);
+    raisePtONJaw(newSilhouPts[17], // pt148
+                 lowFaceMask, upStep);
     
     for(int i = 0; i<num_pts-4; i++) // from 10, 338 ... to 139, 71
     {
@@ -189,7 +239,7 @@ void ForgeSkinMaskV4(const FaceInfo& faceInfo,
 {
     POLYGON coarsePolygon, refinedPolygon;
 
-    ForgeSkinPgV4(faceInfo, coarsePolygon,
+    ForgeSkinPgV4(faceInfo, lowFaceMask, coarsePolygon,
                        raisedFhCurve, raisedPtIndices);
     
     int csNumPoint = 200;
@@ -197,6 +247,7 @@ void ForgeSkinMaskV4(const FaceInfo& faceInfo,
 
     DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
     
+    /*
     // calculate the lower cut line:
     Point2i pt61 = faceInfo.lm_2d[61];
     Point2i pt291 = faceInfo.lm_2d[291];
@@ -206,6 +257,7 @@ void ForgeSkinMaskV4(const FaceInfo& faceInfo,
     int h = faceInfo.imgHeight - y;
     Rect lowCutRect(0, y, w, h);
     lowFaceMask(lowCutRect).copyTo(outMask(lowCutRect));
+    */
     
     outMask = outMask & (~mouthMask) & (~eyebrowMask) & (~eyeMask);
 }
