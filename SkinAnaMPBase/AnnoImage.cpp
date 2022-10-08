@@ -42,6 +42,7 @@ void AnnoGenKeyPoints(Mat& annoImage, const FaceInfo& faceInfo, bool showIndices
 {
     cv::Scalar yellow(0, 255, 255); // (B, G, R)
     cv::Scalar blue(255, 0, 0);
+    /*
     for(int i = 0; i < 468; i++)
     {
         // cv::Point center(faceInfo.lm_2d[i].x, faceInfo.lm_2d[i].y);
@@ -52,6 +53,7 @@ void AnnoGenKeyPoints(Mat& annoImage, const FaceInfo& faceInfo, bool showIndices
                         FONT_HERSHEY_SIMPLEX, 0.5, blue, 1);
         }
     }
+    */
     
     // 对应Dlib上点的序号为18, 22, 23, 27, 37, 40, 43, 46, 32, 36, 49, 55, 58, 9
     int face_2d_pts_indices[] = {46, 55, 285, 276, 33, 173,
@@ -60,11 +62,10 @@ void AnnoGenKeyPoints(Mat& annoImage, const FaceInfo& faceInfo, bool showIndices
     for(int i=0; i<14; i++)
     {
         int lm_index = face_2d_pts_indices[i];
-        int x = faceInfo.lm_2d[lm_index].x;
-        int y = faceInfo.lm_2d[lm_index].y;
+        cv::circle(annoImage, faceInfo.lm_2d[lm_index], 5, yellow, cv::FILLED);
         
-        cv::Point center(x, y);
-        cv::circle(annoImage, center, 5, yellow, cv::FILLED);
+        cv::putText(annoImage, to_string(lm_index), faceInfo.lm_2d[lm_index],
+                    FONT_HERSHEY_SIMPLEX, 0.5, blue, 1);
     }
 }
 

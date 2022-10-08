@@ -38,6 +38,26 @@ void ForgeSkinMaskV3(const FaceInfo& faceInfo,
                      const Mat& mouthMask,
                      const Mat& eyebrowMask,
                      const Mat& eyeMask,
+                     const Mat& lowFaceMask,
+                     Mat& outMask,
+                     //---the following items are used for debugging, output
+                     Point2i raisedFhCurve[NUM_PT_TOP_FH],
+                     int raisedPtIndices[NUM_PT_TOP_FH]);
+
+//-------------------------------------------------------------------------------------------
+
+void ForgeSkinPgV4(const FaceInfo& faceInfo,
+                   const Mat& lowFaceMask,
+                   POLYGON& skinPolygon,
+                        Point2i raisedFhCurve[NUM_PT_TOP_FH], // for debugging, output
+                        int raisedPtIndices[NUM_PT_TOP_FH]    //for debugging, output
+);
+
+void ForgeSkinMaskV4(const FaceInfo& faceInfo,
+                     const Mat& mouthMask,
+                     const Mat& eyebrowMask,
+                     const Mat& eyeMask,
+                     const Mat& lowFaceMask,
                      Mat& outMask,
                      //---the following items are used for debugging, output
                      Point2i raisedFhCurve[NUM_PT_TOP_FH],

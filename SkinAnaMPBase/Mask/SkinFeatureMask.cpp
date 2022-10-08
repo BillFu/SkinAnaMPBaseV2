@@ -190,6 +190,7 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     int raisedPtIndices[NUM_PT_TOP_FH];
     ForgeSkinMaskV3(faceInfo, mouthMask,
                     eyebrowsMask, eyesMask,
+                    lowFaceMask,
                     skinMask, raisedFhCurve, raisedPtIndices);
     
     cv::Scalar yellow(0, 255, 255); // (B, G, R)
@@ -305,7 +306,7 @@ void ForgeMaskAnnoPackV2(const Mat& srcImage,
     int raisedPtIndices[NUM_PT_TOP_FH];
     ForgeSkinMaskV3(faceInfo, mouthMask,
                     eyebrowsMask, eyesMask,
-                    skinMask,
+                    lowFaceMask, skinMask,
                     raisedFhCurve, raisedPtIndices);
     OverlayMaskOnImage(srcImage, skinMask,
                        "Skin Mask", skinMaskImgFile.c_str());
