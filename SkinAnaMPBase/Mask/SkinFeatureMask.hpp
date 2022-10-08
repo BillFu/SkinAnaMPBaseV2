@@ -79,10 +79,12 @@ void ForgeMaskAnnoPackV2(const Mat& srcImage,
                          const FaceSegResult& segResult);
 
 //-------------------------------------------------------------------------------------------
+/*
 void ForgeSkinMaskV2(const FaceInfo& faceInfo,
                      const Mat& mouthMask,
                      const Mat& eyebrowMask,
                      const Mat& eyeMask,
                      Mat& outMask);
+*/
 
 #endif /* end of SKIN_FEATURE_MASK_HPP */

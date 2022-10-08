@@ -34,7 +34,7 @@ Mat ContourGroup2Mask(int img_width, int img_height, const POLYGON_GROUP& contou
 ***********************************************************************************************/
 //void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon);
 
-void ForgeSkinPolygonV2(const FaceInfo& faceInfo, POLYGON& skinPolygon);
+//void ForgeSkinPolygonV2(const FaceInfo& faceInfo, POLYGON& skinPolygon);
 
 //-------------------------------------------------------------------------------------------
 

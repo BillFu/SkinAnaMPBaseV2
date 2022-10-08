@@ -88,6 +88,7 @@ void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon)
     }
 }
 */
+/*
 void ForgeSkinPolygonV2(const FaceInfo& faceInfo, POLYGON& skinPolygon)
 {
 #define NUM_PT_SILH  34
@@ -101,7 +102,8 @@ void ForgeSkinPolygonV2(const FaceInfo& faceInfo, POLYGON& skinPolygon)
     int num_pts = sizeof(silhouette) / sizeof(int);
     
     Point2i raisedFhCurve[NUM_PT_TOP_FH];
-    RaiseupForeheadCurve(faceInfo.lm_2d, raisedFhCurve, 0.8);
+    int raisedPtIndices[NUM_PT_TOP_FH];
+    RaiseupFhCurve(faceInfo.lm_2d, raisedFhCurve, raisedPtIndices, 0.8);
 
     // calculate the new version of coordinates of Points on face silhouette.
     Point2i newSilhouPts[NUM_PT_SILH];
@@ -120,14 +122,6 @@ void ForgeSkinPolygonV2(const FaceInfo& faceInfo, POLYGON& skinPolygon)
         }
     }
     
-    /*
-    for(int i = 0; i<num_pts; i++)
-    {
-        skinPolygon.push_back(newSilhouPts[i]);
-    }
-    */
-    
-    
     for(int i = 0; i<num_pts-4; i++) // from 10, 338 ... to 139, 71
     {
         skinPolygon.push_back(newSilhouPts[i]);
@@ -143,6 +137,7 @@ void ForgeSkinPolygonV2(const FaceInfo& faceInfo, POLYGON& skinPolygon)
     skinPolygon.push_back(newSilhouPts[num_pts-1]); // 109
 
 }
+*/
 //-------------------------------------------------------------------------------------------
 
 void ForgeMouthPolygon(const FaceInfo& faceInfo,
@@ -181,6 +176,7 @@ void ForgeMouthPolygon(const FaceInfo& faceInfo,
 }
 
 //-------------------------------------------------------------------------------------------
+/*
 void ForgeSkinMask(const FaceInfo& faceInfo, Mat& outMask)
 {
     POLYGON coarsePolygon, refinedPolygon;
@@ -192,6 +188,7 @@ void ForgeSkinMask(const FaceInfo& faceInfo, Mat& outMask)
 
     DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
 }
+*/
 
 /*
 // face mask below the eyes, 在鼻子部位向上凸出，接近额头

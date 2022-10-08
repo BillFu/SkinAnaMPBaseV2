@@ -34,8 +34,12 @@ Output: raisedForeheadCurve
 void RaiseupForeheadCurve(const Point2i lm_2d[468], int raisedFhCurve[9][2],
                           float alpha);
 
-void RaiseupForeheadCurve(const Point2i lm_2d[468], Point2i raisedFhCurve[9], float alpha);
-
+//void RaiseupForeheadCurve(const Point2i lm_2d[468], Point2i raisedFhCurve[9], float alpha);
+// Fh: forehead
+void RaiseupFhCurve(const Point2i lm_2d[468],
+                          Point2i raisedFhCurve[NUM_PT_TOP_FH],
+                          int raisedPtIndices[NUM_PT_TOP_FH],
+                    float alpha);
 //-------------------------------------------------------------------------------------------
 /**********************************************************************************************
 Pg: Polygon

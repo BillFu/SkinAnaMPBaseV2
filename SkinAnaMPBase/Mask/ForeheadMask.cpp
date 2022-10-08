@@ -75,8 +75,10 @@ void RaiseupForeheadCurve(const Point2i lm_2d[468], int raisedFhCurve[NUM_PT_TOP
  Output: raisedForeheadCurve
  alpha: [0.0 1.0]，the greater this value is, the more raised up
  *******************************************************************************************/
-void RaiseupForeheadCurve(const Point2i lm_2d[468],
-                          Point2i raisedFhCurve[NUM_PT_TOP_FH], float alpha)
+void RaiseupFhCurve(const Point2i lm_2d[468],
+                          Point2i raisedFhCurve[NUM_PT_TOP_FH],
+                          int raisedPtIndices[NUM_PT_TOP_FH],
+                          float alpha)
 {
     // 前额顶部轮廓线由9个lm点组成。这9个点组成第0排点集，比它们低一些的9个点组成第1排点集。
     // 抬高后获得的9个点组成-1排点集。
@@ -87,6 +89,7 @@ void RaiseupForeheadCurve(const Point2i lm_2d[468],
     {
         int id_row0 = zero_row_indices[i];
         int id_row1 = one_row_indices[i];
+        raisedPtIndices[i] = id_row0;
         
         int yi_0 = lm_2d[id_row0].y;
         int xi_0 = lm_2d[id_row0].x;
@@ -132,7 +135,8 @@ void ForgeForeheadPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
     Point2i pt297a = IpGLmPtWithPair(faceInfo, 297, 332, 0.60);
     
     Point2i raisedFhPts[NUM_PT_TOP_FH];
-    RaiseupForeheadCurve(faceInfo.lm_2d, raisedFhPts, 0.7);
+    int raisedPtIndices[NUM_PT_TOP_FH];
+    RaiseupFhCurve(faceInfo.lm_2d, raisedFhPts, raisedPtIndices, 0.7);
 
     Point2i pt67r = raisedFhPts[2];
     Point2i pt109r = raisedFhPts[3];
@@ -216,7 +220,8 @@ void ForgeExpFhPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
     Point2i pt297a = IpGLmPtWithPair(faceInfo, 297, 332, 0.60);
     
     Point2i raisedFhPts[NUM_PT_TOP_FH];
-    RaiseupForeheadCurve(faceInfo.lm_2d, raisedFhPts, 0.7);
+    int raisedPtIndices[NUM_PT_TOP_FH];
+    RaiseupFhCurve(faceInfo.lm_2d, raisedFhPts, raisedPtIndices, 0.7);
 
     Point2i pt67r = raisedFhPts[2];
     Point2i pt109r = raisedFhPts[3];

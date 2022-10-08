@@ -26,6 +26,7 @@ Date:   2022/9/23
 #include "../AnnoImage.hpp"
 #include "../FaceBgSeg/FaceBgSeg.hpp"
 #include "../BSpline/ParametricBSpline.hpp"
+#include "SkinMask.hpp"
 
 
 namespace fs = std::filesystem;
@@ -185,9 +186,24 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     string skinMaskImgFile = BuildOutImgFileName(outDir,
                              fileNameBone, "skinMask_");
     
-    ForgeSkinMaskV2(faceInfo, mouthMask,
+    Point2i raisedFhCurve[NUM_PT_TOP_FH];
+    int raisedPtIndices[NUM_PT_TOP_FH];
+    ForgeSkinMaskV3(faceInfo, mouthMask,
                     eyebrowsMask, eyesMask,
-                    skinMask);
+                    skinMask, raisedFhCurve, raisedPtIndices);
+    
+    cv::Scalar yellow(0, 255, 255); // (B, G, R)
+    cv::Scalar blue(255, 0, 0);
+    for(int i = 0; i < NUM_PT_TOP_FH; i++)
+    {
+        // cv::Point center(faceInfo.lm_2d[i].x, faceInfo.lm_2d[i].y);
+        cv::circle(annoLmImage, raisedFhCurve[i], 5, blue, cv::FILLED);
+        
+        string caption = to_string(raisedPtIndices[i]) + "r";
+        cv::putText(annoLmImage, caption, raisedFhCurve[i],
+                        FONT_HERSHEY_SIMPLEX, 0.5, blue, 1);
+    }
+    
     OverlayMaskOnImage(annoLmImage, skinMask,
                        "Skin Mask", skinMaskImgFile.c_str());
 }
@@ -197,6 +213,7 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
 /**********************************************************************************************
 本函数构建skinMask，挖掉眉毛、嘴唇、眼睛等区域。
 ***********************************************************************************************/
+/*
 void ForgeSkinMaskV2(const FaceInfo& faceInfo,
                      const Mat& mouthMask,
                      const Mat& eyebrowMask,
@@ -214,6 +231,7 @@ void ForgeSkinMaskV2(const FaceInfo& faceInfo,
     
     outMask = outMask & (~mouthMask) & (~eyebrowMask) & (~eyeMask);
 }
+*/
 
 //-------------------------------------------------------------------------------------------
 /**********************************************************************************************
@@ -282,9 +300,13 @@ void ForgeMaskAnnoPackV2(const Mat& srcImage,
     Mat skinMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string skinMaskImgFile = BuildOutImgFileName(outDir,
                              fileNameBone, "skinMask_");
-    ForgeSkinMaskV2(faceInfo, mouthMask,
+    
+    Point2i raisedFhCurve[NUM_PT_TOP_FH];
+    int raisedPtIndices[NUM_PT_TOP_FH];
+    ForgeSkinMaskV3(faceInfo, mouthMask,
                     eyebrowsMask, eyesMask,
-                    skinMask);
+                    skinMask,
+                    raisedFhCurve, raisedPtIndices);
     OverlayMaskOnImage(srcImage, skinMask,
                        "Skin Mask", skinMaskImgFile.c_str());
 }
