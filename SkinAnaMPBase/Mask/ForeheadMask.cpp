@@ -17,13 +17,11 @@ Date:   2022/9/23
 #include "FundamentalMask.hpp"
 
 
+
 // 前额顶部轮廓线由9个lm点组成。这9个点组成第0排点集，比它们低一些的9个点组成第1排点集。
 // 抬高后获得的9个点组成-1排点集。
-//vector<int> one_row_indices{68, 104, 69, 108, 151, 337, 299, 333, 298};
-//vector<int> zero_row_indices{54, 103, 67, 109, 10,  338, 297, 332, 284};  // 第0排才是MP提取出的前额顶部轮廓线
-
-vector<int> one_row_indices{104, 69, 108, 151, 337, 299, 333 };
-vector<int> zero_row_indices{ 103, 67, 109, 10,  338, 297, 332};  // 第0排才是MP提取出的前额顶部轮廓线
+vector<int> one_row_indices{68, 104, 69, 108, 151, 337, 299, 333, 298};
+vector<int> zero_row_indices{54, 103, 67, 109, 10,  338, 297, 332, 284};  // 第0排才是MP提取出的前额顶部轮廓线
 
 // 如果点在前额顶部轮廓线上，返回它在轮廓线点集中的index；否则返回-1
 int getPtIndexOfFHCurve(int ptIndex)
@@ -45,16 +43,14 @@ int getPtIndexOfFHCurve(int ptIndex)
  Output: raisedForeheadCurve
  alpha: [0.0 1.0]，the greater this value is, the more raised up
  *******************************************************************************************/
-void RaiseupForeheadCurve(const Point2i lm_2d[468], int raisedFhCurve[7][2], float alpha)
+void RaiseupForeheadCurve(const Point2i lm_2d[468], int raisedFhCurve[NUM_PT_TOP_FH][2], float alpha)
 {
     // 前额顶部轮廓线由9个lm点组成。这9个点组成第0排点集，比它们低一些的9个点组成第1排点集。
     // 抬高后获得的9个点组成-1排点集。
     // 所有的lm indices以0为起始（id为0的点是“人中”穴位的最低点，V字沟的谷底）
     // 边缘的抬升效果要逐渐减弱，还要考虑x值向中央收拢一些。
     
-    //int raisedPtsY[9]; // the Y values of the -1 row
-    //int raisedPtsX[9]; // the X values of the -1 row
-    for(int i = 0; i<7; i++)
+    for(int i = 0; i<NUM_PT_TOP_FH; i++)
     {
         int id_row0 = zero_row_indices[i];
         int id_row1 = one_row_indices[i];
@@ -79,16 +75,15 @@ void RaiseupForeheadCurve(const Point2i lm_2d[468], int raisedFhCurve[7][2], flo
  Output: raisedForeheadCurve
  alpha: [0.0 1.0]，the greater this value is, the more raised up
  *******************************************************************************************/
-void RaiseupForeheadCurve(const Point2i lm_2d[468], Point2i raisedFhCurve[7], float alpha)
+void RaiseupForeheadCurve(const Point2i lm_2d[468],
+                          Point2i raisedFhCurve[NUM_PT_TOP_FH], float alpha)
 {
     // 前额顶部轮廓线由9个lm点组成。这9个点组成第0排点集，比它们低一些的9个点组成第1排点集。
     // 抬高后获得的9个点组成-1排点集。
     // 所有的lm indices以0为起始（id为0的点是“人中”穴位的最低点，V字沟的谷底）
     // 边缘的抬升效果要逐渐减弱，还要考虑x值向中央收拢一些。
     
-    //int raisedPtsY[9]; // the Y values of the -1 row
-    //int raisedPtsX[9]; // the X values of the -1 row
-    for(int i = 0; i<7; i++)
+    for(int i = 0; i<NUM_PT_TOP_FH; i++)
     {
         int id_row0 = zero_row_indices[i];
         int id_row1 = one_row_indices[i];
@@ -107,9 +102,9 @@ void RaiseupForeheadCurve(const Point2i lm_2d[468], Point2i raisedFhCurve[7], fl
     }
     
     //把10点再升高一点点， 把109和338稍微升一点
-    raisedFhCurve[3].y -= raisedFhCurve[3].y* 0.06;
-    raisedFhCurve[2].y -= raisedFhCurve[2].y* 0.04; // 109
-    raisedFhCurve[4].y -= raisedFhCurve[4].y* 0.04; // 338
+    raisedFhCurve[4].y -= raisedFhCurve[4].y* 0.06;
+    raisedFhCurve[3].y -= raisedFhCurve[3].y* 0.04; // 109
+    raisedFhCurve[5].y -= raisedFhCurve[5].y* 0.04; // 338
 }
 //-------------------------------------------------------------------------------------------
 
@@ -136,7 +131,7 @@ void ForgeForeheadPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
     Point2i pt67a = IpGLmPtWithPair(faceInfo, 67, 103, 0.60);
     Point2i pt297a = IpGLmPtWithPair(faceInfo, 297, 332, 0.60);
     
-    Point2i raisedFhPts[9];
+    Point2i raisedFhPts[NUM_PT_TOP_FH];
     RaiseupForeheadCurve(faceInfo.lm_2d, raisedFhPts, 0.7);
 
     Point2i pt67r = raisedFhPts[2];
@@ -220,7 +215,7 @@ void ForgeExpFhPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
     Point2i pt67a = IpGLmPtWithPair(faceInfo, 67, 103, 0.60);
     Point2i pt297a = IpGLmPtWithPair(faceInfo, 297, 332, 0.60);
     
-    Point2i raisedFhPts[9];
+    Point2i raisedFhPts[NUM_PT_TOP_FH];
     RaiseupForeheadCurve(faceInfo.lm_2d, raisedFhPts, 0.7);
 
     Point2i pt67r = raisedFhPts[2];

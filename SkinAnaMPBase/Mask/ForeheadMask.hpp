@@ -20,6 +20,8 @@ Date:   2022/9/23
 using namespace std;
 using namespace cv;
 
+#define NUM_PT_TOP_FH  9   // the number of points on the top line of forehead
+
 // 如果点在前额顶部轮廓线上，返回它在轮廓线点集中的index；否则返回-1
 int getPtIndexOfFHCurve(int ptIndex);
 

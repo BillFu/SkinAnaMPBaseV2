@@ -90,18 +90,21 @@ void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon)
 */
 void ForgeSkinPolygonV2(const FaceInfo& faceInfo, POLYGON& skinPolygon)
 {
+#define NUM_PT_SILH  34
+    // 36 points in silhouette
     int silhouette[] = {
-        10,  338, 297, 332, 284, 301, 368, 454, 323, 361, 288,
-        397, 365, 379, 378, 400, 428, 199, 208, 176, 149, 150, 136,
-        172, 58,  132, 93,  234, 127, 139, 71, 54,  103, 67,  109};
+        10,  338, 297, 332, 284, 301, 356, 454, 323, 361, 288,
+        397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136,
+        172, 58,  132, 93,  234, 127, 71,  54,  103, 67,  109
+    };
     
     int num_pts = sizeof(silhouette) / sizeof(int);
     
-    int raisedFhCurve[9][2];
+    Point2i raisedFhCurve[NUM_PT_TOP_FH];
     RaiseupForeheadCurve(faceInfo.lm_2d, raisedFhCurve, 0.8);
 
     // calculate the new version of coordinates of Points on face silhouette.
-    int newSilhouPts[36][2];
+    Point2i newSilhouPts[NUM_PT_SILH];
     for(int i = 0; i<num_pts; i++)
     {
         int index = silhouette[i];
@@ -109,22 +112,36 @@ void ForgeSkinPolygonV2(const FaceInfo& faceInfo, POLYGON& skinPolygon)
         
         if(indexInFHC == -1) // Not on Forehead Curve
         {
-            newSilhouPts[i][0] = faceInfo.lm_2d[index].x;
-            newSilhouPts[i][1] = faceInfo.lm_2d[index].y;
+            newSilhouPts[i] = faceInfo.lm_2d[index];
         }
         else // on Forehead Curve, need update the coordinates, i.e. raising up
         {
-            newSilhouPts[i][0] = raisedFhCurve[indexInFHC][0];
-            newSilhouPts[i][1] = raisedFhCurve[indexInFHC][1];
+            newSilhouPts[i] = raisedFhCurve[indexInFHC];
         }
     }
     
+    /*
     for(int i = 0; i<num_pts; i++)
     {
-        int x = newSilhouPts[i][0];
-        int y = newSilhouPts[i][1];
-        skinPolygon.push_back(Point2i(x, y));
+        skinPolygon.push_back(newSilhouPts[i]);
     }
+    */
+    
+    
+    for(int i = 0; i<num_pts-4; i++) // from 10, 338 ... to 139, 71
+    {
+        skinPolygon.push_back(newSilhouPts[i]);
+    }
+    
+    Point2i pt54 = newSilhouPts[num_pts-4];
+    Point2i pt103 = newSilhouPts[num_pts-3];
+    
+    //Point2i pt54p = Interpolate(pt54, pt103, 0.65);
+
+    skinPolygon.push_back(pt103);
+    skinPolygon.push_back(newSilhouPts[num_pts-2]); // 67
+    skinPolygon.push_back(newSilhouPts[num_pts-1]); // 109
+
 }
 //-------------------------------------------------------------------------------------------
 

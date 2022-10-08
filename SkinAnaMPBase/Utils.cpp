@@ -11,6 +11,7 @@ Date:   2022/9/11
 #include <array>
 #include <limits>
 #include "Common.hpp"
+#include <float.h>
 
 // return a string that present a float with 2 decimal digits.
 // for example, return "3.14" for 3.1415927
@@ -159,7 +160,7 @@ void FeedPadImgToNet(const cv::Mat& resizedPadImg, float* inTensorBuf)
     rpImgRGB.convertTo(quanImg, CV_32FC3, 1.0 / 127.5, -1.0);
     uint8_t* inImgMem = quanImg.ptr<uint8_t>(0);
     int sqSize = resizedPadImg.rows * resizedPadImg.cols;
-    long totalBytes = sqSize*3*sizeof(float32_t);
+    long totalBytes = sqSize*3*4;  // 4 == sizeof(float32_t);
     memcpy(inTensorBuf, inImgMem, totalBytes);
 }
 
