@@ -152,11 +152,12 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     //                    "nose bell mask", noseBellMaskFile.c_str());
     
 
-    //string fleMaskAnnoFile = config_json.at("FaceLowThEyeImage");
+    //string fleMaskFile = BuildOutImgFileName(outDir,
+    //                         fileNameBone, "flm_");
     Mat lowFaceMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgeLowerFaceMask(segResult, fbBiLab, lowFaceMask);
-    //OverlayMaskOnImage(annoImage2, fleMask,
-    //                    "face low th eye", fleMaskAnnoFile.c_str());
+    //OverlayMaskOnImage(annoImage2, lowFaceMask,
+    //                    "face low mask", fleMaskFile.c_str());
 
     string expFhMaskFile = BuildOutImgFileName(outDir,
                              fileNameBone, "efh_");
@@ -188,7 +189,10 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     
     Point2i raisedFhCurve[NUM_PT_TOP_FH];
     int raisedPtIndices[NUM_PT_TOP_FH];
-    ForgeSkinMaskV4(faceInfo, mouthMask,
+    
+    //TestMaskV5(faceInfo, fbBiLab, srcImage);
+    
+    ForgeSkinMaskV5(faceInfo, mouthMask,
                     eyebrowsMask, eyesMask,
                     lowFaceMask,
                     skinMask, raisedFhCurve, raisedPtIndices);
@@ -207,6 +211,7 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     
     OverlayMaskOnImage(annoLmImage, skinMask,
                        "Skin Mask", skinMaskImgFile.c_str());
+    
 }
 
 //-------------------------------------------------------------------------------------------

@@ -23,6 +23,8 @@ namespace fs = std::filesystem;
 
 string openCVType2str(int type);
 
+bool isInImg(const Point2i& pt, int cols, int rows);
+
 /**********************************************************************************************
 RC: rows and cols
 the rows and cols of the out image can be divied by 4
