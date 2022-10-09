@@ -125,8 +125,8 @@ int main(int argc, char **argv)
     //AnnoAllLmInfo(annoLmImage, faceInfo, annoLmImgFile);
 
     Scalar yellowColor(255, 0, 0);
-    //AnnoTwoEyeRefinePts(annoLmImage, faceInfo, yellowColor, true);
-    AnnoGenKeyPoints(annoLmImage, faceInfo, true);
+    AnnoTwoEyeRefinePts(annoLmImage, faceInfo, yellowColor, true);
+    //AnnoGenKeyPoints(annoLmImage, faceInfo, true);
 
     string annoLmImgFile = BuildOutImgFileName(
             outParePath, fileBoneName, "lm_");

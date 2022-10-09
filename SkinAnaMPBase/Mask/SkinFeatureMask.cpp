@@ -102,31 +102,18 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     // 0 for bg, 255 for face, in source space.
     //Mat fbBiLab = FaceBgSegmentor::CalcFaceBgBiLabel(segResult);
     Mat fbBiLab = FaceBgSegmentor::CalcFBBiLabExBeard(segResult);
-    
-    /*
-    Mat skinMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    string faceMaskImgFile = BuildOutImgFileName(outDir,
-                             fileNameBone, "fc_");
-    ForgeSkinMask(faceInfo, skinMask);
-    //OverlayMaskOnImage(annoLmImage, skinMask,
-     //                   "face_contour", faceMaskImgFile.c_str());
-    */
 
     Mat mouthMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string mouthMaskImgFile = BuildOutImgFileName(outDir,
                              fileNameBone, "mc_");
     float expanRatio = 0.3;
     ForgeMouthMask(faceInfo, expanRatio, mouthMask);
-    //OverlayMaskOnImage(srcImage, mouthMask,
-     //               "mouth_contour", mouthMaskImgFile.c_str());
-
+    
     Mat eyebrowsMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string ebsMaskImgFile = BuildOutImgFileName(outDir,
                              fileNameBone, "ebc_");
     ForgeEyebrowsMask(faceInfo, eyebrowsMask);
-    //OverlayMaskOnImage(annoLmImage, eyebowsMask,
-    //                    "eyebows_contour", ebsMaskImgFile.c_str());
-
+    
     Mat eyesMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string eyeMaskImgFile = BuildOutImgFileName(outDir,
                              fileNameBone, "eye_");
@@ -138,41 +125,26 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     string eyeFullMaskImgFile = BuildOutImgFileName(outDir,
                              fileNameBone, "efc_");
     ForgeEyesFullMask(faceInfo, eyesFullMask);
-    //OverlayMaskOnImage(annoLmImage, eyesFullMask,
-    //                    "eye_full_contour", eyeFullMaskImgFile.c_str());
-
-    Mat annoImage2 = srcImage.clone();
-    AnnoGenKeyPoints(annoImage2, faceInfo, true);
     
     string noseBellMaskFile = BuildOutImgFileName(outDir,
                              fileNameBone, "nb_");
     Mat noseBellMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgeNoseBellMask(faceInfo, noseBellMask);
-    //OverlayMaskOnImage(annoImage2, noseBellMask,
-    //                    "nose bell mask", noseBellMaskFile.c_str());
     
-
-    //string fleMaskFile = BuildOutImgFileName(outDir,
-    //                         fileNameBone, "flm_");
     Mat lowFaceMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgeLowerFaceMask(segResult, fbBiLab, lowFaceMask);
-    //OverlayMaskOnImage(annoImage2, lowFaceMask,
-    //                    "face low mask", fleMaskFile.c_str());
-
+    
     string expFhMaskFile = BuildOutImgFileName(outDir,
                              fileNameBone, "efh_");
     Mat expFhMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgeExpFhMask(faceInfo, fbBiLab, expFhMask);
-    AnnoGenKeyPoints(annoImage2, faceInfo, true);
-    //OverlayMaskOnImage(annoImage2, expFhMask,
-    //                    "expand Fh mask", expFhMaskFile.c_str());
-
+    
     string poreMaskAnnoFile = BuildOutImgFileName(outDir,
                              fileNameBone, "pore_");
     Mat poreMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgePoreMaskV3(faceInfo, lowFaceMask, expFhMask, eyesFullMask,
                     mouthMask, poreMask);
-    OverlayMaskOnImage(annoImage2, poreMask,
+    OverlayMaskOnImage(annoLmImage, poreMask,
                         "pore mask", poreMaskAnnoFile.c_str());
     
     string wrkMaskAnnoFile = BuildOutImgFileName(outDir,
@@ -180,7 +152,7 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     Mat wrkMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgeWrinkleMask(faceInfo, lowFaceMask, expFhMask, eyesFullMask,
                     noseBellMask, wrkMask);
-    OverlayMaskOnImage(annoImage2, wrkMask,
+    OverlayMaskOnImage(annoLmImage, wrkMask,
                         "wrinkle mask", wrkMaskAnnoFile.c_str());
     
     Mat skinMask(srcImgS, CV_8UC1, cv::Scalar(0));

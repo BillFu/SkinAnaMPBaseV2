@@ -105,9 +105,11 @@ void ProOneImg(const string& srcImgFile,
     
     Mat annoLmImage = srcImage.clone();
     
-    string lmImgFile = "pose_" + fileNameBone + ".png";
-    fs::path lmImgFullPath = outDir / lmImgFile;
-    AnnoAllLmInfo(annoLmImage, faceInfo, lmImgFullPath.string());
+    //string lmImgFile = "pose_" + fileNameBone + ".png";
+    //fs::path lmImgFullPath = outDir / lmImgFile;
+    //AnnoAllLmInfo(annoLmImage, faceInfo, lmImgFullPath.string());
+    Scalar blue(255, 0, 0);
+    AnnoTwoEyeRefinePts(annoLmImage, faceInfo, blue, true);
     
     string fileBoneName = GetFileBoneName(srcImgFile);
     ForgeMaskAnnoPackDebug(srcImage, annoLmImage,
