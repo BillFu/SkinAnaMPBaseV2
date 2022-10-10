@@ -28,7 +28,6 @@ Point2i getPtOnEb(const FaceInfo& faceInfo, EyeID eyeID, int ptIndex)
     }
 }
 
-
 // return new interpolated No.64 point, can be applied to two eyes!
 // make No.64 moved toward the outside of face a bit.
 // Ip is the abbrevation for Interpolate
@@ -43,7 +42,7 @@ Point2i IpPtwithPair(const FaceInfo& faceInfo, EyeID eyeID, int pIndex1, int pIn
 }
 
 // Note: Only forge One!!!
-void ForgeOneEbPg(const FaceInfo& faceInfo, EyeID eyeID, POLYGON& rightEbPg)
+void ForgeBrowPg(const FaceInfo& faceInfo, EyeID eyeID, POLYGON& rightEbPg)
 {
     // 采用Eye Refine Region的点，左眉毛、右眉毛的坐标索引是相同的！
     //int eyeBowPtIndices[] = {i69, i68, i67, 66, 65, 64, 50, 43, 45};
@@ -84,15 +83,15 @@ void ForgeOneEbPg(const FaceInfo& faceInfo, EyeID eyeID, POLYGON& rightEbPg)
 
 /******************************************************************************************
 *******************************************************************************************/
-void ForgeEyebrowsMask(const FaceInfo& faceInfo, Mat& outMask)
+void ForgeBrowsMask(const FaceInfo& faceInfo, Mat& outMask)
 {
-    POLYGON leftEbPg, rightEbPg;
-    ForgeOneEbPg(faceInfo, LEFT_EYE, leftEbPg);
-    ForgeOneEbPg(faceInfo, RIGHT_EYE, rightEbPg);
+    POLYGON leftBrowPg, rightBrowPg;
+    ForgeBrowPg(faceInfo, LEFT_EYE, leftBrowPg);
+    ForgeBrowPg(faceInfo, RIGHT_EYE, rightBrowPg);
 
     POLYGON_GROUP polygonGroup;
-    polygonGroup.push_back(leftEbPg);
-    polygonGroup.push_back(rightEbPg);
+    polygonGroup.push_back(leftBrowPg);
+    polygonGroup.push_back(rightBrowPg);
     
     //Mat outOrigMask = ContourGroup2Mask(faceInfo.imgWidth, faceInfo.imgHeight, polygonGroup);
     
@@ -194,10 +193,8 @@ void ForgeEyesMask(const FaceInfo& faceInfo, const FaceSegResult& segResult, Mat
 {
     POLYGON leftEyePg, rightEyePg;
     
-    Point2i leftEyeCP = segResult.getLeftEyeCP();
-    Point2i rightEyeCP = segResult.getRightEyeCP();
-    ForgeOneEyePg(faceInfo.lEyeRefinePts, leftEyeCP, leftEyePg);
-    ForgeOneEyePg(faceInfo.rEyeRefinePts, rightEyeCP, rightEyePg);
+    ForgeOneEyePg(faceInfo.lEyeRefinePts, segResult.leftEyeCP, leftEyePg);
+    ForgeOneEyePg(faceInfo.rEyeRefinePts, segResult.rightEyeCP, rightEyePg);
 
     POLYGON_GROUP polygonGroup;
     polygonGroup.push_back(leftEyePg);

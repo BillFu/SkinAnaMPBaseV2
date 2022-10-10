@@ -112,7 +112,7 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     Mat eyebrowsMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string ebsMaskImgFile = BuildOutImgFileName(outDir,
                              fileNameBone, "ebc_");
-    ForgeEyebrowsMask(faceInfo, eyebrowsMask);
+    ForgeBrowsMask(faceInfo, eyebrowsMask);
     
     Mat eyesMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string eyeMaskImgFile = BuildOutImgFileName(outDir,
@@ -235,7 +235,7 @@ void ForgeMaskAnnoPackV2(const Mat& srcImage,
     ForgeMouthMask(faceInfo, expanRatio, mouthMask);
     
     Mat eyebrowsMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    ForgeEyebrowsMask(faceInfo, eyebrowsMask);
+    ForgeBrowsMask(faceInfo, eyebrowsMask);
     
     Mat eyesMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgeEyesMask(faceInfo, segResult, eyesMask);

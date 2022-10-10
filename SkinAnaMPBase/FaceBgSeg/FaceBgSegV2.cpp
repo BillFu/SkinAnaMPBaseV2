@@ -123,7 +123,7 @@ void FaceBgSegmentor::ScaleUpPoint(const Point2i& inPt, Point2i& outPt)
 // NOS: Net Output Space
 // the coordinate of Contour measured in NOS
 // the return BBox is measured in SP, i.e., Source Space
-Rect FaceBgSegmentor::CalcBBoxSPOfContourInNOS(const CONTOURS& ctInNOS)
+Rect FaceBgSegmentor::CalcBBoxSPforContInNOS(const CONTOUR& ctInNOS)
 {
     CONTOUR approxPoly;
     approxPolyDP(ctInNOS, approxPoly, 3, true );
@@ -136,6 +136,33 @@ Rect FaceBgSegmentor::CalcBBoxSPOfContourInNOS(const CONTOURS& ctInNOS)
     return spBBox;
 }
 
+Rect FaceBgSegmentor::CalcBBoxNOSforContInNOS(const CONTOUR& ctInNOS)
+{
+    CONTOUR approxPoly;
+    approxPolyDP(ctInNOS, approxPoly, 3, true );
+    Rect nosBBox = boundingRect(approxPoly);
+    return nosBBox;
+}
+
+
+// crop mask by using contour, i.e., change mask from the global coordinate into local coordinate
+void FaceBgSegmentor::CropMaskByCont(const CONTOUR& contour, const Mat& maskGC,
+                    SPACE_DEF space, SegMask& segMask)
+{
+    segMask.space = space;
+    if(space == NET_OUT_SPACE)
+    {
+        segMask.bbox = CalcBBoxNOSforContInNOS(contour);
+        maskGC(segMask.bbox).copyTo(segMask.mask);
+    }
+    else
+    {
+        segMask.bbox = CalcBBoxSPforContInNOS(contour);
+        maskGC(segMask.bbox).copyTo(segMask.mask);
+    }
+}
+
+//----------------------------------------------------------------------------------------------
 // Bounding Box and Face Center Point in the coordinate system of the source image.
 // Face Center Point must not be the center of BBox,
 // It refers to the center of the line connecting the centers of wo eyes.
@@ -159,13 +186,7 @@ void FaceBgSegmentor::CalcFaceBBox(const Mat& FBEB_Mask,
     std::sort(contours.begin(), contours.end(),
         [](const CONTOUR& a, const CONTOUR& b){return a.size() > b.size();});
     
-    CONTOUR faceContour = contours[0]; // get thr first one and the biggset one
-    CONTOUR approxPoly;
-    approxPolyDP(faceContour, approxPoly, 3, true );
-    Rect smallBBox = boundingRect(approxPoly);
-    
-    // in the end, the result will be transformed into the space of source image.
-    ScaleUpBBox(smallBBox, segResult.faceBBox);
+    segResult.faceBBox = CalcBBoxSPforContInNOS(contours[0]);
 }
 
 //-------------------------------------------------------------------------------------------
@@ -185,7 +206,7 @@ float FaceBgSegmentor::calcEyeAreaDiffRatio(int a1, int a2)
 // or profile view.
 // The center point of face refers to the center of the line connecting the centers of wo eyes.
 // in the profile view, the CP of face esitmated cannot be used for the bad precision.
-void FaceBgSegmentor::CalcEyePts(const Mat& eyesMask, FaceSegResult& segResult)
+void FaceBgSegmentor::CalcEyesInfo(const Mat& eyesMask, FaceSegResult& segResult)
 {
     CONTOURS contours;
     findContours(eyesMask, contours,
@@ -211,37 +232,60 @@ void FaceBgSegmentor::CalcEyePts(const Mat& eyesMask, FaceSegResult& segResult)
         mc.push_back(cv::Point2i(cx, cy));
     }
     
-    Point2i eyeCP1, eyeCP2;
-    ScaleUpPoint(mc[0], eyeCP1);
-    ScaleUpPoint(mc[1], eyeCP2);
+    Point2i eyeCP0, eyeCP1;
+    ScaleUpPoint(mc[0], eyeCP0);
+    ScaleUpPoint(mc[1], eyeCP1);
     
-    segResult.eyeCPs[0] = eyeCP1;
-    segResult.eyeCPs[1] = eyeCP2;
-    
-    double areaEye1 = contourArea(contours[0]);
-    double areaEye2 = contourArea(contours[1]);
+    double areaEye0 = contourArea(contours[0]);
+    double areaEye1 = contourArea(contours[1]);
 
     float scaleX = (float)srcImgW / (float)SEG_NET_OUTPUT_SIZE;
     float scaleY = (float)srcImgH / (float)SEG_NET_OUTPUT_SIZE;
     
-    segResult.eyeAreas[0] = (int)(areaEye1 * scaleX * scaleY);
-    segResult.eyeAreas[1] = (int)(areaEye2 * scaleX * scaleY);
+    int eyeArea0 = (int)(areaEye0 * scaleX * scaleY);
+    int eyeArea1 = (int)(areaEye1 * scaleX * scaleY);
     
-    segResult.eyeAreaDiffRatio = calcEyeAreaDiffRatio(
-            segResult.eyeAreas[0], segResult.eyeAreas[1]);
+    if(eyeCP0.x < eyeCP1.x)  // 0 is left, 1 is right
+    {
+        segResult.leftEyeCP = eyeCP0;
+        segResult.rightEyeCP = eyeCP1;
+        
+        segResult.leftEyeArea = eyeArea0;
+        segResult.rightEyeArea = eyeArea1;
+        
+        CropMaskByCont(contours[0], eyesMask,
+                       NET_OUT_SPACE, segResult.leftEyeMask);
+        CropMaskByCont(contours[1], eyesMask,
+                       NET_OUT_SPACE, segResult.rightEyeMask);
+    }
+    else // 1 is left, 0 is right
+    {
+        segResult.leftEyeCP = eyeCP1;
+        segResult.rightEyeCP = eyeCP0;
+        
+        segResult.leftEyeArea = eyeArea1;
+        segResult.rightEyeArea = eyeArea0;
+        
+        CropMaskByCont(contours[1], eyesMask,
+                       NET_OUT_SPACE, segResult.leftEyeMask);
+        CropMaskByCont(contours[0], eyesMask,
+                       NET_OUT_SPACE, segResult.rightEyeMask);
+    }
+    
+    segResult.eyeAreaDiffRatio = calcEyeAreaDiffRatio(eyeArea0, eyeArea1);
     
     if(segResult.eyeAreaDiffRatio > EyeAreaDiffRation_TH)
     {
         segResult.isFrontView = false;
         // facePriInfo.faceCP = (eyeCP1 + eyeCP2) / 2;
-        int totalEyeArea = segResult.eyeAreas[0] + segResult.eyeAreas[1];
-        float t = (float)segResult.eyeAreas[0] / (float)totalEyeArea;
-        segResult.faceCP =  Interpolate(segResult.eyeCPs[0], segResult.eyeCPs[1], t);
+        int totalEyeArea = eyeArea0 + eyeArea1;
+        float t = (float)eyeArea0 / (float)totalEyeArea;
+        segResult.faceCP =  Interpolate(eyeCP0, eyeCP1, t);
     }
     else
     {
         segResult.isFrontView = true;
-        segResult.faceCP = (eyeCP1 + eyeCP2) / 2;
+        segResult.faceCP = (eyeCP0 + eyeCP1) / 2;
     }
 }
 
@@ -276,7 +320,7 @@ void FaceBgSegmentor::ParseSegLab(FaceSegResult& segResult,
     //imwrite("browsMask.png", browsMask);
 }
 
-void FaceBgSegmentor::CalcBrowInfo(const Mat& browsMask,
+void FaceBgSegmentor::CalcBrowsInfo(const Mat& browsMask,
                                    FaceSegResult& segResult)
 {
     CONTOURS contours;
@@ -306,16 +350,26 @@ void FaceBgSegmentor::CalcBrowInfo(const Mat& browsMask,
     Point2i browCP0, browCP1;
     ScaleUpPoint(mc[0], browCP0);
     ScaleUpPoint(mc[1], browCP1);
-    
+
     if(browCP0.x < browCP1.x)
     {
         segResult.leftBrowCP = browCP0;
         segResult.rightBrowCP = browCP1;
+        
+        CropMaskByCont(contours[0], browsMask,
+                       NET_OUT_SPACE, segResult.leftBrowMask);
+        CropMaskByCont(contours[1], browsMask,
+                       NET_OUT_SPACE, segResult.rightBrowMask);
     }
     else
     {
         segResult.leftBrowCP = browCP1;
         segResult.rightBrowCP = browCP0;
+        
+        CropMaskByCont(contours[1], browsMask,
+                       NET_OUT_SPACE, segResult.leftBrowMask);
+        CropMaskByCont(contours[0], browsMask,
+                       NET_OUT_SPACE, segResult.rightBrowMask);
     }
 }
 
@@ -330,7 +384,7 @@ void FaceBgSegmentor::SegImage(const Mat& srcImage, FaceSegResult& segResult)
     
     CalcFaceBBox(FBEB_Mask, segResult);
 
-    CalcEyePts(eyesMask, segResult);
+    CalcEyesInfo(eyesMask, segResult);
     
-    CalcBrowInfo(browsMask, segResult);
+    CalcBrowsInfo(browsMask, segResult);
 }

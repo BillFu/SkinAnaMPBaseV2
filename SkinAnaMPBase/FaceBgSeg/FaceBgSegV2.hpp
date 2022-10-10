@@ -71,7 +71,10 @@ private:
     // NOS: Net Output Space
     // the coordinate of Contour measured in NOS
     // the return BBox is measured in SP, i.e., Source Space
-    Rect CalcBBoxSPOfContourInNOS(const CONTOURS& ctInNOS);
+    Rect CalcBBoxSPforContInNOS(const CONTOUR& ctInNOS);
+    
+    // the return BBox is measured in NOS 
+    Rect CalcBBoxNOSforContInNOS(const CONTOUR& ctInNOS);
 
     // convert BBox in net output space into the space of source image
     void ScaleUpBBox(const Rect& inBBox, Rect& outBBox);
@@ -84,12 +87,16 @@ private:
     // or profile view.
     // The center point of face refers to the center of the line connecting the centers of wo eyes.
     // in the profile view, the CP of face esitmated cannot be used for the bad precision.
-    void CalcEyePts(const Mat& eyesMask, FaceSegResult& segResult);
+    void CalcEyesInfo(const Mat& eyesMask, FaceSegResult& segResult);
 
     // formula: ratio = abs(a1-a2) / max(a1, a2)
     float calcEyeAreaDiffRatio(int a1, int a2);
     
-    void CalcBrowInfo(const Mat& browsMask, FaceSegResult& segResult);
+    void CalcBrowsInfo(const Mat& browsMask, FaceSegResult& segResult);
+    
+    // crop mask by using contour, i.e., change mask from the global coordinate into local coordinate
+    void CropMaskByCont(const CONTOUR& cont, const Mat& maskGC,
+                        SPACE_DEF space, SegMask& segMask);
 
     //now make this function more thinner,
     //just extract the segmentation labels, a 512*512 matrix with one channel.

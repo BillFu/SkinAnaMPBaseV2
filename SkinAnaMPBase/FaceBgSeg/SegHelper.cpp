@@ -145,11 +145,9 @@ void DrawSegOnImage(const Mat& srcImg, float alpha,
     rectangle(outImg, segResult.faceBBox, colorBox, 2, LINE_8);
 
     cv::Scalar yellow(0, 255, 255); // (B, G, R)
-    for(auto cp: segResult.eyeCPs)
-    {
-        //cv::Point center(x, y);
-        cv::circle(outImg, cp, 10, yellow, cv::FILLED);
-    }
+    
+    cv::circle(outImg, segResult.leftEyeCP, 10, yellow, cv::FILLED);
+    cv::circle(outImg, segResult.rightEyeCP, 10, yellow, cv::FILLED);
     
     cv::circle(outImg, segResult.faceCP, 12, yellow, cv::FILLED);
 

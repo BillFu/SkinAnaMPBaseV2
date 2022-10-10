@@ -57,6 +57,18 @@ struct HeadPose
     }
 };
 
+enum SPACE_DEF
+{
+    SOURCE_SPACE,
+    NET_OUT_SPACE  // 512*512
+};
+
+struct SegMask
+{
+    SPACE_DEF space;
+    Rect bbox;
+    Mat  mask; // sub-matrix cropped from the NOS or SP, its location specified by bbox
+};
 
 // store the information about face which has been refined out from the segment labels
 struct FaceSegResult
@@ -65,11 +77,20 @@ struct FaceSegResult
     Size        srcImgS;
     Rect        faceBBox;
     Point2i     faceCP;         // CP: Center Point;
-    Point2i     eyeCPs[2];      // the area size of No.0 in image is bigger than No.1
-    int         eyeAreas[2];    // in pixels in source image space
     float       eyeAreaDiffRatio;  // ratio = abs(a1-a2) / max(a1, a2)
-    Point2i     leftBrowCP;     // center point of left eyebrow
-    Point2i     rightBrowCP;    // center point of right eyebrow
+    
+    Point2i     leftEyeCP;    // in source space
+    Point2i     rightEyeCP;
+    int         leftEyeArea;  // in source space
+    int         rightEyeArea;
+
+    SegMask     leftEyeMask;
+    SegMask     rightEyeMask;
+    
+    Point2i     leftBrowCP;     // center point of left eyebrow in source space
+    Point2i     rightBrowCP;    // center point of right eyebrow in source space
+    SegMask     leftBrowMask;
+    SegMask     rightBrowMask;
     bool        isFrontView;
     Mat         segLabels;      // 512 * 512, one channel
     
@@ -78,38 +99,14 @@ struct FaceSegResult
         segLabels = Mat(512, 512, CV_8UC1, Scalar(0));
     }
     
-    Point2i getLeftEyeCP() const
-    //the trailing const makes the "this" parameter const,
-    //meaning that you can invoke the method on const objects of the class type,
-    //and that the method cannot modify the object on which it was invoked
-    //(at least, not via the normal channels).
-    {
-        if(eyeCPs[0].x < eyeCPs[1].x)
-            return eyeCPs[0];
-        else
-            return eyeCPs[1];
-    }
-    
-    Point2i getRightEyeCP() const
-    //the trailing const makes the "this" parameter const,
-    //meaning that you can invoke the method on const objects of the class type,
-    //and that the method cannot modify the object on which it was invoked
-    //(at least, not via the normal channels).
-    {
-        if(eyeCPs[0].x > eyeCPs[1].x)
-            return eyeCPs[0];
-        else
-            return eyeCPs[1];
-    }
-    
     friend ostream &operator<<(ostream &output, const FaceSegResult &fpi )
     {
         output << "FacePrimaryInfo{" << endl;
         
         output << "faceBBox: " << fpi.faceBBox << endl;
         output << "faceCP: " << fpi.faceCP << endl;
-        output << "eyeCPs1: " << fpi.eyeCPs[0] << endl;
-        output << "eyeCPs2: " << fpi.eyeCPs[1] << endl;
+        //output << "eyeCPs1: " << fpi.eyeCPs[0] << endl;
+        //output << "eyeCPs2: " << fpi.eyeCPs[1] << endl;
         output << "isFrontView: " << fpi.isFrontView << endl;
 
         output << "}" << endl;
