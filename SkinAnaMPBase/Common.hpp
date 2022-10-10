@@ -76,6 +76,30 @@ struct FaceSegResult
         segLabels = Mat(512, 512, CV_8UC1, Scalar(0));
     }
     
+    Point2i getLeftEyeCP() const
+    //the trailing const makes the "this" parameter const,
+    //meaning that you can invoke the method on const objects of the class type,
+    //and that the method cannot modify the object on which it was invoked
+    //(at least, not via the normal channels).
+    {
+        if(eyeCPs[0].x < eyeCPs[1].x)
+            return eyeCPs[0];
+        else
+            return eyeCPs[1];
+    }
+    
+    Point2i getRightEyeCP() const
+    //the trailing const makes the "this" parameter const,
+    //meaning that you can invoke the method on const objects of the class type,
+    //and that the method cannot modify the object on which it was invoked
+    //(at least, not via the normal channels).
+    {
+        if(eyeCPs[0].x > eyeCPs[1].x)
+            return eyeCPs[0];
+        else
+            return eyeCPs[1];
+    }
+    
     friend ostream &operator<<(ostream &output, const FaceSegResult &fpi )
     {
         output << "FacePrimaryInfo{" << endl;

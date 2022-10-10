@@ -20,7 +20,7 @@ Date:   2022/9/23
 #include <algorithm>
 
 #include "../Utils.hpp"
-#include "EyebrowMask.hpp"
+#include "EyebrowMaskV2.hpp"
 #include "ForeheadMask.hpp"
 #include "LowerFaceMask.hpp"
 #include "../AnnoImage.hpp"
@@ -117,7 +117,7 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     Mat eyesMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string eyeMaskImgFile = BuildOutImgFileName(outDir,
                              fileNameBone, "eye_");
-    ForgeEyesMask(faceInfo, eyesMask);
+    ForgeEyesMask(faceInfo, segResult, eyesMask);
     OverlayMaskOnImage(annoLmImage, eyesMask,
                         "eyes_mask", eyeMaskImgFile.c_str());
 
@@ -238,7 +238,7 @@ void ForgeMaskAnnoPackV2(const Mat& srcImage,
     ForgeEyebrowsMask(faceInfo, eyebrowsMask);
     
     Mat eyesMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    ForgeEyesMask(faceInfo, eyesMask);
+    ForgeEyesMask(faceInfo, segResult, eyesMask);
     
     Mat eyesFullMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string eyeFullMaskImgFile = BuildOutImgFileName(outDir,

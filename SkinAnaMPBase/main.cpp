@@ -10,11 +10,7 @@
 #include "HeadPoseEst.hpp"
 #include "FaceLmExtractV2.hpp"
 #include "AnnoImage.hpp"
-#include "LM_loader.hpp"
-#include "Mask/FundamentalMask.hpp"
-#include "Mask/EyebrowMask.hpp"
 #include "Mask/SkinFeatureMask.hpp"
-#include "Mask/ForeheadMask.hpp"
 #include "Utils.hpp"
 
 #include "FaceBgSeg/FaceBgSeg.hpp"
