@@ -18,7 +18,7 @@ Date:   2022/9/27
 
 #include "Batch.hpp"
 #include "../SkinAnaMPBase/Common.hpp"
-#include "../SkinAnaMPBase/FaceBgSeg/FaceBgSeg.hpp"
+#include "../SkinAnaMPBase/FaceBgSeg/FaceBgSegV2.hpp"
 #include "../SkinAnaMPBase/FaceLmExtractV2.hpp"
 #include "../SkinAnaMPBase/HeadPoseEst.hpp"
 #include "../SkinAnaMPBase/AnnoImage.hpp"
@@ -76,7 +76,8 @@ void ProOneImg(const string& srcImgFile,
     FaceSegResult segResult;
     string segImgFile = "seg_" + fileNameBone + ".png";
     fs::path segImgFP = outDir / segImgFile;  // FP: full path
-    SegImage(srcImage, segResult);
+    FaceBgSegmentor segmentor;
+    segmentor.SegImage(srcImage, segResult);
     DrawSegOnImage(srcImage, 0.5,
         segResult, segImgFP.c_str());
 

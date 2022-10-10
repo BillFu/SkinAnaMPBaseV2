@@ -1,5 +1,0 @@
-_background_  0 0 0
-face	128 0 0
-rightbrown	0 128 0
-righteye	128 128 0
-beard	0 0 128

@@ -65,6 +65,8 @@ public:
     // in the profile view, the CP of face esitmated cannot be used for the bad precision.
     void CalcEyePts(FaceSegResult& segResult);
     
+    void CalcBrowInfo(FaceSegResult& segResult);
+    
     // return a binary labels image: 0 for background, and 255 for face
     // (including all its components), with the same size as the source image
     static Mat CalcFaceBgBiLabel(const FaceSegResult& segResult); 
@@ -111,7 +113,7 @@ void DrawSegOnImage(const Mat& srcImg,
 // call this function outside this module
 // if needToSaveAnno is true, then annoImgFile must to be a valid
 // image file name, otherwise a empty string is a good choice.
-void SegImage(const Mat& srcImage, FaceSegResult& facePriInfo); //,
+void SegImage(const Mat& srcImage, FaceSegResult& faceSegResult); //,
               //bool needToSaveAnno, const string& annoImgFile);
 
 #endif /* end of FACE_BG_SEG_HPP */

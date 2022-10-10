@@ -124,9 +124,7 @@ Mat PaddingImage(const Mat& srcImage, const Rect& bbox,
 }
 
 /******************************************************************************************
- 目前的推理是一次性的，即从模型加载到解释器创建，到推理，到结果提取，这一流程只负责完成一副人脸的LM提取。
- 以后要让前半段的结果长期存活，用于连续推理，以提高效率。
- Note: after invoking this function, return value and hasFace must be check!
+Note: after invoking this function, return value and hasFace must be check!
 *******************************************************************************************/
 bool ExtractFaceLm(const Mat& srcImage,
                    float confTh, const FaceSegResult& segResult,
@@ -140,7 +138,7 @@ bool ExtractFaceLm(const Mat& srcImage,
     Mat paddedImg = PaddingImage(srcImage, segResult.faceBBox,
                            padLeft, padTop);
     
-    imwrite("padR3.png", paddedImg);
+    //imwrite("padR3.png", paddedImg);
     cv::Size padImgSize = paddedImg.size();
     
     //-------------------------*****enter inference*****---------------------------------------------------------

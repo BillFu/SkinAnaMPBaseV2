@@ -24,7 +24,7 @@ Date:   2022/9/23
 #include "ForeheadMask.hpp"
 #include "LowerFaceMask.hpp"
 #include "../AnnoImage.hpp"
-#include "../FaceBgSeg/FaceBgSeg.hpp"
+#include "../FaceBgSeg/FaceBgSegV2.hpp"
 #include "../BSpline/ParametricBSpline.hpp"
 #include "SkinMask.hpp"
 

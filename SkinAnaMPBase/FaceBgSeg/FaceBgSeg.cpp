@@ -415,6 +415,13 @@ void FaceBgSegmentor::CalcEyePts(FaceSegResult& segResult)
 
 //-------------------------------------------------------------------------------------------
 
+void FaceBgSegmentor::CalcBrowInfo(FaceSegResult& segResult)
+{
+    
+}
+
+//-------------------------------------------------------------------------------------------
+
 // return a binary labels image: 0 for background, and 255 for face
 // (including all its components), with the same size as the source image
 Mat FaceBgSegmentor::CalcFaceBgBiLabel(const FaceSegResult& segResult) 

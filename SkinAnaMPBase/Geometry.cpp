@@ -10,7 +10,7 @@ Date:   2022/9/18
 ********************************************************************************/
 
 #include "Geometry.hpp"
-#include "FaceBgSeg/FaceBgSeg.hpp"
+//#include "FaceBgSeg/FaceBgSeg.hpp"
 
 Point2i getPtOnGLm(const FaceInfo& faceInfo, int pIndex)
 {

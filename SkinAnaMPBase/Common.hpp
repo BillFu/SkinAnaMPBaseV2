@@ -64,12 +64,14 @@ struct FaceSegResult
     // all the coordinates and sizes are measured in the space of the source image.
     Size        srcImgS;
     Rect        faceBBox;
-    Point2i     faceCP; // CP: Center Point;
-    Point2i     eyeCPs[2]; // the area size of No.0 in image is bigger than No.1
-    int         eyeAreas[2]; // in pixels in source image space
+    Point2i     faceCP;         // CP: Center Point;
+    Point2i     eyeCPs[2];      // the area size of No.0 in image is bigger than No.1
+    int         eyeAreas[2];    // in pixels in source image space
     float       eyeAreaDiffRatio;  // ratio = abs(a1-a2) / max(a1, a2)
+    Point2i     leftBrowCP;     // center point of left eyebrow
+    Point2i     rightBrowCP;    // center point of right eyebrow
     bool        isFrontView;
-    Mat         segLabels;  // 512 * 512, one channel
+    Mat         segLabels;      // 512 * 512, one channel
     
     FaceSegResult()
     {

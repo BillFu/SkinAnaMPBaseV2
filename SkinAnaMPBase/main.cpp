@@ -13,7 +13,7 @@
 #include "Mask/SkinFeatureMask.hpp"
 #include "Utils.hpp"
 
-#include "FaceBgSeg/FaceBgSeg.hpp"
+#include "FaceBgSeg/FaceBgSegV2.hpp"
 
 using namespace std;
 
@@ -86,7 +86,8 @@ int main(int argc, char **argv)
     string segAnnoImgFP = BuildOutImgFileName(
             outParePath, fileBoneName, "seg_");
     FaceSegResult segResult;
-    SegImage(srcImage, segResult);
+    FaceBgSegmentor segmentor;
+    segmentor.SegImage(srcImage, segResult);
     DrawSegOnImage(srcImage, 0.5,
         segResult, segAnnoImgFP.c_str());
     

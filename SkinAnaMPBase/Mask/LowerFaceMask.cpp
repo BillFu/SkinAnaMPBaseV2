@@ -8,7 +8,7 @@ Date:   2022/10/3
 ********************************************************************************/
 
 #include "LowerFaceMask.hpp"
-#include "../FaceBgSeg/FaceBgSeg.hpp"
+#include "../FaceBgSeg/FaceBgSegV2.hpp"
 #include "../Utils.hpp"
 
 
