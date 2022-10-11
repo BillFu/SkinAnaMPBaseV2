@@ -49,6 +49,34 @@ Point2i Interpolate(const Point2i& p1, const Point2i& p2, float t)
 }
 //-------------------------------------------------------------------------------------------
 
+
+/**********************************************************************************************
+记返回的点为p3. p3.y与p1.y值保持一致，p3.x由p1.x和p2.x内插而来
+t: in range[0.0 1.0].
+when t --> 0.0, then p3.x --> p1.x;
+when t --> 1.0, then p3.x --> p2.x;
+***********************************************************************************************/
+Point2i InterpolateX(const Point2i& p1, const Point2i& p2, float t)
+{
+    Point2i p3;
+    
+    p3.y = p1.y;
+    p3.x = (int)(p1.x + (p2.x - p1.x) * t);
+    
+    return p3;
+}
+
+// as similar with InterpolateX()
+Point2i InterpolateY(const Point2i& p1, const Point2i& p2, float t)
+{
+    Point2i p3;
+    
+    p3.x = p1.x;
+    p3.y = (int)(p1.y + (p2.y - p1.y) * t);
+    
+    return p3;
+}
+//-------------------------------------------------------------------------------------------
 /**********************************************************************************************
 Ip: interpolate
 GLm: general landmark

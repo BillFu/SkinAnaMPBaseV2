@@ -108,19 +108,25 @@ void ForgeBrowPg(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP],
     
     // 采用Eye Refine Region的点，左眉毛、右眉毛的坐标索引是相同的！
     // 对右侧眉毛而言，69点是内侧左下角点。点序列按顺时针方向排列。
-    int browERPIDs[] = {69, 68, 67, 66, 65, 64, 50, 43, 44, 45};
+    //int browERPIDs[] = {69, 68, 67, 66, 65, 64, 50, 43, 44, 45};
     //Point2i fixedERPts[NUM_PT_EYE_REFINE_GROUP]; // ER: eye refine
     //FixERPsBySegBrowCP(eyeRefPts, segBrowCP, fixedERPts);
 
     POLYGON coarsePg;
     
-    coarsePg.push_back(eyeRefPts[69]);
-    coarsePg.push_back(eyeRefPts[68]);
-    coarsePg.push_back(eyeRefPts[67]);
+    Point2i pt69a = InterpolateX(eyeRefPts[69], eyeRefPts[70], 0.5);
+    coarsePg.push_back(pt69a);
+    
+    Point2i pt68a = InterpolateY(eyeRefPts[68], eyeRefPts[69], 0.10);
+    coarsePg.push_back(pt68a);
+    
+    Point2i pt67a = Interpolate(eyeRefPts[67], eyeRefPts[53], -0.25);
+    coarsePg.push_back(pt67a);
+
     coarsePg.push_back(eyeRefPts[66]);
     coarsePg.push_back(eyeRefPts[65]);
     
-    Point2i iPt64 = IpPtInERG(eyeRefPts, 64, 63, 0.35);
+    Point2i iPt64 = IpPtInERG(eyeRefPts, 64, 63, 0.5);
     coarsePg.push_back(iPt64);
 
     coarsePg.push_back(eyeRefPts[50]);
