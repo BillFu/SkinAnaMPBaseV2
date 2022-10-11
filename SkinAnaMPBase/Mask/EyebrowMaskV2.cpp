@@ -28,22 +28,6 @@ Point2i getPtOnEb(const FaceInfo& faceInfo, EyeID eyeID, int ptIndex)
     }
 }
 
-/*
-// return new interpolated No.64 point, can be applied to two eyes!
-// make No.64 moved toward the outside of face a bit.
-// Ip is the abbrevation for Interpolate
-// ERG: eye refine group
-Point2i IpPtInERG(const FaceInfo& faceInfo, EyeID eyeID, int pIndex1, int pIndex2, float t)
-{
-    Point2i P1 = getPtOnEb(faceInfo, eyeID, pIndex1);
-    Point2i P2 = getPtOnEb(faceInfo, eyeID, pIndex2);
-    
-    // be careful with the Point order and the value of t when to invoke InnerInterpolate()
-    Point2i P3 = Interpolate(P1, P2, t);
-    return P3;
-}
-*/
-
 Point2i IpPtInERG(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP],
                   int pIndex1, int pIndex2, float t)
 {
@@ -109,33 +93,33 @@ void ForgeBrowPg(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP],
     // 采用Eye Refine Region的点，左眉毛、右眉毛的坐标索引是相同的！
     // 对右侧眉毛而言，69点是内侧左下角点。点序列按顺时针方向排列。
     //int browERPIDs[] = {69, 68, 67, 66, 65, 64, 50, 43, 44, 45};
-    //Point2i fixedERPts[NUM_PT_EYE_REFINE_GROUP]; // ER: eye refine
-    //FixERPsBySegBrowCP(eyeRefPts, segBrowCP, fixedERPts);
+    Point2i fixedERPts[NUM_PT_EYE_REFINE_GROUP]; // ER: eye refine
+    FixERPsBySegBrowCP(eyeRefPts, segBrowCP, fixedERPts);
 
     POLYGON coarsePg;
     
-    Point2i pt69a = InterpolateX(eyeRefPts[69], eyeRefPts[70], 0.5);
+    Point2i pt69a = InterpolateX(fixedERPts[69], fixedERPts[70], 0.5);
     coarsePg.push_back(pt69a);
     
-    Point2i pt68a = InterpolateY(eyeRefPts[68], eyeRefPts[69], 0.10);
+    Point2i pt68a = InterpolateY(fixedERPts[68], fixedERPts[69], 0.10);
     coarsePg.push_back(pt68a);
     
-    Point2i pt67a = Interpolate(eyeRefPts[67], eyeRefPts[53], -0.25);
+    Point2i pt67a = Interpolate(fixedERPts[67], fixedERPts[53], -0.25);
     coarsePg.push_back(pt67a);
 
-    coarsePg.push_back(eyeRefPts[66]);
-    coarsePg.push_back(eyeRefPts[65]);
+    coarsePg.push_back(fixedERPts[66]);
+    coarsePg.push_back(fixedERPts[65]);
     
-    Point2i iPt64 = IpPtInERG(eyeRefPts, 64, 63, 0.5);
+    Point2i iPt64 = IpPtInERG(fixedERPts, 64, 63, 0.5);
     coarsePg.push_back(iPt64);
 
-    coarsePg.push_back(eyeRefPts[50]);
+    coarsePg.push_back(fixedERPts[50]);
 
-    Point2i iPt43 = IpPtInERG(eyeRefPts, 50, 44, 0.5);
+    Point2i iPt43 = IpPtInERG(fixedERPts, 50, 44, 0.5);
     coarsePg.push_back(iPt43);
     
-    coarsePg.push_back(eyeRefPts[44]);
-    coarsePg.push_back(eyeRefPts[45]);
+    coarsePg.push_back(fixedERPts[44]);
+    coarsePg.push_back(fixedERPts[45]);
 
     // then convert the corse to the refined
     int csNumPoint = 50;
@@ -181,8 +165,7 @@ Point2i TransEyeRefPt2SegSpace(const Point2i& eyeRefPt, int dx, int dy)
 // transform the eye refine points in face mesh space into the segment space
 void FixERPsBySegEyeCP(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP], // input
                        const Point2i& segCP, // eye center point in segment space
-                       Point2i fixedEyeRefPts[NUM_PT_EYE_REFINE_GROUP]   // output
-                       )
+                       Point2i fixedEyeRefPts[NUM_PT_EYE_REFINE_GROUP] /* utput */)
 {
     Point2i kpCP = (eyeRefPts[19] + eyeRefPts[20]) / 2; // eye center point in key points space
     int dx = kpCP.x - segCP.x;  //
@@ -199,11 +182,9 @@ void FixERPsBySegEyeCP(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP], // inpu
 // transform the eye refine points in face mesh space into the segment space
 void FixERPsBySegBrowCP(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP], // input
                        const Point2i& segCP, // eye center point in segment space
-                       Point2i fixedEyeRefPts[NUM_PT_EYE_REFINE_GROUP]   // output
-)
+                       Point2i fixedEyeRefPts[NUM_PT_EYE_REFINE_GROUP]   /* output */)
 {
-    // 19, 20 ??? 
-    Point2i kpCP = (eyeRefPts[19] + eyeRefPts[20]) / 2; // brow center point in key points space
+    Point2i kpCP = (eyeRefPts[53] + eyeRefPts[52]) / 2; // brow center point in key points space
     int dx = kpCP.x - segCP.x;  //
     int dy = kpCP.y - segCP.y;  //
     
