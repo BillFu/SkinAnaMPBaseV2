@@ -21,11 +21,37 @@ using namespace cv;
 #include "../Common.hpp"
 
 
+// Ip: interpolate
+Point2i IpPtInERG(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP],
+                  int pIndex1, int pIndex2, float t);
+
+
+//ERPs: eye refined points
+// 用分割出的眼睛中心点来修正ERPs的坐标
+// transform the eye refine points in face mesh space into the segment space
+void FixERPsBySegEyeCP(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP], // input
+                       const Point2i& segCP, // eye center point in segment space
+                       Point2i fixedEyeRefPts[NUM_PT_EYE_REFINE_GROUP]   // output
+);
+
+
+//ERPs: eye refined points
+// 用分割出的眉毛中心点来修正ERPs的坐标
+// transform the eye refine points in face mesh space into the segment space
+void FixERPsBySegBrowCP(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP], // input
+                       const Point2i& segCP, // eye center point in segment space
+                       Point2i fixedEyeRefPts[NUM_PT_EYE_REFINE_GROUP]   // output
+);
 /**********************************************************************************************
 
 ***********************************************************************************************/
-void ForgeBrowsMask(const FaceInfo& faceInfo, Mat& outMask);
+// Note: Only forge One!!!
+void ForgeBrowPg(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP],
+                 const Point2i& segBrowCP,POLYGON& browPg);
 
+void ForgeBrowsMask(const FaceInfo& faceInfo,
+                    const FaceSegResult& segResult, // input, const
+                    Mat& outMask);
 
 /**********************************************************************************************
 only cover the two eyes

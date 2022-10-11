@@ -28,10 +28,12 @@ Point2i getPtOnEb(const FaceInfo& faceInfo, EyeID eyeID, int ptIndex)
     }
 }
 
+/*
 // return new interpolated No.64 point, can be applied to two eyes!
 // make No.64 moved toward the outside of face a bit.
 // Ip is the abbrevation for Interpolate
-Point2i IpPtwithPair(const FaceInfo& faceInfo, EyeID eyeID, int pIndex1, int pIndex2, float t)
+// ERG: eye refine group
+Point2i IpPtInERG(const FaceInfo& faceInfo, EyeID eyeID, int pIndex1, int pIndex2, float t)
 {
     Point2i P1 = getPtOnEb(faceInfo, eyeID, pIndex1);
     Point2i P2 = getPtOnEb(faceInfo, eyeID, pIndex2);
@@ -40,54 +42,108 @@ Point2i IpPtwithPair(const FaceInfo& faceInfo, EyeID eyeID, int pIndex1, int pIn
     Point2i P3 = Interpolate(P1, P2, t);
     return P3;
 }
+*/
 
+Point2i IpPtInERG(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP],
+                  int pIndex1, int pIndex2, float t)
+{
+    Point2i P1 = eyeRefPts[pIndex1];
+    Point2i P2 = eyeRefPts[pIndex2];
+    
+    // be careful with the Point order and the value of t when to invoke InnerInterpolate()
+    Point2i P3 = Interpolate(P1, P2, t);
+    return P3;
+}
+
+/*
 // Note: Only forge One!!!
-void ForgeBrowPg(const FaceInfo& faceInfo, EyeID eyeID, POLYGON& rightEbPg)
+void ForgeBrowPg(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP],
+                 const Point2i& segBrowCP,
+                 POLYGON& browPg)
 {
     // 采用Eye Refine Region的点，左眉毛、右眉毛的坐标索引是相同的！
     //int eyeBowPtIndices[] = {i69, i68, i67, 66, 65, 64, 50, 43, 45};
+    Point2i fixedERPts[NUM_PT_EYE_REFINE_GROUP]; // ER: eye refine
+    FixERPsBySegBrowCP(eyeRefPts, segBrowCP, fixedERPts);
 
     POLYGON coarseRbPg;
     
-    Point2i iRP69 = IpPtwithPair(faceInfo, eyeID, 69, 45, -0.30);
+    Point2i iRP69 = IpPtInERG(eyeRefPts, 69, 45, -0.30);
     coarseRbPg.push_back(iRP69);
     
-    Point2i iRP68 = IpPtwithPair(faceInfo, eyeID, 68, 67, -0.25);
+    Point2i iRP68 = IpPtInERG(eyeRefPts, 68, 67, -0.25);
     coarseRbPg.push_back(iRP68);
     
-    Point2i eP67 = IpPtwithPair(faceInfo, eyeID, 67, 53, -0.55);
+    Point2i eP67 = IpPtInERG(eyeRefPts, 67, 53, -0.55);
     coarseRbPg.push_back(eP67);
 
-    Point2i eP66 = IpPtwithPair(faceInfo, eyeID, 66, 52, -0.35);
+    Point2i eP66 = IpPtInERG(eyeRefPts, 66, 52, -0.35);
     coarseRbPg.push_back(eP66);
-    Point2i eP65 = IpPtwithPair(faceInfo, eyeID, 65, 51, -0.25);
+    Point2i eP65 = IpPtInERG(eyeRefPts, 65, 51, -0.25);
     coarseRbPg.push_back(eP65);
     
-    Point2i iP64 = IpPtwithPair(faceInfo, eyeID, 64, 51, -0.30);
+    Point2i iP64 = IpPtInERG(eyeRefPts, 64, 51, -0.30);
     coarseRbPg.push_back(iP64);
     
-    Point2i iP50 = IpPtwithPair(faceInfo, eyeID, 50, 65, 0.10);
+    Point2i iP50 = IpPtInERG(eyeRefPts, 50, 65, 0.10);
     coarseRbPg.push_back(iP50);
     
-    Point2i iP43 = IpPtwithPair(faceInfo, eyeID, 43, 52, 0.40);
+    Point2i iP43 = IpPtInERG(eyeRefPts, 43, 52, 0.40);
     // Note: The Order for push_back() is Very Important!!!
     coarseRbPg.push_back(iP43);
     
-    Point2i iP45 = IpPtwithPair(faceInfo, eyeID, 45, 53, 0.25);
+    Point2i iP45 = IpPtInERG(eyeRefPts, 45, 53, 0.25);
     coarseRbPg.push_back(iP45);
 
     // then convert the corse to the refined
     int csNumPoint = 100;
-    CloseSmoothPolygon(coarseRbPg, csNumPoint, rightEbPg);
+    CloseSmoothPolygon(coarseRbPg, csNumPoint, browPg);
 }
+*/
 
+void ForgeBrowPg(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP],
+                 const Point2i& segBrowCP,
+                 POLYGON& browPg)
+{
+    
+    // 采用Eye Refine Region的点，左眉毛、右眉毛的坐标索引是相同的！
+    // 对右侧眉毛而言，69点是内侧左下角点。点序列按顺时针方向排列。
+    int browERPIDs[] = {69, 68, 67, 66, 65, 64, 50, 43, 44, 45};
+    //Point2i fixedERPts[NUM_PT_EYE_REFINE_GROUP]; // ER: eye refine
+    //FixERPsBySegBrowCP(eyeRefPts, segBrowCP, fixedERPts);
+
+    POLYGON coarsePg;
+    
+    coarsePg.push_back(eyeRefPts[69]);
+    coarsePg.push_back(eyeRefPts[68]);
+    coarsePg.push_back(eyeRefPts[67]);
+    coarsePg.push_back(eyeRefPts[66]);
+    coarsePg.push_back(eyeRefPts[65]);
+    
+    Point2i iPt64 = IpPtInERG(eyeRefPts, 64, 63, 0.35);
+    coarsePg.push_back(iPt64);
+
+    coarsePg.push_back(eyeRefPts[50]);
+
+    Point2i iPt43 = IpPtInERG(eyeRefPts, 50, 44, 0.5);
+    coarsePg.push_back(iPt43);
+    
+    coarsePg.push_back(eyeRefPts[44]);
+    coarsePg.push_back(eyeRefPts[45]);
+
+    // then convert the corse to the refined
+    int csNumPoint = 50;
+    CloseSmoothPolygon(coarsePg, csNumPoint, browPg);
+}
 /******************************************************************************************
 *******************************************************************************************/
-void ForgeBrowsMask(const FaceInfo& faceInfo, Mat& outMask)
+void ForgeBrowsMask(const FaceInfo& faceInfo,
+                    const FaceSegResult& segRst,  // Rst: result
+                    Mat& outMask)
 {
     POLYGON leftBrowPg, rightBrowPg;
-    ForgeBrowPg(faceInfo, LEFT_EYE, leftBrowPg);
-    ForgeBrowPg(faceInfo, RIGHT_EYE, rightBrowPg);
+    ForgeBrowPg(faceInfo.lEyeRefinePts, segRst.leftBrowCP, leftBrowPg);
+    ForgeBrowPg(faceInfo.rEyeRefinePts, segRst.rightBrowCP, rightBrowPg);
 
     POLYGON_GROUP polygonGroup;
     polygonGroup.push_back(leftBrowPg);
@@ -117,7 +173,7 @@ Point2i TransEyeRefPt2SegSpace(const Point2i& eyeRefPt, int dx, int dy)
 
 //RefPts: refined points
 // transform the eye refine points in face mesh space into the segment space
-void FixEyeRefPtsBySeg(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP], // input
+void FixERPsBySegEyeCP(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP], // input
                        const Point2i& segCP, // eye center point in segment space
                        Point2i fixedEyeRefPts[NUM_PT_EYE_REFINE_GROUP]   // output
                        )
@@ -132,7 +188,24 @@ void FixEyeRefPtsBySeg(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP], // inpu
     }
 }
 
-
+//ERPs: eye refined points
+// 用分割出的眉毛中心点来修正ERPs的坐标
+// transform the eye refine points in face mesh space into the segment space
+void FixERPsBySegBrowCP(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP], // input
+                       const Point2i& segCP, // eye center point in segment space
+                       Point2i fixedEyeRefPts[NUM_PT_EYE_REFINE_GROUP]   // output
+)
+{
+    // 19, 20 ??? 
+    Point2i kpCP = (eyeRefPts[19] + eyeRefPts[20]) / 2; // brow center point in key points space
+    int dx = kpCP.x - segCP.x;  //
+    int dy = kpCP.y - segCP.y;  //
+    
+    for(int i=0; i<NUM_PT_EYE_REFINE_GROUP; i++)
+    {
+        fixedEyeRefPts[i] = TransEyeRefPt2SegSpace(eyeRefPts[i], dx, dy);
+    }
+}
 /**********************************************************************************************
 only cover the two eyes
 ***********************************************************************************************/
@@ -142,7 +215,7 @@ void ForgeOneEyePg(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP],
                    POLYGON& outPg)
 {
     Point2i fixedERPts[NUM_PT_EYE_REFINE_GROUP]; // ER: eye refine
-    FixEyeRefPtsBySeg(eyeRefPts, segEyeCP, fixedERPts);
+    FixERPsBySegEyeCP(eyeRefPts, segEyeCP, fixedERPts);
 
     POLYGON coarsePg;
     

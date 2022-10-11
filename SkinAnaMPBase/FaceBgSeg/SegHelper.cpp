@@ -146,8 +146,13 @@ void DrawSegOnImage(const Mat& srcImg, float alpha,
 
     cv::Scalar yellow(0, 255, 255); // (B, G, R)
     
+    // show the CPs of eyes
     cv::circle(outImg, segResult.leftEyeCP, 10, yellow, cv::FILLED);
     cv::circle(outImg, segResult.rightEyeCP, 10, yellow, cv::FILLED);
+    
+    // show the CPs of brows
+    cv::circle(outImg, segResult.leftBrowCP, 10, yellow, cv::FILLED);
+    cv::circle(outImg, segResult.rightBrowCP, 10, yellow, cv::FILLED);
     
     cv::circle(outImg, segResult.faceCP, 12, yellow, cv::FILLED);
 
