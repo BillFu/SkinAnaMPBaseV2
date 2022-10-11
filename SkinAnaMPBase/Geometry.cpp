@@ -130,3 +130,13 @@ int CalcLowerJawWidth(const FaceInfo& faceInfo, const Mat& segLabels)
     return jawWidth;
 }
 */
+
+// oriPt + (dx, dy) ---> newPt
+void MovePolygon(const POLYGON& oriPg, int dx, int dy, POLYGON& newPg)
+{
+    for(Point2i oriPt: oriPg)
+    {
+        Point2i newPt(oriPt.x + dx, oriPt.y + dy);
+        newPg.push_back(newPt);
+    }
+}

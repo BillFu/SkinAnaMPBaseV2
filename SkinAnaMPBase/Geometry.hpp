@@ -44,6 +44,8 @@ Point2i InterpolateX(const Point2i& p1, const Point2i& p2, float t);
 Point2i InterpolateY(const Point2i& p1, const Point2i& p2, float t);
 
 //-------------------------------------------------------------------------------------------
+// oriPt + (dx, dy) ---> newPt
+void MovePolygon(const POLYGON& oriPg, int dx, int dy, POLYGON& newPg);
 
 /**********************************************************************************************
 Ip: interpolate
