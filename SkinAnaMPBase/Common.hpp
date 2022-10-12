@@ -32,10 +32,11 @@ typedef unique_ptr<FlatBufferModel> TF_LITE_MODEL;
 typedef vector<Point2i> POLYGON;
 typedef vector<POLYGON> POLYGON_GROUP;
 
+typedef vector<Point> CONTOUR;
+typedef vector<CONTOUR> CONTOURS;
 
 #define SEG_NET_INPUT_SIZE   512
 #define SEG_NET_OUTPUT_SIZE  512
-
 
 enum EyeID
 {
@@ -120,8 +121,9 @@ struct FaceSegResult
 
 struct FaceInfo
 {
-    int imgWidth;  // source image
-    int imgHeight;
+    //int imgWidth;  // source image
+    //int imgHeight;
+    Size  srcImgS;
     
     float confidence; // 这张人脸存在的可信度
     
@@ -139,9 +141,7 @@ struct FaceInfo
     
     FaceInfo()
     {
-        imgWidth = 0;
-        imgHeight = 0;
-        
+        srcImgS = Size(0, 0);
         confidence = 0.0;
     }
 };

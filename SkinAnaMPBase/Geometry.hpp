@@ -47,6 +47,14 @@ Point2i InterpolateY(const Point2i& p1, const Point2i& p2, float t);
 // oriPt + (dx, dy) ---> newPt
 void MovePolygon(const POLYGON& oriPg, int dx, int dy, POLYGON& newPg);
 
+// transform the contour(abbr. Ct) from Net Output Space to Source Space
+// nosLocCt: contour represented in local space cropped by bbox from the global NOS.
+// nosTlPt: the Top Left corner of BBox of contour in the NOS.
+// scaleUpX, scaleUpY: the scale up ratio in X-axis and Y-axis.
+void transCt_NOS2SS(const CONTOUR& nosLocCt, const Point& nosBBoxTlPt,
+                    float scaleUpX, float scaleUpY,
+                    CONTOUR& spCt);
+
 /**********************************************************************************************
 Ip: interpolate
 GLm: general landmark

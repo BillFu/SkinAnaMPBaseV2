@@ -19,10 +19,6 @@
 using namespace std;
 using namespace cv;
 
-
-typedef vector<Point> CONTOUR;
-typedef vector<CONTOUR> CONTOURS;
-
 enum SEG_FACE_BG_LABELS
 {
     SEG_BG_LABEL = 0,

@@ -103,33 +103,6 @@ Point2i getRectCornerPt(const Point2i& p1, const Point2i& p2)
 }
 
 //-------------------------------------------------------------------------------------------
-/**********************************************************************************************
- segLabels: 512*512
-***********************************************************************************************/
-/*
-int CalcLowerJawWidth(const FaceInfo& faceInfo, const Mat& segLabels)
-{
-    Point2i pt200 = getPtOnGLm(faceInfo, 200);
-    int pt200y = pt200.y;  // in source image space
-    
-    // convert pt200y from the source space into seg net space (512*512)
-    int pt200yp = pt200y * SEG_NET_OUTPUT_SIZE / faceInfo.imgHeight;
-    
-    Mat jawRow = segLabels.row(pt200yp);
-    
-    int jawWidth = 0;
-    for(int i=0; i<SEG_NET_OUTPUT_SIZE; i++)
-    {
-        if(jawRow.at<uchar>(i) == SEG_FACE_LABEL)
-            jawWidth += 1;
-    }
-    
-    // convert to the source image
-    jawWidth = jawWidth * faceInfo.imgWidth / SEG_NET_OUTPUT_SIZE;
-    
-    return jawWidth;
-}
-*/
 
 // oriPt + (dx, dy) ---> newPt
 void MovePolygon(const POLYGON& oriPg, int dx, int dy, POLYGON& newPg)
@@ -138,5 +111,24 @@ void MovePolygon(const POLYGON& oriPg, int dx, int dy, POLYGON& newPg)
     {
         Point2i newPt(oriPt.x + dx, oriPt.y + dy);
         newPg.push_back(newPt);
+    }
+}
+
+// transform the contour(abbr. Ct) from Net Output Space to Source Space
+// nosTlPt: the Top Left corner of BBox of contour in the NOS.
+// scaleUpX, scaleUpY: the scale up ratio in X-axis and Y-axis.
+// nosLocCt: contour represented in local space cropped by bbox from the global NOS.
+void transCt_NOS2SS(const CONTOUR& nosLocCt, const Point& nosBBoxTlPt,
+                    float scaleUpX, float scaleUpY,
+                    CONTOUR& spCt)
+{
+    for(Point nosLocPt: nosLocCt)
+    {
+        Point nosPt = nosLocPt + nosBBoxTlPt;
+        
+        int spX = nosPt.x * scaleUpX;
+        int spY = nosPt.y * scaleUpY;
+        
+        spCt.push_back(Point(spX, spY));
     }
 }

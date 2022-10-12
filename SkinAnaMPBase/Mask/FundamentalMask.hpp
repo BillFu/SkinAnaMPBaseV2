@@ -24,10 +24,10 @@ using namespace cv;
 void expanMask(const Mat& inMask, int expandSize, Mat& outMask);
 
 // !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
-void DrawContOnMask(int img_width, int img_height, const POLYGON& contours, Mat& outMask);
+void DrawContOnMask(const POLYGON& contours, Mat& outMask);
 
 Mat ContourGroup2Mask(int img_width, int img_height, const POLYGON_GROUP& contoursGroup);
-
+Mat ContourGroup2Mask(Size imgS, const POLYGON_GROUP& contoursGroup);
 
 /**********************************************************************************************
 本函数构建皮肤区域的矢量版雏形。

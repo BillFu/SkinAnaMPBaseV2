@@ -97,15 +97,15 @@ void ForgeSkinMaskV3(const FaceInfo& faceInfo,
     int csNumPoint = 200;
     CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
 
-    DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
+    DrawContOnMask(refinedPolygon, outMask);
     
     // calculate the lower cut line:
     Point2i pt61 = faceInfo.lm_2d[61];
     Point2i pt291 = faceInfo.lm_2d[291];
     int y = (pt61.y + pt291.y) / 2;
     
-    int w = faceInfo.imgWidth;
-    int h = faceInfo.imgHeight - y;
+    int w = faceInfo.srcImgS.width;
+    int h = faceInfo.srcImgS.height - y;
     Rect lowCutRect(0, y, w, h);
     lowFaceMask(lowCutRect).copyTo(outMask(lowCutRect));
     
@@ -170,7 +170,7 @@ void ForgeSkinPgV4(const FaceInfo& faceInfo,
         }
     }
     
-    int upStep = faceInfo.imgWidth / 1000;
+    int upStep = faceInfo.srcImgS.width / 1000;
     // 修正下巴底缘的三点：377, 152, 148, 使其坐标位于脸部之内
     raisePtONJaw(newSilhouPts[15], // pt377
                  lowFaceMask, upStep);
@@ -218,7 +218,7 @@ void ForgeSkinMaskV4(const FaceInfo& faceInfo,
     int csNumPoint = 200;
     CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
 
-    DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
+    DrawContOnMask(refinedPolygon, outMask);
     
     /*
     // calculate the lower cut line:
@@ -370,7 +370,7 @@ void ForgeSkinMaskV5(const FaceInfo& faceInfo,
     
     int csNumPoint = 200;
     CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
-    DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
+    DrawContOnMask(refinedPolygon, outMask);
     //DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, coarsePolygon, outMask);
     
     outMask = outMask & (~mouthMask) & (~eyebrowMask) & (~eyeMask);

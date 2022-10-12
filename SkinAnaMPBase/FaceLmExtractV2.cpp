@@ -235,8 +235,7 @@ bool ExtractFaceLm(const Mat& srcImage,
     
     //----------------------***exit inference, postprocessing***----------------------------------
     // reverse coordinate transform
-    faceInfo.imgWidth = srcImage.cols;
-    faceInfo.imgHeight = srcImage.rows;
+    faceInfo.srcImgS = srcImage.size();
     
     PadCd2SrcCd_All(padImgSize, padTop, padLeft,
                     segResult.faceBBox.tl(),
