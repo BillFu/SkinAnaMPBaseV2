@@ -48,7 +48,14 @@ void ForgeBrowsMask(const FaceInfo& faceInfo,
 /**********************************************************************************************
 only cover the two eyes
 ***********************************************************************************************/
+// extract the primary and coarse polar sequence on the contour
+void CalcPolarSeqOnCt(const CONTOUR& spCt, const Point2i& eyeCP,
+                      PolarContour& polarCont);
 
+// build a new version of polar point sequence that with even intervals of theta.
+void BuildEvenPolarSeq(const PolarContour& rawPolarSeq,
+                       int num_interval, // how many intervals from 0 to 2*Pi
+                       PolarContour& evenPolarSeq);
 
 void ForgeEyePgBySegRst(Size srcImgS, const SegMask& eyeSegMask, const Point2i& eyeCP,
                         POLYGON& eyePg);

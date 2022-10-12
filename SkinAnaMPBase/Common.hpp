@@ -64,6 +64,32 @@ enum SPACE_DEF
     NET_OUT_SPACE  // 512*512
 };
 
+struct PtInPolarCd  //Point in polar coordinate system
+{
+    double r;
+    double theta;
+    
+    PtInPolarCd():
+    r(0.0), theta(0.0)
+    {
+        
+    }
+    
+    PtInPolarCd(double r0, double theta0):
+    r(r0), theta(theta0)
+    {
+        
+    }
+};
+
+typedef vector<PtInPolarCd>  PtInPolarSeq; //Seq: sequence
+
+struct PolarContour
+{
+    Point2i oriPt;
+    PtInPolarSeq ptSeq;
+};
+
 struct SegMask
 {
     SPACE_DEF space;
