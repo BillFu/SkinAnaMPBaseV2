@@ -108,6 +108,10 @@ struct FaceSegResult
     
     Point2i     leftEyeCP;    // in source space
     Point2i     rightEyeCP;
+    //FP: feature points, P1, P2, P3, P4。P1: 内侧上角点；P2: 外侧上角点；P3: 下弧线中点；P4: 上弧线中点。
+    Point2i     leftFP[4];
+    Point2i     rightFP[4];
+    
     int         leftEyeArea;  // in source space
     int         rightEyeArea;
 
