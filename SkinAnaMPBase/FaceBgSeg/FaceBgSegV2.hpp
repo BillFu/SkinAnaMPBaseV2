@@ -136,6 +136,8 @@ void CalcEyeCtP1P2(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS, Point& P1
 
 // P4: the top middle point on the eye contour,
 // P3: the bottom middle point on the eye contour.
+// 我们在从分割后的栅格数据中提取轮廓点时，用CHAIN_APPROX_NONE保证轮廓点是紧密相挨的，不是稀疏的。
+// 还有一点，眼睛区域不是凸的，这就有可能出现eyeCP出现Mask之外的情形。
 void CalcEyeCtP3P4(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS, Point& P3NOS, Point& P4NOS);
 
 void CalcEyeCtFPs(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS, Point2i eyeFPs_NOS[4]);

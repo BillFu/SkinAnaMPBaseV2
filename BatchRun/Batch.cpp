@@ -81,6 +81,7 @@ void ProOneImg(const string& srcImgFile,
     DrawSegOnImage(srcImage, 0.5,
         segResult, segImgFP.c_str());
 
+    /*
     FaceInfo faceInfo;
 
     float confThresh = 0.75;
@@ -116,6 +117,7 @@ void ProOneImg(const string& srcImgFile,
     ForgeMaskAnnoPackDebug(srcImage, annoLmImage,
                       outDir, fileBoneName,
                       faceInfo, segResult);
+    */
     
     /*
     ForgeMaskAnnoPackV2(srcImage,

@@ -150,6 +150,15 @@ void DrawSegOnImage(const Mat& srcImg, float alpha,
     cv::circle(outImg, segResult.leftEyeCP, 10, yellow, cv::FILLED);
     cv::circle(outImg, segResult.rightEyeCP, 10, yellow, cv::FILLED);
     
+    for(int i=0; i<4; i++)
+    {
+        cv::circle(outImg, segResult.leftEyeFPs[i], 10, yellow, cv::FILLED);
+        cout << "Left Pt " << i << ":" << segResult.leftEyeFPs[i] << endl;
+        
+        cv::circle(outImg, segResult.rightEyeFPs[i], 10, yellow, cv::FILLED);
+        cout << "Right Pt " << i << ":" << segResult.rightEyeFPs[i] << endl;
+    }
+    
     // show the CPs of brows
     cv::circle(outImg, segResult.leftBrowCP, 10, yellow, cv::FILLED);
     cv::circle(outImg, segResult.rightBrowCP, 10, yellow, cv::FILLED);
@@ -276,11 +285,10 @@ void CalcEyeCtP1P2(const CONTOUR& eyeCont_NOS,
 
 // P4: the top middle point on the eye contour,
 // P3: the bottom middle point on the eye contour.
-// 这地方有个稠密点和稀疏点的问题：即轮廓上的点是紧密挨在一起的（例如分割获得的直接结果），
-// 还是有较大间隔的（例如放大到原始图像空间）。
+// 我们在从分割后的栅格数据中提取轮廓点时，用CHAIN_APPROX_NONE保证轮廓点是紧密相挨的，不是稀疏的。
+// 还有一点，眼睛区域不是凸的，这就有可能出现eyeCP出现Mask之外的情形。
 void CalcEyeCtP3P4(const CONTOUR& eyeCont_NOS,
                    const Point& eyeCP_NOS,
-                   int x_gap,  //定义相邻轮廓点的X轴最大间距
                    Point& P3, Point& P4)
 {
     // divide the coordinate space into 4 rotated sections, I, II, III, IV
@@ -288,12 +296,13 @@ void CalcEyeCtP3P4(const CONTOUR& eyeCont_NOS,
     // eyeCP as orignal point of coordinate system
     // 采用垂直线求交的方法
 
+    cout << "eyeCP_NOS: " << eyeCP_NOS << endl;
     for(Point pt: eyeCont_NOS)
     {
         int dx = pt.x - eyeCP_NOS.x;
         int dy = pt.y - eyeCP_NOS.y;
         
-        if(dx >= -x_gap && dx <= x_gap) // 碰到与垂线相交的点了
+        if(dx == 0)  // 碰到与垂线相交的点了
         {
             // 区分与上面的点相交，还是与下面的点相交
             if(dy <= 0) // 与上面的点相交
@@ -315,7 +324,7 @@ void CalcEyeCtFPs(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS, Point2i ey
 
     int x_gap = 1;
     Point P3, P4;
-    CalcEyeCtP3P4(eyeCont_NOS, eyeCP_NOS, x_gap, P3, P4);
+    CalcEyeCtP3P4(eyeCont_NOS, eyeCP_NOS, P3, P4);
     
     eyeFPs_NOS[0] = P1;
     eyeFPs_NOS[1] = P2;

@@ -132,7 +132,6 @@ int main(int argc, char **argv)
     ForgeMaskAnnoPackDebug(srcImage, annoLmImage,
                       outParePath, fileBoneName,
                       faceInfo, segResult);
-
     
     /*
     ForgeMaskAnnoPackV2(srcImage, 

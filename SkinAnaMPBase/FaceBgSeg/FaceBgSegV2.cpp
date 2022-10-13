@@ -215,8 +215,9 @@ float FaceBgSegmentor::calcEyeAreaDiffRatio(int a1, int a2)
 void FaceBgSegmentor::CalcEyesInfo(const Mat& eyesMask, FaceSegResult& segResult)
 {
     CONTOURS contours;
+    //CHAIN_APPROX_SIMPLE会导致轮廓点稀疏，不紧密相挨，导致后面我们的算法失败
     findContours(eyesMask, contours,
-            cv::noArray(), RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+            cv::noArray(), RETR_EXTERNAL, CHAIN_APPROX_NONE);
 
     if(contours.size() < 2)
     {
@@ -341,8 +342,9 @@ void FaceBgSegmentor::CalcBrowsInfo(const Mat& browsMask,
                                    FaceSegResult& segResult)
 {
     CONTOURS contours;
+    //CHAIN_APPROX_SIMPLE会导致轮廓点稀疏，不紧密相挨
     findContours(browsMask, contours,
-            cv::noArray(), RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+            cv::noArray(), RETR_EXTERNAL, CHAIN_APPROX_NONE);
 
     if(contours.size() < 2)
     {

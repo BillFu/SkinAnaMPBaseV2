@@ -46,6 +46,8 @@
 		CBF8FB7D28E68DFC002B58B5 /* ForeheadMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB1E2AB728DD99AB00F416DF /* ForeheadMask.cpp */; };
 		CBF8FB7F28E68DFC002B58B5 /* FundamentalMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBB5DB3C28DD5B3B003CDED3 /* FundamentalMask.cpp */; };
 		CBF8FB8128E68E25002B58B5 /* ParametricBSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB4312A828D41DDD006D71DA /* ParametricBSpline.cpp */; };
+		CBFF429528F8053D000D4303 /* EyebrowMaskV4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB06DD8F28F64DED003EC5BF /* EyebrowMaskV4.cpp */; };
+		CBFF429628F80554000D4303 /* PolarPtSeq.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2606575928F7122400019FFE /* PolarPtSeq.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -455,6 +457,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CBFF429628F80554000D4303 /* PolarPtSeq.cpp in Sources */,
+				CBFF429528F8053D000D4303 /* EyebrowMaskV4.cpp in Sources */,
 				CB7F673F28F4165500060E7C /* SegHelper.cpp in Sources */,
 				CB9D430728F3F77C00CD3B13 /* FaceBgSegV2.cpp in Sources */,
 				CBBF6C5528F154940036619C /* SkinMask.cpp in Sources */,

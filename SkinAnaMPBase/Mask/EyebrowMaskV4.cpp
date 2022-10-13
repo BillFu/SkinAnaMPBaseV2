@@ -161,7 +161,7 @@ void ForgeEyePgBySegRst(Size srcImgS, const SegMask& eyeSegMask,
     findContours(eyeSegMask.mask, contours,
             cv::noArray(), RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
     
-    cout << "The Number of Points on the contour of brow: "
+    cout << "The Number of Points on the contour of eye: "
         << contours[0].size() << endl;
     
     float scaleUpX = (float)srcImgS.width / SEG_NET_OUTPUT_SIZE;
