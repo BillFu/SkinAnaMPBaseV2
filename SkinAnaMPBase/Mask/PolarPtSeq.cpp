@@ -287,5 +287,33 @@ void CalcEyeCtP1P2(const CONTOUR& eyeCont, const Point& eyeCP, Point& P1, Point&
 
     // Seek for P2 in the section I
     FindPtWithMaxR(contSect1, eyeCP, P2);
+}
 
+// P4: the top middle point on the eye contour,
+// P3: the bottom middle point on the eye contour.
+void CalcEyeCtP3P4(const CONTOUR& eyeCont, const Point& eyeCP, Point& P3, Point& P4)
+{
+    // divide the coordinate space into 4 rotated sections, I, II, III, IV
+    // by rotating the ordinary 4-sections 45 degree CCW.
+    // eyeCP as orignal point of coordinate system
+    
+    const double M_PI_Quarter = M_PI / 4.0;
+    const double M_PI_3Quarters = M_PI * 0.75;
+    const double M_PI_5Quarters = M_PI * 1.25;
+    const double M_PI_7Quarters = M_PI * 1.75;
+
+    CONTOUR contSect1, contSect3;
+    for(Point pt: eyeCont)
+    {
+        int dx = pt.x - eyeCP.x;
+        int dy = pt.y - eyeCP.y;
+        double theta = atan2(dy, dx); // theta in [-M_PI M_PI] at this time point
+        if(theta < 0.0)
+            theta += M_PI;
+        
+        if(theta > M_PI_Quarter && theta < M_PI_3Quarters)
+            contSect1.push_back(pt);
+        else if(theta > M_PI_5Quarters && theta < M_PI_7Quarters)
+            contSect3.push_back(pt);
+    }
 }
