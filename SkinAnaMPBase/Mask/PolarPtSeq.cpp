@@ -212,7 +212,7 @@ void BuildEvenPolarSeq(const PolarContour& rawPolarSeq,
                        rawPolarSeq.oriPt, evenPolarSeq);
 }
 
-void smoothPolarPtSeq(const PolarContour& evenPolarSeq,
+void SmoothPolarPtSeq(const PolarContour& evenPolarSeq,
                       int mwLen, //length of moving window
                       PolarContour& smoothPolarSeq)
 {
@@ -239,4 +239,53 @@ void smoothPolarPtSeq(const PolarContour& evenPolarSeq,
         PtInPolarCd ipPt(avg_r, theta);
         smoothPolarSeq.ptSeq.push_back(ipPt);
     }
+}
+
+
+//----Polar coordinate system not used in the following functions method,
+//----Cartesian coordinate system used instead--------------------------
+
+void FindPtWithMaxR(const CONTOUR& contSect, const Point& eyeCP, Point& outPt)
+{
+    double max_r = 0.0;
+    Point candiOutPt(-1, -1); // candidate
+    for(Point pt: contSect)
+    {
+        Point relaCd = pt - eyeCP;
+        double r = sqrt(relaCd.x*relaCd.x + relaCd.y*relaCd.y);
+        if(r > max_r)
+        {
+            max_r = r;
+            candiOutPt = pt;
+        }
+    }
+    
+    outPt = candiOutPt;
+}
+
+// P1: the top left corner on the eye contour,
+// P2: the top right corner on the eye contour.
+void CalcEyeCtP1P2(const CONTOUR& eyeCont, const Point& eyeCP, Point& P1, Point& P2)
+{
+    // divide the coordinate space into 4 sections, I, II, III, IV
+    // by eyeCP and the horizontal and vertical axises.
+    
+    CONTOUR contSect1, contSect2;
+    for(Point pt: eyeCont)
+    {
+        int dx = pt.x - eyeCP.x;
+        int dy = pt.y - eyeCP.y;
+        
+        if(dx > 0 && dy < 0)
+            contSect1.push_back(pt);
+        else if(dx < 0 && dy < 0)
+            contSect2.push_back(pt);
+    }
+    
+    // seek for P1 in the section II,
+    FindPtWithMaxR(contSect2, eyeCP, P1);
+
+    // Seek for P2 in the section I
+    FindPtWithMaxR(contSect1, eyeCP, P2);
+
 }

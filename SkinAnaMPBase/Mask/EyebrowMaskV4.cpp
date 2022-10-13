@@ -180,7 +180,7 @@ void ForgeEyePgBySegRst(Size srcImgS, const SegMask& eyeSegMask,
     
     // then smoothing the evenly interpolated polar pt seq.
     PolarContour smoothPolarSeq;
-    smoothPolarPtSeq(evenPolarSeq, 7, smoothPolarSeq);
+    SmoothPolarPtSeq(evenPolarSeq, 7, smoothPolarSeq);
 }
 
 void ForgeEyesMask(const FaceInfo& faceInfo,
