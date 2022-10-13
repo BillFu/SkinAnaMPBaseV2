@@ -109,10 +109,10 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     float expanRatio = 0.3;
     ForgeMouthMask(faceInfo, expanRatio, mouthMask);
     
-    Mat eyebrowsMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    Mat browsMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string ebsMaskImgFile = BuildOutImgFileName(outDir,
                              fileNameBone, "ebc_");
-    ForgeBrowsMask(faceInfo, segResult, eyebrowsMask);
+    ForgeBrowsMask(faceInfo, segResult, browsMask);
     
     Mat eyesMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string eyeMaskImgFile = BuildOutImgFileName(outDir,
@@ -120,7 +120,7 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     ForgeEyesMask(faceInfo, segResult, eyesMask);
     OverlayMaskOnImage(annoLmImage, eyesMask,
                         "eyes_mask", eyeMaskImgFile.c_str());
-
+    /*
     Mat eyesFullMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string eyeFullMaskImgFile = BuildOutImgFileName(outDir,
                              fileNameBone, "efc_");
@@ -165,7 +165,7 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     //TestMaskV5(faceInfo, fbBiLab, srcImage);
     
     ForgeSkinMaskV5(faceInfo, mouthMask,
-                    eyebrowsMask, eyesMask,
+                    browsMask, eyesMask,
                     lowFaceMask,
                     skinMask, raisedFhCurve, raisedPtIndices);
     
@@ -183,7 +183,7 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     
     OverlayMaskOnImage(annoLmImage, skinMask,
                        "Skin Mask", skinMaskImgFile.c_str());
-    
+    */
 }
 
 //-------------------------------------------------------------------------------------------

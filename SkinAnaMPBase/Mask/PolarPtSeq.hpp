@@ -38,5 +38,9 @@ void SmoothPolarPtSeq(const PolarContour& evenPolarSeq,
                       int mwLen, //length of moving window
                       PolarContour& smoothPolarSeq);
 
+Point PolarPt2CartPt(const PtInPolarCd& polarPt, const Point& oriPt); //, Point& cartPt);
+
+void PolarPtSeq2CartPtSeq(const PolarContour& polarPtSeq,
+                          CONTOUR& cartCont);
 
 #endif /* end of POLAR_PT_SEQ_HPP */

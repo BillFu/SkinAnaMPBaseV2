@@ -97,6 +97,22 @@ struct SegMask
     Mat  mask; // sub-matrix cropped from the NOS or SP, its location specified by bbox
 };
 
+struct SegEyeFPsNOS
+{
+    Point lCorPtNOS;
+    Point rCorPtNOS;
+    Point mTopPtNOS;
+    Point mBotPtNOS;
+};
+
+struct EyeFPs  // in source space
+{
+    Point lCorPt;
+    Point rCorPt;
+    Point mTopPt;
+    Point mBotPt;
+};
+
 // store the information about face which has been refined out from the segment labels
 struct FaceSegResult
 {
@@ -109,9 +125,11 @@ struct FaceSegResult
     Point2i     leftEyeCP;    // in source space
     Point2i     rightEyeCP;
     //Eye FP: feature points of eye, P1, P2, P3, P4。P1: 内侧上角点；P2: 外侧上角点；P3: 下弧线中点；P4: 上弧线中点。
-    Point2i     leftEyeFPs[4];
-    Point2i     rightEyeFPs[4];
-    
+    SegEyeFPsNOS  lEyeFPsNOS;
+    SegEyeFPsNOS  rEyeFPsNOS;
+    EyeFPs        lEyeFPs;
+    EyeFPs        rEyeFPs;
+
     int         leftEyeArea;  // in source space
     int         rightEyeArea;
 
@@ -120,6 +138,9 @@ struct FaceSegResult
     
     Point2i     leftBrowCP;     // center point of left eyebrow in source space
     Point2i     rightBrowCP;    // center point of right eyebrow in source space
+    Point2i     lBrowCP_NOS;  // in Net Output Space
+    Point2i     rBrowCP_NOS;
+
     SegMask     leftBrowMask;
     SegMask     rightBrowMask;
     bool        isFrontView;

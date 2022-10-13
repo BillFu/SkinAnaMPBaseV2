@@ -132,14 +132,20 @@ void DrawSegOnImage(const Mat& srcImg,
 // 有可能因为眼睛相对于相机的Pose差异，而出现上弯月（凹陷朝上）和下弯月（凹陷朝下）之分。
 // 规定：这三个函数的eyeCont是在NOS中定义的！
 // 规定：eyeCP也是限定在NOS中的。
-void CalcEyeCtP1P2(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS, Point& P1NOS, Point& P2NOS);
+//void CalcEyeCtP1P2(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS, Point& P1NOS, Point& P2NOS);
 
-// P4: the top middle point on the eye contour,
-// P3: the bottom middle point on the eye contour.
 // 我们在从分割后的栅格数据中提取轮廓点时，用CHAIN_APPROX_NONE保证轮廓点是紧密相挨的，不是稀疏的。
 // 还有一点，眼睛区域不是凸的，这就有可能出现eyeCP出现Mask之外的情形。
-void CalcEyeCtP3P4(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS, Point& P3NOS, Point& P4NOS);
+void CalcEyeCtMidPts(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS,
+                     Point& bMidPtNOS, Point& tMidPtNOS);
 
-void CalcEyeCtFPs(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS, Point2i eyeFPs_NOS[4]);
+void CalcEyeCtFPs(const CONTOUR& eyeCont_NOS,
+                  const Point& browCP_NOS,
+                  const Point& eyeCP_NOS,
+                  SegEyeFPsNOS& segEyeFPsNOS,
+                  EyeFPs& eyeFPs);
+
+void CalcEyeCornerPts(const CONTOUR& eyeCont_NOS, const Point& browCP_NOS,
+                        Point& lCorPtNOS, Point& rCorPtNOS);
 
 #endif /* end of FACE_BG_SEG_V2_HPP */

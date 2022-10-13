@@ -159,7 +159,7 @@ void ForgeEyePgBySegRst(Size srcImgS, const SegMask& eyeSegMask,
 {
     CONTOURS contours;
     findContours(eyeSegMask.mask, contours,
-            cv::noArray(), RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+                 cv::noArray(), RETR_EXTERNAL, CHAIN_APPROX_NONE);  //CHAIN_APPROX_SIMPLE);
     
     cout << "The Number of Points on the contour of eye: "
         << contours[0].size() << endl;
@@ -181,6 +181,8 @@ void ForgeEyePgBySegRst(Size srcImgS, const SegMask& eyeSegMask,
     // then smoothing the evenly interpolated polar pt seq.
     PolarContour smoothPolarSeq;
     SmoothPolarPtSeq(evenPolarSeq, 7, smoothPolarSeq);
+    
+    PolarPtSeq2CartPtSeq(smoothPolarSeq, eyePg);
 }
 
 void ForgeEyesMask(const FaceInfo& faceInfo,

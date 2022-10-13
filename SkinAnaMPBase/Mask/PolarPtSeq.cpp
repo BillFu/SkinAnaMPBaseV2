@@ -55,7 +55,7 @@ PtInPolarSeq MakePolarSeqInCCWise(const PtInPolarSeq& oriSeq)
     else  // in CW, need turn the order
     {
         PtInPolarSeq ccwSeq;
-        for(int i = numPts; i>=0; i--)
+        for(int i = numPts-1; i>=0; i--)
         {
             ccwSeq.push_back(oriSeq[i]);
         }
@@ -241,4 +241,20 @@ void SmoothPolarPtSeq(const PolarContour& evenPolarSeq,
     }
 }
 
+Point PolarPt2CartPt(const PtInPolarCd& polarPt, const Point& oriPt) //, Point& cartPt)
+{
+    int x = oriPt.x + (int)(polarPt.r * cos(polarPt.theta));
+    int y = oriPt.y + (int)(polarPt.r * sin(polarPt.theta));
+    
+    return Point(x, y);
+}
 
+void PolarPtSeq2CartPtSeq(const PolarContour& polarCont,
+                          CONTOUR& cartCont)
+{
+    for(PtInPolarCd polarPt: polarCont.ptSeq)
+    {
+        Point cartPt = PolarPt2CartPt(polarPt, polarCont.oriPt);
+        cartCont.push_back(cartPt);
+    }
+}

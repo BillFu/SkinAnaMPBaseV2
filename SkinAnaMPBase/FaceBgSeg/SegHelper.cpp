@@ -150,14 +150,16 @@ void DrawSegOnImage(const Mat& srcImg, float alpha,
     cv::circle(outImg, segResult.leftEyeCP, 10, yellow, cv::FILLED);
     cv::circle(outImg, segResult.rightEyeCP, 10, yellow, cv::FILLED);
     
+    /*
     for(int i=0; i<4; i++)
     {
         cv::circle(outImg, segResult.leftEyeFPs[i], 10, yellow, cv::FILLED);
-        cout << "Left Pt " << i << ":" << segResult.leftEyeFPs[i] << endl;
+        //cout << "Left Pt " << i << ":" << segResult.leftEyeFPs[i] << endl;
         
         cv::circle(outImg, segResult.rightEyeFPs[i], 10, yellow, cv::FILLED);
-        cout << "Right Pt " << i << ":" << segResult.rightEyeFPs[i] << endl;
+        //cout << "Right Pt " << i << ":" << segResult.rightEyeFPs[i] << endl;
     }
+    */
     
     // show the CPs of brows
     cv::circle(outImg, segResult.leftBrowCP, 10, yellow, cv::FILLED);
@@ -256,6 +258,7 @@ void FindPtWithMaxR(const CONTOUR& contSect, const Point& eyeCP, Point& outPt)
     outPt = candiOutPt;
 }
 
+/*
 // P1: the top left corner on the eye contour,
 // P2: the top right corner on the eye contour.
 void CalcEyeCtP1P2(const CONTOUR& eyeCont_NOS,
@@ -282,14 +285,12 @@ void CalcEyeCtP1P2(const CONTOUR& eyeCont_NOS,
     // Seek for P2 in the section I
     FindPtWithMaxR(contSect1, eyeCP_NOS, P2);
 }
+*/
 
-// P4: the top middle point on the eye contour,
-// P3: the bottom middle point on the eye contour.
 // 我们在从分割后的栅格数据中提取轮廓点时，用CHAIN_APPROX_NONE保证轮廓点是紧密相挨的，不是稀疏的。
 // 还有一点，眼睛区域不是凸的，这就有可能出现eyeCP出现Mask之外的情形。
-void CalcEyeCtP3P4(const CONTOUR& eyeCont_NOS,
-                   const Point& eyeCP_NOS,
-                   Point& P3, Point& P4)
+void CalcEyeCtMidPts(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS,
+                     Point& bMidPtNOS, Point& tMidPtNOS)
 {
     // divide the coordinate space into 4 rotated sections, I, II, III, IV
     // by rotating the ordinary 4-sections 45 degree CCW.
@@ -307,27 +308,71 @@ void CalcEyeCtP3P4(const CONTOUR& eyeCont_NOS,
             // 区分与上面的点相交，还是与下面的点相交
             if(dy <= 0) // 与上面的点相交
             {
-                P4 = pt;
+                tMidPtNOS = pt;
             }
             else  // 与下面的点相交
             {
-                P3 = pt;
+                bMidPtNOS = pt;
             }
         }
     }
 }
 
-void CalcEyeCtFPs(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS, Point2i eyeFPs_NOS[4])
+void CalcEyeCtFPs(const CONTOUR& eyeCont_NOS,
+                  const Point& browCP_NOS,
+                  const Point& eyeCP_NOS,
+                  SegEyeFPsNOS& segEyeFPsNOS,
+                  EyeFPs& eyeFPs)
 {
-    Point P1, P2;
-    CalcEyeCtP1P2(eyeCont_NOS, eyeCP_NOS, P1, P2);
+    CalcEyeCornerPts(eyeCont_NOS, browCP_NOS,
+        segEyeFPsNOS.lCorPtNOS, segEyeFPsNOS.rCorPtNOS);
 
-    int x_gap = 1;
     Point P3, P4;
-    CalcEyeCtP3P4(eyeCont_NOS, eyeCP_NOS, P3, P4);
+    //CalcEyeCtP3P4(eyeCont_NOS, eyeCP_NOS, P3, P4);
+    CalcEyeCtMidPts(eyeCont_NOS, eyeCP_NOS,
+                    segEyeFPsNOS.mBotPtNOS, segEyeFPsNOS.mTopPtNOS);
     
-    eyeFPs_NOS[0] = P1;
-    eyeFPs_NOS[1] = P2;
-    eyeFPs_NOS[2] = P3;
-    eyeFPs_NOS[3] = P4;
+    //segEyeFPsNOS
+    void FaceBgSegmentor::ScaleUpPoint(const Point2i& inPt, Point2i& outPt)
+
+}
+
+// new idea to calc P1 and P2
+// P1: left corner on the eye contour
+// P2: right corner on the eye contour
+void CalcEyeCornerPts(const CONTOUR& eyeCont_NOS, const Point& browCP_NOS,
+                     Point& lCorPtNOS, Point& rCorPtNOS)
+{
+    double DoublePI = 2*M_PI;
+    
+    double minTheta = 2*DoublePI;
+    double maxTheta = -2*DoublePI;
+    
+    Point candiLCorner;
+    Point candiRCorner;
+    
+    for(Point pt: eyeCont_NOS)
+    {
+        int dx = pt.x - browCP_NOS.x;
+        int dy = pt.y - browCP_NOS.y;
+        
+        double theta = atan2(dy, dx);
+        if(theta < 0.0)
+            theta += DoublePI;
+        
+        if(theta > maxTheta)
+        {
+            maxTheta = theta;
+            candiRCorner = pt;
+        }
+        
+        if(theta < minTheta)
+        {
+            minTheta = theta;
+            candiLCorner = pt;
+        }
+    }
+    
+    lCorPtNOS = candiLCorner;
+    rCorPtNOS = candiRCorner;
 }
