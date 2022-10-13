@@ -226,4 +226,99 @@ Mat FaceBgSegmentor::CalcFBBiLabExBeard(const FaceSegResult& segResult)
 }
 
 //-------------------------------------------------------------------------------------------
+//----Polar coordinate system not used in the following functions method,
+//----Cartesian coordinate system used instead--------------------------
 
+void FindPtWithMaxR(const CONTOUR& contSect, const Point& eyeCP, Point& outPt)
+{
+    double max_r = 0.0;
+    Point candiOutPt(-1, -1); // candidate
+    for(Point pt: contSect)
+    {
+        Point relaCd = pt - eyeCP;
+        double r = sqrt(relaCd.x*relaCd.x + relaCd.y*relaCd.y);
+        if(r > max_r)
+        {
+            max_r = r;
+            candiOutPt = pt;
+        }
+    }
+    
+    outPt = candiOutPt;
+}
+
+// P1: the top left corner on the eye contour,
+// P2: the top right corner on the eye contour.
+void CalcEyeCtP1P2(const CONTOUR& eyeCont_NOS,
+                   const Point& eyeCP_NOS, Point& P1, Point& P2)
+{
+    // divide the coordinate space into 4 sections, I, II, III, IV
+    // by eyeCP and the horizontal and vertical axises.
+    
+    CONTOUR contSect1, contSect2;
+    for(Point pt: eyeCont_NOS)
+    {
+        int dx = pt.x - eyeCP_NOS.x;
+        int dy = pt.y - eyeCP_NOS.y;
+        
+        if(dx > 0 && dy < 0)
+            contSect1.push_back(pt);
+        else if(dx < 0 && dy < 0)
+            contSect2.push_back(pt);
+    }
+    
+    // seek for P1 in the section II,
+    FindPtWithMaxR(contSect2, eyeCP_NOS, P1);
+
+    // Seek for P2 in the section I
+    FindPtWithMaxR(contSect1, eyeCP_NOS, P2);
+}
+
+// P4: the top middle point on the eye contour,
+// P3: the bottom middle point on the eye contour.
+// 这地方有个稠密点和稀疏点的问题：即轮廓上的点是紧密挨在一起的（例如分割获得的直接结果），
+// 还是有较大间隔的（例如放大到原始图像空间）。
+void CalcEyeCtP3P4(const CONTOUR& eyeCont_NOS,
+                   const Point& eyeCP_NOS,
+                   int x_gap,  //定义相邻轮廓点的X轴最大间距
+                   Point& P3, Point& P4)
+{
+    // divide the coordinate space into 4 rotated sections, I, II, III, IV
+    // by rotating the ordinary 4-sections 45 degree CCW.
+    // eyeCP as orignal point of coordinate system
+    // 采用垂直线求交的方法
+
+    for(Point pt: eyeCont_NOS)
+    {
+        int dx = pt.x - eyeCP_NOS.x;
+        int dy = pt.y - eyeCP_NOS.y;
+        
+        if(dx >= -x_gap && dx <= x_gap) // 碰到与垂线相交的点了
+        {
+            // 区分与上面的点相交，还是与下面的点相交
+            if(dy <= 0) // 与上面的点相交
+            {
+                P4 = pt;
+            }
+            else  // 与下面的点相交
+            {
+                P3 = pt;
+            }
+        }
+    }
+}
+
+void CalcEyeCtFPs(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS, Point2i eyeFPs_NOS[4])
+{
+    Point P1, P2;
+    CalcEyeCtP1P2(eyeCont_NOS, eyeCP_NOS, P1, P2);
+
+    int x_gap = 1;
+    Point P3, P4;
+    CalcEyeCtP3P4(eyeCont_NOS, eyeCP_NOS, x_gap, P3, P4);
+    
+    eyeFPs_NOS[0] = P1;
+    eyeFPs_NOS[1] = P2;
+    eyeFPs_NOS[2] = P3;
+    eyeFPs_NOS[3] = P4;
+}

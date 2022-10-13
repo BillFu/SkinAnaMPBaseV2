@@ -75,6 +75,7 @@ private:
     // convert BBox in net output space into the space of source image
     void ScaleUpBBox(const Rect& inBBox, Rect& outBBox);
     void ScaleUpPoint(const Point2i& inPt, Point2i& outPt);
+    void ScaleUpPointSet(const Point2i inPts[], int numPt, Point2i outPts[]);
 
     void CalcFaceBBox(const Mat& FBEB_Mask, FaceSegResult& segResult);
 
@@ -123,5 +124,20 @@ void DrawSegOnImage(const Mat& srcImg,
                     float alpha, const FaceSegResult& facePriInfo,
                     const char* outImgFileName);
 
+
+//---------------------Cartesian coordinate system used instead--------------------------
+// P1: the top left corner on the eye contour,
+// P2: the top right corner on the eye contour.
+// Here we assumed that one closed eye has a shape like meniscus(弯月形)
+// 有可能因为眼睛相对于相机的Pose差异，而出现上弯月（凹陷朝上）和下弯月（凹陷朝下）之分。
+// 规定：这三个函数的eyeCont是在NOS中定义的！
+// 规定：eyeCP也是限定在NOS中的。
+void CalcEyeCtP1P2(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS, Point& P1NOS, Point& P2NOS);
+
+// P4: the top middle point on the eye contour,
+// P3: the bottom middle point on the eye contour.
+void CalcEyeCtP3P4(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS, Point& P3NOS, Point& P4NOS);
+
+void CalcEyeCtFPs(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS, Point2i eyeFPs_NOS[4]);
 
 #endif /* end of FACE_BG_SEG_V2_HPP */

@@ -38,16 +38,5 @@ void SmoothPolarPtSeq(const PolarContour& evenPolarSeq,
                       int mwLen, //length of moving window
                       PolarContour& smoothPolarSeq);
 
-//---------------------Polar coordinate system not used in the following functions method,
-//---------------------Cartesian coordinate system used instead--------------------------
-// P1: the top left corner on the eye contour,
-// P2: the top right corner on the eye contour.
-// Here we assumed that one closed eye has a shape like meniscus(弯月形)
-// 有可能因为眼睛相对于相机的Pose差异，而出现上弯月（凹陷朝上）和下弯月（凹陷朝下）之分。
-void CalcEyeCtP1P2(const CONTOUR& eyeCont, const Point& eyeCP, Point& P1, Point& P2);
-
-// P4: the top middle point on the eye contour,
-// P3: the bottom middle point on the eye contour.
-void CalcEyeCtP3P4(const CONTOUR& eyeCont, const Point& eyeCP, Point& P3, Point& P4);
 
 #endif /* end of POLAR_PT_SEQ_HPP */

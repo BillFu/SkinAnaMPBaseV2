@@ -120,6 +120,12 @@ void FaceBgSegmentor::ScaleUpPoint(const Point2i& inPt, Point2i& outPt)
     outPt = Point2i(outX1, outY1);
 }
 
+void FaceBgSegmentor::ScaleUpPointSet(const Point2i inPts[], int numPt, Point2i outPts[])
+{
+    for(int i=0; i<numPt; i++)
+        ScaleUpPoint(inPts[i], outPts[i]);
+}
+
 // NOS: Net Output Space
 // the coordinate of Contour measured in NOS
 // the return BBox is measured in SP, i.e., Source Space
@@ -232,6 +238,11 @@ void FaceBgSegmentor::CalcEyesInfo(const Mat& eyesMask, FaceSegResult& segResult
         mc.push_back(cv::Point2i(cx, cy));
     }
     
+    Point2i eyeFPs_NOS0[4];
+    Point2i eyeFPs_NOS1[4];
+    CalcEyeCtFPs(contours[0], mc[0], eyeFPs_NOS0);
+    CalcEyeCtFPs(contours[1], mc[1], eyeFPs_NOS1);
+
     Point2i eyeCP0, eyeCP1;
     ScaleUpPoint(mc[0], eyeCP0);
     ScaleUpPoint(mc[1], eyeCP1);
@@ -257,6 +268,9 @@ void FaceBgSegmentor::CalcEyesInfo(const Mat& eyesMask, FaceSegResult& segResult
                        NET_OUT_SPACE, segResult.leftEyeMask);
         CropMaskByCont(contours[1], eyesMask,
                        NET_OUT_SPACE, segResult.rightEyeMask);
+        
+        ScaleUpPointSet(eyeFPs_NOS0, 4, segResult.leftEyeFPs);
+        ScaleUpPointSet(eyeFPs_NOS1, 4, segResult.rightEyeFPs);
     }
     else // 1 is left, 0 is right
     {
@@ -270,6 +284,9 @@ void FaceBgSegmentor::CalcEyesInfo(const Mat& eyesMask, FaceSegResult& segResult
                        NET_OUT_SPACE, segResult.leftEyeMask);
         CropMaskByCont(contours[0], eyesMask,
                        NET_OUT_SPACE, segResult.rightEyeMask);
+        
+        ScaleUpPointSet(eyeFPs_NOS1, 4, segResult.leftEyeFPs);
+        ScaleUpPointSet(eyeFPs_NOS0, 4, segResult.rightEyeFPs);
     }
     
     segResult.eyeAreaDiffRatio = calcEyeAreaDiffRatio(eyeArea0, eyeArea1);
