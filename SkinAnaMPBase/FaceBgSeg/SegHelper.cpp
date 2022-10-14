@@ -126,6 +126,15 @@ Mat FaceBgSegmentor::RenderSegLabels(const Size& imgSize, const Mat& segLabels)
 }
 
 //-------------------------------------------------------------------------------------------
+void DrawEyeFPs(Mat& outImg, const EyeFPs& eyeFPs)
+{
+    cv::Scalar yellow(0, 255, 255); // (B, G, R)
+
+    cv::circle(outImg, eyeFPs.lCorPt, 10, yellow, cv::FILLED);
+    cv::circle(outImg, eyeFPs.rCorPt, 10, yellow, cv::FILLED);
+    cv::circle(outImg, eyeFPs.mTopPt, 10, yellow, cv::FILLED);
+    cv::circle(outImg, eyeFPs.mBotPt, 10, yellow, cv::FILLED);
+}
 
 void DrawSegOnImage(const Mat& srcImg, float alpha,
                     const FaceSegResult& segResult,
@@ -150,16 +159,8 @@ void DrawSegOnImage(const Mat& srcImg, float alpha,
     cv::circle(outImg, segResult.leftEyeCP, 10, yellow, cv::FILLED);
     cv::circle(outImg, segResult.rightEyeCP, 10, yellow, cv::FILLED);
     
-    /*
-    for(int i=0; i<4; i++)
-    {
-        cv::circle(outImg, segResult.leftEyeFPs[i], 10, yellow, cv::FILLED);
-        //cout << "Left Pt " << i << ":" << segResult.leftEyeFPs[i] << endl;
-        
-        cv::circle(outImg, segResult.rightEyeFPs[i], 10, yellow, cv::FILLED);
-        //cout << "Right Pt " << i << ":" << segResult.rightEyeFPs[i] << endl;
-    }
-    */
+    DrawEyeFPs(outImg, segResult.lEyeFPs);
+    DrawEyeFPs(outImg, segResult.rEyeFPs);
     
     // show the CPs of brows
     cv::circle(outImg, segResult.leftBrowCP, 10, yellow, cv::FILLED);
@@ -236,6 +237,14 @@ Mat FaceBgSegmentor::CalcFBBiLabExBeard(const FaceSegResult& segResult)
     return labelsBi;
 }
 
+void PtNOS2PtSP(int srcImgW, int srcImgH,
+                const Point2i& inPt, Point2i& outPt)
+{
+    int outX1 = inPt.x * srcImgW / SEG_NET_OUTPUT_SIZE;
+    int outY1 = inPt.y * srcImgH / SEG_NET_OUTPUT_SIZE;
+        
+    outPt = Point2i(outX1, outY1);
+}
 //-------------------------------------------------------------------------------------------
 //----Polar coordinate system not used in the following functions method,
 //----Cartesian coordinate system used instead--------------------------
@@ -287,6 +296,21 @@ void CalcEyeCtP1P2(const CONTOUR& eyeCont_NOS,
 }
 */
 
+
+void EyeFPsNOS2EyeFPsSP(int srcImgW, int srcImgH,
+                        const SegEyeFPsNOS& segEyeFPsNOS,
+                        EyeFPs& eyeFPs)
+{
+    PtNOS2PtSP(srcImgW, srcImgH,
+               segEyeFPsNOS.lCorPtNOS , eyeFPs.lCorPt);
+    PtNOS2PtSP(srcImgW, srcImgH,
+               segEyeFPsNOS.rCorPtNOS , eyeFPs.rCorPt);
+    PtNOS2PtSP(srcImgW, srcImgH,
+               segEyeFPsNOS.mTopPtNOS , eyeFPs.mTopPt);
+    PtNOS2PtSP(srcImgW, srcImgH,
+               segEyeFPsNOS.mBotPtNOS , eyeFPs.mBotPt);
+}
+
 // 我们在从分割后的栅格数据中提取轮廓点时，用CHAIN_APPROX_NONE保证轮廓点是紧密相挨的，不是稀疏的。
 // 还有一点，眼睛区域不是凸的，这就有可能出现eyeCP出现Mask之外的情形。
 void CalcEyeCtMidPts(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS,
@@ -318,7 +342,8 @@ void CalcEyeCtMidPts(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS,
     }
 }
 
-void CalcEyeCtFPs(const CONTOUR& eyeCont_NOS,
+void CalcEyeCtFPs(int srcImgW, int srcImgH,
+                  const CONTOUR& eyeCont_NOS,
                   const Point& browCP_NOS,
                   const Point& eyeCP_NOS,
                   SegEyeFPsNOS& segEyeFPsNOS,
@@ -327,14 +352,11 @@ void CalcEyeCtFPs(const CONTOUR& eyeCont_NOS,
     CalcEyeCornerPts(eyeCont_NOS, browCP_NOS,
         segEyeFPsNOS.lCorPtNOS, segEyeFPsNOS.rCorPtNOS);
 
-    Point P3, P4;
-    //CalcEyeCtP3P4(eyeCont_NOS, eyeCP_NOS, P3, P4);
     CalcEyeCtMidPts(eyeCont_NOS, eyeCP_NOS,
                     segEyeFPsNOS.mBotPtNOS, segEyeFPsNOS.mTopPtNOS);
     
-    //segEyeFPsNOS
-    void FaceBgSegmentor::ScaleUpPoint(const Point2i& inPt, Point2i& outPt)
-
+    EyeFPsNOS2EyeFPsSP(srcImgW, srcImgH,
+                    segEyeFPsNOS, eyeFPs);
 }
 
 // new idea to calc P1 and P2

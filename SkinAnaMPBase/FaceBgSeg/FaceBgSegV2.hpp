@@ -117,6 +117,8 @@ private:
     static vector<Vec3b> classColorTable;
 };
 
+void DrawEyeFPs(Mat& outImg, const EyeFPs& eyeFPs);
+
 // blend segment labels image with source iamge:
 // result = alpha * segLabels + (1-alpha) * srcImage
 // alpha lies in [0.0 1.0]
@@ -139,7 +141,8 @@ void DrawSegOnImage(const Mat& srcImg,
 void CalcEyeCtMidPts(const CONTOUR& eyeCont_NOS, const Point& eyeCP_NOS,
                      Point& bMidPtNOS, Point& tMidPtNOS);
 
-void CalcEyeCtFPs(const CONTOUR& eyeCont_NOS,
+void CalcEyeCtFPs(int srcImgW, int srcImgH,
+                  const CONTOUR& eyeCont_NOS,
                   const Point& browCP_NOS,
                   const Point& eyeCP_NOS,
                   SegEyeFPsNOS& segEyeFPsNOS,
@@ -147,5 +150,11 @@ void CalcEyeCtFPs(const CONTOUR& eyeCont_NOS,
 
 void CalcEyeCornerPts(const CONTOUR& eyeCont_NOS, const Point& browCP_NOS,
                         Point& lCorPtNOS, Point& rCorPtNOS);
+
+void PtNOS2PtSP(int srcImgW, int srcImgH, const Point2i& inPt, Point2i& outPt);
+
+void EyeFPsNOS2EyeFPsSP(int srcImgW, int srcImgH,
+                        const SegEyeFPsNOS& segEyeFPsNOS,
+                        EyeFPs& eyeFPs);
 
 #endif /* end of FACE_BG_SEG_V2_HPP */

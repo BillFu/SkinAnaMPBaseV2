@@ -92,7 +92,7 @@ int main(int argc, char **argv)
         segResult, segAnnoImgFP.c_str());
     
     cout << "source image has been segmented!" << endl;
-
+    /*
     FaceInfo faceInfo;
 
     float confThresh = 0.75;
@@ -132,7 +132,7 @@ int main(int argc, char **argv)
     ForgeMaskAnnoPackDebug(srcImage, annoLmImage,
                       outParePath, fileBoneName,
                       faceInfo, segResult);
-    
+    */
     /*
     ForgeMaskAnnoPackV2(srcImage, 
                         outParePath, fileBoneName,

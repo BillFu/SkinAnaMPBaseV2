@@ -266,9 +266,9 @@ void FaceBgSegmentor::CalcEyesInfo(const Mat& eyesMask, FaceSegResult& segResult
                        NET_OUT_SPACE, segResult.rightEyeMask);
         
         // 0 is left, 1 is right
-        CalcEyeCtFPs(contours[0], segResult.lBrowCP_NOS,
+        CalcEyeCtFPs(srcImgW, srcImgH, contours[0], segResult.lBrowCP_NOS,
                      mc[0], segResult.lEyeFPsNOS, segResult.lEyeFPs); // left
-        CalcEyeCtFPs(contours[1], segResult.rBrowCP_NOS,
+        CalcEyeCtFPs(srcImgW, srcImgH, contours[1], segResult.rBrowCP_NOS,
                      mc[1], segResult.rEyeFPsNOS, segResult.rEyeFPs); // right
     }
     else // 1 is left, 0 is right
@@ -285,14 +285,11 @@ void FaceBgSegmentor::CalcEyesInfo(const Mat& eyesMask, FaceSegResult& segResult
                        NET_OUT_SPACE, segResult.rightEyeMask);
         
         // 1 is left, 0 is right
-        CalcEyeCtFPs(contours[1], segResult.lBrowCP_NOS,
+        CalcEyeCtFPs(srcImgW, srcImgH, contours[1], segResult.lBrowCP_NOS,
                      mc[1], segResult.lEyeFPsNOS, segResult.lEyeFPs); // left
-        CalcEyeCtFPs(contours[0], segResult.rBrowCP_NOS,
+        CalcEyeCtFPs(srcImgW, srcImgH, contours[0], segResult.rBrowCP_NOS,
                      mc[0], segResult.rEyeFPsNOS, segResult.rEyeFPs); // right
     }
-    
-    //ScaleUpPointSet(lEyeFPs_NOS, 4, segResult.leftEyeFPs);
-    //ScaleUpPointSet(rEyeFPs_NOS, 4, segResult.rightEyeFPs);
     
     segResult.eyeAreaDiffRatio = calcEyeAreaDiffRatio(eyeArea0, eyeArea1);
     
