@@ -59,7 +59,8 @@ void ForgeEyePgBySegRst(Size srcImgS, const SegMask& eyeSegMask, const Point2i& 
 // 用分割的结果构造出一只眼睛的轮廓多边形
 void ForgeEyePgBySegRstV2(Size srcImgS,
                           const SegMask& eyeSegMask,
-                          const SegEyeFPsNOS& eyeFPsNOS,
+                          const EyeFPs& eyeFPs,
+                          float scaleUpX, float scaleUpY,
                           POLYGON& eyePg);
 
 

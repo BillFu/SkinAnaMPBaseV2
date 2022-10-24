@@ -154,48 +154,107 @@ void FixERPsBySegBrowCP(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP], // inp
 
 ***********************************************************************************************/
 
+/*
 // 用分割的结果构造出一只眼睛的轮廓多边形
 void ForgeEyePgBySegRstV2(Size srcImgS,
                           const SegMask& eyeSegMask,
                           const SegEyeFPsNOS& eyeFPsNOS,
+                          float scaleUpX, float scaleUpY,
                           POLYGON& eyePg)
 {
     CONTOURS contours;
     findContours(eyeSegMask.mask, contours,
                  cv::noArray(), RETR_EXTERNAL, CHAIN_APPROX_NONE);  //CHAIN_APPROX_SIMPLE);
     
-    cout << "The Number of Points on the contour of eye: "
-        << contours[0].size() << endl;
-    
-    CONTOUR nosEyeCt;
-    transCt_SMS2NOS(contours[0], eyeSegMask.bbox.tl(),
-                    nosEyeCt);
+    //cout << "The Number of Points on the contour of eye: "
+    //    << contours[0].size() << endl;
 
+    CONTOUR nosEyeCt;
+    transCt_SMS2NOS(contours[0], eyeSegMask.bbox.tl(), nosEyeCt);
+    
     // 先判断出轮廓点的自然顺序是顺时针还是逆时针
-    CLOCK_DIR scanDir;
-    JudgeEyeCtNOSMoveDir(nosEyeCt, eyeFPsNOS, scanDir);
+    //CLOCK_DIR scanDir;
+    //JudgeEyeCtNOSMoveDir(nosEyeCt, eyeFPsNOS, scanDir);
+    
+    // 经过测试，左右眼的轮廓序列都是顺时针，但愿这个认知具有普遍性
+    // 切分为上弧线、下弧线
+    CONTOUR upEyeCurveNOS, lowEyeCurveNOS;
+    SplitEyeCt2UpLowCurves(nosEyeCt,
+                           eyeFPsNOS.lCorPtNOS,
+                           eyeFPsNOS.rCorPtNOS,
+                           upEyeCurveNOS, lowEyeCurveNOS);
+    
+    CONTOUR upEyeSmCurveNOS; //Sm: smoothed
+    smoothCtByPIFit(upEyeCurveNOS, upEyeSmCurveNOS);
+
+    CONTOUR lowEyeSmCurveNOS; //Sm: smoothed
+    smoothCtByPIFit(lowEyeCurveNOS, lowEyeSmCurveNOS);
+    
+    CONTOUR smEyeCtNOS(upEyeSmCurveNOS);
+    // combine lower curve and upper curve into one complete contour
+    for(int i=0; i<lowEyeSmCurveNOS.size(); i++)
+    {
+        smEyeCtNOS.push_back(lowEyeSmCurveNOS[i]);
+    }
+    
+    transCt_GlobalSegNOS2SS(smEyeCtNOS,
+                    scaleUpX, scaleUpY, eyePg);
+}
+*/
+
+// 用分割的结果构造出一只眼睛的轮廓多边形
+void ForgeEyePgBySegRstV2(Size srcImgS,
+                          const SegMask& eyeSegMask,
+                          const EyeFPs& eyeFPs,
+                          float scaleUpX, float scaleUpY,
+                          POLYGON& eyePg)
+{
+    CONTOURS contours;
+    findContours(eyeSegMask.mask, contours,
+                 cv::noArray(), RETR_EXTERNAL, CHAIN_APPROX_NONE);  //CHAIN_APPROX_SIMPLE);
+    
+    //cout << "The Number of Points on the contour of eye: "
+    //    << contours[0].size() << endl;
+
+    CONTOUR ssEyeCt; // in Source Space
+    transCt_LocalSegNOS2SS(contours[0], eyeSegMask.bbox.tl(),
+                    scaleUpX, scaleUpY, ssEyeCt);
+    
+    // 先判断出轮廓点的自然顺序是顺时针还是逆时针
+    //CLOCK_DIR scanDir;
+    //JudgeEyeCtNOSMoveDir(nosEyeCt, eyeFPsNOS, scanDir);
     
     // 经过测试，左右眼的轮廓序列都是顺时针，但愿这个认知具有普遍性
     // 切分为上弧线、下弧线
     CONTOUR upEyeCurve, lowEyeCurve;
-    SplitEyeCt2UpLowCurves(nosEyeCt,
-                           eyeFPsNOS.lCorPtNOS,
-                           eyeFPsNOS.rCorPtNOS,
+    SplitEyeCt2UpLowCurves(ssEyeCt, eyeFPs.lCorPt, eyeFPs.rCorPt,
                            upEyeCurve, lowEyeCurve);
     
+    /*
     CONTOUR upEyeSmCurve; //Sm: smoothed
     smoothCtByPIFit(upEyeCurve, upEyeSmCurve);
 
     CONTOUR lowEyeSmCurve; //Sm: smoothed
     smoothCtByPIFit(lowEyeCurve, lowEyeSmCurve);
     
+    CONTOUR smEyeCt(upEyeSmCurve);
+    
     // combine lower curve and upper curve into one complete contour
-    /*
-    void transCt_NOS2SS(const CONTOUR& nosLocCt, const Point& nosBBoxTlPt,
-                        float scaleUpX, float scaleUpY,
-                        CONTOUR& spCt)
+    for(int i=0; i<lowEyeSmCurve.size(); i++)
+    {
+        smEyeCt.push_back(lowEyeSmCurve[i]);
+    }
     */
-
+    
+    CONTOUR smEyeCt(upEyeCurve);
+    
+    // combine lower curve and upper curve into one complete contour
+    for(int i=0; i<lowEyeCurve.size(); i++)
+    {
+        smEyeCt.push_back(lowEyeCurve[i]);
+    }
+    
+    eyePg = smEyeCt;
 }
 
 // 按轮廓序列的自然顺序遍历轮廓点，先找到上弧线中点，而后继续遍历，看先碰到左角点还是右角点，
@@ -299,11 +358,14 @@ void ForgeEyesMask(const FaceInfo& faceInfo,
 {
     POLYGON leftEyePg, rightEyePg;
 
-    ForgeEyePgBySegRstV2(faceInfo.srcImgS, segRst.lEyeMaskNOS, segRst.lEyeFPsNOS,
-                         leftEyePg);
+    float scaleUpX = (float)faceInfo.srcImgS.width / SEG_NET_OUTPUT_SIZE;
+    float scaleUpY = (float)faceInfo.srcImgS.height / SEG_NET_OUTPUT_SIZE;
     
-    ForgeEyePgBySegRstV2(faceInfo.srcImgS, segRst.rEyeMaskNOS, segRst.rEyeFPsNOS,
-                         rightEyePg);
+    ForgeEyePgBySegRstV2(faceInfo.srcImgS, segRst.lEyeMaskNOS, segRst.lEyeFPs,
+                         scaleUpX, scaleUpY, leftEyePg);
+    
+    ForgeEyePgBySegRstV2(faceInfo.srcImgS, segRst.rEyeMaskNOS, segRst.rEyeFPs,
+                         scaleUpX, scaleUpY, rightEyePg);
     
     POLYGON_GROUP polygonGroup;
     polygonGroup.push_back(leftEyePg);

@@ -118,7 +118,7 @@ void MovePolygon(const POLYGON& oriPg, int dx, int dy, POLYGON& newPg)
 // nosTlPt: the Top Left corner of BBox of contour in the NOS.
 // scaleUpX, scaleUpY: the scale up ratio in X-axis and Y-axis.
 // nosLocCt: contour represented in local space cropped by bbox from the global NOS.
-void transCt_NOS2SS(const CONTOUR& nosLocCt, const Point& nosBBoxTlPt,
+void transCt_LocalSegNOS2SS(const CONTOUR& nosLocCt, const Point& nosBBoxTlPt,
                     float scaleUpX, float scaleUpY,
                     CONTOUR& spCt)
 {
@@ -133,6 +133,21 @@ void transCt_NOS2SS(const CONTOUR& nosLocCt, const Point& nosBBoxTlPt,
     }
 }
 
+// transform the contour(abbr. Ct) from Seg Net Output Space to Source Space
+// nosGlobalCt: contour presented in global SegNOS.
+// scaleUpX, scaleUpY: the scale up ratio in X-axis and Y-axis.
+void transCt_GlobalSegNOS2SS(const CONTOUR& nosGlobalCt,
+                    float scaleUpX, float scaleUpY,
+                    CONTOUR& spCt)
+{
+    for(Point nosPt: nosGlobalCt)
+    {
+        int spX = nosPt.x * scaleUpX;
+        int spY = nosPt.y * scaleUpY;
+        
+        spCt.push_back(Point(spX, spY));
+    }
+}
 
 void transCt_SMS2NOS(const CONTOUR& smsCt, const Point& nosBBoxTLPt,
                     CONTOUR& nosCt)
