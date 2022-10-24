@@ -20,10 +20,11 @@ Date:   2022/10/24
 using namespace std;
 using namespace cv;
 
+#include "Common.hpp"
 
 /**********************************************************************************************
 通过曲线拟合而对轮廓线进行光滑
 ***********************************************************************************************/
-void smoothCtByPIFit(const CONROUR inCt, CONTOUR& outCt);
+void smoothCtByPIFit(const CONTOUR inCt, CONTOUR& outCt);
 
 #endif /* end of POLY_ITEMS_FIT_HPP */

@@ -13,6 +13,7 @@ Date:   2022/10/24
 #include "Geometry.hpp"
 #include "Common.hpp"
 #include "PolarPtSeq.hpp"
+#include "../polyitems_fit.hpp"
 
 
 //-------------------------------------------------------------------------------------------
@@ -150,41 +151,8 @@ void FixERPsBySegBrowCP(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP], // inp
     }
 }
 /**********************************************************************************************
-only cover the two eyes
+
 ***********************************************************************************************/
-/*
-void ForgeEyePgBySegRst(Size srcImgS, const SegMask& eyeSegMask,
-                        const Point2i& eyeCP,
-                        POLYGON& eyePg)
-{
-    CONTOURS contours;
-    findContours(eyeSegMask.mask, contours,
-                 cv::noArray(), RETR_EXTERNAL, CHAIN_APPROX_NONE);  //CHAIN_APPROX_SIMPLE);
-    
-    cout << "The Number of Points on the contour of eye: "
-        << contours[0].size() << endl;
-    
-    float scaleUpX = (float)srcImgS.width / SEG_NET_OUTPUT_SIZE;
-    float scaleUpY = (float)srcImgS.height / SEG_NET_OUTPUT_SIZE;
-    CONTOUR spCt;
-    transCt_NOS2SS(contours[0], eyeSegMask.bbox.tl(),
-                    scaleUpX, scaleUpY, spCt);
-    
-    PolarContour rawPolarSeq;
-    CalcPolarSeqOnCt(spCt, eyeCP, rawPolarSeq);
-    
-    PolarContour evenPolarSeq;
-    BuildEvenPolarSeq(rawPolarSeq,
-                      144, // how many intervals from 0 to 2*Pi
-                      evenPolarSeq);
-    
-    // then smoothing the evenly interpolated polar pt seq.
-    PolarContour smoothPolarSeq;
-    SmoothPolarPtSeq(evenPolarSeq, 7, smoothPolarSeq);
-    
-    PolarPtSeq2CartPtSeq(smoothPolarSeq, eyePg);
-}
-*/
 
 // 用分割的结果构造出一只眼睛的轮廓多边形
 void ForgeEyePgBySegRstV2(Size srcImgS,
@@ -214,6 +182,20 @@ void ForgeEyePgBySegRstV2(Size srcImgS,
                            eyeFPsNOS.lCorPtNOS,
                            eyeFPsNOS.rCorPtNOS,
                            upEyeCurve, lowEyeCurve);
+    
+    CONTOUR upEyeSmCurve; //Sm: smoothed
+    smoothCtByPIFit(upEyeCurve, upEyeSmCurve);
+
+    CONTOUR lowEyeSmCurve; //Sm: smoothed
+    smoothCtByPIFit(lowEyeCurve, lowEyeSmCurve);
+    
+    // combine lower curve and upper curve into one complete contour
+    /*
+    void transCt_NOS2SS(const CONTOUR& nosLocCt, const Point& nosBBoxTlPt,
+                        float scaleUpX, float scaleUpY,
+                        CONTOUR& spCt)
+    */
+
 }
 
 // 按轮廓序列的自然顺序遍历轮廓点，先找到上弧线中点，而后继续遍历，看先碰到左角点还是右角点，

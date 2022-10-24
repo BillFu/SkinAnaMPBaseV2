@@ -7,8 +7,9 @@
 using namespace std;
 using namespace cv;
 
+#include "polyitems_fit.hpp"
 
-Mat polyfit(std::vector<cv::Point2f> &chain, int n)
+Mat polyfit(const vector<Point2f>& chain, int n)
 {
 	Mat y(chain.size(), 1, CV_32F, Scalar::all(0));
 	/* ********【预声明phy超定矩阵】************************/
@@ -44,3 +45,60 @@ Mat polyfit(std::vector<cv::Point2f> &chain, int n)
 	return a;
 }
 
+
+Mat polyfit_int(const vector<Point2i>& chain, int n)
+{
+    Mat y(chain.size(), 1, CV_32F, Scalar::all(0));
+    /* ********【预声明phy超定矩阵】************************/
+    /* 多项式拟合的函数为多项幂函数
+    * f(x)=a0+a1*x+a2*x^2+a3*x^3+......+an*x^n
+    *a0、a1、a2......an是幂系数，也是拟合所求的未知量。设有m个抽样点，则：
+    * 超定矩阵phy=1 x1 x1^2 ... ...  x1^n
+    *           1 x2 x2^2 ... ...  x2^n
+    *           1 x3 x3^2 ... ...  x3^n
+    *              ... ... ... ...
+    *              ... ... ... ...
+    *           1 xm xm^2 ... ...  xm^n
+    *
+    * *************************************************/
+    cv::Mat phy(chain.size(), n, CV_32F, Scalar::all(0));
+
+    for (int i = 0; i<phy.rows; i++)
+    {
+        float* pr = phy.ptr<float>(i);
+        for (int j = 0; j<phy.cols; j++)
+        {
+            pr[j] = pow(chain[i].x, j);
+        }
+        y.at<float>(i) = chain[i].y;
+    }
+
+    Mat phy_t = phy.t();
+    Mat phyMULphy_t = phy.t()*phy;
+    Mat phyMphyInv = phyMULphy_t.inv();
+    Mat a = phyMphyInv*phy_t;
+    a = a*y;
+
+    return a;
+}
+
+int calFittedY(int x, float a0, float a1, float a2)
+{
+    int y = (int)(a2*x*x + a1*x + a0);
+    return y;
+}
+
+void smoothCtByPIFit(const CONTOUR inCt, CONTOUR& outCt)
+{
+    Mat a = polyfit_int(inCt, 3);
+    float a0 = a.at<float>(0);
+    float a1 = a.at<float>(1);
+    float a2 = a.at<float>(2);
+    
+    for(int i=0; i<inCt.size(); i++)
+    {
+        int x = inCt[i].x;
+        int y = calFittedY(x,  a0, a1, a2);
+        outCt.push_back(Point2i(x, y));
+    }
+}
