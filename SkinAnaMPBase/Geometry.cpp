@@ -132,3 +132,14 @@ void transCt_NOS2SS(const CONTOUR& nosLocCt, const Point& nosBBoxTlPt,
         spCt.push_back(Point(spX, spY));
     }
 }
+
+
+void transCt_SMS2NOS(const CONTOUR& smsCt, const Point& nosBBoxTLPt,
+                    CONTOUR& nosCt)
+{
+    for(Point pt: smsCt)
+    {
+        Point nosPt = pt + nosBBoxTLPt;
+        nosCt.push_back(nosPt);
+    }
+}

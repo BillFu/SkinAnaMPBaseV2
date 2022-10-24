@@ -137,7 +137,7 @@ void DrawEyeFPs(Mat& outImg, const EyeFPs& eyeFPs)
 }
 
 void DrawSegOnImage(const Mat& srcImg, float alpha,
-                    const FaceSegResult& segResult,
+                    const FaceSegRst& segResult,
                     const char* outImgFileName)
 {
     Mat segColorLabel = FaceBgSegmentor::RenderSegLabels(
@@ -207,7 +207,7 @@ void DrawSegOnImage(const Mat& srcImg, float alpha,
 
 // return a binary labels image: 0 for background, and 255 for face
 // (including all its components), with the same size as the source image
-Mat FaceBgSegmentor::CalcFaceBgBiLabel(const FaceSegResult& segResult) 
+Mat FaceBgSegmentor::CalcFaceBgBiLabel(const FaceSegRst& segResult) 
 {
     // NOTE: be careful with there are two coordinate system!
     // 1. binary the seg labels image into two classes:
@@ -220,7 +220,7 @@ Mat FaceBgSegmentor::CalcFaceBgBiLabel(const FaceSegResult& segResult)
 }
 
 // FB: face and background
-Mat FaceBgSegmentor::CalcFBBiLabExBeard(const FaceSegResult& segResult)
+Mat FaceBgSegmentor::CalcFBBiLabExBeard(const FaceSegRst& segResult)
 {
     // NOTE: be careful with there are two coordinate system!
     // 1. binary the seg labels image into two classes:

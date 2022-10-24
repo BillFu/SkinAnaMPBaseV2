@@ -127,7 +127,7 @@ Mat PaddingImage(const Mat& srcImage, const Rect& bbox,
 Note: after invoking this function, return value and hasFace must be check!
 *******************************************************************************************/
 bool ExtractFaceLm(const Mat& srcImage,
-                   float confTh, const FaceSegResult& segResult,
+                   float confTh, const FaceSegRst& segResult,
                    bool& hasFace,
                    FaceInfo& faceInfo, string& errorMsg)
 {

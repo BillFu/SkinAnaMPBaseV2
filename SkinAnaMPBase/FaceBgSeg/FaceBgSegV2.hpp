@@ -44,17 +44,17 @@ public:
     FaceBgSegmentor(); 
     ~FaceBgSegmentor();
 
-    void SegImage(const Mat& srcImage, FaceSegResult& segResult);
+    void SegImage(const Mat& srcImage, FaceSegRst& segResult);
 
     // 将分割结果以彩色Table渲染出来，并放大到原始图像尺度
     static Mat RenderSegLabels(const Size& imgSize, const Mat& segLabels);
     
     // return a binary labels image: 0 for background, and 255 for face
     // (including all its components), with the same size as the source image
-    static Mat CalcFaceBgBiLabel(const FaceSegResult& segResult); 
+    static Mat CalcFaceBgBiLabel(const FaceSegRst& segResult);
 
     // FB: face and background
-    static Mat CalcFBBiLabExBeard(const FaceSegResult& segResult);
+    static Mat CalcFBBiLabExBeard(const FaceSegRst& segResult);
 
 private:
     
@@ -77,19 +77,19 @@ private:
     void ScaleUpPoint(const Point2i& inPt, Point2i& outPt);
     void ScaleUpPointSet(const Point2i inPts[], int numPt, Point2i outPts[]);
 
-    void CalcFaceBBox(const Mat& FBEB_Mask, FaceSegResult& segResult);
+    void CalcFaceBBox(const Mat& FBEB_Mask, FaceSegRst& segResult);
 
     // this function includes: calcuate the center point of two eys, area of two eyes,
     // and the ratio of area difference, final determine the face is in front view
     // or profile view.
     // The center point of face refers to the center of the line connecting the centers of wo eyes.
     // in the profile view, the CP of face esitmated cannot be used for the bad precision.
-    void CalcEyesInfo(const Mat& eyesMask, FaceSegResult& segResult);
+    void CalcEyesInfo(const Mat& eyesMask, FaceSegRst& segResult);
 
     // formula: ratio = abs(a1-a2) / max(a1, a2)
     float calcEyeAreaDiffRatio(int a1, int a2);
     
-    void CalcBrowsInfo(const Mat& browsMask, FaceSegResult& segResult);
+    void CalcBrowsInfo(const Mat& browsMask, FaceSegRst& segResult);
     
     // crop mask by using contour, i.e., change mask from the global coordinate into local coordinate
     void CropMaskByCont(const CONTOUR& cont, const Mat& maskGC,
@@ -98,10 +98,10 @@ private:
     //now make this function more thinner,
     //just extract the segmentation labels, a 512*512 matrix with one channel.
     //coloring and resize has been elimated.
-    void SegInfer(const Mat& srcImage, FaceSegResult& segResult); //, uchar segLabel[SEG_NET_OUTPUT_SIZE][SEG_NET_OUTPUT_SIZE]);
+    void SegInfer(const Mat& srcImage, FaceSegRst& segResult); //, uchar segLabel[SEG_NET_OUTPUT_SIZE][SEG_NET_OUTPUT_SIZE]);
 
     // extract all masks that covered by the facial elements
-    void ParseSegLab(FaceSegResult& segResult,
+    void ParseSegLab(FaceSegRst& segResult,
                      Mat& FBEB_Mask,
                      Mat& browsMask,
                      Mat& eyesMask,
@@ -123,7 +123,7 @@ void DrawEyeFPs(Mat& outImg, const EyeFPs& eyeFPs);
 // result = alpha * segLabels + (1-alpha) * srcImage
 // alpha lies in [0.0 1.0]
 void DrawSegOnImage(const Mat& srcImg,
-                    float alpha, const FaceSegResult& facePriInfo,
+                    float alpha, const FaceSegRst& facePriInfo,
                     const char* outImgFileName);
 
 

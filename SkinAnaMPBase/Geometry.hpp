@@ -57,6 +57,11 @@ void transCt_NOS2SS(const CONTOUR& nosLocCt, const Point& nosBBoxTlPt,
                     float scaleUpX, float scaleUpY,
                     CONTOUR& spCt);
 
+//SMS: sub-mask space
+// nosBBoxTLPt: the top left corner point of sub-mask in the NOS
+void transCt_SMS2NOS(const CONTOUR& smsCt, const Point& nosBBoxTLPt,
+                    CONTOUR& nosCt);
+
 /**********************************************************************************************
 Ip: interpolate
 GLm: general landmark

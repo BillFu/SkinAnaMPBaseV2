@@ -20,7 +20,7 @@ Date:   2022/9/23
 #include <algorithm>
 
 #include "../Utils.hpp"
-#include "EyebrowMaskV4.hpp"
+#include "EyebrowMaskV5.hpp"
 #include "ForeheadMask.hpp"
 #include "LowerFaceMask.hpp"
 #include "../AnnoImage.hpp"
@@ -95,7 +95,7 @@ void ForgeWrinkleMask(const FaceInfo& faceInfo,
 void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
                        const fs::path& outDir, const string& fileNameBone,
                        const FaceInfo& faceInfo,
-                       const FaceSegResult& segResult)
+                       const FaceSegRst& segResult)
 {
     cv::Size2i srcImgS = srcImage.size();
     
@@ -220,7 +220,7 @@ void ForgeSkinMaskV2(const FaceInfo& faceInfo,
 void ForgeMaskAnnoPackV2(const Mat& srcImage,
                        const fs::path& outDir, const string& fileNameBone,
                        const FaceInfo& faceInfo,
-                       const FaceSegResult& segResult)
+                       const FaceSegRst& segResult)
 {
     cv::Size2i srcImgS = srcImage.size();
     

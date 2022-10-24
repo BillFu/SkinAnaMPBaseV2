@@ -16,7 +16,7 @@ Date:   2022/10/3
 利用分割的结果来计算眼睛水平线以下的脸部轮廓和Mask，
 嘴部、胡子、部分眼睛在集成时再去剔除。
 ***********************************************************************************************/
-void ForgeLowerFaceMask(const FaceSegResult& segResult,
+void ForgeLowerFaceMask(const FaceSegRst& segResult,
                         const Mat& fbBiLab, Mat& outMask)
 {
     // NOTE: be careful with there are two coordinate system!

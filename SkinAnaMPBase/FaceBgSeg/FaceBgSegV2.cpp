@@ -45,7 +45,7 @@ FaceBgSegmentor::~FaceBgSegmentor()
  *******************************************************************************************/
 
 void FaceBgSegmentor::SegInfer(const Mat& srcImage,
-                              FaceSegResult& segResult)
+                               FaceSegRst& segResult)
 {
     srcImgH = srcImage.rows;
     srcImgW = srcImage.cols;
@@ -174,7 +174,7 @@ void FaceBgSegmentor::CropMaskByCont(const CONTOUR& contour, const Mat& maskGC,
 // It refers to the center of the line connecting the centers of wo eyes.
 // FBEB_Mask: mask covering face and its sub-elements
 void FaceBgSegmentor::CalcFaceBBox(const Mat& FBEB_Mask,
-                                   FaceSegResult& segResult)
+                                   FaceSegRst& segResult)
 {
     // firstly, calculation is carried out in the space of seg labels, i.e., 512*512
     // in the end, the result will be transformed into the space of source image.
@@ -212,7 +212,7 @@ float FaceBgSegmentor::calcEyeAreaDiffRatio(int a1, int a2)
 // or profile view.
 // The center point of face refers to the center of the line connecting the centers of wo eyes.
 // in the profile view, the CP of face esitmated cannot be used for the bad precision.
-void FaceBgSegmentor::CalcEyesInfo(const Mat& eyesMask, FaceSegResult& segResult)
+void FaceBgSegmentor::CalcEyesInfo(const Mat& eyesMask, FaceSegRst& segResult)
 {
     CONTOURS contours;
     //CHAIN_APPROX_SIMPLE会导致轮廓点稀疏，不紧密相挨，导致后面我们的算法失败
@@ -261,9 +261,9 @@ void FaceBgSegmentor::CalcEyesInfo(const Mat& eyesMask, FaceSegResult& segResult
         segResult.rightEyeArea = eyeArea1;
         
         CropMaskByCont(contours[0], eyesMask,
-                       NET_OUT_SPACE, segResult.leftEyeMask);
+                       NET_OUT_SPACE, segResult.lEyeMaskNOS);
         CropMaskByCont(contours[1], eyesMask,
-                       NET_OUT_SPACE, segResult.rightEyeMask);
+                       NET_OUT_SPACE, segResult.rEyeMaskNOS);
         
         // 0 is left, 1 is right
         CalcEyeCtFPs(srcImgW, srcImgH, contours[0], segResult.lBrowCP_NOS,
@@ -280,9 +280,9 @@ void FaceBgSegmentor::CalcEyesInfo(const Mat& eyesMask, FaceSegResult& segResult
         segResult.rightEyeArea = eyeArea0;
         
         CropMaskByCont(contours[1], eyesMask,
-                       NET_OUT_SPACE, segResult.leftEyeMask);
+                       NET_OUT_SPACE, segResult.lEyeMaskNOS);
         CropMaskByCont(contours[0], eyesMask,
-                       NET_OUT_SPACE, segResult.rightEyeMask);
+                       NET_OUT_SPACE, segResult.rEyeMaskNOS);
         
         // 1 is left, 0 is right
         CalcEyeCtFPs(srcImgW, srcImgH, contours[1], segResult.lBrowCP_NOS,
@@ -311,7 +311,7 @@ void FaceBgSegmentor::CalcEyesInfo(const Mat& eyesMask, FaceSegResult& segResult
 //-------------------------------------------------------------------------------------------
 // extract all masks that covered by the facial elements,
 // all of them are measured in Net Output Space
-void FaceBgSegmentor::ParseSegLab(FaceSegResult& segResult,
+void FaceBgSegmentor::ParseSegLab(FaceSegRst& segResult,
                                   Mat& FBEB_Mask,
                                   Mat& browsMask,
                                   Mat& eyesMask,
@@ -340,7 +340,7 @@ void FaceBgSegmentor::ParseSegLab(FaceSegResult& segResult,
 }
 
 void FaceBgSegmentor::CalcBrowsInfo(const Mat& browsMask,
-                                   FaceSegResult& segResult)
+                                    FaceSegRst& segResult)
 {
     CONTOURS contours;
     //CHAIN_APPROX_SIMPLE会导致轮廓点稀疏，不紧密相挨
@@ -398,19 +398,19 @@ void FaceBgSegmentor::CalcBrowsInfo(const Mat& browsMask,
 }
 
 //-------------------------------------------------------------------------------------------
-void FaceBgSegmentor::SegImage(const Mat& srcImage, FaceSegResult& segResult)
+void FaceBgSegmentor::SegImage(const Mat& srcImage, FaceSegRst& segResult)
 {
     SegInfer(srcImage, segResult);
     
-    Mat FBEB_Mask, browsMask, eyesMask, beardMask; // measured in Net Output Space
+    Mat FBEB_MaskNOS, browsMaskNOS, eyesMaskNOS, beardMaskNOS; // measured in Net Output Space
     // extract all masks that covered by the facial elements
-    ParseSegLab(segResult, FBEB_Mask, browsMask, eyesMask, beardMask);
+    ParseSegLab(segResult, FBEB_MaskNOS, browsMaskNOS, eyesMaskNOS, beardMaskNOS);
     
-    CalcFaceBBox(FBEB_Mask, segResult);
+    CalcFaceBBox(FBEB_MaskNOS, segResult);
 
     // brows firstly, and then eyes
-    CalcBrowsInfo(browsMask, segResult);
+    CalcBrowsInfo(browsMaskNOS, segResult);
     
-    CalcEyesInfo(eyesMask, segResult);
+    CalcEyesInfo(eyesMaskNOS, segResult);
 
 }

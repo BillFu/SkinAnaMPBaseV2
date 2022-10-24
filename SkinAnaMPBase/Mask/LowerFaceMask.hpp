@@ -24,7 +24,7 @@ using namespace cv;
 利用分割的结果来计算眼睛水平线以下的脸部轮廓和Mask，
 嘴部、胡子、部分眼睛在集成时再去剔除。
 ***********************************************************************************************/
-void ForgeLowerFaceMask(const FaceSegResult& segResult,
+void ForgeLowerFaceMask(const FaceSegRst& segResult,
                         const Mat& fbBiLab, Mat& outMask);
 
 
@@ -32,7 +32,7 @@ void ForgeLowerFaceMask(const FaceSegResult& segResult,
 利用分割的结果来计算眼睛水平线以下的脸部轮廓和Mask，
 胡子也被剔除。
 ***********************************************************************************************/
-void ForgeLFMaskExBeard(const FaceSegResult& segResult,
+void ForgeLFMaskExBeard(const FaceSegRst& segResult,
                         const Mat& fbBiLab, Mat& outMask);
 
 

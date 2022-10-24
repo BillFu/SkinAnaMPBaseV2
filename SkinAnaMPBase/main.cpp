@@ -85,14 +85,14 @@ int main(int argc, char **argv)
     // FP: full path
     string segAnnoImgFP = BuildOutImgFileName(
             outParePath, fileBoneName, "seg_");
-    FaceSegResult segResult;
+    FaceSegRst segResult;
     FaceBgSegmentor segmentor;
     segmentor.SegImage(srcImage, segResult);
     DrawSegOnImage(srcImage, 0.5,
         segResult, segAnnoImgFP.c_str());
     
     cout << "source image has been segmented!" << endl;
-    /*
+    
     FaceInfo faceInfo;
 
     float confThresh = 0.75;
@@ -132,7 +132,7 @@ int main(int argc, char **argv)
     ForgeMaskAnnoPackDebug(srcImage, annoLmImage,
                       outParePath, fileBoneName,
                       faceInfo, segResult);
-    */
+    
     /*
     ForgeMaskAnnoPackV2(srcImage, 
                         outParePath, fileBoneName,

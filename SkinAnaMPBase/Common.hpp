@@ -64,6 +64,12 @@ enum SPACE_DEF
     NET_OUT_SPACE  // 512*512
 };
 
+enum CLOCK_DIR
+{
+    CLOCK_WISE,
+    CCLOCK_WISE
+};
+
 struct PtInPolarCd  //Point in polar coordinate system
 {
     double r;
@@ -114,7 +120,8 @@ struct EyeFPs  // in source space
 };
 
 // store the information about face which has been refined out from the segment labels
-struct FaceSegResult
+// Rst: result
+struct FaceSegRst
 {
     // all the coordinates and sizes are measured in the space of the source image.
     Size        srcImgS;
@@ -133,8 +140,8 @@ struct FaceSegResult
     int         leftEyeArea;  // in source space
     int         rightEyeArea;
 
-    SegMask     leftEyeMask;
-    SegMask     rightEyeMask;
+    SegMask     lEyeMaskNOS;
+    SegMask     rEyeMaskNOS;
     
     Point2i     leftBrowCP;     // center point of left eyebrow in source space
     Point2i     rightBrowCP;    // center point of right eyebrow in source space
@@ -146,12 +153,12 @@ struct FaceSegResult
     bool        isFrontView;
     Mat         segLabels;      // 512 * 512, one channel
     
-    FaceSegResult()
+    FaceSegRst()
     {
         segLabels = Mat(512, 512, CV_8UC1, Scalar(0));
     }
     
-    friend ostream &operator<<(ostream &output, const FaceSegResult &fpi )
+    friend ostream &operator<<(ostream &output, const FaceSegRst &fpi )
     {
         output << "FacePrimaryInfo{" << endl;
         
