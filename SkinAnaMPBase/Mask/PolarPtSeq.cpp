@@ -32,6 +32,75 @@ void CalcPolarSeqOnCt(const CONTOUR& spCt, const Point2i& eyeCP,
     }
 }
 
+// extract the primary and coarse polar sequence on the contour
+// polePt: the origin of Pole Coordinate System, also called Pole Point.
+// scanDir: CW or CCW when to scan in the natural order of curve
+// the output values of theta will be in range: [0, 2*PI)
+void CalcPolarSeqOnCurve(const CONTOUR& curve, const Point2i& polePt,
+                         CLOCK_DIR scanDir,
+                      PolarContour& polarSeq)
+{
+    if(scanDir == CLOCK_WISE)
+    {
+        CalcPolarSeqOnCurveCW(curve, polePt, polarSeq);
+        
+    } //CCLOCK_WISE
+    else
+    {
+        CalcPolarSeqOnCurveCCW(curve, polePt, polarSeq);
+    }
+}
+
+void CalcPolarSeqOnCurveCCW(const CONTOUR& curve, const Point2i& polePt,
+                      PolarContour& polarSeq)
+{
+    polarSeq.oriPt = polePt;
+    double preTheta = - M_PI;
+    
+    for(Point pt: curve)
+    {
+        Point diff = pt - polePt;
+        double r = sqrt(diff.x * diff.x + diff.y * diff.y);
+        double theta = atan2(diff.y, diff.x);
+        if(theta < 0.0)
+            theta += M_PI*2.0;
+        
+        if(theta > preTheta)
+        {
+            PtInPolarCd ptPolar(r, theta);
+            polarSeq.ptSeq.push_back(ptPolar);
+            
+            preTheta = theta;
+        }
+    }
+}
+
+void CalcPolarSeqOnCurveCW(const CONTOUR& curve, const Point2i& polePt,
+                      PolarContour& polarSeq)
+{
+    polarSeq.oriPt = polePt;
+    double preTheta = 3.0 * M_PI;
+
+    for(Point pt: curve)
+    {
+        Point diff = pt - polePt;
+        double r = sqrt(diff.x * diff.x + diff.y * diff.y);
+        double theta = atan2(diff.y, diff.x);
+        if(theta < 0.0)
+            theta += M_PI*2.0;
+        
+        if(theta < preTheta)
+        {
+            PtInPolarCd ptPolar(r, theta);
+            polarSeq.ptSeq.push_back(ptPolar);
+            
+            preTheta = theta;
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 PtInPolarSeq MakePolarSeqInCCWise(const PtInPolarSeq& oriSeq)
 {
     int numPts = (int)(oriSeq.size());
@@ -120,7 +189,7 @@ void InitIpSetting(const PtInPolarSeq& seq, double angle, int& uID, int& lID)
 {
     int numPts = (int)(seq.size());
 
-    lID = numPts - 1;
+    lID = -1; //numPts - 1;
     uID = 0;
     
     double uAngle = seq[uID].theta;
@@ -212,7 +281,8 @@ void BuildEvenPolarSeq(const PolarContour& rawPolarSeq,
                        rawPolarSeq.oriPt, evenPolarSeq);
 }
 
-void SmoothPolarPtSeq(const PolarContour& evenPolarSeq,
+// 针对的是封闭的弧线
+void SmClosedPolarSeq(const PolarContour& evenPolarSeq,
                       int mwLen, //length of moving window
                       PolarContour& smoothPolarSeq)
 {
@@ -241,6 +311,79 @@ void SmoothPolarPtSeq(const PolarContour& evenPolarSeq,
     }
 }
 
+// 针对的是不封闭的弧线
+void SmOpenPolarSeqV2(const PolarContour& evenPolarSeq,
+                      int mwLen, //length of moving window
+                      PolarContour& smPolarSeq)
+{
+    smPolarSeq.oriPt = evenPolarSeq.oriPt;
+    PtInPolarSeq& smPtSeq = smPolarSeq.ptSeq;
+    
+    int numPts = (int)(evenPolarSeq.ptSeq.size());
+    int mwLenHalf = mwLen / 2;
+    
+    for(int i = 0; i <= numPts-1; i++)
+    {
+        // 在两端，若凑不够窗口中的点数目，则保留原坐标，跳过平均
+        if(i-mwLenHalf < 0)
+        {
+            smPtSeq.push_back(evenPolarSeq.ptSeq[i]);
+            continue;
+        }
+        if(i+mwLenHalf >= numPts)
+        {
+            smPtSeq.push_back(evenPolarSeq.ptSeq[i]);
+            continue;
+        }
+        
+        double sum_r = 0.0;
+        for(int l = i-mwLenHalf; l<= i+mwLenHalf; l++)
+        {
+            sum_r += evenPolarSeq.ptSeq[l].r;
+        }
+        
+        double avg_r = sum_r / mwLen;
+        double theta = evenPolarSeq.ptSeq[i].theta;
+        PtInPolarCd ipPt(avg_r, theta);
+        smPtSeq.push_back(ipPt);
+    }
+}
+
+// 在两个端点处，以复制的方式来凑足窗口所需点数
+void SmOpenPolarSeqV3(const PolarContour& evenPolarSeq,
+                      int mwLen,
+                      PolarContour& smPolarSeq)
+{
+    smPolarSeq.oriPt = evenPolarSeq.oriPt;
+    PtInPolarSeq& smPtSeq = smPolarSeq.ptSeq;
+    
+    int numPts = (int)(evenPolarSeq.ptSeq.size());
+    int mwLenHalf = mwLen / 2;
+    
+    // padding with the first copy and last copy to meet the moving windows
+    PtInPolarSeq padSeq;
+    for(int i = 0; i <= mwLenHalf-1; i++)
+        padSeq.push_back(evenPolarSeq.ptSeq[0]);
+    for(int i = 0; i <= numPts-1; i++)
+        padSeq.push_back(evenPolarSeq.ptSeq[i]);
+    for(int i = 0; i <= mwLenHalf-1; i++)
+        padSeq.push_back(evenPolarSeq.ptSeq[numPts-1]);
+    
+    for(int i = 0; i <= numPts-1; i++)
+    {
+        double sum_r = 0.0;
+        for(int l = i-mwLenHalf; l<= i+mwLenHalf; l++)
+        {
+            sum_r += padSeq[l].r;
+        }
+        
+        double avg_r = sum_r / mwLen;
+        double theta = padSeq[i].theta;
+        PtInPolarCd ipPt(avg_r, theta);
+        smPtSeq.push_back(ipPt);
+    }
+}
+
 Point PolarPt2CartPt(const PtInPolarCd& polarPt, const Point& oriPt) //, Point& cartPt)
 {
     int x = oriPt.x + (int)(polarPt.r * cos(polarPt.theta));
@@ -256,5 +399,70 @@ void PolarPtSeq2CartPtSeq(const PolarContour& polarCont,
     {
         Point cartPt = PolarPt2CartPt(polarPt, polarCont.oriPt);
         cartCont.push_back(cartPt);
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+void IpPolarSeqEvenlyCCW(const PtInPolarSeq& ascThetaSeq, int numInterval,
+                        const Point& oriPt,
+                        PolarContour& evenPolarSeq)
+{
+    int numRawPt = ascThetaSeq.size();
+    PtInPolarCd stPt = ascThetaSeq[0];
+    PtInPolarCd edPt = ascThetaSeq[numRawPt-1];
+    
+    int uID = 1;
+    int lID = 0;
+    
+    double dAngle = (edPt.theta - stPt.theta) / numInterval;
+    double angle = stPt.theta;
+    
+    evenPolarSeq.oriPt = oriPt;
+    while(angle < edPt.theta)
+    {
+        PtInPolarCd uPt = ascThetaSeq[uID];
+        while(angle < uPt.theta)
+        {
+            angle += dAngle;
+            PtInPolarCd outPt;
+            IpPolarCd(ascThetaSeq[uID], ascThetaSeq[lID],
+                                angle, outPt);
+            evenPolarSeq.ptSeq.push_back(outPt);
+        }
+        
+        lID = uID;
+        uID++;
+    }
+}
+
+void IpPolarSeqEvenlyCW(const PtInPolarSeq& desThetaSeq, int numInterval,
+                        const Point& oriPt,
+                        PolarContour& evenPolarSeq)
+{
+    int numRawPt = desThetaSeq.size();
+    PtInPolarCd stPt = desThetaSeq[0];
+    PtInPolarCd edPt = desThetaSeq[numRawPt-1];
+    
+    int uID = 1;
+    int lID = 0;
+    
+    double dAngle = (edPt.theta - stPt.theta) / numInterval;
+    double angle = stPt.theta;
+    
+    evenPolarSeq.oriPt = oriPt;
+    while(angle > edPt.theta)
+    {
+        PtInPolarCd uPt = desThetaSeq[uID];
+        while(angle > uPt.theta)
+        {
+            angle += dAngle; // dAngle is a negative value
+            PtInPolarCd outPt;
+            IpPolarCd(desThetaSeq[uID], desThetaSeq[lID],
+                                angle, outPt);
+            evenPolarSeq.ptSeq.push_back(outPt);
+        }
+        
+        lID = uID;
+        uID++;
     }
 }

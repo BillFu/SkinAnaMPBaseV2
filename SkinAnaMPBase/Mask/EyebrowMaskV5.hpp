@@ -57,14 +57,27 @@ void ForgeEyePgBySegRst(Size srcImgS, const SegMask& eyeSegMask, const Point2i& 
 */
 
 // 用分割的结果构造出一只眼睛的轮廓多边形
-void ForgeEyePgBySegRstV2(Size srcImgS,
+// 思路：切分眼睛轮廓为上、下弧线；用二次曲线拟合；计算光滑后的y值；合并光滑后的上下弧线组成新版本的轮廓线。
+// 以上计算流程均在笛卡尔坐标系中进行。
+void ForgeEyePgBySegRstV2(const Mat& srcImage, 
+                          Size srcImgS,
                           const SegMask& eyeSegMask,
                           const EyeFPs& eyeFPs,
-                          float scaleUpX, float scaleUpY,
+                          double scaleUpX, double scaleUpY,
                           POLYGON& eyePg);
 
+// 用分割的结果构造出一只眼睛的轮廓多边形
+// 思路：切分眼睛轮廓为上、下弧线；将上、下弧线点序列转换为极坐标；计算光滑后的坐标；转化为笛卡尔坐标；
+// 合并光滑后的上下弧线组成新版本的轮廓线。
+void ForgeEyePgBySegRstV3(const Mat& srcImage,
+                          Size srcImgS,
+                          const SegMask& eyeSegMask,
+                          const EyeFPs& eyeFPs,
+                          const Point2i& browCP,
+                          POLYGON& eyePg);
 
-void ForgeEyesMask(const FaceInfo& faceInfo,
+void ForgeEyesMask(const Mat& srcImage,
+                   const FaceInfo& faceInfo,
                    const FaceSegRst& segResult, // input, const 
                    Mat& outMask);
 
@@ -82,5 +95,13 @@ void SplitEyeCt2UpLowCurves(const CONTOUR& nosEyeCont,
                             const Point2i& nosRCorPt,
                             CONTOUR& upEyeCurve,
                             CONTOUR& lowEyeCurve);
+
+
+// PCS: polar coordinate system
+void SmUpEyeCurveViaPCS(const Point2i& browCP, const CONTOUR& upEyeCurve,
+                        CONTOUR& smUpEyeCurve);
+
+void SmLowEyeCurveViaPCS(const Point2i& browCP, const CONTOUR& lowEyeCurve,
+                         CONTOUR& smLowEyeCurve);
 
 #endif /* end of EYEBROW_MASK_V5_HPP */

@@ -117,7 +117,7 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     Mat eyesMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string eyeMaskImgFile = BuildOutImgFileName(outDir,
                              fileNameBone, "eye_");
-    ForgeEyesMask(faceInfo, segResult, eyesMask);
+    ForgeEyesMask(srcImage, faceInfo, segResult, eyesMask);
     OverlayMaskOnImage(annoLmImage, eyesMask,
                         "eyes_mask", eyeMaskImgFile.c_str());
     /*
@@ -238,7 +238,7 @@ void ForgeMaskAnnoPackV2(const Mat& srcImage,
     ForgeBrowsMask(faceInfo, segResult, eyebrowsMask);
     
     Mat eyesMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    ForgeEyesMask(faceInfo, segResult, eyesMask);
+    ForgeEyesMask(srcImage, faceInfo, segResult, eyesMask);
     
     Mat eyesFullMask(srcImgS, CV_8UC1, cv::Scalar(0));
     string eyeFullMaskImgFile = BuildOutImgFileName(outDir,

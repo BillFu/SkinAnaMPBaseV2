@@ -54,13 +54,13 @@ void MovePolygon(const POLYGON& oriPg, int dx, int dy, POLYGON& newPg);
 // nosTlPt: the Top Left corner of BBox of contour in the NOS.
 // scaleUpX, scaleUpY: the scale up ratio in X-axis and Y-axis.
 void transCt_LocalSegNOS2SS(const CONTOUR& nosLocCt, const Point& nosBBoxTlPt,
-                    float scaleUpX, float scaleUpY, CONTOUR& spCt);
+                            Size srcImageS, CONTOUR& spCt);
 
 // transform the contour(abbr. Ct) from Seg Net Output Space to Source Space
 // nosGlobalCt: contour presented in global SegNOS.
 // scaleUpX, scaleUpY: the scale up ratio in X-axis and Y-axis.
 void transCt_GlobalSegNOS2SS(const CONTOUR& nosGlobalCt,
-                    float scaleUpX, float scaleUpY, CONTOUR& spCt);
+                             double scaleUpX, double scaleUpY, CONTOUR& spCt);
 
 //SMS: sub-mask space
 // nosBBoxTLPt: the top left corner point of sub-mask in the NOS

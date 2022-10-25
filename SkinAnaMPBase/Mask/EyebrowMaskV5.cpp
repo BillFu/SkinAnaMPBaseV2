@@ -154,59 +154,12 @@ void FixERPsBySegBrowCP(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP], // inp
 
 ***********************************************************************************************/
 
-/*
 // 用分割的结果构造出一只眼睛的轮廓多边形
-void ForgeEyePgBySegRstV2(Size srcImgS,
-                          const SegMask& eyeSegMask,
-                          const SegEyeFPsNOS& eyeFPsNOS,
-                          float scaleUpX, float scaleUpY,
-                          POLYGON& eyePg)
-{
-    CONTOURS contours;
-    findContours(eyeSegMask.mask, contours,
-                 cv::noArray(), RETR_EXTERNAL, CHAIN_APPROX_NONE);  //CHAIN_APPROX_SIMPLE);
-    
-    //cout << "The Number of Points on the contour of eye: "
-    //    << contours[0].size() << endl;
-
-    CONTOUR nosEyeCt;
-    transCt_SMS2NOS(contours[0], eyeSegMask.bbox.tl(), nosEyeCt);
-    
-    // 先判断出轮廓点的自然顺序是顺时针还是逆时针
-    //CLOCK_DIR scanDir;
-    //JudgeEyeCtNOSMoveDir(nosEyeCt, eyeFPsNOS, scanDir);
-    
-    // 经过测试，左右眼的轮廓序列都是顺时针，但愿这个认知具有普遍性
-    // 切分为上弧线、下弧线
-    CONTOUR upEyeCurveNOS, lowEyeCurveNOS;
-    SplitEyeCt2UpLowCurves(nosEyeCt,
-                           eyeFPsNOS.lCorPtNOS,
-                           eyeFPsNOS.rCorPtNOS,
-                           upEyeCurveNOS, lowEyeCurveNOS);
-    
-    CONTOUR upEyeSmCurveNOS; //Sm: smoothed
-    smoothCtByPIFit(upEyeCurveNOS, upEyeSmCurveNOS);
-
-    CONTOUR lowEyeSmCurveNOS; //Sm: smoothed
-    smoothCtByPIFit(lowEyeCurveNOS, lowEyeSmCurveNOS);
-    
-    CONTOUR smEyeCtNOS(upEyeSmCurveNOS);
-    // combine lower curve and upper curve into one complete contour
-    for(int i=0; i<lowEyeSmCurveNOS.size(); i++)
-    {
-        smEyeCtNOS.push_back(lowEyeSmCurveNOS[i]);
-    }
-    
-    transCt_GlobalSegNOS2SS(smEyeCtNOS,
-                    scaleUpX, scaleUpY, eyePg);
-}
-*/
-
-// 用分割的结果构造出一只眼睛的轮廓多边形
-void ForgeEyePgBySegRstV2(Size srcImgS,
+void ForgeEyePgBySegRstV2(const Mat& srcImage,
+                          Size srcImgS,
                           const SegMask& eyeSegMask,
                           const EyeFPs& eyeFPs,
-                          float scaleUpX, float scaleUpY,
+                          double scaleUpX, double scaleUpY,
                           POLYGON& eyePg)
 {
     CONTOURS contours;
@@ -218,7 +171,7 @@ void ForgeEyePgBySegRstV2(Size srcImgS,
 
     CONTOUR ssEyeCt; // in Source Space
     transCt_LocalSegNOS2SS(contours[0], eyeSegMask.bbox.tl(),
-                    scaleUpX, scaleUpY, ssEyeCt);
+                    srcImgS, ssEyeCt);
     
     // 先判断出轮廓点的自然顺序是顺时针还是逆时针
     //CLOCK_DIR scanDir;
@@ -230,12 +183,28 @@ void ForgeEyePgBySegRstV2(Size srcImgS,
     SplitEyeCt2UpLowCurves(ssEyeCt, eyeFPs.lCorPt, eyeFPs.rCorPt,
                            upEyeCurve, lowEyeCurve);
     
-    /*
     CONTOUR upEyeSmCurve; //Sm: smoothed
     smoothCtByPIFit(upEyeCurve, upEyeSmCurve);
 
     CONTOUR lowEyeSmCurve; //Sm: smoothed
     smoothCtByPIFit(lowEyeCurve, lowEyeSmCurve);
+    
+    /*
+    Mat canvas = srcImage.clone();
+    polylines(canvas, upEyeSmCurve, true, Scalar(255, 0, 0), 2, 8);
+    polylines(canvas, lowEyeSmCurve, true, Scalar(0, 0, 255), 2, 8);
+    imwrite("smEyeCurves.png", canvas);
+    */
+
+    Mat canvas1 = srcImage.clone();
+    polylines(canvas1, upEyeCurve, false, // false for open, true for closed
+              Scalar(255, 0, 0), 2, 8);
+    imwrite("upEyeCurves.png", canvas1);
+    
+    Mat canvas2 = srcImage.clone();
+    polylines(canvas2, lowEyeCurve, false, 
+              Scalar(0, 0, 255), 2, 8);
+    imwrite("lowEyeCurves.png", canvas2);
     
     CONTOUR smEyeCt(upEyeSmCurve);
     
@@ -244,17 +213,112 @@ void ForgeEyePgBySegRstV2(Size srcImgS,
     {
         smEyeCt.push_back(lowEyeSmCurve[i]);
     }
+    
+    eyePg = smEyeCt;
+}
+
+// 用分割的结果构造出一只眼睛的轮廓多边形
+// 思路：切分眼睛轮廓为上、下弧线；将上、下弧线点序列转换为极坐标；计算光滑后的坐标；转化为笛卡尔坐标；
+// 合并光滑后的上下弧线组成新版本的轮廓线。
+void ForgeEyePgBySegRstV3(const Mat& srcImage,
+                          Size srcImgS,
+                          const SegMask& eyeSegMask,
+                          const EyeFPs& eyeFPs,
+                          const Point2i& browCP,
+                          POLYGON& eyePg)
+{
+    CONTOURS contours;
+    findContours(eyeSegMask.mask, contours,
+                 cv::noArray(), RETR_EXTERNAL, CHAIN_APPROX_NONE);  //CHAIN_APPROX_SIMPLE);
+
+    CONTOUR ssEyeCt; // in Source Space
+    transCt_LocalSegNOS2SS(contours[0], eyeSegMask.bbox.tl(),
+                    srcImgS, ssEyeCt);
+    
+    // 经过测试，左右眼的轮廓序列都是顺时针，但愿这个认知具有普遍性
+    // 切分为上弧线、下弧线
+    CONTOUR upEyeCurve, lowEyeCurve;
+    SplitEyeCt2UpLowCurves(ssEyeCt, eyeFPs.lCorPt, eyeFPs.rCorPt,
+                           upEyeCurve, lowEyeCurve);
+    
+    CONTOUR smUpEyeCurve, smLowEyeCurve;
+    
+    SmUpEyeCurveViaPCS(browCP, upEyeCurve, smUpEyeCurve);
+    SmLowEyeCurveViaPCS(browCP, lowEyeCurve, smLowEyeCurve);
+    
+    /*
+    Mat canvas1 = srcImage.clone();
+    polylines(canvas1, smUpEyeCurve, false, // false for open, true for closed
+              Scalar(255, 0, 0), 2, 8);
+    imwrite("upEyeCurves.png", canvas1);
+    
+    Mat canvas2 = srcImage.clone();
+    polylines(canvas2, smLowEyeCurve, false,
+              Scalar(0, 0, 255), 2, 8);
+    imwrite("lowEyeCurves.png", canvas2);
     */
     
-    CONTOUR smEyeCt(upEyeCurve);
+    CONTOUR smEyeCt(smUpEyeCurve);
     
     // combine lower curve and upper curve into one complete contour
-    for(int i=0; i<lowEyeCurve.size(); i++)
+    for(int i=0; i<smLowEyeCurve.size(); i++)
     {
-        smEyeCt.push_back(lowEyeCurve[i]);
+        smEyeCt.push_back(smLowEyeCurve[i]);
     }
     
     eyePg = smEyeCt;
+}
+
+// PCS: polar coordinate system
+void SmUpEyeCurveViaPCS(const Point2i& browCP,  const CONTOUR& upEyeCurve,
+                        CONTOUR& smUpEyeCurve)
+{
+    // 极坐标的原点为眉毛中心点。
+    // theta的取值范围要设定在区间[0, 2*PI)。
+    // 扫描过程中，必须确保theta的单调性，将违犯单调性的点给剔除。
+
+    // 扫描上弧线时，从左角点到右角点，逆时针旋转；theta值增大，
+    // theta的取值范围要设定在区间[0, 2*PI)。
+    PolarContour upEyePolSeq;
+    CalcPolarSeqOnCurve(upEyeCurve, browCP, CCLOCK_WISE,
+                        upEyePolSeq);
+    
+    PolarContour evenUpPolarSeq;
+    
+    int numInterval = 60;
+    IpPolarSeqEvenlyCCW(upEyePolSeq.ptSeq, numInterval,
+                       upEyePolSeq.oriPt, evenUpPolarSeq);
+        
+    // then smoothing the evenly interpolated polar pt seq.
+    PolarContour smUpPolarSeq;
+    SmOpenPolarSeqV2(evenUpPolarSeq, 7, smUpPolarSeq);
+        
+    PolarPtSeq2CartPtSeq(smUpPolarSeq, smUpEyeCurve);
+}
+
+void SmLowEyeCurveViaPCS(const Point2i& browCP, const CONTOUR& lowEyeCurve,
+                         CONTOUR& smLowEyeCurve)
+{
+    // 极坐标的原点为眉毛中心点。
+    // theta的取值范围要设定在区间[0, 2*PI)。
+    // 扫描过程中，必须确保theta的单调性，将违犯单调性的点给剔除。
+
+    // 扫描下弧线时，从右角点到左角点，顺时针旋转；theta值减小，
+    PolarContour lowEyePolSeq;
+    CalcPolarSeqOnCurve(lowEyeCurve, browCP, CLOCK_WISE,
+                        lowEyePolSeq);
+    
+    PolarContour evenLowPolarSeq;
+    int numInterval = 60;
+    IpPolarSeqEvenlyCW(lowEyePolSeq.ptSeq, numInterval,
+                       lowEyePolSeq.oriPt, evenLowPolarSeq);
+        
+    // then smoothing the evenly interpolated polar pt seq.
+    PolarContour smLowPolarSeq;
+    SmOpenPolarSeqV2(evenLowPolarSeq, 7, smLowPolarSeq);
+        
+    PolarPtSeq2CartPtSeq(smLowPolarSeq, smLowEyeCurve);
+    
 }
 
 // 按轮廓序列的自然顺序遍历轮廓点，先找到上弧线中点，而后继续遍历，看先碰到左角点还是右角点，
@@ -352,36 +416,36 @@ void SplitEyeCt2UpLowCurves(const CONTOUR& nosEyeCont,
     
 }
 
-void ForgeEyesMask(const FaceInfo& faceInfo,
+void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
+                   const FaceInfo& faceInfo,
                    const FaceSegRst& segRst, //Rst: result,
                    Mat& outMask)
 {
     POLYGON leftEyePg, rightEyePg;
 
-    float scaleUpX = (float)faceInfo.srcImgS.width / SEG_NET_OUTPUT_SIZE;
-    float scaleUpY = (float)faceInfo.srcImgS.height / SEG_NET_OUTPUT_SIZE;
+    Size srcImgS = faceInfo.srcImgS;
     
-    ForgeEyePgBySegRstV2(faceInfo.srcImgS, segRst.lEyeMaskNOS, segRst.lEyeFPs,
-                         scaleUpX, scaleUpY, leftEyePg);
+    ForgeEyePgBySegRstV3(srcImage,
+                         faceInfo.srcImgS, segRst.lEyeMaskNOS, segRst.lEyeFPs,
+                         segRst.leftBrowCP, leftEyePg);
     
-    ForgeEyePgBySegRstV2(faceInfo.srcImgS, segRst.rEyeMaskNOS, segRst.rEyeFPs,
-                         scaleUpX, scaleUpY, rightEyePg);
+    ForgeEyePgBySegRstV3(srcImage,
+                         faceInfo.srcImgS, segRst.rEyeMaskNOS, segRst.rEyeFPs,
+                         segRst.rightBrowCP, rightEyePg);
     
     POLYGON_GROUP polygonGroup;
     polygonGroup.push_back(leftEyePg);
     polygonGroup.push_back(rightEyePg);
     
-    //Mat outOrigMask = ContourGroup2Mask(faceInfo.imgWidth, faceInfo.imgHeight, polygonGroup);
+    Mat outOrigMask = ContourGroup2Mask(srcImgS.width, srcImgS.height, polygonGroup);
     
-    /*
-    int dila_size = 10;
+    int dila_size = segRst.faceBBox.width * 0.005;
     Mat element = getStructuringElement(MORPH_ELLIPSE,
                            Size(2*dila_size + 1, 2*dila_size+1),
                            Point(dila_size, dila_size));
     
-    cv::Mat outExpandedMask(faceInfo.imgHeight, faceInfo.imgWidth, CV_8UC1, cv::Scalar(0));
+    cv::Mat outExpandedMask(srcImgS.height, srcImgS.width, CV_8UC1, cv::Scalar(0));
     dilate(outOrigMask, outMask, element);
-    */
     
-    outMask = ContourGroup2Mask(faceInfo.srcImgS, polygonGroup);
+    //outMask = ContourGroup2Mask(faceInfo.srcImgS, polygonGroup);
 }
