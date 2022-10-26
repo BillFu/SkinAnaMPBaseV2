@@ -398,3 +398,22 @@ void CalcEyeCornerPts(const CONTOUR& eyeCont_NOS, const Point& browCP_NOS,
     lCorPtNOS = candiLCorner;
     rCorPtNOS = candiRCorner;
 }
+
+Rect RectNOS2RectSS(int srcImgW, int srcImgH, const Rect& rectNOS)
+{
+    Point tlPtNOS = rectNOS.tl(); // in NOS
+    int tlPtSS_x = tlPtNOS.x * srcImgW / SEG_NET_OUTPUT_SIZE;
+    int tlPtSS_y = tlPtNOS.y * srcImgH / SEG_NET_OUTPUT_SIZE;
+    int ssRectW = rectNOS.width * srcImgW / SEG_NET_OUTPUT_SIZE;
+    int ssRectH = rectNOS.height * srcImgH / SEG_NET_OUTPUT_SIZE;
+    
+    Rect rectSS(tlPtSS_x, tlPtSS_y, ssRectW, ssRectH);
+    
+    return rectSS;
+}
+
+Rect RectNOS2RectSS(const Size& srcImgS, const Rect& rectNOS)
+{
+    return RectNOS2RectSS(srcImgS.width, srcImgS.height, rectNOS);
+}
+

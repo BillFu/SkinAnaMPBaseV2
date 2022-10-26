@@ -13,6 +13,7 @@ Date:   2022/10/26
 #include "Geometry.hpp"
 #include "Common.hpp"
 
+#include "../FaceBgSeg/FaceBgSegV2.hpp"
 #include "../Snake/activecontours.h"
 
 //-------------------------------------------------------------------------------------------
@@ -158,7 +159,9 @@ void FixERPsBySegEyeCP(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP], // inpu
 
 /**********************************************************************************************/
 
-void ForgeInitEyePg(const Point2i eyeRefinePts[71], POLYGON& initEyePg)
+void ForgeInitEyePg(const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
+                    POLYGON& initEyePg,
+                    float expandScale)
 {
     POLYGON coarsePg, refinedPolygon;
         
@@ -200,8 +203,19 @@ void ForgeInitEyePg(const Point2i eyeRefinePts[71], POLYGON& initEyePg)
     Point2i pt39p = Interpolate(eyeRefinePts[39], eyeRefinePts[23], 0.15);
     coarsePg.push_back(pt39p);
     
+    Rect coaPgBBox = boundingRect(coarsePg); // maybe need padding and enlarge
+
+    Point2i centerPt = (coaPgBBox.tl() + coaPgBBox.br())/ 2;
+    
+    POLYGON coaExpPg;
+    for(Point2i pt: coarsePg)
+    {
+        Point2i expPt = (pt - centerPt) * expandScale + centerPt;
+        coaExpPg.push_back(expPt);
+    }
+    
     int csNumPoint = 50;
-    CloseSmoothPolygon(coarsePg, csNumPoint, initEyePg);
+    CloseSmoothPolygon(coaExpPg, csNumPoint, initEyePg);
 }
 
 // 用分割的结果构造出一只眼睛的轮廓多边形
@@ -212,23 +226,42 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
                           POLYGON& eyePg)
 {
     POLYGON initEyePg;
-    ForgeInitEyePg(eyeRefinePts, initEyePg);
+    ForgeInitEyePg(eyeRefinePts, initEyePg, 2.0);
     
     Rect initEyePgBBox = boundingRect(initEyePg); // maybe need padding and enlarge
 
-    Point tlPtEyeSegMask = eyeSegMask.bbox.tl(); // in NOS
-    int tlPtEyeMaskSS_x = tlPtEyeSegMask.x * srcImgS.width / SEG_NET_OUTPUT_SIZE;
-    int tlPtEyeMaskSS_y = tlPtEyeSegMask.y * srcImgS.height / SEG_NET_OUTPUT_SIZE;
-    
-    int ssEyeMaskW = eyeSegMask.bbox.width * srcImgS.width / SEG_NET_OUTPUT_SIZE;
-    int ssEyeMaskH = eyeSegMask.bbox.height * srcImgS.height / SEG_NET_OUTPUT_SIZE;
+    Rect eyeMaskBBox = RectNOS2RectSS(srcImgS, eyeSegMask.bbox);
     
     Mat segEyeMaskSS;
-    resize(eyeSegMask.mask, segEyeMaskSS, Size(ssEyeMaskW, ssEyeMaskH), INTER_NEAREST);
+    resize(eyeSegMask.mask, segEyeMaskSS, eyeMaskBBox.size(), INTER_NEAREST);
+    
+    if(RectContainsRect(initEyePgBBox, eyeMaskBBox) == false)
+    {
+        // enlarge the initEyePgBBox by use of union operation
+        initEyePgBBox = initEyePgBBox | eyeMaskBBox;
+    }
     
     Mat workImg(initEyePgBBox.size(), CV_8UC1, Scalar(0));
+    Rect relativeRect = CalcRelativeRect(initEyePgBBox, eyeMaskBBox);
+    segEyeMaskSS.copyTo(workImg(relativeRect));
     
+    //--------------------------------------------------------------
+    // output the current data state to check whether they are appropriate or not
+    
+    POLYGON eyePgWC; // working coordinate system
+    //ForgeInitEyePg(eyeRefinePts, initEyePg);
+    for(Point2i pt: initEyePg)
+    {
+        Point2i ptWC = pt - initEyePgBBox.tl();
+        eyePgWC.push_back(ptWC);
+    }
+    
+    polylines(workImg, eyePgWC, true, Scalar(150), 2, 8);
+    imwrite("initDataAC.png", workImg);
 
+    //--------------------------------------------------------------
+
+    /*
     cvalg::ActiveContours acAlg;
     AlgoParams ap;
     acAlg.setParams(&ap);
@@ -244,6 +277,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     //nf.copyTo(frame);
 
     //eyePg = smEyeCt;
+    */
 }
 
 void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
@@ -255,9 +289,11 @@ void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
 
     Size srcImgS = faceInfo.srcImgS;
     
+    /*
     ForgeEyePgBySnakeAlg(faceInfo.srcImgS, faceInfo.lEyeRefinePts,
                          segRst.lEyeMaskNOS, segRst.lEyeFPs,
                          leftEyePg);
+    */
     
     ForgeEyePgBySnakeAlg(faceInfo.srcImgS, faceInfo.rEyeRefinePts,
                          segRst.rEyeMaskNOS, segRst.rEyeFPs,

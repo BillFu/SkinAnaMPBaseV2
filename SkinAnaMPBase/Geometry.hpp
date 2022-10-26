@@ -93,6 +93,9 @@ the returned Jaw Width measured in the source space
 
 //-------------------------------------------------------------------------------------------
 // 如果smallRect完全能被bigRect容纳，返回true
-bool RectContainsRect(Rect& bigRect, Rect& smallRect); 
+bool RectContainsRect(const Rect& bigRect, const Rect& smallRect);
+
+// 在refRect构成的局部坐标系（以左上角为原点，y轴朝下）中，计算transRect的新版本
+Rect CalcRelativeRect(const Rect& refRect, const Rect& transRect);
 
 #endif /* end of GEOMETRY_HPP */

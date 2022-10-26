@@ -160,10 +160,20 @@ void transCt_SMS2NOS(const CONTOUR& smsCt, const Point& nosBBoxTLPt,
 
 //-------------------------------------------------------------------------------------------
 // 如果smallRect完全能被bigRect容纳，返回true
-bool RectContainsRect(Rect& bigRect, Rect& smallRect)
+bool RectContainsRect(const Rect& bigRect, const Rect& smallRect)
 {
     if((bigRect & smallRect) == smallRect)
         return true;
     else
         return false;
+}
+
+
+// 在refRect构成的局部坐标系（以左上角为原点，y轴朝下）中，计算transRect的新版本
+Rect CalcRelativeRect(const Rect& refRect, const Rect& transRect)
+{
+    Point tlRelCd = transRect.tl() - refRect.tl();
+    Rect relRect(tlRelCd, transRect.size());
+    
+    return relRect;
 }
