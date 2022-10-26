@@ -157,3 +157,13 @@ void transCt_SMS2NOS(const CONTOUR& smsCt, const Point& nosBBoxTLPt,
         nosCt.push_back(nosPt);
     }
 }
+
+//-------------------------------------------------------------------------------------------
+// 如果smallRect完全能被bigRect容纳，返回true
+bool RectContainsRect(Rect& bigRect, Rect& smallRect)
+{
+    if((bigRect & smallRect) == smallRect)
+        return true;
+    else
+        return false;
+}

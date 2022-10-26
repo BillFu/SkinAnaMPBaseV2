@@ -92,5 +92,7 @@ the returned Jaw Width measured in the source space
 //int CalcLowerJawWidth(const FaceInfo& faceInfo, const Mat& segLabels);
 
 //-------------------------------------------------------------------------------------------
+// 如果smallRect完全能被bigRect容纳，返回true
+bool RectContainsRect(Rect& bigRect, Rect& smallRect); 
 
 #endif /* end of GEOMETRY_HPP */

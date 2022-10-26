@@ -156,16 +156,79 @@ void FixERPsBySegEyeCP(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP], // inpu
 }
 
 
-/**********************************************************************************************
+/**********************************************************************************************/
 
-***********************************************************************************************/
+void ForgeInitEyePg(const Point2i eyeRefinePts[71], POLYGON& initEyePg)
+{
+    POLYGON coarsePg, refinedPolygon;
+        
+    // 采用Eye Refine Region的点！
+    // 以右眼为基准，从内侧上角点开始，顺时针绕一周
+    int eyePtIndices[] = { // 顺时针计数
+        24, 15, 14, 13, 12, 11, 10, 9, 16,
+        //32, // 上轮廓线，从左到右
+        //33 //, 34 //, 58, 59, 60, 39    // 下轮廓线，从右到左
+    };
+    
+    int num_pts = sizeof(eyePtIndices) / sizeof(int);
+    
+    for(int i = 0; i<num_pts; i++)
+    {
+        int index = eyePtIndices[i];
+        coarsePg.push_back(eyeRefinePts[index]);
+    }
+    
+    Point2i pt25p = Interpolate(eyeRefinePts[25], eyeRefinePts[48], 0.52);
+    coarsePg.push_back(pt25p);
+    
+    coarsePg.push_back(eyeRefinePts[32]);
+    coarsePg.push_back(eyeRefinePts[33]);
+    
+    Point2i pt57p = Interpolate(eyeRefinePts[57], eyeRefinePts[35], 0.60);
+    coarsePg.push_back(pt57p);
+    
+    // 58, 36 插一个
+    Point2i pt58p = Interpolate(eyeRefinePts[58], eyeRefinePts[36], 0.25);
+    coarsePg.push_back(pt58p);
+
+    Point2i pt59p = Interpolate(eyeRefinePts[59], eyeRefinePts[37], 0.2);
+    coarsePg.push_back(pt59p);
+    
+    Point2i pt60p = Interpolate(eyeRefinePts[60], eyeRefinePts[38], 0.42);
+    coarsePg.push_back(pt60p);
+    
+    Point2i pt39p = Interpolate(eyeRefinePts[39], eyeRefinePts[23], 0.15);
+    coarsePg.push_back(pt39p);
+    
+    int csNumPoint = 50;
+    CloseSmoothPolygon(coarsePg, csNumPoint, initEyePg);
+}
 
 // 用分割的结果构造出一只眼睛的轮廓多边形
 void ForgeEyePgBySnakeAlg(Size srcImgS,
-                          const SegMask& eyeSegMask,
+                          const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
+                          const SegMask& eyeSegMask, // in NOS
                           const EyeFPs& eyeFPs,
                           POLYGON& eyePg)
 {
+    POLYGON initEyePg;
+    ForgeInitEyePg(eyeRefinePts, initEyePg);
+    
+    Rect initEyePgBBox = boundingRect(initEyePg); // maybe need padding and enlarge
+
+    Point tlPtEyeSegMask = eyeSegMask.bbox.tl(); // in NOS
+    int tlPtEyeMaskSS_x = tlPtEyeSegMask.x * srcImgS.width / SEG_NET_OUTPUT_SIZE;
+    int tlPtEyeMaskSS_y = tlPtEyeSegMask.y * srcImgS.height / SEG_NET_OUTPUT_SIZE;
+    
+    int ssEyeMaskW = eyeSegMask.bbox.width * srcImgS.width / SEG_NET_OUTPUT_SIZE;
+    int ssEyeMaskH = eyeSegMask.bbox.height * srcImgS.height / SEG_NET_OUTPUT_SIZE;
+    
+    Mat segEyeMaskSS;
+    resize(eyeSegMask.mask, segEyeMaskSS, Size(ssEyeMaskW, ssEyeMaskH), INTER_NEAREST);
+    
+    Mat workImg(initEyePgBBox.size(), CV_8UC1, Scalar(0));
+    
+
     cvalg::ActiveContours acAlg;
     AlgoParams ap;
     acAlg.setParams(&ap);
@@ -192,10 +255,12 @@ void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
 
     Size srcImgS = faceInfo.srcImgS;
     
-    ForgeEyePgBySnakeAlg(faceInfo.srcImgS, segRst.lEyeMaskNOS, segRst.lEyeFPs,
+    ForgeEyePgBySnakeAlg(faceInfo.srcImgS, faceInfo.lEyeRefinePts,
+                         segRst.lEyeMaskNOS, segRst.lEyeFPs,
                          leftEyePg);
     
-    ForgeEyePgBySnakeAlg(faceInfo.srcImgS, segRst.rEyeMaskNOS, segRst.rEyeFPs,
+    ForgeEyePgBySnakeAlg(faceInfo.srcImgS, faceInfo.rEyeRefinePts,
+                         segRst.rEyeMaskNOS, segRst.rEyeFPs,
                          rightEyePg);
     
     POLYGON_GROUP polygonGroup;

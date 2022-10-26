@@ -157,4 +157,6 @@ void EyeFPsNOS2EyeFPsSP(int srcImgW, int srcImgH,
                         const SegEyeFPsNOS& segEyeFPsNOS,
                         EyeFPs& eyeFPs);
 
+void RectNOS2RectSS(const Rect& rectNOS, Rect& rectSS);
+
 #endif /* end of FACE_BG_SEG_V2_HPP */

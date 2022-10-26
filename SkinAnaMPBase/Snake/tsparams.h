@@ -57,7 +57,8 @@
 class AlgoParams
 {
 public:
-    AlgoParams(){
+    AlgoParams()
+    {
 #ifdef SOBEL_FILL_IN_NEG_SPACE
         this->_sobelDeadSpace = true;
 #else
