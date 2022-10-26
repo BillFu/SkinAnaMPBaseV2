@@ -20,7 +20,7 @@ Date:   2022/9/23
 #include <algorithm>
 
 #include "../Utils.hpp"
-#include "EyebrowMaskV5.hpp"
+#include "EyebrowMaskV6.hpp"
 #include "ForeheadMask.hpp"
 #include "LowerFaceMask.hpp"
 #include "../AnnoImage.hpp"
