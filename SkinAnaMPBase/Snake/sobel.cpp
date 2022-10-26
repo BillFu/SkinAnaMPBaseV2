@@ -7,23 +7,22 @@
     1, 0,-1        -1,-2,-1
 */
 
-sobelPack FullSobel(Mat frame, int thresh, bool calcAngle, bool deadSpace)
+sobelPack FullSobel(Mat gray, int thresh, bool calcAngle, bool deadSpace)
 {
-    // Grayscale the image
-    Mat gray;
-    cvtColor(frame, gray, COLOR_BGR2GRAY); // ???
-
-    int reservedSpace = (frame.cols*frame.rows)/2;
+    int reservedSpace = (gray.cols*gray.rows)/2;
 
     // Get the data to return ready
     sobelPack data;
     gray.copyTo(data.frame);
     data.contours.reserve(reservedSpace);
 
-    if(calcAngle){
+    if(calcAngle)
+    {
         data.angleAvailable = true;
         data.angles.reserve(reservedSpace);
-    } else {
+    }
+    else
+    {
         data.angleAvailable = false;
     }
 
@@ -53,7 +52,6 @@ sobelPack FullSobel(Mat frame, int thresh, bool calcAngle, bool deadSpace)
             int value = static_cast<int>(std::ceil(std::sqrt((px*px) + (py*py))));
             if(value > 255)
                 value = 255;
-
 
             if(value >= thresh)
             {

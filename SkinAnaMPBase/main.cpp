@@ -117,10 +117,12 @@ int main(int argc, char **argv)
     
     Mat annoLmImage = srcImage.clone();
     
-    //string annoLmImgFile = BuildOutImgFileName(
-    //        outParePath, fileBoneName, "lm_");
-    //AnnoAllLmInfo(annoLmImage, faceInfo, annoLmImgFile);
-
+    /*
+    string annoLmImgFile = BuildOutImgFileName(
+            outParePath, fileBoneName, "lm_");
+    AnnoAllLmInfo(annoLmImage, faceInfo, annoLmImgFile);
+     */
+    
     Scalar yellowColor(255, 0, 0);
     AnnoTwoEyeRefinePts(annoLmImage, faceInfo, yellowColor, true);
     //AnnoGenKeyPoints(annoLmImage, faceInfo, true);

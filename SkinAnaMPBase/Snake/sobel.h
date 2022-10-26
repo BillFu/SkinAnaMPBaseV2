@@ -18,7 +18,8 @@
 
 using namespace cv;
 
-struct sobelPack{
+struct sobelPack
+{
     // Image returned
     Mat frame;
 

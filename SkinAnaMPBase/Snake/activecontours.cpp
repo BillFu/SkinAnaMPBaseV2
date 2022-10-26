@@ -69,7 +69,8 @@ cv::Mat cvalg::ActiveContours::iterate(cv::Mat currentFrame)
     {
 
 #ifdef USE_ANGLE_INSERTION
-        if((( clock() - _lastAngle ) / CLOCKS_PER_SEC) > ANGLE_WAIT_SEC){
+        if((( clock() - _lastAngle ) / CLOCKS_PER_SEC) > ANGLE_WAIT_SEC)
+        {
             angleInsertion();
         }
 #endif
@@ -77,7 +78,8 @@ cv::Mat cvalg::ActiveContours::iterate(cv::Mat currentFrame)
 #ifdef USE_AVERAGE_LENGTH_BISECTION
         // Does more harm than good
 
-        if((( clock() - _lastBisect ) / CLOCKS_PER_SEC) > BISECT_WAIT){
+        if((( clock() - _lastBisect ) / CLOCKS_PER_SEC) > BISECT_WAIT)
+        {
             selfInsertion();
         }
 #endif
@@ -97,9 +99,7 @@ cv::Mat cvalg::ActiveContours::iterate(cv::Mat currentFrame)
         Point s(startx, starty);
         Point e(endx, endy);
 
-        _points[i] = newPosition(
-                    i, s, e, sobelEdges.frame
-                    );
+        _points[i] = newPosition(i, s, e, sobelEdges.frame);
 
 #ifdef DRAW_NEIGHBORS
         if(_params->getDrawSnakePoints())
@@ -111,7 +111,9 @@ cv::Mat cvalg::ActiveContours::iterate(cv::Mat currentFrame)
     if(_params->getViewSobel())
     {
         cvtColor(sobelEdges.frame, returnFrame, COLOR_GRAY2BGR);
-    } else {
+    }
+    else
+    {
         currentFrame.copyTo(returnFrame);
     }
     return returnFrame;
@@ -158,13 +160,18 @@ Point ActiveContours::newPosition(int pointIndex, Point start, Point end, Mat im
         for(int x = 0; x < cols; x++)
         {
             int cval = (int)image.at<uchar>(y + start.y,x + start.x);
-            if(flag){
+            if(flag)
+            {
                 flag = false;
                  ngmax = cval;
                  ngmin = cval;
-            } else if (cval> ngmax){
+            }
+            else if (cval> ngmax)
+            {
                 ngmax = cval;
-            } else if (cval < ngmin){
+            }
+            else if (cval < ngmin)
+            {
                 ngmin = cval;
             }
         }
@@ -239,11 +246,14 @@ Point ActiveContours::newPosition(int pointIndex, Point start, Point end, Mat im
 
             float energy = econt + ecurv + eimage;
 
-            if(flag){
+            if(flag)
+            {
                 flag = false;
                 localMin = energy;
                 location = Point(parentX, parentY);
-            } else if (energy < localMin){
+            }
+            else if (energy < localMin)
+            {
                 localMin = energy;
                 location = Point(parentX, parentY);
             }
