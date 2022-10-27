@@ -101,4 +101,7 @@ Rect CalcRelativeRect(const Rect& refRect, const Rect& transRect);
 // return the corrected point which lies in the rectangle.
 Point2i MakePtInRect(const Rect& rect, Point2i& pt);
 
+// inflate the original rect from the center and toward all sides.
+void InflateRect(int inflateSize, Rect& rect);
+
 #endif /* end of GEOMETRY_HPP */

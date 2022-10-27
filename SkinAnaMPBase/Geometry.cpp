@@ -200,3 +200,15 @@ Point2i MakePtInRect(const Rect& rect, Point2i& pt)
     
     return Point2i(correctX, correctY);
 }
+
+
+// inflate the original rect from the center and toward all sides.
+void InflateRect(int inflateSize, Rect& rect)
+{
+    rect += cv::Point(-inflateSize, -inflateSize);
+    rect += cv::Size(inflateSize*2, inflateSize*2);
+    
+    // cv::Rect has the + (and other) operators overloaded such that
+    // if it's a cv::Point it will adjust the origin,
+    // and if it's a cv::Size it will adjust width and height.
+}
