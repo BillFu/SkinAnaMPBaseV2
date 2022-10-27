@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2602327628CCBFB100B11D7A /* HeadPoseEst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2602327528CCBFB100B11D7A /* HeadPoseEst.cpp */; };
 		2606575B28F7122400019FFE /* PolarPtSeq.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2606575928F7122400019FFE /* PolarPtSeq.cpp */; };
+		2639C11E290AA90F00CB19E2 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 265B7B9728E5B26D004F5E49 /* libtensorflowlite.so */; };
 		263B540228CD861C004CF77D /* AnnoImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540028CD861C004CF77D /* AnnoImage.cpp */; };
 		263B540528CD8B34004CF77D /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540428CD8B34004CF77D /* Utils.cpp */; };
 		265B7B9A28E5C971004F5E49 /* HeadPoseEst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2602327528CCBFB100B11D7A /* HeadPoseEst.cpp */; };
@@ -22,7 +23,6 @@
 		CB02B84F290677E9001F8E61 /* polyitems_fit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB02B84E290677E9001F8E61 /* polyitems_fit.cpp */; };
 		CB1E2AB928DD99AB00F416DF /* ForeheadMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB1E2AB728DD99AB00F416DF /* ForeheadMask.cpp */; };
 		CB255A9628C7237A005C8A81 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB255A9528C7237A005C8A81 /* main.cpp */; };
-		CB266F7F290A1555007F8576 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CBD123FD28E58EEB004A42A9 /* libtensorflowlite.so */; };
 		CB3CACFE28F8ED04000A8BF0 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CBD123FD28E58EEB004A42A9 /* libtensorflowlite.so */; };
 		CB41C4E4290A79760012BC6A /* EyebrowMaskV7.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB41C4E2290A79760012BC6A /* EyebrowMaskV7.cpp */; };
 		CB4312AA28D41DDD006D71DA /* ParametricBSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB4312A828D41DDD006D71DA /* ParametricBSpline.cpp */; };
@@ -154,7 +154,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CB266F7F290A1555007F8576 /* libtensorflowlite.so in Frameworks */,
+				2639C11E290AA90F00CB19E2 /* libtensorflowlite.so in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -654,7 +654,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/include",
-					/Users/meicet/nlohmann_json/include,
+					/Users/fuliye/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/lib,
@@ -683,7 +683,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/include",
-					/Users/meicet/nlohmann_json/include,
+					/Users/fuliye/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/lib,
