@@ -24,6 +24,7 @@
 		CB255A9628C7237A005C8A81 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB255A9528C7237A005C8A81 /* main.cpp */; };
 		CB266F7F290A1555007F8576 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CBD123FD28E58EEB004A42A9 /* libtensorflowlite.so */; };
 		CB3CACFE28F8ED04000A8BF0 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CBD123FD28E58EEB004A42A9 /* libtensorflowlite.so */; };
+		CB41C4E4290A79760012BC6A /* EyebrowMaskV7.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB41C4E2290A79760012BC6A /* EyebrowMaskV7.cpp */; };
 		CB4312AA28D41DDD006D71DA /* ParametricBSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB4312A828D41DDD006D71DA /* ParametricBSpline.cpp */; };
 		CB45E23F28E54BA7004E8D25 /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB45E23E28E54BA7004E8D25 /* Geometry.cpp */; };
 		CB62F4712908D04600828C4C /* activecontours.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB62F4672908D04600828C4C /* activecontours.cpp */; };
@@ -31,7 +32,6 @@
 		CB62F4732908D04600828C4C /* customsnake.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB62F46B2908D04600828C4C /* customsnake.cpp */; };
 		CB62F4742908D04600828C4C /* gaussarea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB62F46F2908D04600828C4C /* gaussarea.cpp */; };
 		CB62F4752908D04600828C4C /* bresenham.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB62F4702908D04600828C4C /* bresenham.cpp */; };
-		CB62F4782908D3A800828C4C /* EyebrowMaskV6.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB62F4772908D3A800828C4C /* EyebrowMaskV6.cpp */; };
 		CB7F673F28F4165500060E7C /* SegHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB9D430828F3F9DA00CD3B13 /* SegHelper.cpp */; };
 		CB9D430628F3F6B000CD3B13 /* FaceBgSegV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB9D430528F3F6B000CD3B13 /* FaceBgSegV2.cpp */; };
 		CB9D430728F3F77C00CD3B13 /* FaceBgSegV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB9D430528F3F6B000CD3B13 /* FaceBgSegV2.cpp */; };
@@ -110,6 +110,8 @@
 		CB255A9228C7237A005C8A81 /* SkinAnaMPBase */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SkinAnaMPBase; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB255A9528C7237A005C8A81 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		CB3C248E28D00BA300804E6E /* libtensorflowlite.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtensorflowlite.so; path = SkinAnaMPBase/intel_lib/libtensorflowlite.so; sourceTree = "<group>"; };
+		CB41C4E2290A79760012BC6A /* EyebrowMaskV7.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EyebrowMaskV7.cpp; sourceTree = "<group>"; };
+		CB41C4E3290A79760012BC6A /* EyebrowMaskV7.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EyebrowMaskV7.hpp; sourceTree = "<group>"; };
 		CB4312A728D41A36006D71DA /* spline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spline.h; sourceTree = "<group>"; };
 		CB4312A828D41DDD006D71DA /* ParametricBSpline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParametricBSpline.cpp; sourceTree = "<group>"; };
 		CB4312A928D41DDD006D71DA /* ParametricBSpline.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ParametricBSpline.hpp; sourceTree = "<group>"; };
@@ -125,8 +127,6 @@
 		CB62F46E2908D04600828C4C /* bresenham.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bresenham.h; sourceTree = "<group>"; };
 		CB62F46F2908D04600828C4C /* gaussarea.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gaussarea.cpp; sourceTree = "<group>"; };
 		CB62F4702908D04600828C4C /* bresenham.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bresenham.cpp; sourceTree = "<group>"; };
-		CB62F4762908D3A800828C4C /* EyebrowMaskV6.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EyebrowMaskV6.hpp; sourceTree = "<group>"; };
-		CB62F4772908D3A800828C4C /* EyebrowMaskV6.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EyebrowMaskV6.cpp; sourceTree = "<group>"; };
 		CB62F4792908DF8300828C4C /* tsparams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tsparams.h; sourceTree = "<group>"; };
 		CB79324B28D1B07400BE136B /* libtensorflow-lite.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libtensorflow-lite.a"; path = "SkinAnaMPBase/intel_lib/libtensorflow-lite.a"; sourceTree = "<group>"; };
 		CB9D430428F3F6B000CD3B13 /* FaceBgSegV2.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FaceBgSegV2.hpp; sourceTree = "<group>"; };
@@ -192,8 +192,8 @@
 		264E012328D6C1DF00CB94D1 /* Mask */ = {
 			isa = PBXGroup;
 			children = (
-				CB62F4772908D3A800828C4C /* EyebrowMaskV6.cpp */,
-				CB62F4762908D3A800828C4C /* EyebrowMaskV6.hpp */,
+				CB41C4E2290A79760012BC6A /* EyebrowMaskV7.cpp */,
+				CB41C4E3290A79760012BC6A /* EyebrowMaskV7.hpp */,
 				2606575928F7122400019FFE /* PolarPtSeq.cpp */,
 				2606575A28F7122400019FFE /* PolarPtSeq.hpp */,
 				CBBF6C5228F13E370036619C /* SkinMask.cpp */,
@@ -480,7 +480,6 @@
 				263B540228CD861C004CF77D /* AnnoImage.cpp in Sources */,
 				2680A22E28EFC54B00A305EB /* FaceLmExtractV2.cpp in Sources */,
 				CBBF6C5428F13E370036619C /* SkinMask.cpp in Sources */,
-				CB62F4782908D3A800828C4C /* EyebrowMaskV6.cpp in Sources */,
 				26B65A5E28EA92900019104F /* LowerFaceMask.cpp in Sources */,
 				CB62F4742908D04600828C4C /* gaussarea.cpp in Sources */,
 				2602327628CCBFB100B11D7A /* HeadPoseEst.cpp in Sources */,
@@ -492,6 +491,7 @@
 				CB62F4752908D04600828C4C /* bresenham.cpp in Sources */,
 				CBB5DB4028DD5E97003CDED3 /* SkinFeatureMask.cpp in Sources */,
 				CB9D430928F3F9DA00CD3B13 /* SegHelper.cpp in Sources */,
+				CB41C4E4290A79760012BC6A /* EyebrowMaskV7.cpp in Sources */,
 				CB62F4732908D04600828C4C /* customsnake.cpp in Sources */,
 				CB1E2AB928DD99AB00F416DF /* ForeheadMask.cpp in Sources */,
 				CBB5DB3D28DD5B3B003CDED3 /* FundamentalMask.cpp in Sources */,
