@@ -54,6 +54,7 @@ namespace cvalg
 {
 
 using namespace cv;
+using namespace std;
 
 class ActiveContours
 {
@@ -61,27 +62,31 @@ public:
     ActiveContours();
     void init(int i_width, int i_height);
     void insertPoint(Point p);
-    Mat iterate(Mat currentFrame);
+    
+    void optimize(const Mat& inImg, int viewRadius, int iterTimes);
+
     bool minimumRunReqSet();
     Mat drawSnake(Mat frame);
     
     void setParams(AlgoParams* params);
 
     bool previously_reset;
+    
+    vector<Point> getOptimizedCont();
 
 private:
     AlgoParams* _params;
 
     int _w, _h;
-    cv::Point _center;
-    std::vector<Point> _points;
+    Point _center;
+    vector<Point> _points;
 
     float _alpha;
     float _beta;
     float _gamma;
     float _avgDist;
 
-    Point newPosition(int pointIndex, Point start, Point end, Mat image);
+    Point updatePos(int pointIndex, Point start, Point end, Mat image);
     void averagePointDistance();
 
     // Splits snake by a couple of different

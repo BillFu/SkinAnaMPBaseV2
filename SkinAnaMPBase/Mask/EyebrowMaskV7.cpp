@@ -200,7 +200,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     initEyePgBBox = initEyePgBBox | eyeMaskBBox;
 
     // make initEyePgBBox enlarged
-    int padSize = 50;
+    int padSize = 20;
     InflateRect(padSize, initEyePgBBox);
 
     Mat workImg(initEyePgBBox.size(), CV_8UC1, Scalar(0));
@@ -223,46 +223,70 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     // 再把initEyePgWC转化为栅格形式，并与segEyeMask会师，合并
     drawContours(workImg, contours, 0, Scalar(255), FILLED);
 
-    int eroRadius = 20;
+    int diaRadius = 3;
     Mat element = getStructuringElement( MORPH_ELLIPSE,
-                           Size(2*eroRadius + 1, 2*eroRadius + 1),
-                           Point(eroRadius, eroRadius));
+                           Size(2*diaRadius + 1, 2*diaRadius + 1),
+                           Point(diaRadius, diaRadius));
     dilate(workImg, workImg, element);
-    // imwrite("initDataAC.png", workImg1);
+    imwrite("CombInitAC.png", workImg);
 
     // --- 把合并后的结果转为矢量域
-    CONTOURS contours1;
-    findContours(workImg, contours1,
+    CONTOURS acCts; // acCts[0] will be input snake algorithm
+    findContours(workImg, acCts,
             cv::noArray(), RETR_EXTERNAL, CHAIN_APPROX_NONE);
+    
+    workImg.release();
+    
+    int numPts = acCts[0].size();
 
+    CONTOUR sampPtCt;  // 稀疏化的轮廓点
+    int sampGap = 30;
+    int numSampPt = numPts / sampGap;
+    
+    for(int i = 0; i < numSampPt; i++)
+    {
+        int id = i * sampGap;
+        sampPtCt.push_back(acCts[0][id]);
+    }
+    
     //--------------------------------------------------------------
     // ---- just for debugging
     Mat canvas(initEyePgBBox.size(), CV_8UC1, Scalar(0));
     segEyeMaskSS.copyTo(canvas(relativeRect));
-    drawContours(canvas, contours1, 0, Scalar(150), 2);
+    drawContours(canvas, acCts, 0, Scalar(150), 2);
     imwrite("InitStateAC.png", canvas);
+    canvas.release();
+
+    double arcLen = arcLength(acCts[0], true);
+    cout << "arcLen: " << arcLen << endl;
 
     //--------------------------------------------------------------
     cvalg::ActiveContours acAlg;
     AlgoParams ap;
+    ap._nPoints = sampPtCt.size();
     acAlg.setParams(&ap);
 
-    /*
-    Size workImgS = workImg.size();
-    acAlg.init(workImgS.width, workImgS.height);
+    Mat acImg(initEyePgBBox.size(), CV_8UC1, Scalar(0));
+    segEyeMaskSS.copyTo(acImg(relativeRect)); // 将segEyeMask复写到acImg
+    
+    Size acImgS = acImg.size();
+    acAlg.init(acImgS.width, acImgS.height);
 
-    for(Point2i pt: adjustEyePgWC)
+    for(Point2i pt: sampPtCt)
     {
         acAlg.insertPoint(pt);
     }
     
-    Mat newFrame = acAlg.iterate(workImg);
-    //Mat nf = customContourAlg.drawSnake(frame);
-    //nf.copyTo(frame);
+    //acImg = ~acImg;
+    acAlg.optimize(acImg, 35, 80);
 
-    //eyePg = smEyeCt;
-    */
+    CONTOUR finCt = acAlg.getOptimizedCont();
+    CONTOURS finCts;
+    finCts.push_back(finCt);
+    drawContours(acImg, finCts, 0, Scalar(150), 2);
+    imwrite("finRstAC.png", acImg);
     
+    eyePg = finCt;
 }
 
 void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
@@ -274,6 +298,7 @@ void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
 
     Size srcImgS = faceInfo.srcImgS;
     
+    
     ForgeEyePgBySnakeAlg(faceInfo.srcImgS, faceInfo.lEyeRefinePts,
                          segRst.lEyeMaskNOS, segRst.lEyeFPs,
                          segRst.leftEyeCP, leftEyePg);
@@ -283,7 +308,6 @@ void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
                          segRst.rEyeMaskNOS, segRst.rEyeFPs,
                          segRst.rightEyeCP, rightEyePg);
     */
-    
     POLYGON_GROUP polygonGroup;
     polygonGroup.push_back(leftEyePg);
     polygonGroup.push_back(rightEyePg);

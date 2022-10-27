@@ -1,9 +1,7 @@
 {
-	"FaceMeshAttenModelFile": 			"models/face_landmark_with_attention.tflite",
+	"SegModelFile": 				    "models/seg_model.onnx",
+	"ClassColorFile":					"models/classes3.txt",
+	"FaceMeshAttenModel": 				"models/face_lm_attent.tflite",
 	"SourceImage":						"images/JPN/cross_5.jpg",
-	"AnnoPoseImage": 					"result/JPN/anno_cross_5.png",
-	"FaceContourImage": 				"result/JPN/fc_cross_5.png",
-	"MouthContourImage": 				"result/JPN/mc_cross_5.png",
-	"EyebowsContourImage": 				"result/JPN/ebc_cross_5.png",
-	"EyeFullContourImage": 				"result/JPN/efc_cross_5.png"
+	"OutDir":							"result/JPN/case5"
 }

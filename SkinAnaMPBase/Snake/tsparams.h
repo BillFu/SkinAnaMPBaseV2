@@ -46,11 +46,11 @@
 #define DRAW_NEIGHBORS
 
 // Required
-#define CONTOUR_ALPHA       0.2
-#define CONTOUR_BETA        1
+#define CONTOUR_ALPHA       2
+#define CONTOUR_BETA        16
 #define CONTOUR_GAMMA       100
 #define MINIMUM_POINTS      4
-#define CONTOUR_START_POINT 100
+#define CONTOUR_START_POINT 200
 
 /* Active Contour */
 
@@ -113,7 +113,8 @@ public:
     float getBeta(){ return _beta; }
     float getGama(){ return _gamma; }
 
-private:
+//private:
+public:
     int _nPoints;
     int _sobelThresh;
     bool _sobelAngle;
