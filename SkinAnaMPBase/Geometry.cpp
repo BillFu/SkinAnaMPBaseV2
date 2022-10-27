@@ -177,3 +177,26 @@ Rect CalcRelativeRect(const Rect& refRect, const Rect& transRect)
     
     return relRect;
 }
+
+
+// return the corrected point which lies in the rectangle.
+Point2i MakePtInRect(const Rect& rect, Point2i& pt)
+{
+    if(rect.contains(pt))
+        return pt;
+    
+    int correctX = pt.x;
+    int correctY = pt.y;
+    
+    if(correctX < 0)
+        correctX = 0;
+    if(correctX >= rect.width)
+        correctX = rect.width - 1;
+    
+    if(correctY < 0)
+        correctY = 0;
+    if(correctY >= rect.height)
+        correctY = rect.height - 1;
+    
+    return Point2i(correctX, correctY);
+}

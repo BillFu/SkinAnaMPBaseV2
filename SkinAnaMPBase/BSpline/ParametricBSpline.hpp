@@ -22,11 +22,12 @@ using namespace cv;
 
 
 /**********************************************************************************************
-本函数的作用是，传入粗糙的折线多边形，构造出光滑、封闭的多边形。
+本函数的作用是，传入粗糙的折线多边形（或不封闭的折线），构造出光滑的多边形、折线，且增加点数使之稠密。
 csPolygon: closed, opened BSpline polygon
 ***********************************************************************************************/
 
-void CloseSmoothPolygon(const POLYGON& contours, int csNumPoint, POLYGON& csPolygon);
+void DenseSmoothPolygon(const POLYGON& contours, int csNumPoint,
+                        POLYGON& csPolygon, bool is_closed_curve = true);
 
 
 //-------------------------------------------------------------------------------------------

@@ -51,10 +51,12 @@ void ForgeBrowsMask(const FaceInfo& faceInfo,
 void ForgeInitEyePg(const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
                     float expandScale, int& numPtsUC, POLYGON& initEyePg);
 
+// eyeCP: given by face/bg segment and in source space
 void ForgeEyePgBySnakeAlg(Size srcImgS,
                           const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
                           const SegMask& eyeSegMask,
                           const EyeFPs& eyeFPs,
+                          const Point2i& eyeCP,
                           POLYGON& eyePg);
 
 void ForgeEyesMask(const Mat& srcImage,
@@ -70,5 +72,15 @@ void SplitEyeCt2UpLowCurves(const CONTOUR& nosEyeCont,
                             CONTOUR& upEyeCurve,
                             CONTOUR& lowEyeCurve);
 
+
+// 移动初始眼睛轮廓线上的点，让它们跳出Mask的包围圈
+// 逃出包围圈的方向：从中心点出发，到当前轮廓点连一条线，沿这条线远离中心点，最终可逃离包围圈，或到达工作区边界。
+// 采用新思路，就可以不用区分上弧线、下弧线。
+// eyeCPWC: center point of eye in working coordinate system
+void MoveInitEyePtsOutMask(const POLYGON& eyePgWC,
+                           int workRegW, int workRegH,
+                           const Mat& workMask,
+                           const Point2i& eyeCPWC,
+                           POLYGON& adjustEyePgWC);
 
 #endif /* end of EYEBROW_MASK_V6_HPP */

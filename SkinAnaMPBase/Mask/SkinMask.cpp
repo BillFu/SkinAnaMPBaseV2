@@ -95,7 +95,7 @@ void ForgeSkinMaskV3(const FaceInfo& faceInfo,
                        raisedFhCurve, raisedPtIndices);
     
     int csNumPoint = 200;
-    CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+    DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
 
     DrawContOnMask(refinedPolygon, outMask);
     
@@ -216,7 +216,7 @@ void ForgeSkinMaskV4(const FaceInfo& faceInfo,
                        raisedFhCurve, raisedPtIndices);
     
     int csNumPoint = 200;
-    CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+    DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
 
     DrawContOnMask(refinedPolygon, outMask);
     
@@ -369,7 +369,7 @@ void ForgeSkinMaskV5(const FaceInfo& faceInfo,
                        raisedFhCurve, raisedPtIndices);
     
     int csNumPoint = 200;
-    CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+    DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
     DrawContOnMask(refinedPolygon, outMask);
     //DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, coarsePolygon, outMask);
     

@@ -81,7 +81,8 @@ void create_time_grid(std::vector<double>& T, double& tmin, double& tmax,
  csNumPoint: how many points should be output to present csPolygon
  *******************************************************************************************/
 
-void CloseSmoothPolygon(const POLYGON& contours, int csNumPoint, POLYGON& csPolygon)
+void DenseSmoothPolygon(const POLYGON& contours, int csNumPoint,
+                        POLYGON& csPolygon, bool is_closed_curve)
 {
     std::vector<double> inX;
     std::vector<double> inY;
@@ -94,7 +95,6 @@ void CloseSmoothPolygon(const POLYGON& contours, int csNumPoint, POLYGON& csPoly
     
     tk::spline::spline_type type = tk::spline::cspline;
     bool make_monotonic = false;
-    bool is_closed_curve = true;
 
     // setup auxiliary "time grid"
     double tmin = 0.0, tmax = 0.0;

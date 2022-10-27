@@ -98,4 +98,7 @@ bool RectContainsRect(const Rect& bigRect, const Rect& smallRect);
 // 在refRect构成的局部坐标系（以左上角为原点，y轴朝下）中，计算transRect的新版本
 Rect CalcRelativeRect(const Rect& refRect, const Rect& transRect);
 
+// return the corrected point which lies in the rectangle.
+Point2i MakePtInRect(const Rect& rect, Point2i& pt);
+
 #endif /* end of GEOMETRY_HPP */

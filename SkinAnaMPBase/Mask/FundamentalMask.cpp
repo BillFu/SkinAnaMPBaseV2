@@ -219,7 +219,7 @@ void ForgeMouthMask(const FaceInfo& faceInfo, float expanRatio, Mat& outFinalMas
     ForgeMouthPolygon(faceInfo, mouthW, mouthH, coarsePolygon);
     
     int csNumPoint = 60;
-    CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+    DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
 
     // when to construct a Mat, Height first, and then Width!
     Mat basicMask(faceInfo.srcImgS, CV_8UC1, cv::Scalar(0));
@@ -259,7 +259,7 @@ void ForgeOneEyeFullMask(const FaceInfo& faceInfo, EyeID eyeID, Mat& outMask)
         ForgeOneEyeFullPg(faceInfo.rEyeRefinePts, coarsePolygon);
     
     int csNumPoint = 50; //200;
-    CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+    DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
 
     DrawContOnMask(refinedPolygon, outMask);
 }
@@ -300,7 +300,7 @@ void ForgeNoseMask(const FaceInfo& faceInfo, Mat& outMask)
     ForgeNosePolygon(faceInfo, coarsePolygon);
     
     int csNumPoint = 100;
-    CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+    DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
 
     DrawContOnMask(refinedPolygon, outMask);
 }
@@ -383,7 +383,7 @@ void ForgeNoseBellMask(const FaceInfo& faceInfo, Mat& outMask)
     ForgeNoseBellPg(faceInfo, coarsePg);
     
     int csNumPoint = 80;
-    CloseSmoothPolygon(coarsePg, csNumPoint, refinedPg);
+    DenseSmoothPolygon(coarsePg, csNumPoint, refinedPg);
 
     DrawContOnMask(refinedPg, outMask);
 }

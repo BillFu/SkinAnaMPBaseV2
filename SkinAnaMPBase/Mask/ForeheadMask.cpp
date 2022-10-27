@@ -197,7 +197,7 @@ void ForgeForeheadMask(const FaceInfo& faceInfo, const Mat& fbBiLab, Mat& outMas
     ForgeForeheadPg(faceInfo, coarsePolygon);
     
     int csNumPoint = 80;
-    CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+    DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
 
     DrawContOnMask(refinedPolygon, outMask);
     
@@ -279,7 +279,7 @@ void ForgeExpFhMask(const FaceInfo& faceInfo, const Mat& fbBiLab, Mat& outMask)
     ForgeExpFhPg(faceInfo, coarsePg);
     
     int csNumPoint = 100;
-    CloseSmoothPolygon(coarsePg, csNumPoint, refinedPg);
+    DenseSmoothPolygon(coarsePg, csNumPoint, refinedPg);
 
     DrawContOnMask(refinedPg, outMask);
     

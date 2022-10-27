@@ -106,7 +106,7 @@ void ForgeBrowPg(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP],
 
     // then convert the corse to the refined
     int csNumPoint = 50;
-    CloseSmoothPolygon(coarsePg, csNumPoint, browPg);
+    DenseSmoothPolygon(coarsePg, csNumPoint, browPg);
 }
 /******************************************************************************************
 *******************************************************************************************/
@@ -162,7 +162,7 @@ void FixERPsBySegEyeCP(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP], // inpu
 void ForgeInitEyePg(const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
                     float expandScale, int& numPtsUC, POLYGON& initEyePg)
 {
-    POLYGON coarsePg, refinedPolygon;
+    POLYGON refinedPolygon;
         
     // 采用Eye Refine Region的点！
     // 以右眼为基准，从内侧上角点开始，顺时针绕一周
@@ -170,24 +170,38 @@ void ForgeInitEyePg(const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
     int ptIDsOnUpCurve[] = {40, 23, 22, 21, 20, 19, 18, 17, 32}; // 顺时针计数, total 9 points
     int ptIDsOnLowCurve[] = {55, 56, 57, 58, 59, 60, 61};  // total 7 points
     
-    numPtsUC = sizeof(ptIDsOnUpCurve) / sizeof(int);
-    for(int i = 0; i<numPtsUC; i++)
+    CONTOUR coarseUpCurve, coarseLowCurve;
+    int numCoarsePtsUC = sizeof(ptIDsOnUpCurve) / sizeof(int);
+    for(int i = 0; i<numCoarsePtsUC; i++)
     {
         int index = ptIDsOnUpCurve[i];
-        coarsePg.push_back(eyeRefinePts[index]);
+        coarseUpCurve.push_back(eyeRefinePts[index]);
     }
     
-    int numPtsLC = sizeof(ptIDsOnLowCurve) / sizeof(int);
-    for(int i = 0; i<numPtsLC; i++)
+    int numCoarsePtsLC = sizeof(ptIDsOnLowCurve) / sizeof(int);
+    for(int i = 0; i<numCoarsePtsLC; i++)
     {
         int index = ptIDsOnLowCurve[i];
-        coarsePg.push_back(eyeRefinePts[index]);
+        coarseLowCurve.push_back(eyeRefinePts[index]);
     }
     
-    Rect coaPgBBox = boundingRect(coarsePg); // maybe need padding and enlarge
+    CONTOUR refineUpCurve, refineLowCurve;
+    DenseSmoothPolygon(coarseUpCurve, 120, refineUpCurve, false);
+    DenseSmoothPolygon(coarseLowCurve, 100, refineLowCurve, false);
+    
+    numPtsUC = (int)(refineUpCurve.size());
+
+    // combine the upper and lower curve into a closed contour
+    POLYGON combinedCurve(refineUpCurve);
+    for(Point2i pt: refineLowCurve)
+    {
+        combinedCurve.push_back(pt);
+    }
+    
+    Rect coaPgBBox = boundingRect(combinedCurve); // maybe need padding and enlarge
     Point2i centerPt = (coaPgBBox.tl() + coaPgBBox.br())/ 2;
     
-    for(Point2i pt: coarsePg)
+    for(Point2i pt: combinedCurve)
     {
         Point2i expPt = (pt - centerPt) * expandScale + centerPt;
         initEyePg.push_back(expPt);
@@ -195,12 +209,17 @@ void ForgeInitEyePg(const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
 }
 
 // 移动初始眼睛轮廓线上的点，让它们跳出Mask的包围圈
+// 逃出包围圈的方向：从中心点出发，到当前轮廓点连一条线，沿这条线远离中心点，最终可逃离包围圈，或到达工作区边界。
+// 采用新思路，就可以不用区分上弧线、下弧线。
+// eyeCPWC: center point of eye in working coordinate system
 void MoveInitEyePtsOutMask(const POLYGON& eyePgWC,
-                           int numPtsUC,  // UC: upper curve
-                           int subRegionH,
+                           int workRegW, int workRegH,
                            const Mat& workMask,
+                           const Point2i& eyeCPWC,  
                            POLYGON& adjustEyePgWC)
 {
+    Rect workRect(0, 0, workRegW, workRegH);
+    
     for(int i = 0; i<eyePgWC.size(); i++)
     {
         Point pt = eyePgWC[i];
@@ -209,33 +228,34 @@ void MoveInitEyePtsOutMask(const POLYGON& eyePgWC,
             adjustEyePgWC.push_back(pt);
         else
         {
-            if(i < numPtsUC) // on upper curve, then move upside
+            while((workRect.contains(pt)) && (workMask.at<uchar>(pt) == 255))
             {
-                while((pt.y > 0) && (workMask.at<uchar>(pt) == 255))
-                    pt.y -= 5;
-                
-                if(pt.y < 0)
-                    pt.y = 1;
-            }
-            else // on lower curve, then move downside
-            {
-                while((pt.y <= subRegionH-1) && (workMask.at<uchar>(pt) == 255))
-                    pt.y += 5;
-                
-                if(pt.y >= subRegionH)
-                    pt.y = subRegionH - 2;
+                Point dvec = pt - eyeCPWC;
+                float len = sqrt(dvec.x * dvec.x + dvec.y * dvec.y);
+                float unit_dx = dvec.x / len;
+                float unit_dy = dvec.y / len;
+                Point mv_offset(unit_dx * 5, unit_dy * 5);
+                pt += mv_offset;
             }
             
+            // check the moved point and make sure that it still lies in working region.
+            if(workRect.contains(pt) == false)
+            {
+                pt = MakePtInRect(workRect, pt);
+            }
+        
             adjustEyePgWC.push_back(pt);
         }
     }
 }
 
 // 用分割的结果构造出一只眼睛的轮廓多边形
+// eyeCP: given by face/bg segment and in source space
 void ForgeEyePgBySnakeAlg(Size srcImgS,
                           const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
                           const SegMask& eyeSegMask, // in NOS
                           const EyeFPs& eyeFPs,
+                          const Point2i& eyeCP,
                           POLYGON& eyePg)
 {
     POLYGON initEyePg;
@@ -270,12 +290,16 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
         eyePgWC.push_back(ptWC);
     }
     
+    Point2i eyeCPWC = eyeCP - initEyePgBBox.tl();
+
     // 通过移动向上、向上的移动，使eyePgWC上的点跳出Mask的包围圈。
     POLYGON adjustEyePgWC;
-    MoveInitEyePtsOutMask(eyePgWC, numPtsUC, workImg.rows,
-                        workImg, adjustEyePgWC);
+    MoveInitEyePtsOutMask(eyePgWC, workImg.cols, workImg.rows,
+                        workImg, eyeCPWC, adjustEyePgWC);
     
     polylines(workImg, adjustEyePgWC, true, Scalar(150), 2, 8);
+    circle(workImg, eyeCPWC, 5, Scalar(150), -1);  // 画半径为5的圆(画点）
+
     imwrite("initDataAC.png", workImg);
 
     //--------------------------------------------------------------
@@ -310,12 +334,12 @@ void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
     
     ForgeEyePgBySnakeAlg(faceInfo.srcImgS, faceInfo.lEyeRefinePts,
                          segRst.lEyeMaskNOS, segRst.lEyeFPs,
-                         leftEyePg);
+                         segRst.leftEyeCP, leftEyePg);
     
     /*
     ForgeEyePgBySnakeAlg(faceInfo.srcImgS, faceInfo.rEyeRefinePts,
                          segRst.rEyeMaskNOS, segRst.rEyeFPs,
-                         rightEyePg);
+                         segRst.rightEyeCP, rightEyePg);
     */
     
     POLYGON_GROUP polygonGroup;
