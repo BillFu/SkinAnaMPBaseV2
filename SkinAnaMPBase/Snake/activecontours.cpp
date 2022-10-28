@@ -55,7 +55,8 @@ void ActiveContours::insertPoint(Point p)
     _points.push_back(p);
 }
 
-void cvalg::ActiveContours::optimize(const Mat& inImg, int viewRadius,
+void cvalg::ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
+                                     int viewRadius,
                                      int iterTimes)
 {
     // Take the current frame, and do sobel edge detection, threshold = 120
@@ -84,7 +85,7 @@ void cvalg::ActiveContours::optimize(const Mat& inImg, int viewRadius,
             Point s(startx, starty);
             Point e(endx, endy);
             
-            _points[i] = updatePos(i, s, e, sobelEdges.frame);
+            _points[i] = updatePos(i, s, e, sobelEdges.frame, cornerField);
         }
     }
 }
@@ -96,7 +97,8 @@ bool ActiveContours::minimumRunReqSet()
     return false;
 }
 
-Point ActiveContours::updatePos(int pointIndex, Point start, Point end, Mat image)
+Point ActiveContours::updatePos(int pointIndex, Point start, Point end,
+                                const Mat& edgeImage, const Mat& cornerField)
 {
     int cols = end.x - start.x;
     int rows = end.y - start.y;
@@ -115,7 +117,7 @@ Point ActiveContours::updatePos(int pointIndex, Point start, Point end, Mat imag
     for(int y = 0; y < rows; y ++)
         for(int x = 0; x < cols; x++)
         {
-            int cval = (int)image.at<uchar>(y + start.y,x + start.x);
+            int cval = (int)edgeImage.at<uchar>(y + start.y,x + start.x);
             if(flag)
             {
                 flag = false;
@@ -134,7 +136,7 @@ Point ActiveContours::updatePos(int pointIndex, Point start, Point end, Mat imag
 
     if(ngmax == 0)
         ngmax = 1;
-     if(ngmin == 0)
+    if(ngmin == 0)
          ngmin = 1;
 
     flag = true;
@@ -187,7 +189,7 @@ Point ActiveContours::updatePos(int pointIndex, Point start, Point end, Mat imag
                 Gradient magnitude encoded in pixel information
                     - May want to change this 'feature'
             */
-            float eimage = -(int)image.at<uchar>(parentY,parentX);
+            float eimage = -(int)edgeImage.at<uchar>(parentY,parentX);
             //float eimage = (int)image.at<uchar>(parentY,parentX);
             eimage *= _params->getGama();
 

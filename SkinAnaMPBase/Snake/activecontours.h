@@ -63,7 +63,8 @@ public:
     void init(int i_width, int i_height);
     void insertPoint(Point p);
     
-    void optimize(const Mat& inImg, int viewRadius, int iterTimes);
+    void optimize(const Mat& inImg, const Mat& cornerField,
+                  int viewRadius, int iterTimes);
 
     bool minimumRunReqSet();
     Mat drawSnake(Mat frame);
@@ -86,7 +87,8 @@ private:
     float _gamma;
     float _avgDist;
 
-    Point updatePos(int pointIndex, Point start, Point end, Mat image);
+    Point updatePos(int pointIndex, Point start, Point end,
+                    const Mat& edgeImage, const Mat& cornerField);
     void averagePointDistance();
 
     // Splits snake by a couple of different

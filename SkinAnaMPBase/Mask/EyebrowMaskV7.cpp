@@ -280,6 +280,8 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     imwrite("InitStateAC.png", canvas);
     canvas.release();
 
+    
+    
     double arcLen = arcLength(acCts[0], true);
     cout << "arcLen: " << arcLen << endl;
 
@@ -301,7 +303,15 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     }
     
     //acImg = ~acImg;
-    acAlg.optimize(acImg, 35, 80);
+    vector<Point2i> peaks;
+    peaks.push_back(lEyeCornerWC);
+    peaks.push_back(rEyeCornerWC);
+
+    int fieldW = initEyePgBBox.size().width;
+    int fieldH = initEyePgBBox.size().height;
+    Mat cornerField = BuildGaussField(fieldW, fieldH, 7, peaks);
+    
+    acAlg.optimize(acImg, cornerField, 35, 80);
 
     CONTOUR finCt = acAlg.getOptimizedCont();
     CONTOURS finCts;

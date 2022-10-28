@@ -9,6 +9,7 @@ Date:   2022/10/28
 
 #include "GaussField.hpp"
 #include <algorithm>
+#include "../Utils.hpp"
 
 using namespace std;
 /*
@@ -130,24 +131,33 @@ Mat BuildGaussField(int fieldW, int fieldH, int sigma,
 {
     Rect fieldRect(0, 0, fieldW, fieldH);
     
-    Mat field(fieldW, fieldH, CV_32FC1, Scalar(0.0));
+    // 注意：构造一个Mat时，排在前面的是rows，后面才是cols，换言之，先高后宽！！！
+    Mat field(fieldH, fieldW, CV_32FC1, Scalar(0.0));
     
     int kerRadius = 3*sigma;
     int kerDiameter = kerRadius*2 + 1; // must be a odd number
     
     cv::Mat kernel = getGaussKernel(kerDiameter, kerDiameter, sigma, sigma);
+    string kernel_DataType = openCVType2str(kernel.type());
+    cout << "kernel_DataType: " << kernel_DataType << endl;
 
     for(Point2i pt: peaks)
     {
         Point2i tl(pt.x-kerRadius, pt.y-kerRadius);
         Point2i br(pt.x+kerRadius, pt.y+kerRadius);
-        Rect kerRect(tl, br);
+        Rect kerRect(tl.x, tl.y, kerDiameter, kerDiameter);
         Rect validKerRect = kerRect & fieldRect;
-        kernel.copyTo(field(validKerRect));
+        Mat clippedKer = kernel(Rect(0, 0, validKerRect.width, validKerRect.height));
+        clippedKer.copyTo(field(validKerRect));
     }
     
     float maxV = *max_element(field.begin<float>(), field.end<float>());
     float minV = *min_element(field.begin<float>(), field.end<float>());
 
-    return field;
+    Mat scaleImg = field * 255 / maxV;
+    //imwrite("field.png", scaleImg);
+    Mat ucharField;
+    scaleImg.assignTo(ucharField, CV_8UC1);
+    
+    return ucharField;
 }
