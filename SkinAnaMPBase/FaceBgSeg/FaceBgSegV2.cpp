@@ -239,9 +239,9 @@ void FaceBgSegmentor::CalcEyesInfo(const Mat& eyesMask, FaceSegRst& segResult)
         mc.push_back(cv::Point2i(cx, cy));
     }
     
-    Point2i eyeCP0, eyeCP1;
-    ScaleUpPoint(mc[0], eyeCP0);
-    ScaleUpPoint(mc[1], eyeCP1);
+    Point2i eyeSegCP0, eyeSegCP1;
+    ScaleUpPoint(mc[0], eyeSegCP0);
+    ScaleUpPoint(mc[1], eyeSegCP1);
     
     double areaEye0 = contourArea(contours[0]);
     double areaEye1 = contourArea(contours[1]);
@@ -252,10 +252,10 @@ void FaceBgSegmentor::CalcEyesInfo(const Mat& eyesMask, FaceSegRst& segResult)
     int eyeArea0 = (int)(areaEye0 * scaleX * scaleY);
     int eyeArea1 = (int)(areaEye1 * scaleX * scaleY);
     
-    if(eyeCP0.x < eyeCP1.x)  // 0 is left, 1 is right
+    if(eyeSegCP0.x < eyeSegCP1.x)  // 0 is left, 1 is right
     {
-        segResult.leftEyeCP = eyeCP0;
-        segResult.rightEyeCP = eyeCP1;
+        segResult.lEyeSegCP = eyeSegCP0;
+        segResult.rEyeSegCP = eyeSegCP1;
         
         segResult.leftEyeArea = eyeArea0;
         segResult.rightEyeArea = eyeArea1;
@@ -273,8 +273,8 @@ void FaceBgSegmentor::CalcEyesInfo(const Mat& eyesMask, FaceSegRst& segResult)
     }
     else // 1 is left, 0 is right
     {
-        segResult.leftEyeCP = eyeCP1;
-        segResult.rightEyeCP = eyeCP0;
+        segResult.lEyeSegCP = eyeSegCP1;
+        segResult.rEyeSegCP = eyeSegCP0;
         
         segResult.leftEyeArea = eyeArea1;
         segResult.rightEyeArea = eyeArea0;
@@ -299,12 +299,12 @@ void FaceBgSegmentor::CalcEyesInfo(const Mat& eyesMask, FaceSegRst& segResult)
         // facePriInfo.faceCP = (eyeCP1 + eyeCP2) / 2;
         int totalEyeArea = eyeArea0 + eyeArea1;
         float t = (float)eyeArea0 / (float)totalEyeArea;
-        segResult.faceCP =  Interpolate(eyeCP0, eyeCP1, t);
+        segResult.faceCP =  Interpolate(eyeSegCP0, eyeSegCP1, t);
     }
     else
     {
         segResult.isFrontView = true;
-        segResult.faceCP = (eyeCP0 + eyeCP1) / 2;
+        segResult.faceCP = (eyeSegCP0 + eyeSegCP1) / 2;
     }
 }
 

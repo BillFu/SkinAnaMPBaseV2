@@ -117,7 +117,7 @@ private:
     static vector<Vec3b> classColorTable;
 };
 
-void DrawEyeFPs(Mat& outImg, const EyeFPs& eyeFPs);
+void DrawEyeFPs(Mat& outImg, const EyeSegFPs& eyeFPs);
 
 // blend segment labels image with source iamge:
 // result = alpha * segLabels + (1-alpha) * srcImage
@@ -146,7 +146,7 @@ void CalcEyeCtFPs(int srcImgW, int srcImgH,
                   const Point& browCP_NOS,
                   const Point& eyeCP_NOS,
                   SegEyeFPsNOS& segEyeFPsNOS,
-                  EyeFPs& eyeFPs);
+                  EyeSegFPs& eyeFPs);
 
 void CalcEyeCornerPts(const CONTOUR& eyeCont_NOS, const Point& browCP_NOS,
                         Point& lCorPtNOS, Point& rCorPtNOS);
@@ -155,7 +155,7 @@ void PtNOS2PtSP(int srcImgW, int srcImgH, const Point2i& inPt, Point2i& outPt);
 
 void EyeFPsNOS2EyeFPsSP(int srcImgW, int srcImgH,
                         const SegEyeFPsNOS& segEyeFPsNOS,
-                        EyeFPs& eyeFPs);
+                        EyeSegFPs& eyeFPs);
 
 Rect RectNOS2RectSS(int srcImgW, int srcImgH, const Rect& rectNOS);
 Rect RectNOS2RectSS(const Size& srcImgS, const Rect& rectNOS);

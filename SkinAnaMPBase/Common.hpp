@@ -111,7 +111,7 @@ struct SegEyeFPsNOS
     Point mBotPtNOS;
 };
 
-struct EyeFPs  // in source space
+struct EyeSegFPs  // in source space
 {
     Point lCorPt;
     Point rCorPt;
@@ -129,13 +129,17 @@ struct FaceSegRst
     Point2i     faceCP;         // CP: Center Point;
     float       eyeAreaDiffRatio;  // ratio = abs(a1-a2) / max(a1, a2)
     
-    Point2i     leftEyeCP;    // in source space
-    Point2i     rightEyeCP;
+    //关于lEyeSegCP和rEyeSegCP的说明：
+    // Seg表示来自人脸/背景分割的结果；没有加NOS的修饰，表示坐标是Source Space中的。
+    // 该规则也适用于其他字段。
+    Point2i     lEyeSegCP;    // in source space
+    Point2i     rEyeSegCP;
+    
     //Eye FP: feature points of eye, P1, P2, P3, P4。P1: 内侧上角点；P2: 外侧上角点；P3: 下弧线中点；P4: 上弧线中点。
     SegEyeFPsNOS  lEyeFPsNOS;
     SegEyeFPsNOS  rEyeFPsNOS;
-    EyeFPs        lEyeFPs;
-    EyeFPs        rEyeFPs;
+    EyeSegFPs        lEyeFPs;
+    EyeSegFPs        rEyeFPs;
 
     int         leftEyeArea;  // in source space
     int         rightEyeArea;

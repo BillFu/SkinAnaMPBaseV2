@@ -49,14 +49,14 @@ void ForgeBrowsMask(const FaceInfo& faceInfo,
 // the points in the returned initEyePg are measured in Source Space.
 // in the final step, expand the polygon
 void ForgeInitEyePg(const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
-                    POLYGON& initEyePg);
+                    const Point2i& eyeSegCP, POLYGON& initEyePg);
 
 // eyeCP: given by face/bg segment and in source space
 void ForgeEyePgBySnakeAlg(Size srcImgS,
                           const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
                           const SegMask& eyeSegMask,
-                          const EyeFPs& eyeFPs,
-                          const Point2i& eyeCP,
+                          const EyeSegFPs& eyeFPs,
+                          const Point2i& eyeSegCP,
                           POLYGON& eyePg);
 
 void ForgeEyesMask(const Mat& srcImage,

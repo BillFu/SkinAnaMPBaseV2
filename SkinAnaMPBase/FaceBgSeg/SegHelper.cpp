@@ -126,7 +126,7 @@ Mat FaceBgSegmentor::RenderSegLabels(const Size& imgSize, const Mat& segLabels)
 }
 
 //-------------------------------------------------------------------------------------------
-void DrawEyeFPs(Mat& outImg, const EyeFPs& eyeFPs)
+void DrawEyeFPs(Mat& outImg, const EyeSegFPs& eyeFPs)
 {
     cv::Scalar yellow(0, 255, 255); // (B, G, R)
 
@@ -156,8 +156,8 @@ void DrawSegOnImage(const Mat& srcImg, float alpha,
     cv::Scalar yellow(0, 255, 255); // (B, G, R)
     
     // show the CPs of eyes
-    cv::circle(outImg, segResult.leftEyeCP, 10, yellow, cv::FILLED);
-    cv::circle(outImg, segResult.rightEyeCP, 10, yellow, cv::FILLED);
+    cv::circle(outImg, segResult.lEyeSegCP, 10, yellow, cv::FILLED);
+    cv::circle(outImg, segResult.rEyeSegCP, 10, yellow, cv::FILLED);
     
     DrawEyeFPs(outImg, segResult.lEyeFPs);
     DrawEyeFPs(outImg, segResult.rEyeFPs);
@@ -299,7 +299,7 @@ void CalcEyeCtP1P2(const CONTOUR& eyeCont_NOS,
 
 void EyeFPsNOS2EyeFPsSP(int srcImgW, int srcImgH,
                         const SegEyeFPsNOS& segEyeFPsNOS,
-                        EyeFPs& eyeFPs)
+                        EyeSegFPs& eyeFPs)
 {
     PtNOS2PtSP(srcImgW, srcImgH,
                segEyeFPsNOS.lCorPtNOS , eyeFPs.lCorPt);
@@ -347,7 +347,7 @@ void CalcEyeCtFPs(int srcImgW, int srcImgH,
                   const Point& browCP_NOS,
                   const Point& eyeCP_NOS,
                   SegEyeFPsNOS& segEyeFPsNOS,
-                  EyeFPs& eyeFPs)
+                  EyeSegFPs& eyeFPs)
 {
     CalcEyeCornerPts(eyeCont_NOS, browCP_NOS,
         segEyeFPsNOS.lCorPtNOS, segEyeFPsNOS.rCorPtNOS);

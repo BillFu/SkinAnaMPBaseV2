@@ -16,6 +16,8 @@ Date:   2022/10/27
 #include "../FaceBgSeg/FaceBgSegV2.hpp"
 #include "../Snake/activecontours.h"
 
+#include "../Snake/GaussField.hpp"
+
 //-------------------------------------------------------------------------------------------
 // Eb is abbreviation for Eyebrow
 // Pg is abbreviation for Polygon
@@ -160,7 +162,7 @@ void FixERPsBySegEyeCP(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP], // inpu
 /**********************************************************************************************/
 
 void ForgeInitEyePg(const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
-                    POLYGON& initEyePg)
+                    const Point2i& eyeSegCP, POLYGON& initEyePg)
 {
     POLYGON refinedPolygon;
         
@@ -169,12 +171,25 @@ void ForgeInitEyePg(const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
     int ptIDsOnCurve[] = {40, 23, 22, 21, 20, 19, 18, 17, 32,
         55, 56, 57, 58, 59, 60, 61}; // 顺时针计数, total 9 points
     
-    //CONTOUR coarseCurve;
+    POLYGON initEyePg0;
     int numCoarsePts = sizeof(ptIDsOnCurve) / sizeof(int);
     for(int i = 0; i<numCoarsePts; i++)
     {
         int index = ptIDsOnCurve[i];
-        initEyePg.push_back(eyeRefinePts[index]);
+        initEyePg0.push_back(eyeRefinePts[index]);
+    }
+    
+    // 根据两个区域（分割出的栅格版，和关键点构造出的矢量版）的质心位置差异，
+    // 对矢量版的点位置进行移动，使得二者的重叠面积尽可能地大。
+    Moments m = moments(initEyePg0, false);
+    Point2f mc_f(m.m10/m.m00, m.m01/m.m00);
+    
+    Point2i eyePgCP((int)mc_f.x, (int)mc_f.y);
+    
+    Point2i vecDiff = eyePgCP - eyeSegCP;
+    for(Point2i pt: initEyePg0)
+    {
+        initEyePg.push_back(pt - vecDiff);
     }
 }
 
@@ -183,17 +198,18 @@ void ForgeInitEyePg(const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
 void ForgeEyePgBySnakeAlg(Size srcImgS,
                           const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
                           const SegMask& eyeSegMask, // in NOS
-                          const EyeFPs& eyeFPs,
-                          const Point2i& eyeCP,
+                          const EyeSegFPs& eyeSegFPs,
+                          const Point2i& eyeSegCP,
                           POLYGON& eyePg)
 {
     POLYGON initEyePg;
-    ForgeInitEyePg(eyeRefinePts, initEyePg);
+    ForgeInitEyePg(eyeRefinePts, eyeSegCP, initEyePg);
     
     Rect initEyePgBBox = boundingRect(initEyePg); // maybe need padding and enlarge
     Rect eyeMaskBBox = RectNOS2RectSS(srcImgS, eyeSegMask.bbox);
     
     Mat segEyeMaskSS;
+    //DetectCorner_ST(eyeSegMask.mask); // shi-tomasi
     resize(eyeSegMask.mask, segEyeMaskSS, eyeMaskBBox.size(), INTER_NEAREST);
     
     // enlarge the initEyePgBBox by use of union operation
@@ -216,6 +232,11 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
         initEyePgWC.push_back(relaPt);
     }
     
+    // 将分割结果中提取到的两个角点，转换到initEyePgBBox框定的工作坐标系(WC)
+    Point2i lEyeCornerWC, rEyeCornerWC;
+    lEyeCornerWC = eyeSegFPs.lCorPt - initEyePgBBox.tl();
+    rEyeCornerWC = eyeSegFPs.rCorPt - initEyePgBBox.tl();
+
     // --- 在栅格域合并两个Mask
     CONTOURS contours;
     contours.push_back(initEyePgWC);
@@ -254,6 +275,8 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     Mat canvas(initEyePgBBox.size(), CV_8UC1, Scalar(0));
     segEyeMaskSS.copyTo(canvas(relativeRect));
     drawContours(canvas, acCts, 0, Scalar(150), 2);
+    circle(canvas, lEyeCornerWC, 5, Scalar(150), cv::FILLED);
+    circle(canvas, rEyeCornerWC, 5, Scalar(150), cv::FILLED);
     imwrite("InitStateAC.png", canvas);
     canvas.release();
 
@@ -301,12 +324,12 @@ void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
     
     ForgeEyePgBySnakeAlg(faceInfo.srcImgS, faceInfo.lEyeRefinePts,
                          segRst.lEyeMaskNOS, segRst.lEyeFPs,
-                         segRst.leftEyeCP, leftEyePg);
+                         segRst.lEyeSegCP, leftEyePg);
     
     /*
     ForgeEyePgBySnakeAlg(faceInfo.srcImgS, faceInfo.rEyeRefinePts,
                          segRst.rEyeMaskNOS, segRst.rEyeFPs,
-                         segRst.rightEyeCP, rightEyePg);
+                         segRst.rEyeSegCP, rightEyePg);
     */
     POLYGON_GROUP polygonGroup;
     polygonGroup.push_back(leftEyePg);
