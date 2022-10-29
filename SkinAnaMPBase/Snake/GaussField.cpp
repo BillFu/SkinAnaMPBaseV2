@@ -152,12 +152,13 @@ Mat BuildGaussField(int fieldW, int fieldH, int sigma,
     }
     
     float maxV = *max_element(field.begin<float>(), field.end<float>());
-    float minV = *min_element(field.begin<float>(), field.end<float>());
+    //float minV = *min_element(field.begin<float>(), field.end<float>());
 
     Mat scaleImg = field * 255 / maxV;
     //imwrite("field.png", scaleImg);
     Mat ucharField;
     scaleImg.assignTo(ucharField, CV_8UC1);
     
+    ucharField = ~ucharField; // inversed, more smaller (positive) when near the peaks
     return ucharField;
 }

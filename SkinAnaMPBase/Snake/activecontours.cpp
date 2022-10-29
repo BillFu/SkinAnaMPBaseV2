@@ -126,6 +126,11 @@ Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
     Mat edgeSubImg = edgeImage(ROI);
     int edgeMax = (int)(*max_element(edgeSubImg.begin<uchar>(), edgeSubImg.end<uchar>()));
     int edgeMin = (int)(*min_element(edgeSubImg.begin<uchar>(), edgeSubImg.end<uchar>()));
+    
+    if(edgeMax == 0)
+        edgeMax = 1; // edgeMax will act as denominator later
+    if(edgeMax == edgeMin)
+        edgeMax++;  // avoid that: edgeMax - edgeMin == 0
 
     // 逐个遍历当前点的邻域
     for(int y = 0; y < rows-1; y ++)
@@ -171,12 +176,11 @@ Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
             eimage *= _params->getGama();
 
             // Normalize ???
-            econt /= edgeMax;
+            econt /= edgeMax;  // 前面已经防止edgeMax为0了
             ecurv /= edgeMax;
 
+            // divisor never be zero for specical processing has been taken ahead.
             int divisor = edgeMax - edgeMin;
-            if (divisor <= 0)
-                divisor = 1;
             eimage = (eimage - edgeMin) / divisor;
 
             float energy = econt + ecurv + eimage;
