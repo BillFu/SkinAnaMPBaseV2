@@ -87,18 +87,33 @@ private:
     float _gamma;
     float _avgDist;
 
+    Point2i GetPrevPt(int ptIndex);
+    Point2i GetNextPt(int ptIndex);
+
     Point updatePos(int pointIndex, Point start, Point end,
                     const Mat& edgeImage, const Mat& cornerField,
+                    float MaxEcont, float MaxEcurv,
                     vector<float>& EcontRec,
                     vector<float>& EcurvRec,
                     vector<float>& EtotalRec);
     
     void AvgPointDist();
+    
+    // 估算E的各分量的大致取值（是各点取最大值，还是取平均值？）
+    // 这个操作在优化开始前利用初始数据来完成
+    void estiEnergeComponents(float& MaxEcont, float& MaxEcurv);
+    
+    float CalcEcont(const Point2i& prevPt,
+                    const Point2i& neibPt, float avgDist);
+    
+    // Ecurv = (x[i-1] - 2x[i] + x[i+1])^2 + (y[i-1] - 2y[i] + y[i+1])^2
+    float CalcEcurv(const Point2i& prevPt,
+                    const Point2i& neibPt, const Point2i& nextPt);
 };
 }
 
 void ShowMaxMinInRec(const std::vector<float>& rec,
-                     const std::string& maxTitle, const std::string& minString);
+                     const std::string& title);
 
 #endif // IFDEF ACTIVE_CONTOUR_ALG
 

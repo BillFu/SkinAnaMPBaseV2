@@ -46,9 +46,11 @@
 #define DRAW_NEIGHBORS
 
 // Required
-#define CONTOUR_ALPHA       2
-#define CONTOUR_BETA        16
-#define CONTOUR_GAMMA       100
+#define CONTOUR_ALPHA       0.3
+#define CONTOUR_BETA        1.8
+#define CONTOUR_GAMMA       1.0
+#define CONTOUR_LAMBDA      2.2
+
 #define MINIMUM_POINTS      4
 #define CONTOUR_START_POINT 200
 
@@ -89,6 +91,7 @@ public:
         this->_alpha = CONTOUR_ALPHA;
         this->_beta = CONTOUR_BETA;
         this->_gamma = CONTOUR_GAMMA;
+        this->_lambda = CONTOUR_LAMBDA;
     }
 
     ~AlgoParams(){}
@@ -125,6 +128,7 @@ public:
     float _alpha;
     float _beta;
     float _gamma;
+    float _lambda;
 };
 
 /*    End Active Contours   */

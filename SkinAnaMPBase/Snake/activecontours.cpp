@@ -1,5 +1,9 @@
 #include "activecontours.h"
 #include "../Geometry.hpp"
+#include "../Utils.hpp"
+#include <numeric>
+
+using namespace std;
 
 #ifdef ACTIVE_CONTOUR_ALG
 
@@ -13,14 +17,6 @@ ActiveContours::ActiveContours()
     _alpha = CONTOUR_ALPHA;
     _gamma = CONTOUR_GAMMA;
     previously_reset = false;
-
-#ifdef USE_ANGLE_INSERTION
-    _lastAngle = clock();
-#endif
-
-#ifdef USE_AVERAGE_LENGTH_BISECTION
-    _lastBisect = clock();
-#endif
 }
 
 vector<Point> ActiveContours::getOptimizedCont()
@@ -47,17 +43,96 @@ void ActiveContours::insertPoint(Point p)
     _points.push_back(p);
 }
 
-void ShowMaxMinInRec(const vector<float>& rec, const string& maxTitle, const string& minString)
+void ShowMaxMinInRec(const vector<float>& rec,
+    const string& title)
 {
     float MaxV = *max_element(rec.begin(), rec.end());
     float MinV = *min_element(rec.begin(), rec.end());
-    cout << maxTitle << MaxV << "," <<  minString << MinV << endl;
+    cout << "-----------" << title << "------------" << endl;
+    cout << "max: " << MaxV << "," <<  "min: " << MinV << endl;
+    
+    float sumV = accumulate(rec.begin(), rec.end(), 0.0);
+    float avgV = sumV / rec.size();
+    cout << "avg: " << avgV << endl;
+    cout << "-------------------------------------" << endl;
 }
 
-void cvalg::ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
+Point2i ActiveContours::GetPrevPt(int ptIndex)
+{
+    int numPt = static_cast<int>(_points.size());
+    int prevIndex = (ptIndex-1 + numPt) % numPt;
+    return _points[prevIndex];
+}
+
+Point2i ActiveContours::GetNextPt(int ptIndex)
+{
+    int nextIndex = (ptIndex+1) % _points.size();
+    return _points[nextIndex];
+}
+
+/*  Econt: (δ- (x[i] - x[i-1]) + (y[i] - y[i-1]))^2
+    δ = avg dist between snake points */
+float ActiveContours::CalcEcont(const Point2i& prevPt, const Point2i& neibPt, float avgDist)
+{
+    // Calculate Econt
+    float dis = DisBetw2Pts(neibPt, prevPt);
+    float econt = std::pow(avgDist - dis, 2);
+    
+    return econt;
+}
+
+// Ecurv = (x[i-1] - 2x[i] + x[i+1])^2 + (y[i-1] - 2y[i] + y[i+1])^2
+float ActiveContours::CalcEcurv(const Point2i& prevPt,
+                const Point2i& neibPt, const Point2i& nextPt)
+{
+    Point2i delta = prevPt + nextPt - neibPt*2;
+    float ecurv = LenOfVector(delta);
+    return ecurv;
+}
+
+// 估算E的各分量的大致取值（是各点取最大值，还是取平均值？）
+
+void ActiveContours::estiEnergeComponents(float& MaxEcont, float& MaxEcurv)
+{
+    AvgPointDist();
+
+    vector<float> EcontRec, EcurvRec, EtotalRec;
+    for(int i = 0; i < static_cast<int>(_points.size()); i++)
+    {
+        Point2i prevPt = GetPrevPt(i);
+        Point2i nextPt = GetNextPt(i);
+        Point2i curPt = _points[i];
+        
+        float Econt = CalcEcont(prevPt, curPt, _avgDist);
+        float Ecurv = CalcEcurv(prevPt, curPt, nextPt);
+        EcontRec.push_back(Econt);
+        EcurvRec.push_back(Ecurv);
+    }
+    
+    MaxEcont = *max_element(EcontRec.begin(), EcontRec.end());
+    float sumEcont = accumulate(EcontRec.begin(), EcontRec.end(), 0.0);
+    float avgEcont = sumEcont / EcontRec.size();
+    cout << "maxEcont: " << MaxEcont << endl;
+    cout << "avgEcont: " << avgEcont << endl;
+
+    MaxEcurv = *max_element(EcurvRec.begin(), EcurvRec.end());
+    float sumEcurve = accumulate(EcurvRec.begin(), EcurvRec.end(), 0.0);
+    float avgEcurve = sumEcurve / EcurvRec.size();
+    cout << "maxEcurv: " << MaxEcurv << endl;
+    cout << "avgEcurve: " << avgEcurve << endl;
+    
+}
+
+void ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
                                      int viewRadius,
                                      int iterTimes)
 {
+    string typeStr = openCVType2str(cornerField.type());
+    cout << "type of cornerField: " << typeStr << endl;
+
+    float MaxEcont, MaxEcurv;
+    estiEnergeComponents(MaxEcont, MaxEcurv);
+
     // Take the current frame, and do sobel edge detection, threshold = 120
     // any contour with an intensity < 120 won't come back
     //  - Inside the pack is frame (Mat), contours (vector<Point>)
@@ -86,14 +161,17 @@ void cvalg::ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
             Point e(endx, endy);
             
             _points[i] = updatePos(i, s, e, sobelEdges.frame, cornerField,
+                                   MaxEcont, MaxEcurv,
                                    EcontRec, EcurvRec, EtotalRec);
         }
         
+        /*
         cout << "--------------" << k << "---------------" << endl;
         // output the max and min values in the record of this epoch
-        ShowMaxMinInRec(EcontRec, "EcontMax: ", ", EcontMin: ");
-        ShowMaxMinInRec(EcurvRec, "EcurvMax: ", ", EcurvMin: ");
-        ShowMaxMinInRec(EtotalRec, "EtotalMax: ", ", EtotalMin: ");
+        ShowMaxMinInRec(EcontRec, "Econt");
+        ShowMaxMinInRec(EcurvRec, "Ecurv");
+        ShowMaxMinInRec(EtotalRec, "Etotal");
+         */
     }
 }
 
@@ -107,6 +185,7 @@ bool ActiveContours::minimumRunReqSet()
 // pointIndex: 当前被扫描点在轮廓序列中的索引
 Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
                                 const Mat& edgeImage, const Mat& cornerField,
+                                float MaxEcont, float MaxEcurv,
                                 vector<float>& EcontRec,
                                 vector<float>& EcurvRec,
                                 vector<float>& EtotalRec)
@@ -132,6 +211,10 @@ Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
     if(edgeMax == edgeMin)
         edgeMax++;  // avoid that: edgeMax - edgeMin == 0
 
+    // 在轮廓线上当前点的前一个被扫描点
+    Point prevPt = GetPrevPt(ptIndex);
+    Point nextPt = GetNextPt(ptIndex);
+    
     // 逐个遍历当前点的邻域
     for(int y = 0; y < rows-1; y ++)
     {
@@ -140,54 +223,36 @@ Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
             /* E = ∫(α(s)Econt + β(s)Ecurv + γ(s)Eimage)ds */
             // X,Y Location in image
             Point2i curNeibPt = start + Point2i(x, y);
-
-            /*  Econt: (δ- (x[i] - x[i-1]) + (y[i] - y[i-1]))^2
-                δ = avg dist between snake points */
-            Point prevPt;  // 在轮廓线上当前点的前一个被扫描点
-            if(ptIndex == 0)
-                prevPt = _points[_points.size()-1];  // 环形
-            else
-                prevPt = _points[ptIndex-1];
-            
-            // Calculate Econt
-            float dis = DisBetw2Pts(curNeibPt, prevPt);
-            float econt = std::pow(_avgDist - dis, 2);
-            EcontRec.push_back(econt);
+            float Econt = CalcEcont(prevPt, curNeibPt, _avgDist);
+            Econt /= MaxEcont;
+            EcontRec.push_back(Econt);
 
             // Multiply by alpha
-            econt *= _params->getAlpha();
-
-            // Ecurv = (x[i-1] - 2x[i] + x[i+1])^2 + (y[i-1] - 2y[i] + y[i+1])^2
-            Point nextPt;
-            if(ptIndex == numPt-1)
-                nextPt = _points[0];
-            else
-                nextPt = _points[ptIndex+1];
-
-            Point2i delta = prevPt + nextPt - curNeibPt*2;
-            float ecurv = LenOfVector(delta);
-            EcurvRec.push_back(ecurv);
-            ecurv *= _params->getBeta();
+            Econt *= _params->getAlpha();
+            
+            float Ecurv = CalcEcurv(prevPt, curNeibPt, nextPt);
+            Ecurv /= MaxEcurv;
+            EcurvRec.push_back(Ecurv);
+            Ecurv *= _params->getBeta();
 
             /*  Eimage: -||∇||
                 Gradient magnitude encoded in pixel information
                     - May want to change this 'feature' */
-            float eimage = -(int)edgeImage.at<uchar>(curNeibPt);
-            eimage *= _params->getGama();
-
-            // Normalize ???
-            econt /= edgeMax;  // 前面已经防止edgeMax为0了
-            ecurv /= edgeMax;
+            float Eedge = -(int)edgeImage.at<uchar>(curNeibPt);
+            Eedge *= _params->getGama();
+            
+            float Ecor = cornerField.at<float>(curNeibPt);
+            Ecor *= _params->_lambda;
 
             // divisor never be zero for specical processing has been taken ahead.
             int divisor = edgeMax - edgeMin;
-            eimage = (eimage - edgeMin) / divisor;
+            Eedge = (Eedge - edgeMin) / divisor;
 
-            float energy = econt + ecurv + eimage;
-            EtotalRec.push_back(energy);
-            if (energy < minEnerge)
+            float Energy = Econt + Ecurv + Eedge + Ecor;
+            EtotalRec.push_back(Energy);
+            if (Energy < minEnerge)
             {
-                minEnerge = energy;
+                minEnerge = Energy;
                 minLoc = curNeibPt;
             }
         }
