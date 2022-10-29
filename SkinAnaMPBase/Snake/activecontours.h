@@ -88,23 +88,17 @@ private:
     float _avgDist;
 
     Point updatePos(int pointIndex, Point start, Point end,
-                    const Mat& edgeImage, const Mat& cornerField);
+                    const Mat& edgeImage, const Mat& cornerField,
+                    vector<float>& EcontRec,
+                    vector<float>& EcurvRec,
+                    vector<float>& EtotalRec);
+    
     void AvgPointDist();
-
-    // Splits snake by a couple of different
-    // methods
-#ifdef USE_ANGLE_INSERTION
-    clock_t _lastAngle;
-    void angleInsertion();
-#endif
-
-#ifdef USE_AVERAGE_LENGTH_BISECTION
-    clock_t _lastBisect;
-    void selfInsertion();
-#endif
-
 };
 }
+
+void ShowMaxMinInRec(const std::vector<float>& rec,
+                     const std::string& maxTitle, const std::string& minString);
 
 #endif // IFDEF ACTIVE_CONTOUR_ALG
 

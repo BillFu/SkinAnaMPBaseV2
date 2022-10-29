@@ -47,6 +47,13 @@ void ActiveContours::insertPoint(Point p)
     _points.push_back(p);
 }
 
+void ShowMaxMinInRec(const vector<float>& rec, const string& maxTitle, const string& minString)
+{
+    float MaxV = *max_element(rec.begin(), rec.end());
+    float MinV = *min_element(rec.begin(), rec.end());
+    cout << maxTitle << MaxV << "," <<  minString << MinV << endl;
+}
+
 void cvalg::ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
                                      int viewRadius,
                                      int iterTimes)
@@ -64,6 +71,7 @@ void cvalg::ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
     // For each snake point
     for(int k=0; k<iterTimes; k++)
     {
+        vector<float> EcontRec, EcurvRec, EtotalRec;
         for(int i = 0; i < static_cast<int>(_points.size()); i++)
         {
             // Define the neighborhood
@@ -77,8 +85,15 @@ void cvalg::ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
             Point s(startx, starty);
             Point e(endx, endy);
             
-            _points[i] = updatePos(i, s, e, sobelEdges.frame, cornerField);
+            _points[i] = updatePos(i, s, e, sobelEdges.frame, cornerField,
+                                   EcontRec, EcurvRec, EtotalRec);
         }
+        
+        cout << "--------------" << k << "---------------" << endl;
+        // output the max and min values in the record of this epoch
+        ShowMaxMinInRec(EcontRec, "EcontMax: ", ", EcontMin: ");
+        ShowMaxMinInRec(EcurvRec, "EcurvMax: ", ", EcurvMin: ");
+        ShowMaxMinInRec(EtotalRec, "EtotalMax: ", ", EtotalMin: ");
     }
 }
 
@@ -91,26 +106,27 @@ bool ActiveContours::minimumRunReqSet()
 
 // pointIndex: 当前被扫描点在轮廓序列中的索引
 Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
-                                const Mat& edgeImage, const Mat& cornerField)
+                                const Mat& edgeImage, const Mat& cornerField,
+                                vector<float>& EcontRec,
+                                vector<float>& EcurvRec,
+                                vector<float>& EtotalRec)
 {
     int cols = end.x - start.x;
     int rows = end.y - start.y;
 
     int numPt = static_cast<int>(_points.size());
     // Location of point in center of neighborhood
-    Point location = _points[ptIndex];
-
-    float localMin = 999999;
+    Point minLoc = _points[ptIndex]; // minLoc also be the new destionation
+    float minEnerge = 999999;
 
     // Update the average dist
     AvgPointDist();
 
     Rect ROI(start, end);
     Mat edgeSubImg = edgeImage(ROI);
-    int ngmax = (int)(*max_element(edgeSubImg.begin<uchar>(), edgeSubImg.end<uchar>()));
-    int ngmin = (int)(*min_element(edgeSubImg.begin<uchar>(), edgeSubImg.end<uchar>()));
+    int edgeMax = (int)(*max_element(edgeSubImg.begin<uchar>(), edgeSubImg.end<uchar>()));
+    int edgeMin = (int)(*min_element(edgeSubImg.begin<uchar>(), edgeSubImg.end<uchar>()));
 
-    bool flag = true;
     // 逐个遍历当前点的邻域
     for(int y = 0; y < rows-1; y ++)
     {
@@ -118,10 +134,9 @@ Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
         {
             /* E = ∫(α(s)Econt + β(s)Ecurv + γ(s)Eimage)ds */
             // X,Y Location in image
-            Point2i parentPt = start + Point2i(x, y);
+            Point2i curNeibPt = start + Point2i(x, y);
 
-            /*  Econt
-                (δ- (x[i] - x[i-1]) + (y[i] - y[i-1]))^2
+            /*  Econt: (δ- (x[i] - x[i-1]) + (y[i] - y[i-1]))^2
                 δ = avg dist between snake points */
             Point prevPt;  // 在轮廓线上当前点的前一个被扫描点
             if(ptIndex == 0)
@@ -130,8 +145,9 @@ Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
                 prevPt = _points[ptIndex-1];
             
             // Calculate Econt
-            float dis = DisBetw2Pts(parentPt, prevPt);
+            float dis = DisBetw2Pts(curNeibPt, prevPt);
             float econt = std::pow(_avgDist - dis, 2);
+            EcontRec.push_back(econt);
 
             // Multiply by alpha
             econt *= _params->getAlpha();
@@ -143,46 +159,38 @@ Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
             else
                 nextPt = _points[ptIndex+1];
 
-            //float ecurv = std::pow( (prevPt.x - (parentPt.x*2) + nextPt.x), 2);
-            //ecurv += std::pow( (prevPt.y - (parentPt.y*2) + nextPt.y), 2);
-            Point2i delta = prevPt + nextPt - parentPt*2;
+            Point2i delta = prevPt + nextPt - curNeibPt*2;
             float ecurv = LenOfVector(delta);
+            EcurvRec.push_back(ecurv);
             ecurv *= _params->getBeta();
 
-            /*  Eimage
-                -||∇||
+            /*  Eimage: -||∇||
                 Gradient magnitude encoded in pixel information
                     - May want to change this 'feature' */
-            float eimage = -(int)edgeImage.at<uchar>(parentPt.y, parentPt.x);
+            float eimage = -(int)edgeImage.at<uchar>(curNeibPt);
             eimage *= _params->getGama();
 
-            // Normalize
-            econt /= ngmax;
-            ecurv /= ngmax;
+            // Normalize ???
+            econt /= edgeMax;
+            ecurv /= edgeMax;
 
-            int divisor = ngmax-ngmin;
+            int divisor = edgeMax - edgeMin;
             if (divisor <= 0)
                 divisor = 1;
-            eimage = (eimage-ngmin) / divisor;
+            eimage = (eimage - edgeMin) / divisor;
 
             float energy = econt + ecurv + eimage;
-
-            if(flag)
+            EtotalRec.push_back(energy);
+            if (energy < minEnerge)
             {
-                flag = false;
-                localMin = energy;
-                location = parentPt;
-            }
-            else if (energy < localMin)
-            {
-                localMin = energy;
-                location = parentPt;
+                minEnerge = energy;
+                minLoc = curNeibPt;
             }
         }
     }
 
     // Return The (new) location
-    return location;
+    return minLoc;
 }
 
 void ActiveContours::AvgPointDist()
