@@ -104,4 +104,7 @@ Point2i MakePtInRect(const Rect& rect, Point2i& pt);
 // inflate the original rect from the center and toward all sides.
 void InflateRect(int inflateSize, Rect& rect);
 
+float DisBetw2Pts(const Point& pt1, const Point& pt2);
+float LenOfVector(const Point& vect);
+
 #endif /* end of GEOMETRY_HPP */

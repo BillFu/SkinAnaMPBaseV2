@@ -212,3 +212,18 @@ void InflateRect(int inflateSize, Rect& rect)
     // if it's a cv::Point it will adjust the origin,
     // and if it's a cv::Size it will adjust width and height.
 }
+
+//-------------------------------------------------------------------------------------------
+
+float DisBetw2Pts(const Point& pt1, const Point& pt2)
+{
+    Point dPt = pt1 - pt2;
+    float dis = sqrt(dPt.x * dPt.x + dPt.y * dPt.y);
+    return dis;
+}
+
+float LenOfVector(const Point& vect)
+{
+    float length = sqrt(vect.x * vect.x + vect.y * vect.y);
+    return length;
+}

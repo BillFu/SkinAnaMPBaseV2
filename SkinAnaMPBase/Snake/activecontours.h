@@ -89,7 +89,7 @@ private:
 
     Point updatePos(int pointIndex, Point start, Point end,
                     const Mat& edgeImage, const Mat& cornerField);
-    void averagePointDistance();
+    void AvgPointDist();
 
     // Splits snake by a couple of different
     // methods

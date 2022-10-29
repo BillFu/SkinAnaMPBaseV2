@@ -1,5 +1,4 @@
 #include "activecontours.h"
-#include "../Geometry.hpp"
 
 #ifdef ACTIVE_CONTOUR_ALG
 
@@ -44,6 +43,15 @@ void ActiveContours::init(int iw, int ih)
 
 void ActiveContours::insertPoint(Point p)
 {
+    /*
+    if(static_cast<int>(_points.size()) >= _params->getNumberPoints())
+        return;
+    
+    std::vector<Point>::iterator it = std::find (_points.begin(), _points.end(), p);
+    
+    if(it != _points.end())
+        return;
+    */
     _points.push_back(p);
 }
 
@@ -89,71 +97,100 @@ bool ActiveContours::minimumRunReqSet()
     return false;
 }
 
-// pointIndex: 当前被扫描点在轮廓序列中的索引
-Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
+Point ActiveContours::updatePos(int pointIndex, Point start, Point end,
                                 const Mat& edgeImage, const Mat& cornerField)
 {
     int cols = end.x - start.x;
     int rows = end.y - start.y;
 
-    int numPt = static_cast<int>(_points.size());
     // Location of point in center of neighborhood
-    Point location = _points[ptIndex];
-
-    float localMin = 999999;
-
-    // Update the average dist
-    AvgPointDist();
-
-    Rect ROI(start, end);
-    Mat edgeSubImg = edgeImage(ROI);
-    int ngmax = (int)(*max_element(edgeSubImg.begin<uchar>(), edgeSubImg.end<uchar>()));
-    int ngmin = (int)(*min_element(edgeSubImg.begin<uchar>(), edgeSubImg.end<uchar>()));
+    Point location = _points[pointIndex];
 
     bool flag = true;
-    // 逐个遍历当前点的邻域
+    float localMin;
+
+    // Update the average dist
+    averagePointDistance();
+
+    int ngmax = -99999;
+    int ngmin = 99999;
+    for(int y = 0; y < rows; y ++)
+        for(int x = 0; x < cols; x++)
+        {
+            int cval = (int)edgeImage.at<uchar>(y + start.y,x + start.x);
+            if(flag)
+            {
+                flag = false;
+                 ngmax = cval;
+                 ngmin = cval;
+            }
+            else if (cval> ngmax)
+            {
+                ngmax = cval;
+            }
+            else if (cval < ngmin)
+            {
+                ngmin = cval;
+            }
+        }
+
+    if(ngmax == 0)
+        ngmax = 1;
+    if(ngmin == 0)
+         ngmin = 1;
+
+    flag = true;
     for(int y = 0; y < rows-1; y ++)
     {
         for(int x = 0; x < cols-1; x++)
         {
-            /* E = ∫(α(s)Econt + β(s)Ecurv + γ(s)Eimage)ds */
+
+            /*
+                E = ∫(α(s)Econt + β(s)Ecurv + γ(s)Eimage)ds
+            */
             // X,Y Location in image
-            Point2i parentPt = start + Point2i(x, y);
+            int parentX = x + start.x;
+            int parentY = y + start.y;
 
             /*  Econt
                 (δ- (x[i] - x[i-1]) + (y[i] - y[i-1]))^2
-                δ = avg dist between snake points */
-            Point prevPt;  // 在轮廓线上当前点的前一个被扫描点
-            if(ptIndex == 0)
-                prevPt = _points[_points.size()-1];  // 环形
+                δ = avg dist between snake points
+            */
+            Point prevPoint;
+            if(pointIndex == 0)
+                prevPoint = _points[_points.size()-1];
             else
-                prevPt = _points[ptIndex-1];
-            
+                prevPoint = _points[pointIndex-1];
             // Calculate Econt
-            float dis = DisBetw2Pts(parentPt, prevPt);
-            float econt = std::pow(_avgDist - dis, 2);
+            float econt = (parentX - prevPoint.x) + (parentY - prevPoint.y);
+            econt = std::pow(econt, 2);
+
+            econt = _avgDist - econt;
 
             // Multiply by alpha
             econt *= _params->getAlpha();
 
-            // Ecurv = (x[i-1] - 2x[i] + x[i+1])^2 + (y[i-1] - 2y[i] + y[i+1])^2
-            Point nextPt;
-            if(ptIndex == numPt-1)
-                nextPt = _points[0];
+            /*  Ecurv
+                (x[i-1] - 2x[i] + x[i+1])^2 + (y[i-1] - 2y[i] + y[i+1])^2
+            */
+            Point nextPoint;
+            if(pointIndex == static_cast<int>(_points.size()-1))
+                nextPoint = _points[0];
             else
-                nextPt = _points[ptIndex+1];
+                nextPoint = _points[pointIndex+1];
 
-            //float ecurv = std::pow( (prevPt.x - (parentPt.x*2) + nextPt.x), 2);
-            //ecurv += std::pow( (prevPt.y - (parentPt.y*2) + nextPt.y), 2);
-            Point2i delta = prevPt + nextPt - parentPt*2;
-            float ecurv = LenOfVector(delta);
+            float ecurv = std::pow( (prevPoint.x - (parentX*2) + nextPoint.x), 2);
+            ecurv += std::pow( (prevPoint.y - (parentY*2) + nextPoint.y), 2);
             ecurv *= _params->getBeta();
 
             /*  Eimage
                 -||∇||
+
                 Gradient magnitude encoded in pixel information
-                    - May want to change this 'feature' */
-            float eimage = -(int)edgeImage.at<uchar>(parentPt.y, parentPt.x);
+                    - May want to change this 'feature'
+            */
+            float eimage = -(int)edgeImage.at<uchar>(parentY,parentX);
+            //float eimage = (int)image.at<uchar>(parentY,parentX);
             eimage *= _params->getGama();
 
             // Normalize
@@ -171,12 +208,12 @@ Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
             {
                 flag = false;
                 localMin = energy;
-                location = parentPt;
+                location = Point(parentX, parentY);
             }
             else if (energy < localMin)
             {
                 localMin = energy;
-                location = parentPt;
+                location = Point(parentX, parentY);
             }
         }
     }
@@ -185,19 +222,20 @@ Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
     return location;
 }
 
-void ActiveContours::AvgPointDist()
+void ActiveContours::averagePointDistance()
 {
     float sum = 0.0;
-    int numPt = static_cast<int>(_points.size());
-    
-    for(int i = 0; i <numPt-1; i++)
+    for(int i = 0; i < static_cast<int>(_points.size()-1); i++)
     {
-        float dis = DisBetw2Pts(_points[i], _points[i+1]);
-        sum += dis;
+        sum += std::sqrt(
+        ((_points[i].x - _points[i+1].x)*(_points[i].x - _points[i+1].x))+
+        ((_points[i].y - _points[i+1].y)*(_points[i].y - _points[i+1].y)));
     }
-    
-    float dis1 = DisBetw2Pts(_points[numPt-1], _points[0]);
-    sum += dis1;
+    sum += std::sqrt(
+    ((_points[_points.size()-1].x - _points[0].x)*
+            (_points[_points.size()-1].x - _points[0].x))+
+    ((_points[_points.size()-1].y - _points[0].y)*
+            (_points[_points.size()-1].y - _points[0].y)));
     _avgDist = sum / _points.size();
 }
 
