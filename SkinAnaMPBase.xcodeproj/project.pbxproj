@@ -29,9 +29,6 @@
 		CB45E23F28E54BA7004E8D25 /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB45E23E28E54BA7004E8D25 /* Geometry.cpp */; };
 		CB62F4712908D04600828C4C /* activecontours.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB62F4672908D04600828C4C /* activecontours.cpp */; };
 		CB62F4722908D04600828C4C /* sobel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB62F46A2908D04600828C4C /* sobel.cpp */; };
-		CB62F4732908D04600828C4C /* customsnake.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB62F46B2908D04600828C4C /* customsnake.cpp */; };
-		CB62F4742908D04600828C4C /* gaussarea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB62F46F2908D04600828C4C /* gaussarea.cpp */; };
-		CB62F4752908D04600828C4C /* bresenham.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB62F4702908D04600828C4C /* bresenham.cpp */; };
 		CB7F673F28F4165500060E7C /* SegHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB9D430828F3F9DA00CD3B13 /* SegHelper.cpp */; };
 		CB9D430628F3F6B000CD3B13 /* FaceBgSegV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB9D430528F3F6B000CD3B13 /* FaceBgSegV2.cpp */; };
 		CB9D430728F3F77C00CD3B13 /* FaceBgSegV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB9D430528F3F6B000CD3B13 /* FaceBgSegV2.cpp */; };
@@ -119,15 +116,9 @@
 		CB45E23D28E54BA7004E8D25 /* Geometry.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Geometry.hpp; sourceTree = "<group>"; };
 		CB45E23E28E54BA7004E8D25 /* Geometry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Geometry.cpp; sourceTree = "<group>"; };
 		CB62F4672908D04600828C4C /* activecontours.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = activecontours.cpp; sourceTree = "<group>"; };
-		CB62F4682908D04600828C4C /* gaussarea.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gaussarea.h; sourceTree = "<group>"; };
 		CB62F4692908D04600828C4C /* activecontours.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = activecontours.h; sourceTree = "<group>"; };
 		CB62F46A2908D04600828C4C /* sobel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sobel.cpp; sourceTree = "<group>"; };
-		CB62F46B2908D04600828C4C /* customsnake.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = customsnake.cpp; sourceTree = "<group>"; };
 		CB62F46C2908D04600828C4C /* sobel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sobel.h; sourceTree = "<group>"; };
-		CB62F46D2908D04600828C4C /* customsnake.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = customsnake.h; sourceTree = "<group>"; };
-		CB62F46E2908D04600828C4C /* bresenham.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bresenham.h; sourceTree = "<group>"; };
-		CB62F46F2908D04600828C4C /* gaussarea.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gaussarea.cpp; sourceTree = "<group>"; };
-		CB62F4702908D04600828C4C /* bresenham.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bresenham.cpp; sourceTree = "<group>"; };
 		CB62F4792908DF8300828C4C /* tsparams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tsparams.h; sourceTree = "<group>"; };
 		CB79324B28D1B07400BE136B /* libtensorflow-lite.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libtensorflow-lite.a"; path = "SkinAnaMPBase/intel_lib/libtensorflow-lite.a"; sourceTree = "<group>"; };
 		CB9D430428F3F6B000CD3B13 /* FaceBgSegV2.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FaceBgSegV2.hpp; sourceTree = "<group>"; };
@@ -289,12 +280,6 @@
 				CB62F4792908DF8300828C4C /* tsparams.h */,
 				CB62F4672908D04600828C4C /* activecontours.cpp */,
 				CB62F4692908D04600828C4C /* activecontours.h */,
-				CB62F4702908D04600828C4C /* bresenham.cpp */,
-				CB62F46E2908D04600828C4C /* bresenham.h */,
-				CB62F46B2908D04600828C4C /* customsnake.cpp */,
-				CB62F46D2908D04600828C4C /* customsnake.h */,
-				CB62F46F2908D04600828C4C /* gaussarea.cpp */,
-				CB62F4682908D04600828C4C /* gaussarea.h */,
 				CB62F46A2908D04600828C4C /* sobel.cpp */,
 				CB62F46C2908D04600828C4C /* sobel.h */,
 			);
@@ -486,18 +471,15 @@
 				2680A22E28EFC54B00A305EB /* FaceLmExtractV2.cpp in Sources */,
 				CBBF6C5428F13E370036619C /* SkinMask.cpp in Sources */,
 				26B65A5E28EA92900019104F /* LowerFaceMask.cpp in Sources */,
-				CB62F4742908D04600828C4C /* gaussarea.cpp in Sources */,
 				2602327628CCBFB100B11D7A /* HeadPoseEst.cpp in Sources */,
 				CB62F4722908D04600828C4C /* sobel.cpp in Sources */,
 				CB4312AA28D41DDD006D71DA /* ParametricBSpline.cpp in Sources */,
 				CB45E23F28E54BA7004E8D25 /* Geometry.cpp in Sources */,
 				263B540528CD8B34004CF77D /* Utils.cpp in Sources */,
 				2606575B28F7122400019FFE /* PolarPtSeq.cpp in Sources */,
-				CB62F4752908D04600828C4C /* bresenham.cpp in Sources */,
 				CBB5DB4028DD5E97003CDED3 /* SkinFeatureMask.cpp in Sources */,
 				CB9D430928F3F9DA00CD3B13 /* SegHelper.cpp in Sources */,
 				CB41C4E4290A79760012BC6A /* EyebrowMaskV7.cpp in Sources */,
-				CB62F4732908D04600828C4C /* customsnake.cpp in Sources */,
 				CB1E2AB928DD99AB00F416DF /* ForeheadMask.cpp in Sources */,
 				CBC3D53E290BCC810056D14E /* GaussField.cpp in Sources */,
 				CBB5DB3D28DD5B3B003CDED3 /* FundamentalMask.cpp in Sources */,

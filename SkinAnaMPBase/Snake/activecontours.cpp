@@ -119,7 +119,7 @@ float ActiveContours::CalcEcurv(const Point2i& prevPt,
 
 void ActiveContours::estiEnergeComponents(float& MaxEcont, float& MaxEcurv)
 {
-    AvgPointDist();
+    _avgDist = AvgPointDist(_points);
 
     vector<float> EcontRec, EcurvRec, EtotalRec;
     for(int i = 0; i < static_cast<int>(_points.size()); i++)
@@ -183,11 +183,24 @@ void ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
                                      _params->getSobelAngle(),
                                      _params->getSobelDeadSpace());
     
-    imwrite("sobel.png", sobelEdges.frame);
+    //imwrite("sobel.png", sobelEdges.frame);
     
     // For each snake point
     for(int k=0; k<iterTimes; k++)
     {
+        //----------start to debug--------------------------------------------
+        Mat canvas = inImg.clone();
+        //CONTOURS curCts;
+        //curCts.push_back(_points);
+        //drawContours(canvas, curCts, 0, Scalar(150), 2);
+        for(int i = 0; i < _points.size(); i++)
+        {
+            cv::circle(canvas, _points[i], 1, Scalar(150), cv::FILLED);
+        }
+        string outFile = "rstAC_" + to_string(k) + ".png";
+        imwrite(outFile, canvas);
+        //---------end of debugging-------------------------------------------
+        
         vector<float> EcontRec, EcurvRec, EedgeRec, EcorRec,EtotalRec;
         for(int i = 0; i < static_cast<int>(_points.size()); i++)
         {
@@ -202,13 +215,10 @@ void ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
         cout << "--------------------------------" << k << "-----------------------------------" << endl;
         // output the average value of all energy components in current epoch
         ShowECompData(EcontRec, EcurvRec, EedgeRec, EcorRec);
-
-        Mat canvas = inImg.clone();
-        CONTOURS curCts;
-        curCts.push_back(_points);
-        drawContours(canvas, curCts, 0, Scalar(150), 2);
-        string outFile = "rstAC_" + to_string(k) + ".png";
-        imwrite(outFile, canvas);
+        
+        CONTOUR sparsedCont;
+        SparsePtsOnContour(_points, 0.7, sparsedCont);
+        _points = sparsedCont;
     }
 }
 
@@ -242,20 +252,10 @@ Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
     //int numPt = static_cast<int>(_points.size());
    
     // Update the average dist
-    AvgPointDist();
+    _avgDist = AvgPointDist(_points);
 
     Rect ROI(start, end);
-    /*
-    Mat edgeSubImg = edgeImage(ROI);
-    int edgeMax = (int)(*max_element(edgeSubImg.begin<uchar>(), edgeSubImg.end<uchar>()));
-    int edgeMin = (int)(*min_element(edgeSubImg.begin<uchar>(), edgeSubImg.end<uchar>()));
     
-    if(edgeMax == 0)
-        edgeMax = 1; // edgeMax will act as denominator later
-    if(edgeMax == edgeMin)
-        edgeMax++;  // avoid that: edgeMax - edgeMin == 0
-    */
-
     // 在轮廓线上当前点的前一个被扫描点
     Point prevPt = GetPrevPt(ptIndex);
     Point nextPt = GetNextPt(ptIndex);
@@ -313,21 +313,7 @@ Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
     return minLoc;
 }
 
-void ActiveContours::AvgPointDist()
-{
-    float sum = 0.0;
-    int numPt = static_cast<int>(_points.size());
-    
-    for(int i = 0; i <numPt-1; i++)
-    {
-        float dis = DisBetw2Pts(_points[i], _points[i+1]);
-        sum += dis;
-    }
-    
-    float dis1 = DisBetw2Pts(_points[numPt-1], _points[0]);
-    sum += dis1;
-    _avgDist = sum / _points.size();
-}
+
 
 }
 #endif // ACTIVE_CONTOUR_ALG

@@ -261,7 +261,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     int numPts = acCts[0].size();
 
     CONTOUR sampPtCt;  // 稀疏化的轮廓点
-    int sampGap = 20;
+    int sampGap = 10;
     int numSampPt = numPts / sampGap;
     
     for(int i = 0; i < numSampPt; i++)
@@ -271,6 +271,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     }
     
     //--------------------------------------------------------------
+    /*
     // ---- just for debugging
     Mat canvas(initEyePgBBox.size(), CV_8UC1, Scalar(0));
     segEyeMaskSS.copyTo(canvas(relativeRect));
@@ -282,7 +283,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
 
     double arcLen = arcLength(acCts[0], true);
     cout << "arcLen: " << arcLen << endl;
-
+    */
     //--------------------------------------------------------------
     cvalg::ActiveContours acAlg;
     AlgoParams ap;
@@ -306,14 +307,18 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     int fieldH = initEyePgBBox.size().height;
     
     // cornerField经过了反相，越接近peaks，值越小
-    Mat cornerField = BuildGaussField(fieldW, fieldH, 9, peaks);
+    Mat cornerField = BuildGaussField(fieldW, fieldH, 7, peaks);
     
-    acAlg.optimize(acImg, cornerField, 16, 35);
+    acAlg.optimize(acImg, cornerField, 15, 10);
 
     CONTOUR finCt = acAlg.getOptimizedCont();
-    CONTOURS finCts;
-    finCts.push_back(finCt);
-    drawContours(acImg, finCts, 0, Scalar(150), 2);
+    //CONTOURS finCts;
+    //finCts.push_back(finCt);
+    //drawContours(acImg, finCts, 0, Scalar(150), 1);
+    for(int i = 0; i < finCt.size(); i++)
+    {
+        cv::circle(acImg, finCt[i], 1, Scalar(150), cv::FILLED);
+    }
     imwrite("finRstAC.png", acImg);
     
     eyePg = finCt;
@@ -328,7 +333,6 @@ void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
 
     Size srcImgS = faceInfo.srcImgS;
     
-    
     ForgeEyePgBySnakeAlg(faceInfo.srcImgS, faceInfo.lEyeRefinePts,
                          segRst.lEyeMaskNOS, segRst.lEyeFPs,
                          segRst.lEyeSegCP, leftEyePg);
@@ -338,6 +342,7 @@ void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
                          segRst.rEyeMaskNOS, segRst.rEyeFPs,
                          segRst.rEyeSegCP, rightEyePg);
     */
+    
     POLYGON_GROUP polygonGroup;
     polygonGroup.push_back(leftEyePg);
     polygonGroup.push_back(rightEyePg);

@@ -13,7 +13,8 @@ sobelPack FullSobel(Mat gray, int thresh, bool calcAngle, bool deadSpace)
 
     // Get the data to return ready
     sobelPack data;
-    gray.copyTo(data.frame);
+    //gray.copyTo(data.frame);
+    data.frame = Mat(gray.size(), CV_8UC1, Scalar(0));
     data.contours.reserve(reservedSpace);
 
     if(calcAngle)

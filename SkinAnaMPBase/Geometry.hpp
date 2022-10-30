@@ -33,7 +33,6 @@ Point2i Interpolate(int x1, int y1, int x2, int y2, float t);
 
 Point2i Interpolate(const Point2i& p1, const Point2i& p2, float t);
 
-
 /**********************************************************************************************
 记返回的点为p3. p3.y与p1.y值保持一致，p3.x由p1.x和p2.x内插而来
 t: in range[0.0 1.0].
@@ -81,16 +80,6 @@ Point2i getPtOnGLm(const FaceInfo& faceInfo, int pIndex);
 // return a new point, which with x from p1, y from p2
 Point2i getRectCornerPt(const Point2i& p1, const Point2i& p2);
 
-
-//-------------------------------------------------------------------------------------------
-
-/**********************************************************************************************
-segLabels: 512*512
-the returned Jaw Width measured in the source space
-***********************************************************************************************/
-
-//int CalcLowerJawWidth(const FaceInfo& faceInfo, const Mat& segLabels);
-
 //-------------------------------------------------------------------------------------------
 // 如果smallRect完全能被bigRect容纳，返回true
 bool RectContainsRect(const Rect& bigRect, const Rect& smallRect);
@@ -106,5 +95,13 @@ void InflateRect(int inflateSize, Rect& rect);
 
 float DisBetw2Pts(const Point& pt1, const Point& pt2);
 float LenOfVector(const Point& vect);
+
+//-------------------------------------------------------------------------------------------
+float AvgPointDist(const CONTOUR& cont);
+
+// 将contour多余的点（指挨得太近的点）删除掉
+// 思路：计算contour上平均的点距，将小于alpha倍平均点距的点给依次删掉。
+void SparsePtsOnContour(const CONTOUR& oriCont, float alpha, CONTOUR& sparCont);
+
 
 #endif /* end of GEOMETRY_HPP */

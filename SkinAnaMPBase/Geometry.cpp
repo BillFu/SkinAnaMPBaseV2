@@ -227,3 +227,53 @@ float LenOfVector(const Point& vect)
     float length = sqrt(vect.x * vect.x + vect.y * vect.y);
     return length;
 }
+
+
+// 将contour多余的点（指挨得太近的点）删除掉
+// 思路：计算contour上平均的点距，将小于alpha倍平均点距的点给依次删掉。
+void SparsePtsOnContour(const CONTOUR& oriCont, float alpha, CONTOUR& sparCont)
+{
+    float avgDist = AvgPointDist(oriCont);
+    float shortThresh = avgDist * alpha;
+    
+    int numPt = static_cast<int>(oriCont.size());
+
+    for(int i=0; i<numPt; i++)
+    {
+        int prevID = (i + numPt - 1) % numPt;
+        Point2i prevPt = oriCont[prevID];
+        int nextID = (i + 1) % numPt;
+        Point2i nextPt = oriCont[nextID];
+        
+        float dist0 = DisBetw2Pts(prevPt, oriCont[i]);
+        float dist1 = DisBetw2Pts(oriCont[i], nextPt);
+        
+        if(dist0 <= shortThresh) // && dist1 <= shortThresh)
+        {
+            cout << "a point deleted!" << endl;
+            continue;
+        }
+        else
+        {
+            sparCont.push_back(oriCont[i]);
+        }
+    }
+}
+
+float AvgPointDist(const CONTOUR& cont)
+{
+    int numPt = static_cast<int>(cont.size());
+    if(numPt <= 1)
+        return 0.0;
+    
+    float sum = 0.0;
+    for(int i = 0; i <=numPt-1; i++)
+    {
+        int nextID = (i + 1) % numPt;
+        float dis = DisBetw2Pts(cont[i], cont[nextID]);
+        sum += dis;
+    }
+    
+    float avgDist = sum / numPt;
+    return avgDist;
+}

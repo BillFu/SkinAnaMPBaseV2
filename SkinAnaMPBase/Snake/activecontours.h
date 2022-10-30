@@ -14,8 +14,6 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "sobel.h"
-#include "bresenham.h"
-#include "gaussarea.h"
 #include "../Common.hpp"
 
 
@@ -100,7 +98,7 @@ private:
                     vector<float>& EcorRec,
                     vector<float>& EtotalRec);
     
-    void AvgPointDist();
+    //void AvgPointDist();
     
     // 估算E的各分量的大致取值（是各点取最大值，还是取平均值？）
     // 这个操作在优化开始前利用初始数据来完成
