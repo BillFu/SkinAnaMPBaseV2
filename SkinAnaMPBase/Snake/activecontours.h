@@ -16,6 +16,7 @@
 #include "sobel.h"
 #include "bresenham.h"
 #include "gaussarea.h"
+#include "../Common.hpp"
 
 
 /*
@@ -61,7 +62,7 @@ class ActiveContours
 public:
     ActiveContours();
     void init(int i_width, int i_height);
-    void insertPoint(Point p);
+    void setInitCont(const CONTOUR& initCont);
     
     void optimize(const Mat& inImg, const Mat& cornerField,
                   int viewRadius, int iterTimes);
@@ -80,7 +81,7 @@ private:
 
     int _w, _h;
     Point _center;
-    vector<Point> _points;
+    CONTOUR _points;
 
     float _alpha;
     float _beta;
@@ -95,6 +96,8 @@ private:
                     float MaxEcont, float MaxEcurv,
                     vector<float>& EcontRec,
                     vector<float>& EcurvRec,
+                    vector<float>& EedgeRec,
+                    vector<float>& EcorRec,
                     vector<float>& EtotalRec);
     
     void AvgPointDist();
@@ -109,6 +112,15 @@ private:
     // Ecurv = (x[i-1] - 2x[i] + x[i+1])^2 + (y[i-1] - 2y[i] + y[i+1])^2
     float CalcEcurv(const Point2i& prevPt,
                     const Point2i& neibPt, const Point2i& nextPt);
+    
+    void ShowECompData(vector<float>& EcontRec,
+                       vector<float>& EcurvRec,
+                       vector<float>& EedgeRec,
+                       vector<float>& EcorRec);
+    
+    void BuildNeigArea(int ptIndex, int viewRadius,
+                       Point2i& startPt, Point2i& endPt);
+
 };
 }
 

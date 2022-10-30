@@ -46,10 +46,10 @@
 #define DRAW_NEIGHBORS
 
 // Required
-#define CONTOUR_ALPHA       0.3
-#define CONTOUR_BETA        1.8
-#define CONTOUR_GAMMA       1.0
-#define CONTOUR_LAMBDA      2.2
+#define CONTOUR_ALPHA       5.0   //越小，轮廓线越短，越紧致
+#define CONTOUR_BETA        3.0   //越小，越倾向于光滑
+#define CONTOUR_GAMMA       25.0   //越大，越贴近边缘
+#define CONTOUR_LAMBDA      10.0   //越大，越靠近角点
 
 #define MINIMUM_POINTS      4
 #define CONTOUR_START_POINT 200
@@ -61,30 +61,6 @@ class AlgoParams
 public:
     AlgoParams()
     {
-#ifdef SOBEL_FILL_IN_NEG_SPACE
-        this->_sobelDeadSpace = true;
-#else
-        this->_sobelDeadSpace = false;
-#endif
-
-#ifdef SOBEL_CALCULATE_ANGLE
-        this->_sobelAngle = true;
-#else
-        this->_sobelAngle = false;
-#endif
-
-#ifdef DRAW_LINE
-        this->_drawSnakeLines = true;
-#else
-        this->_drawSnakeLines = false;
-#endif
-
-#ifdef DRAW_POINTS
-        this->_drawSnakePoints = true;
-#else
-        this->_drawSnakePoints = false;
-#endif
-
         this->_sobelThresh = SOBEL_THRESH;
         this->_viewSobel = false;
         this->_nPoints = CONTOUR_START_POINT;

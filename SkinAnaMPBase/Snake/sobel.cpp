@@ -57,22 +57,8 @@ sobelPack FullSobel(Mat gray, int thresh, bool calcAngle, bool deadSpace)
             {
                 data.contours.push_back(Point(x,y));
                 data.frame.at<uchar>(x,y) = value;
-                if(calcAngle)
-                {
-                    if(px != 0)
-                        data.angles.push_back( std::atan(py/px) );
-                    else
-                        data.angles.push_back(0.0);
-                }
             }
-            else if (deadSpace)
-            {
-                // This keeps the contours the color of the original pixels
-                // Because we have the points of interest, we don't need to draw
-                // anything, but its usually pleasing to look at.
-                // undefine SOBEL_FILL_IN_NEG_SPACE to ignore op
-                data.frame.at<uchar>(x,y) = 0;
-            }
+            
         } // End Y
     }// End X
     return data;

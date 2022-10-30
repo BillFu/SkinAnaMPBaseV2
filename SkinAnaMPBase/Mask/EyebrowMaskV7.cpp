@@ -286,7 +286,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     //--------------------------------------------------------------
     cvalg::ActiveContours acAlg;
     AlgoParams ap;
-    ap._nPoints = sampPtCt.size();
+    ap._nPoints = static_cast<int>(sampPtCt.size());
     acAlg.setParams(&ap);
 
     Mat acImg(initEyePgBBox.size(), CV_8UC1, Scalar(0));
@@ -295,10 +295,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     Size acImgS = acImg.size();
     acAlg.init(acImgS.width, acImgS.height);
 
-    for(Point2i pt: sampPtCt)
-    {
-        acAlg.insertPoint(pt);
-    }
+    acAlg.setInitCont(sampPtCt);
     
     //acImg = ~acImg;
     vector<Point2i> peaks;
@@ -311,7 +308,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     // cornerField经过了反相，越接近peaks，值越小
     Mat cornerField = BuildGaussField(fieldW, fieldH, 9, peaks);
     
-    acAlg.optimize(acImg, cornerField, 24, 30);
+    acAlg.optimize(acImg, cornerField, 16, 35);
 
     CONTOUR finCt = acAlg.getOptimizedCont();
     CONTOURS finCts;
