@@ -35,6 +35,85 @@ struct LineSegment{
     }
 };
 
+// 从头部取出，从尾部加入，环形装置；
+// 取出时，将head flag往后拨一格；
+// 加入新元素时，将tail flag往后拨一格。
+template <class T>
+class CircularBuf
+{
+  private:
+    vector<T> buf;
+    int headFlag;
+    int tailFlag;
+    int bufSize; // 满员时的容量
+    
+  public:
+    CircularBuf(int bufSize0)
+    {
+        bufSize = bufSize0;
+        buf.reserve(bufSize);
+        headFlag = -1; // !!!
+        tailFlag = 0;
+    }
+    
+    // return how much elements stored in the buf now
+    int elementNum() const
+    {
+        return (tailFlag + bufSize - headFlag) % bufSize;
+    }
+    
+    bool isFull()
+    {
+        if(tailFlag == headFlag)
+            return true;
+        else
+            return false;
+    }
+    
+    // if index is a negative value, counting from tail
+    // if index is zero or a positive value, coutning from head
+    T getElement(int index) const
+    {
+        if(index >= 0) // starting from head and iterating forward
+        {
+            int actIndex = (headFlag + index) % bufSize;
+            return buf[actIndex];
+        }
+        else  // starting from tail and iterating backward
+        {
+            int actIndex = (tailFlag + index + bufSize) % bufSize;
+            return buf[actIndex];
+        }
+    }
+    
+    // 如果tail位置为0的话，head位置应该是什么
+    int headReverseIndex() const
+    {
+        return headFlag - tailFlag;
+    }
+    
+    T popFront()
+    {
+        T popElement = buf[headFlag];
+        headFlag = (headFlag+1) % bufSize;
+        
+        if(headFlag == tailFlag) // become empty
+        {
+            headFlag = -1; // !!!
+            tailFlag = 0;
+        }
+        return popElement;
+    }
+    void pushBack(T& t)
+    {
+        if(headFlag == -1)  // add the first element
+            headFlag = 0;
+        
+        buf[tailFlag] = t;
+        tailFlag = (tailFlag + 1) % bufSize;
+    }
+};
+
 /**********************************************************************************************
 (x3, y3) is the inner interpolated result.
 t: in range[0.0 1.0].

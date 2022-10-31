@@ -279,38 +279,72 @@ float AvgPointDist(const CONTOUR& cont)
 }
 
 //-------------------------------------------------------------------------------------------
+int crossProduct(const Point2i& vect1, const Point2i& vect2)
+{
+    return (vect1.x * vect2.y - vect1.y * vect2.x);
+}
 
 bool CheckCrossOfTwoLineSegs(const LineSegment& lineSeg1, const LineSegment& lineSeg2)
 {
-    return false;
+    // <a, b> is lineSeg1; <c, d> is lineSeg2
+    const Point2i& a = lineSeg1.sPt;
+    const Point2i& b = lineSeg1.ePt;
+    const Point2i& c = lineSeg2.sPt;
+    const Point2i& d = lineSeg2.ePt;
+    
+    //快速排斥实验
+    if( max(c.x, d.x) < min(a.x, b.x)||
+        max(a.x, b.x) < min(c.x, d.x)||
+        max(c.y, d.y) < min(a.y, b.y)||
+        max(a.y, b.y) < min(c.y, d.y))
+    {
+        return false;
+    }
+    //跨立实验
+    if(   crossProduct(a-d,c-d)*crossProduct(b-d,c-d)>0
+       || crossProduct(d-b,a-b)*crossProduct(c-b,a-b)>0)
+    {
+        return  false;
+    }
+    
+    return true;
 }
+
 
 // 1st version: just check there is a cross existed between lineSeg and
 // any line segment of lineSegBuf.
 // includeFinalSeg indicates whether the last one of lineSegBuf will be considered or not.
 bool CheckCrossOfLineSegs(const LineSegment& lineSeg,
-                       const list<LineSegment>& lineSegBuf,
-                       bool includeLastSeg)
+                          const CircularBuf<LineSegment>& lineSegBuf,
+                          bool includeLastSeg)
 {
     if(!includeLastSeg)
     {
         // the processing needs that there are at least two line segs existed
-        if(lineSegBuf.size() <= 1)
+        if(lineSegBuf.elementNum() <= 1)
             return false;
         
-        for(int i = lineSegBuf.size() - 2; i >= 0; i--)
+        int headRevIndex = lineSegBuf.headReverseIndex();
+        for(int i = -2; i>= headRevIndex; i--)
         {
-            
+            LineSegment lineSeg2 = lineSegBuf.getElement(i);
+            bool isIntersect = CheckCrossOfTwoLineSegs(lineSeg, lineSeg2);
+            if(isIntersect)
+                return true;
         }
     }
     else
     {
-        if(lineSegBuf.size() <= 0)
+        if(lineSegBuf.elementNum() <= 0)
             return false;
         
-        for(int i = lineSegBuf.size() - 1; i >= 0; i--)
+        int headRevIndex = lineSegBuf.headReverseIndex();
+        for(int i = -1; i >= headRevIndex; i--)
         {
-            
+            LineSegment lineSeg2 = lineSegBuf.getElement(-i);
+            bool isIntersect = CheckCrossOfTwoLineSegs(lineSeg, lineSeg2);
+            if(isIntersect)
+                return true;
         }
     }
         
@@ -320,7 +354,7 @@ bool CheckCrossOfLineSegs(const LineSegment& lineSeg,
 // 1st version: just check there is a tie existed or not
 bool CheckTieOnContour(const CONTOUR& oriCont, int lineSegBufSize)
 {
-    list<LineSegment> lineSegBuf;
+    CircularBuf<LineSegment> lineSegBuf(lineSegBufSize);
     
     int numPt = static_cast<int>(oriCont.size());
     if(numPt <= 3)
@@ -329,13 +363,13 @@ bool CheckTieOnContour(const CONTOUR& oriCont, int lineSegBufSize)
     for(int i=0; i <=numPt-1; i++)
     {
         int j = (i + 1) % numPt;
-
         LineSegment curLineSeg(i, j, oriCont[i], oriCont[j]);
         
+        bool hasCross = CheckCrossOfLineSegs(curLineSeg, lineSegBuf, false);
+        if(hasCross)
+            return true;
         
-        lineSegBuf.push_back(curLineSeg);
-        if(lineSegBuf.size() > lineSegBufSize)
-            lineSegBuf.pop_front();
+        lineSegBuf.pushBack(curLineSeg);
     }
     
     return false;
