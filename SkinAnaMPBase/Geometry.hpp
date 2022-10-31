@@ -21,17 +21,86 @@ using namespace cv;
 
 // contour上的线段
 struct LineSegment{
-    int     sIndex;
-    int     eIndex;
+    int     sIdx;
+    int     eIdx;
     Point2i sPt;
     Point2i ePt;
     
     LineSegment(int sIndex0, int eIndex0,
                 const Point2i& sPt0, const Point2i& ePt0):
-            sIndex(sIndex0), eIndex(eIndex0),
+            sIdx(sIndex0), eIdx(eIndex0),
             sPt(sPt0), ePt(ePt0)
     {
+    }
+    
+    LineSegment(const LineSegment& lSeg):
+            sIdx(lSeg.sIdx), eIdx(lSeg.eIdx),
+            sPt(lSeg.sPt), ePt(lSeg.ePt)
+    {
+    }
+    
+    friend ostream &operator<<(ostream &output, const LineSegment& lSeg )
+    {
+        output << "LineSegment{" << endl;
+        output << "\tsIdx: " << lSeg.sIdx << ", sPt: " << lSeg.sPt << endl;
+        output << "\teIdx: " << lSeg.eIdx << ", ePt: " << lSeg.ePt << "}" << endl;
+        return output;
+    }
+};
+
+// 用交叉的两段线段来表示Tie，其他点和线段目前用不到
+struct Tie{
+    LineSegment lineSeg1;
+    LineSegment lineSeg2;
+    
+    Tie(const LineSegment& lineSegA, const LineSegment& lineSegB):
+        lineSeg1(lineSegA) , lineSeg2(lineSegB)
+    {
+    }
+    
+    friend ostream &operator<<(ostream &output, const Tie& tie )
+    {
+        output << "Tie{" << endl;
+        output << "\tlineSeg1: " << tie.lineSeg1;
+        output << "\tlineSeg2: " << tie.lineSeg2;
+        output << "}" << endl;
+        return output;
+    }
+};
+
+struct TieGroup
+{
+    vector<Tie> ties;
+    
+    int getTieNum()
+    {
+        return static_cast<int>(ties.size());
+    }
+    
+    bool hasTie()
+    {
+        return (getTieNum() == 0);
+    }
+    
+    // 仅仅检查第一个Tie
+    bool ptInTie(int idx, Tie*& pTie)
+    {
+        if(getTieNum() == 0)
+        {
+            pTie = NULL;
+            return false;
+        }
         
+        if(ties[0].lineSeg1.sIdx == idx)
+        {
+            pTie = &(ties[0]);
+            return true;
+        }
+        else
+        {
+            pTie = NULL;
+            return false;
+        }
     }
 };
 
@@ -52,6 +121,12 @@ class CircularBuf
     {
         bufSize = bufSize0;
         buf.reserve(bufSize);
+        headFlag = -1; // !!!
+        tailFlag = 0;
+    }
+    
+    void cleanUp()
+    {
         headFlag = -1; // !!!
         tailFlag = 0;
     }
@@ -197,15 +272,20 @@ float AvgPointDist(const CONTOUR& cont);
 void SparsePtsOnContour(const CONTOUR& oriCont, float alpha, CONTOUR& sparCont);
 
 // 1st version: just check there is a tie existed or not
-bool CheckTieOnContour(const CONTOUR& oriCont, int lineSegBufSize);
+void CheckTieOnContour(const CONTOUR& oriCont, int lineSegBufSize,
+                       TieGroup& tieGroup);
 
 // 1st version: just check there is a cross existed between lineSeg and
 // any line segment of lineSegBuf.
 // includeFinalSeg indicates whether the last one of lineSegBuf will be considered or not.
 bool CheckCrossOfLineSegs(const LineSegment& lineSeg,
-                       const list<LineSegment>& lineSegBuf,
-                       bool includeLastSeg=false);
+                          const list<LineSegment>& lineSegBuf,
+                          vector<Tie>& tieSet,
+                          bool includeLastSeg=false);
 
 bool CheckCrossOfTwoLineSegs(const LineSegment& lineSeg1, const LineSegment& lineSeg2);
+
+// clean up the points in ties recorded in tieGroup, produce a clean contour without ties.
+void DelTiesOnCont(const CONTOUR& oriCont, TieGroup& tieGroup, CONTOUR& cleanCont);
 
 #endif /* end of GEOMETRY_HPP */

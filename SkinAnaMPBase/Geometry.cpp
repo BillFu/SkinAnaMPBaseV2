@@ -316,6 +316,7 @@ bool CheckCrossOfTwoLineSegs(const LineSegment& lineSeg1, const LineSegment& lin
 // includeFinalSeg indicates whether the last one of lineSegBuf will be considered or not.
 bool CheckCrossOfLineSegs(const LineSegment& lineSeg,
                           const CircularBuf<LineSegment>& lineSegBuf,
+                          vector<Tie>& tieSet,
                           bool includeLastSeg)
 {
     if(!includeLastSeg)
@@ -330,7 +331,10 @@ bool CheckCrossOfLineSegs(const LineSegment& lineSeg,
             LineSegment lineSeg2 = lineSegBuf.getElement(i);
             bool isIntersect = CheckCrossOfTwoLineSegs(lineSeg, lineSeg2);
             if(isIntersect)
+            {
+                tieSet.push_back(Tie(lineSeg2, lineSeg));
                 return true;
+            }
         }
     }
     else
@@ -352,25 +356,52 @@ bool CheckCrossOfLineSegs(const LineSegment& lineSeg,
 }
 
 // 1st version: just check there is a tie existed or not
-bool CheckTieOnContour(const CONTOUR& oriCont, int lineSegBufSize)
+void CheckTieOnContour(const CONTOUR& oriCont, int lineSegBufSize,
+                       TieGroup& tieGroup)
 {
     CircularBuf<LineSegment> lineSegBuf(lineSegBufSize);
     
     int numPt = static_cast<int>(oriCont.size());
     if(numPt <= 3)
-        return false;
+        return;
 
     for(int i=0; i <=numPt-1; i++)
     {
         int j = (i + 1) % numPt;
         LineSegment curLineSeg(i, j, oriCont[i], oriCont[j]);
         
-        bool hasCross = CheckCrossOfLineSegs(curLineSeg, lineSegBuf, false);
+        bool hasCross = CheckCrossOfLineSegs(curLineSeg, lineSegBuf,
+                                             tieGroup.ties, false);
         if(hasCross)
-            return true;
-        
-        lineSegBuf.pushBack(curLineSeg);
+            lineSegBuf.cleanUp(); //clean up the buf to prepare for detecting next tie
+        else
+            lineSegBuf.pushBack(curLineSeg);
+    }
+}
+
+// clean up the points in ties recorded in tieGroup, produce a clean contour without ties.
+void DelTiesOnCont(const CONTOUR& oriCont, TieGroup& tieGroup, CONTOUR& cleanCont)
+{
+    if(tieGroup.hasTie() == false)
+    {
+        cleanCont = oriCont;
+        return;
     }
     
-    return false;
+    int numPt = static_cast<int>(oriCont.size());
+
+    int curPtIdx = 0;
+    while(curPtIdx <=numPt-1)
+    {
+        Tie* pTie;
+        bool inTile = tieGroup.ptInTie(i, pTie);
+        if(!inTie)
+        {
+            cleanCont.push_back(oriCont[i]);
+        }
+        else
+        {
+            
+        }
+    }
 }

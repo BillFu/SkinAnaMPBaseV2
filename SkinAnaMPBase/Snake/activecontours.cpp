@@ -216,9 +216,16 @@ void ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
         // output the average value of all energy components in current epoch
         ShowECompData(EcontRec, EcurvRec, EedgeRec, EcorRec);
         
-        bool hasTie = CheckTieOnContour(_points, 5);
-        if(hasTie)
-            cout << "Tie existed on the contour!" << endl;
+        //vector<Tie> tieSet;
+        TieGroup tieGroup;
+        CheckTieOnContour(_points, 5, tieGroup);
+        
+        if(tieGroup.hasTie())
+        {
+            cout << "Num of Tie found: " << tieGroup.getTieNum() << endl;
+            for(Tie tie: tieGroup.ties)
+                cout << tie << endl;
+        }
 
         CONTOUR sparsedCont;
         SparsePtsOnContour(_points, 0.7, sparsedCont);
