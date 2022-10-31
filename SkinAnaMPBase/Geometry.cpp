@@ -277,3 +277,66 @@ float AvgPointDist(const CONTOUR& cont)
     float avgDist = sum / numPt;
     return avgDist;
 }
+
+//-------------------------------------------------------------------------------------------
+
+bool CheckCrossOfTwoLineSegs(const LineSegment& lineSeg1, const LineSegment& lineSeg2)
+{
+    return false;
+}
+
+// 1st version: just check there is a cross existed between lineSeg and
+// any line segment of lineSegBuf.
+// includeFinalSeg indicates whether the last one of lineSegBuf will be considered or not.
+bool CheckCrossOfLineSegs(const LineSegment& lineSeg,
+                       const list<LineSegment>& lineSegBuf,
+                       bool includeLastSeg)
+{
+    if(!includeLastSeg)
+    {
+        // the processing needs that there are at least two line segs existed
+        if(lineSegBuf.size() <= 1)
+            return false;
+        
+        for(int i = lineSegBuf.size() - 2; i >= 0; i--)
+        {
+            
+        }
+    }
+    else
+    {
+        if(lineSegBuf.size() <= 0)
+            return false;
+        
+        for(int i = lineSegBuf.size() - 1; i >= 0; i--)
+        {
+            
+        }
+    }
+        
+    return false;
+}
+
+// 1st version: just check there is a tie existed or not
+bool CheckTieOnContour(const CONTOUR& oriCont, int lineSegBufSize)
+{
+    list<LineSegment> lineSegBuf;
+    
+    int numPt = static_cast<int>(oriCont.size());
+    if(numPt <= 3)
+        return false;
+
+    for(int i=0; i <=numPt-1; i++)
+    {
+        int j = (i + 1) % numPt;
+
+        LineSegment curLineSeg(i, j, oriCont[i], oriCont[j]);
+        
+        
+        lineSegBuf.push_back(curLineSeg);
+        if(lineSegBuf.size() > lineSegBufSize)
+            lineSegBuf.pop_front();
+    }
+    
+    return false;
+}

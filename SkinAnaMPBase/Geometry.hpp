@@ -19,7 +19,21 @@ using namespace cv;
 
 #include "Common.hpp"
 
-
+// contour上的线段
+struct LineSegment{
+    int     sIndex;
+    int     eIndex;
+    Point2i sPt;
+    Point2i ePt;
+    
+    LineSegment(int sIndex0, int eIndex0,
+                const Point2i& sPt0, const Point2i& ePt0):
+            sIndex(sIndex0), eIndex(eIndex0),
+            sPt(sPt0), ePt(ePt0)
+    {
+        
+    }
+};
 
 /**********************************************************************************************
 (x3, y3) is the inner interpolated result.
@@ -103,5 +117,16 @@ float AvgPointDist(const CONTOUR& cont);
 // 思路：计算contour上平均的点距，将小于alpha倍平均点距的点给依次删掉。
 void SparsePtsOnContour(const CONTOUR& oriCont, float alpha, CONTOUR& sparCont);
 
+// 1st version: just check there is a tie existed or not
+bool CheckTieOnContour(const CONTOUR& oriCont, int lineSegBufSize);
+
+// 1st version: just check there is a cross existed between lineSeg and
+// any line segment of lineSegBuf.
+// includeFinalSeg indicates whether the last one of lineSegBuf will be considered or not.
+bool CheckCrossOfLineSegs(const LineSegment& lineSeg,
+                       const list<LineSegment>& lineSegBuf,
+                       bool includeLastSeg=false);
+
+bool CheckCrossOfTwoLineSegs(const LineSegment& lineSeg1, const LineSegment& lineSeg2);
 
 #endif /* end of GEOMETRY_HPP */
