@@ -42,6 +42,7 @@
 		CBD1240228E5994E004A42A9 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540428CD8B34004CF77D /* Utils.cpp */; };
 		CBD1240628E59A8C004A42A9 /* Batch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBD1240528E59A8C004A42A9 /* Batch.cpp */; };
 		CBD39AE82910AA9D00260263 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CBD123FD28E58EEB004A42A9 /* libtensorflowlite.so */; };
+		CBD39AEB2910B58700260263 /* Tie.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBD39AE92910B58700260263 /* Tie.cpp */; };
 		CBDA6B9728D5550B00BE0756 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBDA6B9628D5550B00BE0756 /* main.cpp */; };
 		CBDA6B9E28D55FDC00BE0756 /* HeadPoseEst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2602327528CCBFB100B11D7A /* HeadPoseEst.cpp */; };
 		CBDA6BA028D5603600BE0756 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540428CD8B34004CF77D /* Utils.cpp */; };
@@ -137,6 +138,8 @@
 		CBD123FD28E58EEB004A42A9 /* libtensorflowlite.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtensorflowlite.so; path = intel_lib/libtensorflowlite.so; sourceTree = "<group>"; };
 		CBD1240428E59A8C004A42A9 /* Batch.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Batch.hpp; sourceTree = "<group>"; };
 		CBD1240528E59A8C004A42A9 /* Batch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Batch.cpp; sourceTree = "<group>"; };
+		CBD39AE92910B58700260263 /* Tie.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tie.cpp; sourceTree = "<group>"; };
+		CBD39AEA2910B58700260263 /* Tie.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Tie.hpp; sourceTree = "<group>"; };
 		CBDA6B9428D5550B00BE0756 /* LMExporter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LMExporter; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBDA6B9628D5550B00BE0756 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		CBDBD7AF28D561FF00F3AD03 /* LM_Exporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LM_Exporter.cpp; sourceTree = "<group>"; };
@@ -238,6 +241,8 @@
 				CB4312A628D419A0006D71DA /* BSpline */,
 				CB45E23E28E54BA7004E8D25 /* Geometry.cpp */,
 				CB45E23D28E54BA7004E8D25 /* Geometry.hpp */,
+				CBD39AE92910B58700260263 /* Tie.cpp */,
+				CBD39AEA2910B58700260263 /* Tie.hpp */,
 				26E506B028D3665B000059DA /* LM_Loader.cpp */,
 				26E506B128D3665B000059DA /* LM_loader.hpp */,
 				26F7BE6428CDE49500A83344 /* Common.hpp */,
@@ -480,6 +485,7 @@
 				CBB5DB4028DD5E97003CDED3 /* SkinFeatureMask.cpp in Sources */,
 				CB9D430928F3F9DA00CD3B13 /* SegHelper.cpp in Sources */,
 				CB41C4E4290A79760012BC6A /* EyebrowMaskV7.cpp in Sources */,
+				CBD39AEB2910B58700260263 /* Tie.cpp in Sources */,
 				CB1E2AB928DD99AB00F416DF /* ForeheadMask.cpp in Sources */,
 				CBC3D53E290BCC810056D14E /* GaussField.cpp in Sources */,
 				CBB5DB3D28DD5B3B003CDED3 /* FundamentalMask.cpp in Sources */,

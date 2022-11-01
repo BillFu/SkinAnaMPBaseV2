@@ -1,5 +1,6 @@
 #include "activecontours.h"
 #include "../Geometry.hpp"
+#include "../Tie.hpp"
 #include "../Utils.hpp"
 #include <numeric>
 
