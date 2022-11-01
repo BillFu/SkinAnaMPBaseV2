@@ -4,3 +4,7 @@ git tag -a v1.0 -m "before importing activate contours model"
 git remote set-url origin https://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@github.com/BillFu/SkinAnaMPBaseV2.git
 
 git push origin v1.0
+
+
+git tag -a v2.0 -m "activate contours model done."
+git push origin v2.0
