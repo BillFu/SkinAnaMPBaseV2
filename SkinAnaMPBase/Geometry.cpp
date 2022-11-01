@@ -255,8 +255,9 @@ void IpPtViaS(const Point2i& uPt, const Point2i& lPt,
     outPt = Interpolate(lPt, uPt, t);
 }
 
+// 重新采样，使得新获得的点在S范围内均匀分布。
 // S: accumulated arc length
-void MakePtsEvenAlongWithS(const CONTOUR& oriCont, int newNumPt, CONTOUR& evenCont)
+void MakePtsEvenWithS(const CONTOUR& oriCont, int newNumPt, CONTOUR& evenCont)
 {
     // 第一步，统计累计弧长分布
     int numPt = static_cast<int>(oriCont.size());
@@ -280,28 +281,34 @@ void MakePtsEvenAlongWithS(const CONTOUR& oriCont, int newNumPt, CONTOUR& evenCo
         STable.push_back(S);
     }
     
-    double interS = 0.0;
-    double SStep = S / newNumPt;
-    
     evenCont.push_back(oriCont[0]);
 
     int lID = 0;
     int uID = 1;
-    while(interS < STable[numPt])
+    double SStep = S / newNumPt;
+    double interS = SStep;
+    while(interS < STable[numPt-1])
     {
         float SUpLimit = STable[uID];
         float SLowLimt = STable[lID];
+        
+        while(interS > SUpLimit)
+        {
+            lID = uID;
+            uID++;
+            
+            SUpLimit = STable[uID];
+            SLowLimt = STable[lID];
+        }
+        
         while(interS < SUpLimit)
         {
-            interS += SStep;
             Point2i evenPt;
             IpPtViaS(oriCont[uID], oriCont[lID],
                      SUpLimit, SLowLimt, interS, evenPt);
 
-            evenCont.push_back(evenPt);
+            evenCont.push_back(evenPt);            
+            interS += SStep;
         }
-        
-        lID = uID;
-        uID++;
     }
 }

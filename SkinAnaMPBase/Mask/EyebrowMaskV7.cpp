@@ -258,36 +258,32 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     
     workImg.release();
     
-    int numPts = acCts[0].size();
+    double S = arcLength(acCts[0], true);
+    cout << "arcLen: " << S << endl;
 
-    CONTOUR sampPtCt;  // 稀疏化的轮廓点
-    int sampGap = 25;
-    int numSampPt = numPts / sampGap;
+    int viewRadius = 11;
+    int gap = 2*viewRadius + 1;
+    int numPts = (int)(S / gap);
     
-    for(int i = 0; i < numSampPt; i++)
-    {
-        int id = i * sampGap;
-        sampPtCt.push_back(acCts[0][id]);
-    }
-    
+    CONTOUR evenCont;  // resampled Points that locate evenly along with S
+    MakePtsEvenWithS(acCts[0], numPts, evenCont);
     //--------------------------------------------------------------
-    /*
+    
     // ---- just for debugging
     Mat canvas(initEyePgBBox.size(), CV_8UC1, Scalar(0));
     segEyeMaskSS.copyTo(canvas(relativeRect));
-    drawContours(canvas, acCts, 0, Scalar(150), 2);
+    CONTOURS evenConts;
+    evenConts.push_back(evenCont);
+    drawContours(canvas, evenConts, 0, Scalar(150), 2);
     circle(canvas, lEyeCornerWC, 5, Scalar(150), cv::FILLED);
     circle(canvas, rEyeCornerWC, 5, Scalar(150), cv::FILLED);
-    imwrite("InitStateAC.png", canvas);
+    imwrite("InitCont.png", canvas);
     canvas.release();
-
-    double arcLen = arcLength(acCts[0], true);
-    cout << "arcLen: " << arcLen << endl;
-    */
+    
     //--------------------------------------------------------------
     cvalg::ActiveContours acAlg;
     AlgoParams ap;
-    ap._nPoints = static_cast<int>(sampPtCt.size());
+    ap._nPoints = static_cast<int>(evenCont.size());
     acAlg.setParams(&ap);
 
     Mat acImg(initEyePgBBox.size(), CV_8UC1, Scalar(0));
@@ -296,7 +292,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     Size acImgS = acImg.size();
     acAlg.init(acImgS.width, acImgS.height);
 
-    acAlg.setInitCont(sampPtCt);
+    acAlg.setInitCont(evenCont);
     
     //acImg = ~acImg;
     vector<Point2i> peaks;
@@ -309,7 +305,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     // cornerField经过了反相，越接近peaks，值越小
     Mat cornerField = BuildGaussField(fieldW, fieldH, 7, peaks);
     
-    acAlg.optimize(acImg, cornerField, 23, 15);
+    acAlg.optimize(acImg, cornerField, viewRadius, 15);
 
     CONTOUR finCt = acAlg.getOptimizedCont();
     //CONTOURS finCts;

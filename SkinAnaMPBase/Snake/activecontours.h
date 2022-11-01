@@ -85,7 +85,7 @@ private:
     Point2i GetPrevPt(int ptIndex);
     Point2i GetNextPt(int ptIndex);
 
-    Point updatePos(int pointIndex, Point start, Point end,
+    Point updatePos(int ptIndex, Point start, Point end,
                     const Mat& edgeImage, const Mat& cornerField,
                     float MaxEcont, float MaxEcurv,
                     vector<float>& EcontRec,
@@ -93,6 +93,12 @@ private:
                     vector<float>& EedgeRec,
                     vector<float>& EcorRec,
                     vector<float>& EtotalRec);
+    
+    Point updatePosV2(int ptIndex, Point start, Point end,
+                    const Mat& edgeImage, const Mat& cornerField,
+                    float MaxEcont, float MaxEcurv,
+                    float& destEcont, float& destEcurv,
+                    float& destEedge, float& destEcor);
     
     //void AvgPointDist();
     

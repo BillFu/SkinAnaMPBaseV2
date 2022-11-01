@@ -101,6 +101,7 @@ float AvgPointDist(const CONTOUR& cont);
 void IpPtViaS(const Point2i& uPt, const Point2i& lPt,
               float upS, float lowS, float interS, Point2i& outPt);
 
-void MakePtsEvenAlongWithS(const CONTOUR& cont, int newNumPt, CONTOUR& evenCont);
+// 重新采样，使得新获得的点在S范围内均匀分布。
+void MakePtsEvenWithS(const CONTOUR& cont, int newNumPt, CONTOUR& evenCont);
 
 #endif /* end of GEOMETRY_HPP */

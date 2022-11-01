@@ -200,22 +200,23 @@ void ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
         imwrite(outFile, canvas);
         //---------end of debugging-------------------------------------------
         
-        vector<float> EcontRec, EcurvRec, EedgeRec, EcorRec,EtotalRec;
+        //vector<float> EcontRec, EcurvRec, EedgeRec, EcorRec,EtotalRec;
+        float destEcont, destEcurv, destEedge, destEcor;
         for(int i = 0; i < static_cast<int>(_points.size()); i++)
         {
             Point2i startPt, endPt;
             BuildNeigArea(i, viewRadius, startPt, endPt);
-            _points[i] = updatePos(i, startPt, endPt, sobelEdges.frame, cornerField,
-                                   MaxEcont, MaxEcurv,
-                                   EcontRec, EcurvRec, EedgeRec, EcorRec,
-                                   EtotalRec);
+            
+            _points[i] = updatePosV2(i, startPt, endPt, sobelEdges.frame, cornerField,
+                                     MaxEcont, MaxEcurv,
+                                     destEcont, destEcurv, destEedge, destEcor);
         }
         
         cout << "--------------------------------" << k << "-----------------------------------" << endl;
         // output the average value of all energy components in current epoch
-        ShowECompData(EcontRec, EcurvRec, EedgeRec, EcorRec);
+        //ShowECompData(EcontRec, EcurvRec, EedgeRec, EcorRec);
         
-        //vector<Tie> tieSet;
+        /*
         TieGroup tieGroup;
         CheckTieOnContour(_points, 5, tieGroup);
         
@@ -225,13 +226,16 @@ void ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
             for(Tie tie: tieGroup.ties)
                 cout << tie << endl;
         }
+        */
 
-        CONTOUR cleanCont;
-        DelTiesOnContV2(_points, tieGroup, cleanCont);
+        CONTOUR evenCont;  // resampled Points that locate evenly along with S
+        MakePtsEvenWithS(_points, _points.size(), evenCont);
+        //CONTOUR cleanCont;
+        //DelTiesOnContV2(_points, tieGroup, cleanCont);
 
         //CONTOUR sparsedCont;
         //SparsePtsOnContour(cleanCont, 0.7, sparsedCont);
-        _points = cleanCont;
+        _points = evenCont;
     }
 }
 
@@ -325,6 +329,71 @@ Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
     // Return The (new) location
     return minLoc;
 }
+
+
+Point ActiveContours::updatePosV2(int ptIndex, Point start, Point end,
+                const Mat& edgeImage, const Mat& cornerField,
+                float MaxEcont, float MaxEcurv,
+                float& destEcont, float& destEcurv,
+                float& destEedge, float& destEcor )
+{
+    int cols = end.x - start.x;
+    int rows = end.y - start.y;
+   
+    // Update the average dist
+    _avgDist = AvgPointDist(_points);
+
+    Rect ROI(start, end);
+    
+    // 在轮廓线上当前点的前一个被扫描点
+    Point prevPt = GetPrevPt(ptIndex);
+    Point nextPt = GetNextPt(ptIndex);
+    
+    // Location of point in center of neighborhood
+    Point minLoc = _points[ptIndex]; // minLoc also be the new destionation
+    float minEnerge = 999999;
+    // 逐个遍历当前点的邻域
+    for(int y = 0; y < rows-1; y ++)
+    {
+        for(int x = 0; x < cols-1; x++)
+        {
+            /* E = ∫(α(s)Econt + β(s)Ecurv + γ(s)Eimage)ds */
+            // X,Y Location in image
+            Point2i curNeibPt = start + Point2i(x, y);
+            float Econt = CalcEcont(prevPt, curNeibPt, _avgDist);
+            Econt /= MaxEcont;
+            
+            float Ecurv = CalcEcurv(prevPt, curNeibPt, nextPt);
+            Ecurv /= MaxEcurv;
+
+            /*  Eimage: -||∇||
+                Gradient magnitude encoded in pixel information
+                    - May want to change this 'feature' */
+            float Eedge = (float)edgeImage.at<uchar>(curNeibPt);
+            //then add minus sign before it
+            Eedge = 1.0 - Eedge/255.0; // make it in the interval: [0, 1]
+            
+            float Ecor = cornerField.at<float>(curNeibPt); // already lies in [0.0, 1.0]
+
+            float Energy = Econt*_params->getAlpha() + Ecurv*_params->getBeta()
+                            + Eedge*_params->getGama() + Ecor*_params->_lambda;
+            if (Energy < minEnerge)
+            {
+                minEnerge = Energy;
+                minLoc = curNeibPt;
+                
+                destEcont = Econt;
+                destEcurv = Ecurv;
+                destEedge = Eedge;
+                destEcor = Ecor;
+            }
+        }
+    }
+
+    // Return The (new) location
+    return minLoc;
+}
+
 
 }
 
