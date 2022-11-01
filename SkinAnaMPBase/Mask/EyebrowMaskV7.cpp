@@ -222,7 +222,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     Mat workImg(initEyePgBBox.size(), CV_8UC1, Scalar(0));
     Rect relativeRect = CalcRelativeRect(initEyePgBBox, eyeMaskBBox);
     segEyeMaskSS.copyTo(workImg(relativeRect)); // 将segEyeMask先复写到workImg
-    // imwrite("InitSegMask.png", workImg);
+    imwrite("InitSegMask.png", workImg);
 
     // 坐标转换，由source space转入initEyePgBBox框定的局部坐标系，也称工作坐标系(WC)
     POLYGON initEyePgWC;
@@ -261,7 +261,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     int numPts = acCts[0].size();
 
     CONTOUR sampPtCt;  // 稀疏化的轮廓点
-    int sampGap = 20;
+    int sampGap = 25;
     int numSampPt = numPts / sampGap;
     
     for(int i = 0; i < numSampPt; i++)
@@ -309,7 +309,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     // cornerField经过了反相，越接近peaks，值越小
     Mat cornerField = BuildGaussField(fieldW, fieldH, 7, peaks);
     
-    acAlg.optimize(acImg, cornerField, 21, 10);
+    acAlg.optimize(acImg, cornerField, 23, 15);
 
     CONTOUR finCt = acAlg.getOptimizedCont();
     //CONTOURS finCts;
@@ -321,7 +321,12 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     }
     imwrite("finRstAC.png", acImg);
     
-    eyePg = finCt;
+    // transform the coordinate system of finCT from WC to SS
+    for(Point2i pt: finCt)
+    {
+        Point2i ptSS = pt + initEyePgBBox.tl();
+        eyePg.push_back(ptSS);
+    }
 }
 
 void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
@@ -333,15 +338,13 @@ void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
 
     Size srcImgS = faceInfo.srcImgS;
     
-    ForgeEyePgBySnakeAlg(faceInfo.srcImgS, faceInfo.lEyeRefinePts,
-                         segRst.lEyeMaskNOS, segRst.lEyeFPs,
-                         segRst.lEyeSegCP, leftEyePg);
-    
-    /*
     ForgeEyePgBySnakeAlg(faceInfo.srcImgS, faceInfo.rEyeRefinePts,
                          segRst.rEyeMaskNOS, segRst.rEyeFPs,
                          segRst.rEyeSegCP, rightEyePg);
-    */
+    
+    ForgeEyePgBySnakeAlg(faceInfo.srcImgS, faceInfo.lEyeRefinePts,
+                         segRst.lEyeMaskNOS, segRst.lEyeFPs,
+                         segRst.lEyeSegCP, leftEyePg);
     
     POLYGON_GROUP polygonGroup;
     polygonGroup.push_back(leftEyePg);

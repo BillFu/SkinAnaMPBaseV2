@@ -245,3 +245,63 @@ float AvgPointDist(const CONTOUR& cont)
     float avgDist = sum / numPt;
     return avgDist;
 }
+
+// Ip: abbr. of Interpolate
+void IpPtViaS(const Point2i& uPt, const Point2i& lPt,
+              float upS, float lowS, float interS, Point2i& outPt)
+{
+        
+    double t = (interS - lowS) / (upS - lowS);
+    outPt = Interpolate(lPt, uPt, t);
+}
+
+// S: accumulated arc length
+void MakePtsEvenAlongWithS(const CONTOUR& oriCont, int newNumPt, CONTOUR& evenCont)
+{
+    // 第一步，统计累计弧长分布
+    int numPt = static_cast<int>(oriCont.size());
+
+    vector<float> STable; // 存贮绝对数值，而非相对百分比
+    STable.reserve(numPt+1);
+    STable.push_back(0.0);
+    float S = 0.0;
+    
+    for(int i=1; i<=numPt; i++)
+    {
+        int curIdx;
+        int prevIdx = i - 1;
+        if(i < numPt)
+            curIdx = i;
+        else
+            curIdx = 0;
+        
+        float dis = DisBetw2Pts(oriCont[prevIdx], oriCont[curIdx]);
+        S += dis;
+        STable.push_back(S);
+    }
+    
+    double interS = 0.0;
+    double SStep = S / newNumPt;
+    
+    evenCont.push_back(oriCont[0]);
+
+    int lID = 0;
+    int uID = 1;
+    while(interS < STable[numPt])
+    {
+        float SUpLimit = STable[uID];
+        float SLowLimt = STable[lID];
+        while(interS < SUpLimit)
+        {
+            interS += SStep;
+            Point2i evenPt;
+            IpPtViaS(oriCont[uID], oriCont[lID],
+                     SUpLimit, SLowLimt, interS, evenPt);
+
+            evenCont.push_back(evenPt);
+        }
+        
+        lID = uID;
+        uID++;
+    }
+}

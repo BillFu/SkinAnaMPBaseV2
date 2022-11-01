@@ -97,4 +97,10 @@ float LenOfVector(const Point& vect);
 //-------------------------------------------------------------------------------------------
 float AvgPointDist(const CONTOUR& cont);
 
+// S: 弧长
+void IpPtViaS(const Point2i& uPt, const Point2i& lPt,
+              float upS, float lowS, float interS, Point2i& outPt);
+
+void MakePtsEvenAlongWithS(const CONTOUR& cont, int newNumPt, CONTOUR& evenCont);
+
 #endif /* end of GEOMETRY_HPP */

@@ -131,9 +131,9 @@ void FaceBgSegmentor::ScaleUpPointSet(const Point2i inPts[], int numPt, Point2i 
 // the return BBox is measured in SP, i.e., Source Space
 Rect FaceBgSegmentor::CalcBBoxSPforContInNOS(const CONTOUR& ctInNOS)
 {
-    CONTOUR approxPoly;
-    approxPolyDP(ctInNOS, approxPoly, 3, true );
-    Rect nosBBox = boundingRect(approxPoly);
+    //CONTOUR approxPoly;
+    //approxPolyDP(ctInNOS, approxPoly, 3, true );
+    Rect nosBBox = boundingRect(ctInNOS);
     
     // in the end, the result will be transformed into the space of source image.
     Rect spBBox;
@@ -144,9 +144,9 @@ Rect FaceBgSegmentor::CalcBBoxSPforContInNOS(const CONTOUR& ctInNOS)
 
 Rect FaceBgSegmentor::CalcBBoxNOSforContInNOS(const CONTOUR& ctInNOS)
 {
-    CONTOUR approxPoly;
-    approxPolyDP(ctInNOS, approxPoly, 3, true );
-    Rect nosBBox = boundingRect(approxPoly);
+    //CONTOUR approxPoly;
+    //approxPolyDP(ctInNOS, approxPoly, 3, true );
+    Rect nosBBox = boundingRect(ctInNOS);
     return nosBBox;
 }
 

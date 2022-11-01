@@ -229,9 +229,9 @@ void ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
         CONTOUR cleanCont;
         DelTiesOnContV2(_points, tieGroup, cleanCont);
 
-        CONTOUR sparsedCont;
-        SparsePtsOnContour(cleanCont, 0.7, sparsedCont);
-        _points = sparsedCont;
+        //CONTOUR sparsedCont;
+        //SparsePtsOnContour(cleanCont, 0.7, sparsedCont);
+        _points = cleanCont;
     }
 }
 

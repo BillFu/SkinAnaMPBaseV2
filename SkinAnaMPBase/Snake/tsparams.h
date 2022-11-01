@@ -41,9 +41,9 @@
 
 // Required
 #define CONTOUR_ALPHA       0.5   //越小，轮廓线越短，越紧致
-#define CONTOUR_BETA        0.05   //越小，越倾向于光滑
-#define CONTOUR_GAMMA       0.8   //越大，越贴近边缘
-#define CONTOUR_LAMBDA      2.8   //越大，越靠近角点
+#define CONTOUR_BETA        0.3   //越大，才能放大曲率的差异，曲率越小越光滑
+#define CONTOUR_GAMMA       1.0   //越大，越贴近边缘
+#define CONTOUR_LAMBDA      2.2   //越大，越靠近角点
 
 #define MINIMUM_POINTS      4
 #define CONTOUR_START_POINT 200

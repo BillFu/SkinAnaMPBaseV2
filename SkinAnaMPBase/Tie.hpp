@@ -142,30 +142,6 @@ struct TieGroup
     {
         return (getTieNum() == 0);
     }
-    
-    // 仅仅检查第一个Tie
-    bool ptInTie(int idx, Tie*& pTie)
-    {
-        /*
-        if(getTieNum() == 0)
-        {
-            pTie = NULL;
-            return false;
-        }
-        
-        if(ties[0].lineSeg1.sIdx == idx)
-        {
-            pTie = &(ties[0]);
-            return true;
-        }
-        else
-        {
-            pTie = NULL;
-            return false;
-        }
-        */
-        return true;
-    }
 };
 
 // 从头部取出，从尾部加入，环形装置；
