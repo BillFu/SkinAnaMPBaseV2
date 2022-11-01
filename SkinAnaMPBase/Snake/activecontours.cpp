@@ -6,8 +6,6 @@
 
 using namespace std;
 
-#ifdef ACTIVE_CONTOUR_ALG
-
 namespace cvalg {
 
 ActiveContours::ActiveContours()
@@ -228,8 +226,11 @@ void ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
                 cout << tie << endl;
         }
 
+        CONTOUR cleanCont;
+        DelTiesOnContV2(_points, tieGroup, cleanCont);
+
         CONTOUR sparsedCont;
-        SparsePtsOnContour(_points, 0.7, sparsedCont);
+        SparsePtsOnContour(cleanCont, 0.7, sparsedCont);
         _points = sparsedCont;
     }
 }
@@ -325,8 +326,5 @@ Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
     return minLoc;
 }
 
-
-
 }
-#endif // ACTIVE_CONTOUR_ALG
 

@@ -92,20 +92,34 @@ bool CheckCrossOfLineSegs(const LineSegment& lineSeg,
         if(lineSegBuf.elementNum() <= 1)
             return false;
         
+        // the points in descent index order seen ever since the scaning begins
+        vector<int> revOrderSeenPts;
+        revOrderSeenPts.push_back(lineSeg.eIdx);
+        revOrderSeenPts.push_back(lineSeg.sIdx);
+        // 当前弧段不在历史窗口中！
+        LineSegment last2ndLS = lineSegBuf.getElement(-1);
         int headRevIndex = lineSegBuf.headReverseIndex();
+        revOrderSeenPts.push_back(last2ndLS.sIdx);
         for(int i = -2; i>= headRevIndex; i--)
         {
-            LineSegment lineSeg2 = lineSegBuf.getElement(i);
-            bool isIntersect = CheckCrossOfTwoLineSegs(lineSeg, lineSeg2);
+            LineSegment midwayLS = lineSegBuf.getElement(i);
+            bool isIntersect = CheckCrossOfTwoLineSegs(lineSeg, midwayLS);
             if(isIntersect)
             {
-                tieSet.push_back(Tie(lineSeg2, lineSeg));
+                revOrderSeenPts.push_back(midwayLS.sIdx);
+                // now, a fish has been hooked successfully
+                tieSet.push_back(Tie(revOrderSeenPts));
                 return true;
+            }
+            else // midway points and arcs, no intersection happened
+            {
+                revOrderSeenPts.push_back(midwayLS.sIdx);
             }
         }
     }
     else
     {
+        /*  这段代码以后需要时，再修改完善
         if(lineSegBuf.elementNum() <= 0)
             return false;
         
@@ -117,6 +131,7 @@ bool CheckCrossOfLineSegs(const LineSegment& lineSeg,
             if(isIntersect)
                 return true;
         }
+        */
     }
         
     return false;
@@ -146,8 +161,12 @@ void CheckTieOnContour(const CONTOUR& oriCont, int lineSegBufSize,
     }
 }
 
+/*
+ 新思路：将所有Tie上的MidWay点合并成一个组，它们成为被删除的点名单。然后，从头遍历OriCont，
+ 不在被删除名单上的点被保留，反之则被忽视掉。
+ */
 // clean up the points in ties recorded in tieGroup, produce a clean contour without ties.
-void DelTiesOnCont(const CONTOUR& oriCont, TieGroup& tieGroup, CONTOUR& cleanCont)
+void DelTiesOnContV2(const CONTOUR& oriCont, TieGroup& tieGroup, CONTOUR& cleanCont)
 {
     if(tieGroup.hasTie() == false)
     {
@@ -155,22 +174,39 @@ void DelTiesOnCont(const CONTOUR& oriCont, TieGroup& tieGroup, CONTOUR& cleanCon
         return;
     }
     
+    // the start and end points of Tie have been excluded from the black list
+    vector<int> ptBlackList;
+    UnionPtsOnTieGroup(tieGroup, ptBlackList);
+
     int numPt = static_cast<int>(oriCont.size());
 
-    int curPtIdx = 0;
-    while(curPtIdx <=numPt-1)
+    for(int i=0; i<numPt-1; i++)
     {
-        /*
-        Tie* pTie;
-        bool inTile = tieGroup.ptInTie(i, pTie);
-        if(!inTie)
-        {
-            cleanCont.push_back(oriCont[i]);
-        }
+        if(InBlackList(i, ptBlackList)) // in the black list
+            continue;
         else
+            cleanCont.push_back(oriCont[i]);
+    }
+}
+
+bool InBlackList(int ptIdx, const vector<int>& blackList)
+{
+    if(std::find(blackList.begin(), blackList.end(), ptIdx)
+        != blackList.end()) // in the black list
+        return true;
+    else
+        return false;
+}
+
+void UnionPtsOnTieGroup(const TieGroup& tieGroup, vector<int>& ptBlackList)
+{
+    for(Tie tie : tieGroup.ties)
+    {
+        // the start and end points should be excluded from the black list
+        int numPtInTie = tie.ptIdxs.size();
+        for(int i=1; i<=numPtInTie-2; i++)
         {
-            
+            ptBlackList.push_back(tie.ptIdxs[i]);
         }
-        */
     }
 }

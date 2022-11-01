@@ -261,7 +261,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     int numPts = acCts[0].size();
 
     CONTOUR sampPtCt;  // 稀疏化的轮廓点
-    int sampGap = 10;
+    int sampGap = 20;
     int numSampPt = numPts / sampGap;
     
     for(int i = 0; i < numSampPt; i++)
@@ -309,7 +309,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     // cornerField经过了反相，越接近peaks，值越小
     Mat cornerField = BuildGaussField(fieldW, fieldH, 7, peaks);
     
-    acAlg.optimize(acImg, cornerField, 15, 10);
+    acAlg.optimize(acImg, cornerField, 21, 10);
 
     CONTOUR finCt = acAlg.getOptimizedCont();
     //CONTOURS finCts;

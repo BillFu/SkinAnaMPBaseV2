@@ -4,7 +4,6 @@
 // Contains #define for algo info
 #include "tsparams.h"
 
-#ifdef ACTIVE_CONTOUR_ALG
 #include <set>
 #include <vector>
 #include <iterator>
@@ -45,9 +44,6 @@
     between two if the length between them
     are
 */
-#ifdef USE_AVERAGE_LENGTH_BISECTION
-    #define BISECT_WAIT 4
-#endif
 
 namespace cvalg
 {
@@ -125,7 +121,6 @@ private:
 void ShowMaxMinInRec(const std::vector<float>& rec,
                      const std::string& title);
 
-#endif // IFDEF ACTIVE_CONTOUR_ALG
 
 #endif // ACTIVE_CONTOURS_H
 

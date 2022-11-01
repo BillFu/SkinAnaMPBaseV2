@@ -48,6 +48,7 @@ struct LineSegment{
     }
 };
 
+/*
 // 用交叉的两段线段来表示Tie，其他点和线段目前用不到
 struct Tie{
     LineSegment lineSeg1;
@@ -65,6 +66,66 @@ struct Tie{
         output << "\tlineSeg2: " << tie.lineSeg2;
         output << "}" << endl;
         return output;
+    }
+};
+*/
+
+enum PtLocOnTie
+{
+    PT_OUT_TIE,  // Not on the tie
+    PT_START_TIE,
+    PT_MIDWAY_TIE,
+    PT_END_TIE
+};
+
+// 记录Tie上的点集，按扫描顺序
+struct Tie{
+    vector<int> ptIdxs;
+    
+    Tie()
+    {
+    }
+    
+    Tie(const vector<int>& revOrderPts)
+    {
+        int numPts = revOrderPts.size();
+        for(int i=numPts-1; i>=0; i--)
+        {
+            ptIdxs.push_back(revOrderPts[i]);
+        }
+    }
+    
+    bool isValid()
+    {
+        if(ptIdxs.size() >= 4)
+            return true;
+        else
+            return false;
+    }
+    
+    friend ostream &operator<<(ostream &output, const Tie& tie )
+    {
+        output << "Tie{" << endl;
+        //output << tie.ptIdxs;
+        output << "}" << endl;
+        return output;
+    }
+    
+    PtLocOnTie GetLocPt(int ptIdx)
+    {
+        if(!isValid())
+            return PT_OUT_TIE;
+        
+        if(std::find(ptIdxs.begin(), ptIdxs.end(), ptIdx) == ptIdxs.end())
+            return PT_OUT_TIE;
+        
+        int numPt = static_cast<int>(ptIdxs.size());
+        if(ptIdx == ptIdxs[0])
+            return PT_START_TIE;
+        else if(ptIdx == ptIdxs[numPt-1])
+            return PT_END_TIE;
+        else
+            return PT_MIDWAY_TIE;
     }
 };
 
@@ -85,6 +146,7 @@ struct TieGroup
     // 仅仅检查第一个Tie
     bool ptInTie(int idx, Tie*& pTie)
     {
+        /*
         if(getTieNum() == 0)
         {
             pTie = NULL;
@@ -101,6 +163,8 @@ struct TieGroup
             pTie = NULL;
             return false;
         }
+        */
+        return true;
     }
 };
 
@@ -209,6 +273,10 @@ bool CheckCrossOfLineSegs(const LineSegment& lineSeg,
 bool CheckCrossOfTwoLineSegs(const LineSegment& lineSeg1, const LineSegment& lineSeg2);
 
 // clean up the points in ties recorded in tieGroup, produce a clean contour without ties.
-void DelTiesOnCont(const CONTOUR& oriCont, TieGroup& tieGroup, CONTOUR& cleanCont);
+void DelTiesOnContV2(const CONTOUR& oriCont, TieGroup& tieGroup, CONTOUR& cleanCont);
+
+bool InBlackList(int ptIdx, const vector<int>& blackList);
+
+void UnionPtsOnTieGroup(const TieGroup& tieGroup, vector<int>& ptBlackList);
 
 #endif /* end of TIE_HPP */
