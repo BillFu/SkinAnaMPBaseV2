@@ -393,6 +393,7 @@ void DelTiesOnCont(const CONTOUR& oriCont, TieGroup& tieGroup, CONTOUR& cleanCon
     int curPtIdx = 0;
     while(curPtIdx <=numPt-1)
     {
+        /*
         Tie* pTie;
         bool inTile = tieGroup.ptInTie(i, pTie);
         if(!inTie)
@@ -403,5 +404,6 @@ void DelTiesOnCont(const CONTOUR& oriCont, TieGroup& tieGroup, CONTOUR& cleanCon
         {
             
         }
+        */
     }
 }
