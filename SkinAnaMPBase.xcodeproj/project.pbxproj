@@ -22,6 +22,8 @@
 		CB02B84F290677E9001F8E61 /* polyitems_fit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB02B84E290677E9001F8E61 /* polyitems_fit.cpp */; };
 		CB1E2AB928DD99AB00F416DF /* ForeheadMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB1E2AB728DD99AB00F416DF /* ForeheadMask.cpp */; };
 		CB255A9628C7237A005C8A81 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB255A9528C7237A005C8A81 /* main.cpp */; };
+		CB2F690D29125C4D00E35FC3 /* Chaikin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB2F690C29125C4C00E35FC3 /* Chaikin.cpp */; };
+		CB2F690E29125C5700E35FC3 /* Chaikin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB2F690C29125C4C00E35FC3 /* Chaikin.cpp */; };
 		CB3CACFE28F8ED04000A8BF0 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CBD123FD28E58EEB004A42A9 /* libtensorflowlite.so */; };
 		CB41C4E4290A79760012BC6A /* EyebrowMaskV7.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB41C4E2290A79760012BC6A /* EyebrowMaskV7.cpp */; };
 		CB4312AA28D41DDD006D71DA /* ParametricBSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB4312A828D41DDD006D71DA /* ParametricBSpline.cpp */; };
@@ -108,6 +110,8 @@
 		CB1E2AB828DD99AB00F416DF /* ForeheadMask.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ForeheadMask.hpp; sourceTree = "<group>"; };
 		CB255A9228C7237A005C8A81 /* SkinAnaMPBase */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SkinAnaMPBase; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB255A9528C7237A005C8A81 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		CB2F690B29125C4C00E35FC3 /* Chaikin.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Chaikin.hpp; sourceTree = "<group>"; };
+		CB2F690C29125C4C00E35FC3 /* Chaikin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Chaikin.cpp; sourceTree = "<group>"; };
 		CB3C248E28D00BA300804E6E /* libtensorflowlite.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtensorflowlite.so; path = SkinAnaMPBase/intel_lib/libtensorflowlite.so; sourceTree = "<group>"; };
 		CB41C4E2290A79760012BC6A /* EyebrowMaskV7.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EyebrowMaskV7.cpp; sourceTree = "<group>"; };
 		CB41C4E3290A79760012BC6A /* EyebrowMaskV7.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EyebrowMaskV7.hpp; sourceTree = "<group>"; };
@@ -241,6 +245,8 @@
 				CB4312A628D419A0006D71DA /* BSpline */,
 				CB45E23E28E54BA7004E8D25 /* Geometry.cpp */,
 				CB45E23D28E54BA7004E8D25 /* Geometry.hpp */,
+				CB2F690C29125C4C00E35FC3 /* Chaikin.cpp */,
+				CB2F690B29125C4C00E35FC3 /* Chaikin.hpp */,
 				CBD39AE92910B58700260263 /* Tie.cpp */,
 				CBD39AEA2910B58700260263 /* Tie.hpp */,
 				26E506B028D3665B000059DA /* LM_Loader.cpp */,
@@ -485,6 +491,7 @@
 				CBB5DB4028DD5E97003CDED3 /* SkinFeatureMask.cpp in Sources */,
 				CB9D430928F3F9DA00CD3B13 /* SegHelper.cpp in Sources */,
 				CB41C4E4290A79760012BC6A /* EyebrowMaskV7.cpp in Sources */,
+				CB2F690D29125C4D00E35FC3 /* Chaikin.cpp in Sources */,
 				CBD39AEB2910B58700260263 /* Tie.cpp in Sources */,
 				CB1E2AB928DD99AB00F416DF /* ForeheadMask.cpp in Sources */,
 				CBC3D53E290BCC810056D14E /* GaussField.cpp in Sources */,
@@ -511,6 +518,7 @@
 				CBD1240228E5994E004A42A9 /* Utils.cpp in Sources */,
 				CBD123FB28E58D12004A42A9 /* Geometry.cpp in Sources */,
 				CBD1240628E59A8C004A42A9 /* Batch.cpp in Sources */,
+				CB2F690E29125C5700E35FC3 /* Chaikin.cpp in Sources */,
 				CBD123F428E5880E004A42A9 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
