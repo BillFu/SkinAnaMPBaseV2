@@ -10,8 +10,9 @@ Date:   2022/10/27
 #include "EyebrowMaskV7.hpp"
 #include "../BSpline/ParametricBSpline.hpp"
 #include "FundamentalMask.hpp"
-#include "Geometry.hpp"
-#include "Common.hpp"
+#include "../Geometry.hpp"
+#include "../Chaikin.hpp"
+#include "../Common.hpp"
 
 #include "../FaceBgSeg/FaceBgSegV2.hpp"
 #include "../Snake/activecontours.h"
@@ -339,9 +340,22 @@ void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
                          segRst.lEyeMaskNOS, segRst.lEyeFPs,
                          segRst.lEyeSegCP, leftEyePg);
     
+    /*
+    POLYGON smLEyePg, smREyePg;
+    int shortThresh = 2;
+    int iterTimes = 4;
+    SmoothContourCK(rightEyePg, shortThresh,
+                    iterTimes, smREyePg);
+    SmoothContourCK(leftEyePg, shortThresh,
+                    iterTimes, smLEyePg);
     POLYGON_GROUP polygonGroup;
-    polygonGroup.push_back(leftEyePg);
+    polygonGroup.push_back(smLEyePg);
+    polygonGroup.push_back(smREyePg);
+    */
+    
+    POLYGON_GROUP polygonGroup;
     polygonGroup.push_back(rightEyePg);
+    polygonGroup.push_back(leftEyePg);
     
     //Mat outOrigMask = ContourGroup2Mask(srcImgS.width, srcImgS.height, polygonGroup);
     outMask = ContourGroup2Mask(srcImgS.width, srcImgS.height, polygonGroup);
