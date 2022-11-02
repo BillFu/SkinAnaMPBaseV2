@@ -104,4 +104,8 @@ void IpPtViaS(const Point2i& uPt, const Point2i& lPt,
 // 重新采样，使得新获得的点在S范围内均匀分布。
 void MakePtsEvenWithS(const CONTOUR& cont, int newNumPt, CONTOUR& evenCont);
 
+//-------------------------------------------------------------------------------------------
+float EstCurvate(const Point2i& p1, const Point2i& p2, const Point2i& p3);
+void EstMeanCurvateOfCt(const CONTOUR& cont, float& meanCurv, vector<float> curvList);
+
 #endif /* end of GEOMETRY_HPP */

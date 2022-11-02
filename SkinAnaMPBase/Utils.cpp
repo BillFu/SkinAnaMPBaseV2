@@ -244,3 +244,13 @@ Point2i convSrcPt2SegNetPt(const Size& srcImgS, const Point2i& srcPt)
 
     return Point2i(segNetX, segNetY);
 }
+
+template<typename T>
+T stddev(std::vector<T> const & func)
+{
+    T mean = std::accumulate(func.begin(), func.end(), 0.0) / func.size();
+    T sq_sum = std::inner_product(func.begin(), func.end(), func.begin(), 0.0,
+        [](T const & x, T const & y) { return x + y; },
+        [mean](T const & x, T const & y) { return (x - mean)*(y - mean); });
+    return std::sqrt(sq_sum / func.size());
+}

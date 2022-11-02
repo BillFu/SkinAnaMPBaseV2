@@ -312,3 +312,32 @@ void MakePtsEvenWithS(const CONTOUR& oriCont, int newNumPt, CONTOUR& evenCont)
         }
     }
 }
+
+//-------------------------------------------------------------------------------------------
+
+float EstCurvate(const Point2i& p1, const Point2i& p2, const Point2i& p3)
+{
+    Point2i delta = p1 + p3 - p2*2;
+    float numerator = LenOfVector(delta);
+    float dominator = DisBetw2Pts(p1, p2) + DisBetw2Pts(p2, p3);
+
+    return numerator / dominator;
+}
+
+void EstMeanCurvateOfCt(const CONTOUR& cont, float& meanCurv,
+                        vector<float> curvList)
+{
+    int N = static_cast<int>(cont.size());
+    if(N < 3)
+        meanCurv = 0.0;
+    
+    float sumCurvate = 0.0;
+    for(int i=1; i<=N-2; i++)
+    {
+        float K = EstCurvate(cont[i-1], cont[i], cont[i+1]);
+        curvList.push_back(K);
+        sumCurvate += K;
+    }
+    
+    meanCurv = sumCurvate / (N-2);
+}
