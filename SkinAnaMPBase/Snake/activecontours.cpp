@@ -23,11 +23,6 @@ vector<Point> ActiveContours::getOptimizedCont()
     return _points;
 }
 
-void ActiveContours::setParams(AlgoParams* params)
-{
-    _params = params;
-}
-
 void ActiveContours::init(int iw, int ih)
 {
     _w = iw;
@@ -162,6 +157,14 @@ void ActiveContours::BuildNeigArea(int ptIndex, int viewRadius,
     endPt   = Point2i(endx, endy);
 }
 
+void ActiveContours::UpdateAmpCoeff(const Energy& energy, AmpCoeff& ampCoeff)
+{
+    ampCoeff.alpha = 1.5*energy.Eunwtol / (energy.Econt + 0.0001);
+    ampCoeff.beta = energy.Eunwtol / (energy.Ecurv + 0.0001);
+    ampCoeff.gamma = 0.3* energy.Eunwtol / (energy.Eedge + 0.0001);
+    ampCoeff.lambda = energy.Eunwtol / (energy.Ecor + 0.0001);
+}
+
 void ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
                                      int viewRadius,
                                      int iterTimes)
@@ -177,14 +180,22 @@ void ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
     //  - Inside the pack is frame (Mat), contours (vector<Point>)
     //      angleAvailable (bool) to indicate if angle is calcd
     //      angles (vector<float>) giving the angles of the contours
-    sobelPack sobelEdges = FullSobel(inImg,
-                                     _params->getSobelThreash(),
-                                     _params->getSobelAngle(),
-                                     _params->getSobelDeadSpace());
+    int sobelThresh = 120;
+    sobelPack sobelEdges = FullSobel(inImg, sobelThresh);
     
     //imwrite("sobel.png", sobelEdges.frame);
     
     // For each snake point
+    // every point has its own AmpCoeff and will be changed during the iterations
+    int numPts = static_cast<int>(_points.size());
+    vector<AmpCoeff> ampCoeffList;
+    ampCoeffList.reserve(numPts);
+    for(int i=0; i<numPts; i++)
+    {
+        AmpCoeff coeff;
+        ampCoeffList.push_back(coeff);
+    }
+
     for(int k=0; k<iterTimes; k++)
     {
         //----------start to debug--------------------------------------------
@@ -200,19 +211,22 @@ void ActiveContours::optimize(const Mat& inImg, const Mat& cornerField,
         imwrite(outFile, canvas);
         //---------end of debugging-------------------------------------------
         
-        //vector<float> EcontRec, EcurvRec, EedgeRec, EcorRec,EtotalRec;
-        float destEcont, destEcurv, destEedge, destEcor;
+        vector<Energy> EnergeRec;
+        Energy destEnergy;
         for(int i = 0; i < static_cast<int>(_points.size()); i++)
         {
             Point2i startPt, endPt;
             BuildNeigArea(i, viewRadius, startPt, endPt);
             
             _points[i] = updatePosV2(i, startPt, endPt, sobelEdges.frame, cornerField,
-                                     MaxEcont, MaxEcurv,
-                                     destEcont, destEcurv, destEedge, destEcor);
+                                     MaxEcont, MaxEcurv, ampCoeffList[i], destEnergy);
+            EnergeRec.push_back(destEnergy);
+            
+            // update amplifying coefficient
+            UpdateAmpCoeff(destEnergy, ampCoeffList[i]);
         }
         
-        cout << "--------------------------------" << k << "-----------------------------------" << endl;
+        //cout << "--------------------------------" << k << "-----------------------------------" << endl;
         // output the average value of all energy components in current epoch
         //ShowECompData(EcontRec, EcurvRec, EedgeRec, EcorRec);
         
@@ -246,96 +260,14 @@ bool ActiveContours::minimumRunReqSet()
     return false;
 }
 
-// pointIndex: 当前被扫描点在轮廓序列中的索引
 /*
- Econt为正值，越小表示轮廓线越短，形状越紧致，越成团状。
- Ecurv为正值，越小表示曲率越小，越光滑；越大表示形状越复杂，振荡越严重。
- Eedge被人为设置为负值，越小表示此处为边缘的概率大，越接近0，表示越为内部的灰度均匀点。
- Eedge也变化为正值，越小表示此处为边缘的概率大；越大，表示越为内部的灰度均匀点。
- Ecor正值，但被反相，越大表示越不可能为角点；越小表示越接近角点。
+ destUnwTolE: 未加权获得的总能量。
+ destWTolE:  加权之后计算出的总能量。
  */
-Point ActiveContours::updatePos(int ptIndex, Point start, Point end,
-                                const Mat& edgeImage, const Mat& cornerField,
-                                float MaxEcont, float MaxEcurv,
-                                vector<float>& EcontRec,
-                                vector<float>& EcurvRec,
-                                vector<float>& EedgeRec,
-                                vector<float>& EcorRec,
-                                vector<float>& EtotalRec)
-{
-    int cols = end.x - start.x;
-    int rows = end.y - start.y;
-
-    //int numPt = static_cast<int>(_points.size());
-   
-    // Update the average dist
-    _avgDist = AvgPointDist(_points);
-
-    Rect ROI(start, end);
-    
-    // 在轮廓线上当前点的前一个被扫描点
-    Point prevPt = GetPrevPt(ptIndex);
-    Point nextPt = GetNextPt(ptIndex);
-    
-    // Location of point in center of neighborhood
-    Point minLoc = _points[ptIndex]; // minLoc also be the new destionation
-    float minEnerge = 999999;
-    // 逐个遍历当前点的邻域
-    for(int y = 0; y < rows-1; y ++)
-    {
-        for(int x = 0; x < cols-1; x++)
-        {
-            /* E = ∫(α(s)Econt + β(s)Ecurv + γ(s)Eimage)ds */
-            // X,Y Location in image
-            Point2i curNeibPt = start + Point2i(x, y);
-            float Econt = CalcEcont(prevPt, curNeibPt, _avgDist);
-            Econt /= MaxEcont;
-            EcontRec.push_back(Econt);
-
-            // Multiply by alpha
-            Econt *= _params->getAlpha();
-            
-            float Ecurv = CalcEcurv(prevPt, curNeibPt, nextPt);
-            Ecurv /= MaxEcurv;
-            EcurvRec.push_back(Ecurv);
-            Ecurv *= _params->getBeta();
-
-            /*  Eimage: -||∇||
-                Gradient magnitude encoded in pixel information
-                    - May want to change this 'feature' */
-            float Eedge = (float)edgeImage.at<uchar>(curNeibPt);
-            // divisor never be zero for specical processing has been taken ahead.
-            //int divisor = edgeMax - edgeMin;
-            //Eedge = (Eedge - edgeMin) / divisor; // make it in [0, 1] after normalization
-            //then add minus sign before it
-            Eedge = 1.0 - Eedge/255.0; // make it in the interval: [0, 1]
-            EedgeRec.push_back(Eedge);
-            Eedge *= _params->getGama();
-            
-            float Ecor = cornerField.at<float>(curNeibPt); // already lies in [0.0, 1.0]
-            EcorRec.push_back(Ecor);
-            Ecor *= _params->_lambda;
-
-            float Energy = Econt + Ecurv + Eedge + Ecor;
-            EtotalRec.push_back(Energy);
-            if (Energy < minEnerge)
-            {
-                minEnerge = Energy;
-                minLoc = curNeibPt;
-            }
-        }
-    }
-
-    // Return The (new) location
-    return minLoc;
-}
-
-
-Point ActiveContours::updatePosV2(int ptIndex, Point start, Point end,
+Point ActiveContours:: updatePosV2(int ptIndex, Point start, Point end,
                 const Mat& edgeImage, const Mat& cornerField,
                 float MaxEcont, float MaxEcurv,
-                float& destEcont, float& destEcurv,
-                float& destEedge, float& destEcor )
+                const AmpCoeff& ampCoeff, Energy& destEnerge)
 {
     int cols = end.x - start.x;
     int rows = end.y - start.y;
@@ -375,17 +307,15 @@ Point ActiveContours::updatePosV2(int ptIndex, Point start, Point end,
             
             float Ecor = cornerField.at<float>(curNeibPt); // already lies in [0.0, 1.0]
 
-            float Energy = Econt*_params->getAlpha() + Ecurv*_params->getBeta()
-                            + Eedge*_params->getGama() + Ecor*_params->_lambda;
+            float UnwEnergy = Econt + Ecurv + Eedge + Ecor;
+            float Energy = Econt* ampCoeff.alpha + Ecurv*ampCoeff.beta +
+                Eedge*ampCoeff.gamma + Ecor*ampCoeff.lambda;
             if (Energy < minEnerge)
             {
                 minEnerge = Energy;
                 minLoc = curNeibPt;
                 
-                destEcont = Econt;
-                destEcurv = Ecurv;
-                destEedge = Eedge;
-                destEcor = Ecor;
+                destEnerge.SetValues(Econt, Ecurv, Eedge, Ecor, UnwEnergy, Energy);
             }
         }
     }

@@ -216,7 +216,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     initEyePgBBox = initEyePgBBox | eyeMaskBBox;
 
     // make initEyePgBBox enlarged
-    int padSize = 20;
+    int padSize = 12;
     InflateRect(padSize, initEyePgBBox);
 
     Mat workImg(initEyePgBBox.size(), CV_8UC1, Scalar(0));
@@ -261,7 +261,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     double S = arcLength(acCts[0], true);
     cout << "arcLen: " << S << endl;
 
-    int viewRadius = 11;
+    int viewRadius = 13;
     int gap = 2*viewRadius + 1;
     int numPts = (int)(S / gap);
     
@@ -282,10 +282,7 @@ void ForgeEyePgBySnakeAlg(Size srcImgS,
     
     //--------------------------------------------------------------
     cvalg::ActiveContours acAlg;
-    AlgoParams ap;
-    ap._nPoints = static_cast<int>(evenCont.size());
-    acAlg.setParams(&ap);
-
+    
     Mat acImg(initEyePgBBox.size(), CV_8UC1, Scalar(0));
     segEyeMaskSS.copyTo(acImg(relativeRect)); // 将segEyeMask复写到acImg
     
@@ -346,15 +343,17 @@ void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
     polygonGroup.push_back(leftEyePg);
     polygonGroup.push_back(rightEyePg);
     
-    Mat outOrigMask = ContourGroup2Mask(srcImgS.width, srcImgS.height, polygonGroup);
-    
+    //Mat outOrigMask = ContourGroup2Mask(srcImgS.width, srcImgS.height, polygonGroup);
+    outMask = ContourGroup2Mask(srcImgS.width, srcImgS.height, polygonGroup);
+    /*
     int dila_size = segRst.faceBBox.width * 0.005;
     Mat element = getStructuringElement(MORPH_ELLIPSE,
                            Size(2*dila_size + 1, 2*dila_size+1),
                            Point(dila_size, dila_size));
     
-    cv::Mat outExpandedMask(srcImgS.height, srcImgS.width, CV_8UC1, cv::Scalar(0));
-    dilate(outOrigMask, outMask, element);
+    //cv::Mat outExpandedMask(srcImgS.height, srcImgS.width, CV_8UC1, cv::Scalar(0));
+    //dilate(outOrigMask, outMask, element);
     
     //outMask = ContourGroup2Mask(faceInfo.srcImgS, polygonGroup);
+     */
 }

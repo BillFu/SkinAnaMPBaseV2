@@ -51,6 +51,45 @@ namespace cvalg
 using namespace cv;
 using namespace std;
 
+struct Energy
+{
+    float Econt;
+    float Ecurv;
+    float Eedge;
+    float Ecor;
+    float Eunwtol; // unweighted total
+    float Ewtol;  // weighted total
+    
+    void SetValues(float Econt0, float Ecurv0, float Eedge0,
+                   float Ecor0, float Eunwtol0, float Ewtol0)
+    {
+        Econt = Econt0;
+        Ecurv = Ecurv0;
+        Eedge = Eedge0;
+        Ecor = Ecor0;
+        Eunwtol = Eunwtol0; // unweighted total
+        Ewtol = Ewtol0;
+    }
+};
+
+struct AmpCoeff // amplifying coefficient
+{
+    float alpha;
+    float beta;
+    float gamma;
+    float lambda;
+    
+    AmpCoeff()
+    {
+        alpha = 1.0;
+        beta = 1.0;
+        gamma = 1.0;
+        lambda = 1.0;
+    }
+};
+
+
+
 class ActiveContours
 {
 public:
@@ -64,15 +103,11 @@ public:
     bool minimumRunReqSet();
     Mat drawSnake(Mat frame);
     
-    void setParams(AlgoParams* params);
-
     bool previously_reset;
     
     vector<Point> getOptimizedCont();
 
 private:
-    AlgoParams* _params;
-
     int _w, _h;
     Point _center;
     CONTOUR _points;
@@ -84,24 +119,12 @@ private:
 
     Point2i GetPrevPt(int ptIndex);
     Point2i GetNextPt(int ptIndex);
-
-    Point updatePos(int ptIndex, Point start, Point end,
-                    const Mat& edgeImage, const Mat& cornerField,
-                    float MaxEcont, float MaxEcurv,
-                    vector<float>& EcontRec,
-                    vector<float>& EcurvRec,
-                    vector<float>& EedgeRec,
-                    vector<float>& EcorRec,
-                    vector<float>& EtotalRec);
     
     Point updatePosV2(int ptIndex, Point start, Point end,
-                    const Mat& edgeImage, const Mat& cornerField,
-                    float MaxEcont, float MaxEcurv,
-                    float& destEcont, float& destEcurv,
-                    float& destEedge, float& destEcor);
-    
-    //void AvgPointDist();
-    
+                      const Mat& edgeImage, const Mat& cornerField,
+                      float MaxEcont, float MaxEcurv,
+                      const AmpCoeff& ampCoeff, Energy& destEnerge);
+        
     // 估算E的各分量的大致取值（是各点取最大值，还是取平均值？）
     // 这个操作在优化开始前利用初始数据来完成
     void estiEnergeComponents(float& MaxEcont, float& MaxEcurv);
@@ -120,6 +143,8 @@ private:
     
     void BuildNeigArea(int ptIndex, int viewRadius,
                        Point2i& startPt, Point2i& endPt);
+    
+    void UpdateAmpCoeff(const Energy& energy, AmpCoeff& ampCoeff);
 
 };
 }

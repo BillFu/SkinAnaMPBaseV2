@@ -18,6 +18,7 @@
 
 using namespace cv;
 
+
 struct sobelPack
 {
     // Image returned
@@ -25,14 +26,8 @@ struct sobelPack
 
     // Points of interedt
     std::vector<Point> contours;
-
-    // Angles of line at point matching
-    std::vector<float> angles;
-
-    // Signifies if angle was calculated
-    bool angleAvailable;
 };
 
-sobelPack FullSobel(Mat frame, int thresh, bool calcAngle, bool deadSpace);
+sobelPack FullSobel(const Mat& gray, int sobelThresh);
 
 #endif // SOBEL_H

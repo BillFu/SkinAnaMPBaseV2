@@ -7,7 +7,7 @@
     1, 0,-1        -1,-2,-1
 */
 
-sobelPack FullSobel(Mat gray, int thresh, bool calcAngle, bool deadSpace)
+sobelPack FullSobel(const Mat& gray, int sobelThresh)
 {
     int reservedSpace = (gray.cols*gray.rows)/2;
 
@@ -16,16 +16,6 @@ sobelPack FullSobel(Mat gray, int thresh, bool calcAngle, bool deadSpace)
     //gray.copyTo(data.frame);
     data.frame = Mat(gray.size(), CV_8UC1, Scalar(0));
     data.contours.reserve(reservedSpace);
-
-    if(calcAngle)
-    {
-        data.angleAvailable = true;
-        data.angles.reserve(reservedSpace);
-    }
-    else
-    {
-        data.angleAvailable = false;
-    }
 
     for(int x = 1; x < gray.rows-2; x++)
     {
@@ -54,9 +44,8 @@ sobelPack FullSobel(Mat gray, int thresh, bool calcAngle, bool deadSpace)
             if(value > 255)
                 value = 255;
 
-            if(value >= thresh)
+            if(value >= sobelThresh)
             {
-                data.contours.push_back(Point(x,y));
                 data.frame.at<uchar>(x,y) = value;
             }
             

@@ -39,11 +39,11 @@
 #define DRAW_POINTS         1
 #define DRAW_NEIGHBORS
 
-// Required
-#define CONTOUR_ALPHA       0.5   //越小，轮廓线越短，越紧致
-#define CONTOUR_BETA        0.3   //越大，才能放大曲率的差异，曲率越小越光滑
+// 这是初始的参考基准值，在迭代过程中，与之关联的变量的值会随位置和时间而动态变化。
+#define CONTOUR_ALPHA       1.0   //越小，轮廓线越短，越紧致
+#define CONTOUR_BETA        1.0   //越大，才能放大曲率的差异，曲率越小越光滑
 #define CONTOUR_GAMMA       1.0   //越大，越贴近边缘
-#define CONTOUR_LAMBDA      2.2   //越大，越靠近角点
+#define CONTOUR_LAMBDA      1.0   //越大，越靠近角点
 
 #define MINIMUM_POINTS      4
 #define CONTOUR_START_POINT 200
