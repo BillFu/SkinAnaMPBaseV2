@@ -267,3 +267,16 @@ float stddev_float(vector<float> const & func)
         [mean](float const & x, float const & y) { return (x - mean)*(y - mean); });
     return std::sqrt(sq_sum / func.size());
 }
+
+CONTOUR ComTwoArcs2Cont(const CONTOUR arc1, const CONTOUR arc2)
+{
+    CONTOUR mergeCt(arc1);
+        
+    // combine lower curve and upper curve into one complete contour
+    for(int i=0; i<arc2.size(); i++)
+    {
+        mergeCt.push_back(arc2[i]);
+    }
+
+    return mergeCt;
+}

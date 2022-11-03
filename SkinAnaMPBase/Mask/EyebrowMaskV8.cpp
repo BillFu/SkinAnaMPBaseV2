@@ -12,6 +12,7 @@ Date:   2022/11/3
 #include "../Geometry.hpp"
 #include "../Chaikin.hpp"
 #include "../Common.hpp"
+#include "../Utils.hpp"
 
 #include "../FaceBgSeg/FaceBgSegV2.hpp"
 #include "EyebrowMaskV8.hpp"
@@ -196,87 +197,34 @@ void ForgeInitEyePg(const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
 // forge the polygong of one eye, only use the result of face/bg segment
 void ForgeEyePg(Size srcImgS, const SegMask& eyeSegMask,
                 const EyeSegFPs& eyeFPs,
-                const Mat& srcImage,
-                const string& outFileName)
+                CONTOUR& smEyeCt)
 {
     CONTOURS contours;
     findContours(eyeSegMask.mask, contours,
                      cv::noArray(), RETR_EXTERNAL, CHAIN_APPROX_NONE);
-    
-    //findContours(eyeSegMask.mask, contours,
-    //                 cv::noArray(), RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-  
-    //cout << "The Number of Points on the contour of eye: "
-    //    << contours[0].size() << endl;
 
     CONTOUR ssEyeCt; // in Source Space
     transCt_LocalSegNOS2SS(contours[0], eyeSegMask.bbox.tl(),
                     srcImgS, ssEyeCt);
-    
-    Mat canvas = srcImage.clone();
-    //CONTOURS curCts;
-    //curCts.push_back(_points);
-    //drawContours(canvas, curCts, 0, Scalar(150), 2);
-    
+        
     CONTOUR upEyeCurve, lowEyeCurve;
     SplitEyeCt(ssEyeCt,eyeFPs.lCorPt, eyeFPs.rCorPt,
                 upEyeCurve, lowEyeCurve);
     
     CONTOUR smUpEyeCurve;
     SmCurveByFit(upEyeCurve, smUpEyeCurve);
-    //SmoothCtByPIFit(upEyeCurve, smUpEyeCurve);
 
     CONTOUR smLowEyeCurve;
     SmCurveByFit(lowEyeCurve, smLowEyeCurve);
-    //SmoothCtByPIFit(lowEyeCurve, smLowEyeCurve);
-    for(int i = 0; i < lowEyeCurve.size(); i++)
-    {
-        cv::circle(canvas, lowEyeCurve[i], 1, Scalar(150, 200, 50), cv::FILLED);
-    }
-    /*
-    for(int i = 0; i < lowEyeCurve.size(); i++)
-    {
-        cv::circle(canvas, lowEyeCurve[i], 1, Scalar(150, 200, 50), cv::FILLED);
-    }
-    */
     
-    //Mat canvas = srcImage.clone();
-    polylines(canvas, smUpEyeCurve, false,
-                  Scalar(0, 0, 255), 2, 8);
-    
-    polylines(canvas, smLowEyeCurve, false,
-                  Scalar(0, 0, 255), 2, 8);
-    
-    imwrite(outFileName, canvas);
+    // combine tow arcs into one closed contour
+    CONTOUR combEyeCt = ComTwoArcs2Cont(smLowEyeCurve, smUpEyeCurve);
+
+    CONTOUR sparCont;
+    SparsePtsOnContV2(combEyeCt, 0.25, sparCont);
+    SmoothContourCK(sparCont, 2,
+                    3, smEyeCt);
 }
-
-/*
-// forge the polygong of one eye, only use the result of face/bg segment
-void ForgeEyePgV2(Size srcImgS, const SegMask& eyeSegMask,
-                  const SegEyeFPsNOS& eyeFPsNOS,
-                const Mat& srcImage,
-                const string& outFileName)
-{
-    CONTOURS contours;
-    findContours(eyeSegMask.mask, contours,
-                     cv::noArray(), RETR_EXTERNAL, CHAIN_APPROX_NONE);  //CHAIN_APPROX_SIMPLE);
-    
-    Point2i lLocCorPtNOS = eyeFPsNOS.lCorPtNOS - eyeSegMask.bbox.tl();
-    Point2i rLocCorPtNOS = eyeFPsNOS.rCorPtNOS - eyeSegMask.bbox.tl();
-    
-    CONTOUR upEyeCurLocNOS, lowEyeCurLocNOS;
-    SplitEyeCt(contours[0],
-               lLocCorPtNOS, rLocCorPtNOS,
-               upEyeCurLocNOS, lowEyeCurLocNOS);
-        
-    CONTOUR smUpEyeCurve;
-    SmoothCtByPIFitV2(upEyeCurLocNOS, smUpEyeCurve);
-
-    CONTOUR smLowEyeCurve;
-    SmoothCtByPIFitV2(lowEyeCurLocNOS, smLowEyeCurve);
-
-}
-*/
 
 void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
                    const FaceInfo& faceInfo,
@@ -287,19 +235,8 @@ void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
 
     Size srcImgS = faceInfo.srcImgS;
     
-    ForgeEyePg(srcImgS, segRst.lEyeMaskNOS, segRst.lEyeFPs,
-               srcImage, "leftSmCurve.png");
-    ForgeEyePg(srcImgS, segRst.rEyeMaskNOS, segRst.rEyeFPs,
-               srcImage, "rightSmCurve.png");
-
-    
-    /*
-    POLYGON smLEyePg, smREyePg;
-    
-    POLYGON_GROUP polygonGroup;
-    polygonGroup.push_back(smLEyePg);
-    polygonGroup.push_back(smREyePg);
-    */
+    ForgeEyePg(srcImgS, segRst.lEyeMaskNOS, segRst.lEyeFPs, leftEyePg);
+    ForgeEyePg(srcImgS, segRst.rEyeMaskNOS, segRst.rEyeFPs, rightEyePg);
     
     POLYGON_GROUP polygonGroup;
     polygonGroup.push_back(rightEyePg);
@@ -307,48 +244,5 @@ void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
     
     //Mat outOrigMask = ContourGroup2Mask(srcImgS.width, srcImgS.height, polygonGroup);
     outMask = ContourGroup2Mask(srcImgS.width, srcImgS.height, polygonGroup);
-    /*
-    int dila_size = segRst.faceBBox.width * 0.005;
-    Mat element = getStructuringElement(MORPH_ELLIPSE,
-                           Size(2*dila_size + 1, 2*dila_size+1),
-                           Point(dila_size, dila_size));
-    
-    //cv::Mat outExpandedMask(srcImgS.height, srcImgS.width, CV_8UC1, cv::Scalar(0));
-    //dilate(outOrigMask, outMask, element);
-    
-    //outMask = ContourGroup2Mask(faceInfo.srcImgS, polygonGroup);
-     */
 }
 
-/*
-void ForgeEyesMaskV2(const Mat& srcImage, // add this variable just for debugging
-                   const FaceInfo& faceInfo,
-                   const FaceSegRst& segRst, //Rst: result,
-                   Mat& outMask)
-{
-    POLYGON leftEyePg, rightEyePg;
-
-    Size srcImgS = faceInfo.srcImgS;
-    
-    ForgeEyePgV2(srcImgS, segRst.lEyeMaskNOS, segRst.lEyeFPsNOS,
-               srcImage, "leftSmCurve.png");
-    ForgeEyePgV2(srcImgS, segRst.rEyeMaskNOS, segRst.rEyeFPsNOS,
-               srcImage, "rightSmCurve.png");
-
-    
-    POLYGON smLEyePg, smREyePg;
-    
-    POLYGON_GROUP polygonGroup;
-    polygonGroup.push_back(smLEyePg);
-    polygonGroup.push_back(smREyePg);
-
-    
-    POLYGON_GROUP polygonGroup;
-    polygonGroup.push_back(rightEyePg);
-    polygonGroup.push_back(leftEyePg);
-    
-    //Mat outOrigMask = ContourGroup2Mask(srcImgS.width, srcImgS.height, polygonGroup);
-    outMask = ContourGroup2Mask(srcImgS.width, srcImgS.height, polygonGroup);
-    
-}
-*/

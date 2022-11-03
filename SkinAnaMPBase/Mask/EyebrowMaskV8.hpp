@@ -58,13 +58,7 @@ void ForgeEyesMask(const Mat& srcImage,
 
 // forge the polygong of one eye, only use the result of face/bg segment
 void ForgeEyePg(Size srcImgS, const SegMask& eyeSegMask,
-                const EyeSegFPs& eyeFPs,
-                const Mat& srcImage,
-                const string& outFileName);
+                const EyeSegFPs& eyeFPs, CONTOUR& smEyeCt);
 
-void ForgeEyePgV2(Size srcImgS, const SegMask& eyeSegMask,
-                  const SegEyeFPsNOS& eyeFPsNOS,
-                const Mat& srcImage,
-                  const string& outFileName);
 
 #endif /* end of EYEBROW_MASK_V8_HPP */

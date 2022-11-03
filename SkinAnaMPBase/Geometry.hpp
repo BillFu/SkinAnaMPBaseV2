@@ -97,6 +97,8 @@ float LenOfVector(const Point& vect);
 //-------------------------------------------------------------------------------------------
 float AvgPointDist(const CONTOUR& cont);
 
+float MaxPointDist(const CONTOUR& cont);
+
 // S: 弧长
 void IpPtViaS(const Point2i& uPt, const Point2i& lPt,
               float upS, float lowS, float interS, Point2i& outPt);
@@ -109,4 +111,9 @@ float EstCurvate(const Point2i& p1, const Point2i& p2, const Point2i& p3);
 
 void EstMeanStdevCurvateOfCt(const CONTOUR& cont, float& meanCurv,
                              float& stdevCurv, vector<float>& curvList);
+
+// 思路：计算轮廓上的最大点距，MaxDis，设定阈值: Th = MaxDis*alpha,
+// 将间隔小于Th的点给删掉，获得稀疏化的轮廓。
+void SparsePtsOnContV2(const CONTOUR& oriCont, float alpha, CONTOUR& sparCont);
+
 #endif /* end of GEOMETRY_HPP */

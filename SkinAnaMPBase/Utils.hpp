@@ -16,6 +16,8 @@ Date:   2022/9/11
 
 #include "opencv2/opencv.hpp"
 
+#include "Common.hpp"
+
 using namespace std;
 using namespace cv;
 
@@ -79,5 +81,6 @@ Point2i convSrcPt2SegNetPt(const Size& srcImgS, const Point2i& srcPt);
 
 float stddev_float(vector<float> const & func);
 
+CONTOUR ComTwoArcs2Cont(const CONTOUR arc1, const CONTOUR arc2);
 
 #endif /* end of UTILS_HPP */

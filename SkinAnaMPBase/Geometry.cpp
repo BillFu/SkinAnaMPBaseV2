@@ -246,6 +246,25 @@ float AvgPointDist(const CONTOUR& cont)
     return avgDist;
 }
 
+float MaxPointDist(const CONTOUR& cont)
+{
+    int numPt = static_cast<int>(cont.size());
+    if(numPt <= 1)
+        return 0.0;
+    
+    float maxDis = 0.0;
+    for(int i = 0; i <=numPt-1; i++)
+    {
+        int nextID = (i + 1) % numPt;
+        float dis = DisBetw2Pts(cont[i], cont[nextID]);
+        
+        if(maxDis < dis)
+            maxDis = dis;
+    }
+    
+    return maxDis;
+}
+
 // Ip: abbr. of Interpolate
 void IpPtViaS(const Point2i& uPt, const Point2i& lPt,
               float upS, float lowS, float interS, Point2i& outPt)
@@ -347,4 +366,35 @@ void EstMeanStdevCurvateOfCt(const CONTOUR& cont, float& meanCurv,
     
     float Ssq = (sumCurvSq - (N-2) * meanCurv * meanCurv) / (N-2);
     stdevCurv = sqrt(Ssq);
+}
+
+// 思路：计算轮廓上的最大点距，MaxDis，设定阈值: Th = MaxDis*alpha,
+// 将间隔小于Th的点给删掉，获得稀疏化的轮廓。
+void SparsePtsOnContV2(const CONTOUR& oriCont, float alpha, CONTOUR& sparCont)
+{
+    float maxDist = MaxPointDist(oriCont);
+    float shortThresh = maxDist * alpha;
+    
+    int numPt = static_cast<int>(oriCont.size());
+
+    for(int i=0; i<numPt; i++)
+    {
+        int prevID = (i + numPt - 1) % numPt;
+        Point2i prevPt = oriCont[prevID];
+        int nextID = (i + 1) % numPt;
+        Point2i nextPt = oriCont[nextID];
+        
+        float dist0 = DisBetw2Pts(prevPt, oriCont[i]);
+        //float dist1 = DisBetw2Pts(oriCont[i], nextPt);
+        
+        if(dist0 <= shortThresh) // && dist1 <= shortThresh)
+        {
+            //cout << "a point deleted!" << endl;
+            continue;
+        }
+        else
+        {
+            sparCont.push_back(oriCont[i]);
+        }
+    }
 }
