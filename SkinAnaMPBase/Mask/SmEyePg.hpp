@@ -35,4 +35,6 @@ void FindNearestPtOnCt(const CONTOUR& EyeCont, const Point2i& refPt,
 
 void SmCurveByFit(const CONTOUR& EyeCont, CONTOUR& smCont);
 
+void DelHighCurvPtsOnCurve(const CONTOUR& EyeCurve, CONTOUR& trimCurve);
+
 #endif /* end of SM_EYE_PG_HPP */

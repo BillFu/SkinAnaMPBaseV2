@@ -76,7 +76,8 @@ Point2i convSegNetPt2SrcPt(const Size& srcImgS, const Point2i& snPt);
 Point2i convSrcPt2SegNetPt(const Size& srcImgS, const Point2i& srcPt);
 
 //-------------------------------------------------------------------------------------------
-template<typename T>
-T stddev(std::vector<T> const & func);
+
+float stddev_float(vector<float> const & func);
+
 
 #endif /* end of UTILS_HPP */

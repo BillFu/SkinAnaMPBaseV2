@@ -17,7 +17,6 @@
 		2680A22F28EFC55A00A305EB /* FaceLmExtractV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2680A22C28EFC54B00A305EB /* FaceLmExtractV2.cpp */; };
 		26B65A5E28EA92900019104F /* LowerFaceMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B65A5C28EA92900019104F /* LowerFaceMask.cpp */; };
 		26B65A5F28EA983E0019104F /* LowerFaceMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B65A5C28EA92900019104F /* LowerFaceMask.cpp */; };
-		26D773AB29129DE00051177F /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 265B7B9728E5B26D004F5E49 /* libtensorflowlite.so */; };
 		26D773AE2912A1450051177F /* SmEyePg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D773AC2912A1450051177F /* SmEyePg.cpp */; };
 		26DB15F528D69DEE00F195CF /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 2602327828CCC52E00B11D7A /* libtensorflowlite.so */; };
 		26E506B228D3665B000059DA /* LM_Loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E506B028D3665B000059DA /* LM_Loader.cpp */; };
@@ -27,8 +26,9 @@
 		CB2F690D29125C4D00E35FC3 /* Chaikin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB2F690C29125C4C00E35FC3 /* Chaikin.cpp */; };
 		CB2F690E29125C5700E35FC3 /* Chaikin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB2F690C29125C4C00E35FC3 /* Chaikin.cpp */; };
 		CB3CACFE28F8ED04000A8BF0 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CBD123FD28E58EEB004A42A9 /* libtensorflowlite.so */; };
-		CB41C4E4290A79760012BC6A /* EyebrowMaskV7.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB41C4E2290A79760012BC6A /* EyebrowMaskV7.cpp */; };
 		CB4312AA28D41DDD006D71DA /* ParametricBSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB4312A828D41DDD006D71DA /* ParametricBSpline.cpp */; };
+		CB443CDF2913496C00E9B24B /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CBD123FD28E58EEB004A42A9 /* libtensorflowlite.so */; };
+		CB443CE22913545300E9B24B /* EyebrowMaskV8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB443CE02913545300E9B24B /* EyebrowMaskV8.cpp */; };
 		CB45E23F28E54BA7004E8D25 /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB45E23E28E54BA7004E8D25 /* Geometry.cpp */; };
 		CB62F4712908D04600828C4C /* activecontours.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB62F4672908D04600828C4C /* activecontours.cpp */; };
 		CB62F4722908D04600828C4C /* sobel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB62F46A2908D04600828C4C /* sobel.cpp */; };
@@ -116,11 +116,11 @@
 		CB2F690B29125C4C00E35FC3 /* Chaikin.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Chaikin.hpp; sourceTree = "<group>"; };
 		CB2F690C29125C4C00E35FC3 /* Chaikin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Chaikin.cpp; sourceTree = "<group>"; };
 		CB3C248E28D00BA300804E6E /* libtensorflowlite.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtensorflowlite.so; path = SkinAnaMPBase/intel_lib/libtensorflowlite.so; sourceTree = "<group>"; };
-		CB41C4E2290A79760012BC6A /* EyebrowMaskV7.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EyebrowMaskV7.cpp; sourceTree = "<group>"; };
-		CB41C4E3290A79760012BC6A /* EyebrowMaskV7.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EyebrowMaskV7.hpp; sourceTree = "<group>"; };
 		CB4312A728D41A36006D71DA /* spline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spline.h; sourceTree = "<group>"; };
 		CB4312A828D41DDD006D71DA /* ParametricBSpline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParametricBSpline.cpp; sourceTree = "<group>"; };
 		CB4312A928D41DDD006D71DA /* ParametricBSpline.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ParametricBSpline.hpp; sourceTree = "<group>"; };
+		CB443CE02913545300E9B24B /* EyebrowMaskV8.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EyebrowMaskV8.cpp; sourceTree = "<group>"; };
+		CB443CE12913545300E9B24B /* EyebrowMaskV8.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EyebrowMaskV8.hpp; sourceTree = "<group>"; };
 		CB45E23D28E54BA7004E8D25 /* Geometry.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Geometry.hpp; sourceTree = "<group>"; };
 		CB45E23E28E54BA7004E8D25 /* Geometry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Geometry.cpp; sourceTree = "<group>"; };
 		CB62F4672908D04600828C4C /* activecontours.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = activecontours.cpp; sourceTree = "<group>"; };
@@ -158,7 +158,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26D773AB29129DE00051177F /* libtensorflowlite.so in Frameworks */,
+				CB443CDF2913496C00E9B24B /* libtensorflowlite.so in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,10 +196,10 @@
 		264E012328D6C1DF00CB94D1 /* Mask */ = {
 			isa = PBXGroup;
 			children = (
+				CB443CE02913545300E9B24B /* EyebrowMaskV8.cpp */,
+				CB443CE12913545300E9B24B /* EyebrowMaskV8.hpp */,
 				26D773AC2912A1450051177F /* SmEyePg.cpp */,
 				26D773AD2912A1450051177F /* SmEyePg.hpp */,
-				CB41C4E2290A79760012BC6A /* EyebrowMaskV7.cpp */,
-				CB41C4E3290A79760012BC6A /* EyebrowMaskV7.hpp */,
 				2606575928F7122400019FFE /* PolarPtSeq.cpp */,
 				2606575A28F7122400019FFE /* PolarPtSeq.hpp */,
 				CBBF6C5228F13E370036619C /* SkinMask.cpp */,
@@ -241,10 +241,6 @@
 			isa = PBXGroup;
 			children = (
 				CB62F4662908CFCF00828C4C /* Snake */,
-				CB02B8502906790F001F8E61 /* polyitems_fit.hpp */,
-				CB02B84E290677E9001F8E61 /* polyitems_fit.cpp */,
-				2680A22C28EFC54B00A305EB /* FaceLmExtractV2.cpp */,
-				2680A22D28EFC54B00A305EB /* FaceLmExtractV2.hpp */,
 				CB45E23928E54A09004E8D25 /* FaceBgSeg */,
 				264E012328D6C1DF00CB94D1 /* Mask */,
 				CB4312A628D419A0006D71DA /* BSpline */,
@@ -252,6 +248,10 @@
 				CB45E23D28E54BA7004E8D25 /* Geometry.hpp */,
 				CB2F690C29125C4C00E35FC3 /* Chaikin.cpp */,
 				CB2F690B29125C4C00E35FC3 /* Chaikin.hpp */,
+				CB02B8502906790F001F8E61 /* polyitems_fit.hpp */,
+				CB02B84E290677E9001F8E61 /* polyitems_fit.cpp */,
+				2680A22C28EFC54B00A305EB /* FaceLmExtractV2.cpp */,
+				2680A22D28EFC54B00A305EB /* FaceLmExtractV2.hpp */,
 				CBD39AE92910B58700260263 /* Tie.cpp */,
 				CBD39AEA2910B58700260263 /* Tie.hpp */,
 				26E506B028D3665B000059DA /* LM_Loader.cpp */,
@@ -479,6 +479,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CB255A9628C7237A005C8A81 /* main.cpp in Sources */,
+				CB443CE22913545300E9B24B /* EyebrowMaskV8.cpp in Sources */,
 				26E506B228D3665B000059DA /* LM_Loader.cpp in Sources */,
 				CB02B84F290677E9001F8E61 /* polyitems_fit.cpp in Sources */,
 				CB62F4712908D04600828C4C /* activecontours.cpp in Sources */,
@@ -496,7 +497,6 @@
 				2606575B28F7122400019FFE /* PolarPtSeq.cpp in Sources */,
 				CBB5DB4028DD5E97003CDED3 /* SkinFeatureMask.cpp in Sources */,
 				CB9D430928F3F9DA00CD3B13 /* SegHelper.cpp in Sources */,
-				CB41C4E4290A79760012BC6A /* EyebrowMaskV7.cpp in Sources */,
 				CB2F690D29125C4D00E35FC3 /* Chaikin.cpp in Sources */,
 				CBD39AEB2910B58700260263 /* Tie.cpp in Sources */,
 				CB1E2AB928DD99AB00F416DF /* ForeheadMask.cpp in Sources */,
@@ -655,6 +655,7 @@
 		CB255A9A28C7237A005C8A81 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 92XGFP9RCT;
@@ -662,7 +663,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/include",
-					/Users/fuliye/nlohmann_json/include,
+					/Users/meicet/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/lib,
@@ -684,6 +685,7 @@
 		CB255A9B28C7237A005C8A81 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 92XGFP9RCT;
@@ -691,7 +693,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/include",
-					/Users/fuliye/nlohmann_json/include,
+					/Users/meicet/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/lib,

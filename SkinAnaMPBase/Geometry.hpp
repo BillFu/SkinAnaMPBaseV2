@@ -106,6 +106,7 @@ void MakePtsEvenWithS(const CONTOUR& cont, int newNumPt, CONTOUR& evenCont);
 
 //-------------------------------------------------------------------------------------------
 float EstCurvate(const Point2i& p1, const Point2i& p2, const Point2i& p3);
-void EstMeanCurvateOfCt(const CONTOUR& cont, float& meanCurv, vector<float> curvList);
 
+void EstMeanStdevCurvateOfCt(const CONTOUR& cont, float& meanCurv,
+                             float& stdevCurv, vector<float>& curvList);
 #endif /* end of GEOMETRY_HPP */

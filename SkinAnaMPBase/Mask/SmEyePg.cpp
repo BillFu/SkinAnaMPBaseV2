@@ -12,6 +12,7 @@ Date:   2022/11/2
 #include "Geometry.hpp"
 #include "Utils.hpp"
 #include "SmEyePg.hpp"
+#include "polyitems_fit.hpp"
 
 //-------------------------------------------------------------------------------
 /*
@@ -55,16 +56,16 @@ void SplitEyeCt(const CONTOUR& EyeCont,
     FindNearestPtOnCt(EyeCont, refLCorPt, actLCorIdx, actLCorPt);
     FindNearestPtOnCt(EyeCont, refRCorPt, actRCorIdx, actRCorPt);
 
-    assert(actLCorIdx < actRCorIdx);
+    //assert(actLCorIdx < actRCorIdx);
         
     int numPts = static_cast<int>(EyeCont.size());
 
     // 假设前提：轮廓点序列是按顺时针排列的，且左角点排在前面，右角点排在后面----这点让人不放心
     // collect the points on the upper curve
-    int rCorIdx = -1;
-    for(int i=actLCorIdx; i<=actRCorIdx; i++)
+    for(int i=actLCorIdx; i<=actRCorIdx+numPts; i++)
     {
-        upEyeCurve.push_back(EyeCont[i]);
+        int j = i % numPts; // act: actual
+        upEyeCurve.push_back(EyeCont[j]);
     }
     
     // caollect the points on the lower curve
@@ -75,16 +76,36 @@ void SplitEyeCt(const CONTOUR& EyeCont,
     }
 }
 
-void SmCurveByFit(const CONTOUR& EyeCont, CONTOUR& smCont)
+void DelHighCurvPtsOnCurve(const CONTOUR& EyeCurve, CONTOUR& trimCurve)
+{
+    float meanCurv, stdevCurv;
+    vector<float> curvList;
+    EstMeanStdevCurvateOfCt(EyeCurve, meanCurv, stdevCurv, curvList);
+
+    auto minmax = std::minmax_element(curvList.begin(), curvList.end());
+    cout << "minK: " << *minmax.first << ", maxK: " << *minmax.second << endl;
+    cout << "meanCurv: " << meanCurv << ", stdevCurv: " << stdevCurv << endl;
+
+    float curvThresh = meanCurv + 1.2*stdevCurv;
+    
+    int N = static_cast<int>(EyeCurve.size());
+    for(int i=1; i<=N-2; i++)
+    {
+        if(curvList[i-1] < curvThresh)
+        {
+            trimCurve.push_back(EyeCurve[i]);
+        }
+    }
+}
+
+void SmCurveByFit(const CONTOUR& EyeCurve, CONTOUR& smCont)
 {
     // frist step: calculate the mean of curvature, then
     // remove the points at both end of contour, which have high curvature.
-    float meanCurv;
-    vector<float> curvList;
-    EstMeanCurvateOfCt(EyeCont, meanCurv, curvList);
-    float sigmaCurv = stddev<float>(curvList);
-    
-    float curvThresh = meanCurv + 1.5*sigmaCurv; // 86.6% falls in (mean - 1.5*sigma, mean + 1.5*sigma)
-    
+    CONTOUR trimCurve;
+    DelHighCurvPtsOnCurve(EyeCurve, trimCurve);
+
+    //CONTOUR smC
+    SmoothCtByPIFit(trimCurve, smCont);
 }
 

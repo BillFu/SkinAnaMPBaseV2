@@ -324,20 +324,27 @@ float EstCurvate(const Point2i& p1, const Point2i& p2, const Point2i& p3)
     return numerator / dominator;
 }
 
-void EstMeanCurvateOfCt(const CONTOUR& cont, float& meanCurv,
-                        vector<float> curvList)
+void EstMeanStdevCurvateOfCt(const CONTOUR& cont, float& meanCurv,
+                             float& stdevCurv,
+                        vector<float>& curvList)
 {
     int N = static_cast<int>(cont.size());
     if(N < 3)
         meanCurv = 0.0;
     
     float sumCurvate = 0.0;
+    float sumCurvSq = 0.0;
+
     for(int i=1; i<=N-2; i++)
     {
         float K = EstCurvate(cont[i-1], cont[i], cont[i+1]);
         curvList.push_back(K);
         sumCurvate += K;
+        sumCurvSq += K*K;
     }
     
     meanCurv = sumCurvate / (N-2);
+    
+    float Ssq = (sumCurvSq - (N-2) * meanCurv * meanCurv) / (N-2);
+    stdevCurv = sqrt(Ssq);
 }

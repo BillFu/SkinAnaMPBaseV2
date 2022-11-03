@@ -88,7 +88,7 @@ int calFittedY(int x, float a0, float a1, float a2)
     return y;
 }
 
-void smoothCtByPIFit(const CONTOUR inCt, CONTOUR& outCt)
+void SmoothCtByPIFit(const CONTOUR inCt, CONTOUR& outCt)
 {
     Mat a = polyfit_int(inCt, 3);
     float a0 = a.at<float>(0);
