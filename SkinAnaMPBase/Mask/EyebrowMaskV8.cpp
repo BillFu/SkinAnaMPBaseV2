@@ -194,9 +194,29 @@ void ForgeInitEyePg(const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
     }
 }
 
+// 检查点序列X坐标的单调性
+void CheckMonoX(const CONTOUR& smEyeCt)
+{
+    int gtTimes = 0;
+    int ltTimes = 0;
+    
+    int numPt = static_cast<int>(smEyeCt.size());
+
+    for(int i=1; i<=numPt-1; i++)
+    {
+        if(smEyeCt[i-1].x < smEyeCt[i].x)
+            gtTimes++;
+        else
+            ltTimes++;
+    }
+    
+    cout << "gtTimes: " << gtTimes << ", ltTimes: " << ltTimes << endl;
+}
+
 // forge the polygong of one eye, only use the result of face/bg segment
 void ForgeEyePg(Size srcImgS, const SegMask& eyeSegMask,
                 const EyeSegFPs& eyeFPs,
+                const Point2i& browCP,
                 CONTOUR& smEyeCt)
 {
     CONTOURS contours;
@@ -211,6 +231,9 @@ void ForgeEyePg(Size srcImgS, const SegMask& eyeSegMask,
     SplitEyeCt(ssEyeCt,eyeFPs.lCorPt, eyeFPs.rCorPt,
                 upEyeCurve, lowEyeCurve);
     
+    //CheckMonoX(upEyeCurve);
+    //CheckMonoX(lowEyeCurve);
+    
     CONTOUR smUpEyeCurve;
     SmCurveByFit(upEyeCurve, smUpEyeCurve);
 
@@ -219,11 +242,9 @@ void ForgeEyePg(Size srcImgS, const SegMask& eyeSegMask,
     
     // combine tow arcs into one closed contour
     CONTOUR combEyeCt = ComTwoArcs2Cont(smLowEyeCurve, smUpEyeCurve);
+    //smEyeCt = ComTwoArcs2Cont(smLowEyeCurve, smUpEyeCurve);
 
-    CONTOUR sparCont;
-    SparsePtsOnContV2(combEyeCt, 0.25, sparCont);
-    SmoothContourCK(sparCont, 2,
-                    3, smEyeCt);
+    SmCorSecOnEyePg(combEyeCt, browCP, smEyeCt);
 }
 
 void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
@@ -235,8 +256,10 @@ void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
 
     Size srcImgS = faceInfo.srcImgS;
     
-    ForgeEyePg(srcImgS, segRst.lEyeMaskNOS, segRst.lEyeFPs, leftEyePg);
-    ForgeEyePg(srcImgS, segRst.rEyeMaskNOS, segRst.rEyeFPs, rightEyePg);
+    ForgeEyePg(srcImgS, segRst.lEyeMaskNOS, segRst.lEyeFPs,
+               segRst.leftBrowCP, leftEyePg);
+    ForgeEyePg(srcImgS, segRst.rEyeMaskNOS, segRst.rEyeFPs,
+               segRst.rightBrowCP, rightEyePg);
     
     POLYGON_GROUP polygonGroup;
     polygonGroup.push_back(rightEyePg);
@@ -246,3 +269,125 @@ void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
     outMask = ContourGroup2Mask(srcImgS.width, srcImgS.height, polygonGroup);
 }
 
+void DeterCorSecPtIdxs(const vector<PtInfo>& ptInfoSec,
+                       int& idx1, int& idx2 //  idx1 on upper curve, idx2 on lower curve
+                       )
+{
+    //int idx1_lsec = lIdxSec[0];
+    //int idx2_lsec = lIdxSec[lIdxSec.size() - 1];
+    int numPt = static_cast<int>(ptInfoSec.size());
+    if(ptInfoSec[0].polCd.r > ptInfoSec[numPt-1].polCd.r)
+    {
+        idx1 = ptInfoSec[numPt-1].idx;
+        idx2 = ptInfoSec[0].idx;
+    }
+    else
+    {
+        idx1 = ptInfoSec[0].idx;
+        idx2 = ptInfoSec[numPt-1].idx;
+    }
+}
+
+void CombOriSec(const CONTOUR& eyeCont, int idx_r1, int idx_l1, CONTOUR& finCt)
+{
+    int N = static_cast<int>(eyeCont.size());
+
+    if(idx_r1 < idx_l1)
+    {
+        for(int i = idx_r1; i<= idx_l1; i++)
+        {
+            finCt.push_back(eyeCont[i]);
+        }
+    }
+    else //idx_r1 > idx_l1
+    {
+        for(int i = idx_r1; i<= idx_l1 + N; i++)
+        {
+            int j = i % N;
+            finCt.push_back(eyeCont[j]);
+        }
+    }
+}
+
+void CombSmCorSec(const CONTOUR& smCorSec, CONTOUR& finCt)
+{
+    for(Point pt: smCorSec)
+        finCt.push_back(pt);
+}
+
+void SmCorSecOnEyePg(const CONTOUR& eyeCont, const Point2i& browCP,
+                     CONTOUR& finCt)
+{
+    vector<PtInfo>  PtInfoList;
+    double DoublePI = 2*M_PI;
+
+    float maxA = -999.9;
+    float minA = 999.9;
+    
+    int i = 0;
+    for(Point pt: eyeCont)
+    {
+        Point diff = pt - browCP;
+        double r = sqrt(diff.x * diff.x + diff.y * diff.y);
+        double theta = atan2(diff.y, diff.x);
+        if(theta < 0.0)
+            theta += + DoublePI;
+        
+        if(maxA < theta)
+            maxA = theta;
+        if(minA > theta)
+            minA = theta;
+        
+        PtInfo ptInfo(i, pt, r, theta);
+        PtInfoList.push_back(ptInfo);
+        
+        i++;
+    }
+        
+    float devA = (maxA - minA) / 8.0;
+    float lAngTh = minA + devA;
+    float rAngTh = maxA - devA;
+    
+    vector<PtInfo> lCorPtInfoSec, rCorPtInfoSec; // Sec: Section
+    CONTOUR lCorSecCt, rCorSecCt;
+    
+    int N = static_cast<int>(eyeCont.size());
+    for(int i=0; i<=N-1; i++)
+    {
+        if(PtInfoList[i].polCd.theta < lAngTh)
+        {
+            lCorPtInfoSec.push_back(PtInfoList[i]);
+            lCorSecCt.push_back(eyeCont[i]);
+        }
+        else if(PtInfoList[i].polCd.theta > rAngTh)
+        {
+            rCorPtInfoSec.push_back(PtInfoList[i]);
+            rCorSecCt.push_back(eyeCont[i]);
+        }
+    }
+    
+    //  idx1 on upper curve, idx2 on lower curve
+    int idx_r1, idx_r2, idx_l1, idx_l2; // in original eye contour
+    DeterCorSecPtIdxs(lCorPtInfoSec, idx_l1, idx_l2);
+    DeterCorSecPtIdxs(rCorPtInfoSec, idx_r1, idx_r2);
+    
+    CONTOUR lSmCorSec;
+    SmoothContourCK(lCorSecCt, 2,
+                    3, lSmCorSec);
+    
+    CONTOUR lRevSmCorSec;
+    for(int j=lSmCorSec.size()-1; j>=0; j--)
+    {
+        lRevSmCorSec.push_back(lSmCorSec[j]);
+    }
+    
+    CONTOUR rSmCorSec;
+    SmoothContourCK(rCorSecCt, 2,
+                    3, rSmCorSec);
+
+    //合并的顺序： r1-l1, l1-l2, l2-r2, r2-r1
+    CombOriSec(eyeCont, idx_r1, idx_l1, finCt);
+    CombSmCorSec(lCorSecCt, finCt);
+    CombOriSec(eyeCont, idx_l2, idx_r2, finCt);
+    CombSmCorSec(rCorSecCt, finCt);
+}

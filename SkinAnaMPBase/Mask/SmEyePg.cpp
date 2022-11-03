@@ -122,10 +122,10 @@ void SmCurveByFit(const CONTOUR& EyeCurve, CONTOUR& smCont)
 {
     // frist step: calculate the mean of curvature, then
     // remove the points at both end of contour, which have high curvature.
-    CONTOUR trimCurve;
-    DelExtremCurvPtsOnCurve(EyeCurve, trimCurve);
+    //CONTOUR trimCurve;
+    //DelExtremCurvPtsOnCurve(EyeCurve, trimCurve);
 
     //CONTOUR smC
-    SmoothCtByPIFitOrder2(trimCurve, smCont);
+    SmoothCtByPIFitOrder2V2(EyeCurve, smCont);
 }
 

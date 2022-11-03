@@ -101,6 +101,7 @@ void SmoothCtByPIFitOrder2(const CONTOUR inCt, CONTOUR& outCt)
     float a1 = a.at<float>(1);
     float a2 = a.at<float>(2);
     
+    /*
     int addedNumPt = 15;
     int dx = 2;
     for(int i=-addedNumPt; i<0; i++)
@@ -109,6 +110,7 @@ void SmoothCtByPIFitOrder2(const CONTOUR inCt, CONTOUR& outCt)
         int y = calFittedYOrder2(x,  a0, a1, a2);
         outCt.push_back(Point2i(x, y));
     }
+    */
     
     for(int i=0; i<inCt.size(); i++)
     {
@@ -117,6 +119,7 @@ void SmoothCtByPIFitOrder2(const CONTOUR inCt, CONTOUR& outCt)
         outCt.push_back(Point2i(x, y));
     }
     
+    /*
     int oriNumPt = static_cast<int>(inCt.size());
     for(int i=1; i<=addedNumPt; i++)
     {
@@ -124,7 +127,37 @@ void SmoothCtByPIFitOrder2(const CONTOUR inCt, CONTOUR& outCt)
         int y = calFittedYOrder2(x,  a0, a1, a2);
         outCt.push_back(Point2i(x, y));
     }
+    */
     
+}
+
+void SmoothCtByPIFitOrder2V2(const CONTOUR inCt, CONTOUR& outCt)
+{
+    CONTOUR xSeq, ySeq;
+    for(int i=0; i<inCt.size(); i++)
+    {
+        xSeq.push_back(Point2i(i, inCt[i].x));
+        ySeq.push_back(Point2i(i, inCt[i].y));
+    }
+    
+    Mat a = polyfit_int(xSeq, 3);
+    float a0 = a.at<float>(0);
+    float a1 = a.at<float>(1);
+    float a2 = a.at<float>(2);
+    
+    
+    Mat b = polyfit_int(ySeq, 3);
+    float b0 = b.at<float>(0);
+    float b1 = b.at<float>(1);
+    float b2 = b.at<float>(2);
+    
+    for(int i=0; i<inCt.size(); i++)
+    {
+        //int x = inCt[i].x;
+        int x = calFittedYOrder2(i,  a0, a1, a2);
+        int y = calFittedYOrder2(i,  b0, b1, b2);
+        outCt.push_back(Point2i(x, y));
+    }
 }
 
 void SmoothCtByPIFitOrder3(const CONTOUR inCt, CONTOUR& outCt)

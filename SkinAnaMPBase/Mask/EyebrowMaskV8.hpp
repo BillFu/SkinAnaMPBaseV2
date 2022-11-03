@@ -19,6 +19,18 @@ using namespace cv;
 
 #include "../Common.hpp"
 
+struct PtInfo
+{
+    int          idx;
+    Point2i      carCd;
+    PtInPolarCd  polCd;
+
+    PtInfo(int i0, const Point2i& carCd0, float r0, float theta0):
+        idx(i0), carCd(carCd0), polCd(r0, theta0)
+    {
+        
+    }
+};
 
 // Ip: interpolate
 Point2i IpPtInERG(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP],
@@ -58,7 +70,9 @@ void ForgeEyesMask(const Mat& srcImage,
 
 // forge the polygong of one eye, only use the result of face/bg segment
 void ForgeEyePg(Size srcImgS, const SegMask& eyeSegMask,
-                const EyeSegFPs& eyeFPs, CONTOUR& smEyeCt);
+                const EyeSegFPs& eyeFPs, const Point2i& browCP,
+                CONTOUR& smEyeCt);
 
-
+void SmCorSecOnEyePg(const CONTOUR& eyeCont, const Point2i& browCP,
+                     CONTOUR& finCt);
 #endif /* end of EYEBROW_MASK_V8_HPP */
