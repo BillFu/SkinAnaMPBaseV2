@@ -25,6 +25,10 @@ using namespace cv;
 /**********************************************************************************************
 通过曲线拟合而对轮廓线进行光滑
 ***********************************************************************************************/
-void SmoothCtByPIFit(const CONTOUR inCt, CONTOUR& outCt);
+//void SmoothCtByPIFit(const CONTOUR inCt, CONTOUR& outCt);
+
+// void SmoothCtByPIFitV2(const CONTOUR inCtNOS, CONTOUR& outCt);
+void SmoothCtByPIFitOrder3(const CONTOUR inCt, CONTOUR& outCt);
+void SmoothCtByPIFitOrder2(const CONTOUR inCt, CONTOUR& outCt);
 
 #endif /* end of POLY_ITEMS_FIT_HPP */

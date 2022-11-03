@@ -55,43 +55,63 @@ void SplitEyeCt(const CONTOUR& EyeCont,
     int   actLCorIdx, actRCorIdx;
     FindNearestPtOnCt(EyeCont, refLCorPt, actLCorIdx, actLCorPt);
     FindNearestPtOnCt(EyeCont, refRCorPt, actRCorIdx, actRCorPt);
-
-    //assert(actLCorIdx < actRCorIdx);
         
     int numPts = static_cast<int>(EyeCont.size());
 
-    // 假设前提：轮廓点序列是按顺时针排列的，且左角点排在前面，右角点排在后面----这点让人不放心
-    // collect the points on the upper curve
-    for(int i=actLCorIdx; i<=actRCorIdx+numPts; i++)
+    // OpenCV中，findContours()返回的轮廓点序列：外轮廓为逆时针方向，内轮廓为顺时针方向
+    // 左右角点排在轮廓线中index次序与他们的y值大小有关，谁的小，谁排在前面。
+    // !!! 无论哪种情形，i都是增大的。
+    if(actLCorIdx > actRCorIdx)
     {
-        int j = i % numPts; // act: actual
-        upEyeCurve.push_back(EyeCont[j]);
+        // rightCorner --> leftCorner, upper curve
+        for(int i=actRCorIdx; i<= actLCorIdx; i++)
+        {
+            lowEyeCurve.push_back(EyeCont[i]);
+        }
+        
+        // leftCorner --> rightCorner, lower curve
+        for(int i=actLCorIdx; i<=actRCorIdx+numPts; i++)
+        {
+            int j = i % numPts;
+            upEyeCurve.push_back(EyeCont[j]);
+        }
     }
-    
-    // caollect the points on the lower curve
-    for(int i=actRCorIdx; i< actLCorIdx+numPts; i++)
+    else // actLCorIdx < actRCorIdx
     {
-        int j = i % numPts; // act: actual
-        lowEyeCurve.push_back(EyeCont[j]);
+        // rightCorner --> leftCorner, upper curve
+        for(int i=actRCorIdx; i<= actLCorIdx+numPts; i++)
+        {
+            int j = i % numPts;
+            lowEyeCurve.push_back(EyeCont[j]);
+        }
+        
+        // leftCorner --> rightCorner, lower curve
+        for(int i=actLCorIdx; i>=actRCorIdx; i++)
+        {
+            upEyeCurve.push_back(EyeCont[i]);
+        }
     }
 }
 
-void DelHighCurvPtsOnCurve(const CONTOUR& EyeCurve, CONTOUR& trimCurve)
+void DelExtremCurvPtsOnCurve(const CONTOUR& EyeCurve, CONTOUR& trimCurve)
 {
     float meanCurv, stdevCurv;
     vector<float> curvList;
     EstMeanStdevCurvateOfCt(EyeCurve, meanCurv, stdevCurv, curvList);
 
-    auto minmax = std::minmax_element(curvList.begin(), curvList.end());
-    cout << "minK: " << *minmax.first << ", maxK: " << *minmax.second << endl;
+    //auto minmax = std::minmax_element(curvList.begin(), curvList.end());
+    float maxK = *max_element(curvList.begin(), curvList.end());
+    float minK = *min_element(curvList.begin(), curvList.end());
+    cout << "minK: " << minK << ", maxK: " << maxK << endl;
     cout << "meanCurv: " << meanCurv << ", stdevCurv: " << stdevCurv << endl;
 
-    float curvThresh = meanCurv + 1.2*stdevCurv;
-    
+    float curvUpTh = meanCurv + stdevCurv;
+    float curvLowTh = 0.010; //meanCurv - stdevCurv;
+
     int N = static_cast<int>(EyeCurve.size());
     for(int i=1; i<=N-2; i++)
     {
-        if(curvList[i-1] < curvThresh)
+        if(curvList[i-1] > curvLowTh && curvList[i-1] < curvUpTh )
         {
             trimCurve.push_back(EyeCurve[i]);
         }
@@ -103,9 +123,9 @@ void SmCurveByFit(const CONTOUR& EyeCurve, CONTOUR& smCont)
     // frist step: calculate the mean of curvature, then
     // remove the points at both end of contour, which have high curvature.
     CONTOUR trimCurve;
-    DelHighCurvPtsOnCurve(EyeCurve, trimCurve);
+    DelExtremCurvPtsOnCurve(EyeCurve, trimCurve);
 
     //CONTOUR smC
-    SmoothCtByPIFit(trimCurve, smCont);
+    SmoothCtByPIFitOrder2(trimCurve, smCont);
 }
 

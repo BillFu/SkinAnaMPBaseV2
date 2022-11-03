@@ -82,23 +82,83 @@ Mat polyfit_int(const vector<Point2i>& chain, int n)
     return a;
 }
 
-int calFittedY(int x, float a0, float a1, float a2)
+int calFittedYOrder2(int x, float a0, float a1, float a2)
 {
     int y = (int)(a2*x*x + a1*x + a0);
     return y;
 }
 
-void SmoothCtByPIFit(const CONTOUR inCt, CONTOUR& outCt)
+int calFittedYOrder3(int x, float a0, float a1, float a2, float a3)
+{
+    int y = (int)(a3*x*x*x + a2*x*x + a1*x + a0);
+    return y;
+}
+
+void SmoothCtByPIFitOrder2(const CONTOUR inCt, CONTOUR& outCt)
 {
     Mat a = polyfit_int(inCt, 3);
     float a0 = a.at<float>(0);
     float a1 = a.at<float>(1);
     float a2 = a.at<float>(2);
     
+    int addedNumPt = 15;
+    int dx = 2;
+    for(int i=-addedNumPt; i<0; i++)
+    {
+        int x = inCt[0].x + i*dx;
+        int y = calFittedYOrder2(x,  a0, a1, a2);
+        outCt.push_back(Point2i(x, y));
+    }
+    
+    for(int i=0; i<inCt.size(); i++)
+    {
+        int x = inCt[i].x;
+        int y = calFittedYOrder2(x,  a0, a1, a2);
+        outCt.push_back(Point2i(x, y));
+    }
+    
+    int oriNumPt = static_cast<int>(inCt.size());
+    for(int i=1; i<=addedNumPt; i++)
+    {
+        int x = inCt[oriNumPt-1].x + i*dx;
+        int y = calFittedYOrder2(x,  a0, a1, a2);
+        outCt.push_back(Point2i(x, y));
+    }
+    
+}
+
+void SmoothCtByPIFitOrder3(const CONTOUR inCt, CONTOUR& outCt)
+{
+    Mat a = polyfit_int(inCt, 4);
+    float a0 = a.at<float>(0);
+    float a1 = a.at<float>(1);
+    float a2 = a.at<float>(2);
+    float a3 = a.at<float>(3);
+
+    for(int i=0; i<inCt.size(); i++)
+    {
+        int x = inCt[i].x;
+        int y = calFittedYOrder3(x,  a0, a1, a2, a3);
+        outCt.push_back(Point2i(x, y));
+    }
+}
+
+/*
+// 传入的是NOS的Local坐标，传出的是SS尺度下的全局坐标
+void SmoothCtByPIFitV2(const CONTOUR inCtLocNOS, CONTOUR& outCt)
+{
+    Mat a = polyfit_int(inCtLocNOS, 3); // 传入3，实际计算的是2次多项式函数
+    float a0 = a.at<float>(0);
+    float a1 = a.at<float>(1);
+    float a2 = a.at<float>(2);
+    
+
     for(int i=0; i<inCt.size(); i++)
     {
         int x = inCt[i].x;
         int y = calFittedY(x,  a0, a1, a2);
         outCt.push_back(Point2i(x, y));
     }
+    
 }
+*/
