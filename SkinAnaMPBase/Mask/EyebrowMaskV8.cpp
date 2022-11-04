@@ -231,14 +231,11 @@ void ForgeEyePg(Size srcImgS, const SegMask& eyeSegMask,
     SplitEyeCt(ssEyeCt,eyeFPs.lCorPt, eyeFPs.rCorPt,
                 upEyeCurve, lowEyeCurve);
     
-    //CheckMonoX(upEyeCurve);
-    //CheckMonoX(lowEyeCurve);
-    
     CONTOUR smUpEyeCurve;
-    SmCurveByFit(upEyeCurve, smUpEyeCurve);
+    SmCtByPIFitOrd3V2(upEyeCurve, smUpEyeCurve);
 
     CONTOUR smLowEyeCurve;
-    SmCurveByFit(lowEyeCurve, smLowEyeCurve);
+    SmCtByPIFitOrd3V2(lowEyeCurve, smLowEyeCurve);
     
     SmCorSecOnEyePgV2(srcImgS, smUpEyeCurve, smLowEyeCurve, browCP, smEyeCt);
 }

@@ -118,6 +118,7 @@ void DelExtremCurvPtsOnCurve(const CONTOUR& EyeCurve, CONTOUR& trimCurve)
     }
 }
 
+/*
 void SmCurveByFit(const CONTOUR& EyeCurve, CONTOUR& smCont)
 {
     // frist step: calculate the mean of curvature, then
@@ -126,6 +127,8 @@ void SmCurveByFit(const CONTOUR& EyeCurve, CONTOUR& smCont)
     //DelExtremCurvPtsOnCurve(EyeCurve, trimCurve);
 
     //CONTOUR smC
-    SmoothCtByPIFitOrder2V2(EyeCurve, smCont);
+    //SmoothCtByPIFitOrder2V2(EyeCurve, smCont);
+    SmCtByPIFitOrd3V2(EyeCurve, smCont);
 }
+*/
 

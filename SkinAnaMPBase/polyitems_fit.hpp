@@ -32,4 +32,6 @@ void SmoothCtByPIFitOrder3(const CONTOUR inCt, CONTOUR& outCt);
 void SmoothCtByPIFitOrder2(const CONTOUR inCt, CONTOUR& outCt);
 void SmoothCtByPIFitOrder2V2(const CONTOUR inCt, CONTOUR& outCt);
 
+void SmCtByPIFitOrd3V2(const CONTOUR inCt, CONTOUR& outCt);
+
 #endif /* end of POLY_ITEMS_FIT_HPP */

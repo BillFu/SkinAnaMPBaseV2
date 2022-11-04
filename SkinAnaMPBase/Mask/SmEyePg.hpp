@@ -33,7 +33,7 @@ void SplitEyeCt(const CONTOUR& EyeCont,
 void FindNearestPtOnCt(const CONTOUR& EyeCont, const Point2i& refPt,
                        int& nearestIdx, Point2i& nearestPt);
 
-void SmCurveByFit(const CONTOUR& EyeCont, CONTOUR& smCont);
+//void SmCurveByFit(const CONTOUR& EyeCont, CONTOUR& smCont);
 
 void DelExtremCurvPtsOnCurve(const CONTOUR& EyeCurve, CONTOUR& trimCurve);
 

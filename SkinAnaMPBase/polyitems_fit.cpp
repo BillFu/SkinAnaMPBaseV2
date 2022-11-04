@@ -176,22 +176,33 @@ void SmoothCtByPIFitOrder3(const CONTOUR inCt, CONTOUR& outCt)
     }
 }
 
-/*
-// 传入的是NOS的Local坐标，传出的是SS尺度下的全局坐标
-void SmoothCtByPIFitV2(const CONTOUR inCtLocNOS, CONTOUR& outCt)
+void SmCtByPIFitOrd3V2(const CONTOUR inCt, CONTOUR& outCt)
 {
-    Mat a = polyfit_int(inCtLocNOS, 3); // 传入3，实际计算的是2次多项式函数
+    CONTOUR xSeq, ySeq;
+    for(int i=0; i<inCt.size(); i++)
+    {
+        xSeq.push_back(Point2i(i, inCt[i].x));
+        ySeq.push_back(Point2i(i, inCt[i].y));
+    }
+    
+    Mat a = polyfit_int(xSeq, 4);
     float a0 = a.at<float>(0);
     float a1 = a.at<float>(1);
     float a2 = a.at<float>(2);
+    float a3 = a.at<float>(3);
+
     
+    Mat b = polyfit_int(ySeq, 4);
+    float b0 = b.at<float>(0);
+    float b1 = b.at<float>(1);
+    float b2 = b.at<float>(2);
+    float b3 = b.at<float>(3);
 
     for(int i=0; i<inCt.size(); i++)
     {
-        int x = inCt[i].x;
-        int y = calFittedY(x,  a0, a1, a2);
+        //int x = inCt[i].x;
+        int x = calFittedYOrder3(i, a0, a1, a2, a3);
+        int y = calFittedYOrder3(i, b0, b1, b2, b3);
         outCt.push_back(Point2i(x, y));
     }
-    
 }
-*/
