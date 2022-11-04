@@ -32,6 +32,18 @@ struct PtInfo
     }
 };
 
+struct PtInfoV2
+{
+    Point2i      carCd;
+    PtInPolarCd  polCd;
+
+    PtInfoV2(const Point2i& carCd0, float r0, float theta0):
+         carCd(carCd0), polCd(r0, theta0)
+    {
+        
+    }
+};
+
 // Ip: interpolate
 Point2i IpPtInERG(const Point2i eyeRefPts[NUM_PT_EYE_REFINE_GROUP],
                   int pIndex1, int pIndex2, float t);
@@ -75,4 +87,8 @@ void ForgeEyePg(Size srcImgS, const SegMask& eyeSegMask,
 
 void SmCorSecOnEyePg(const CONTOUR& eyeCont, const Point2i& browCP,
                      CONTOUR& finCt);
+
+void SmCorSecOnEyePgV2(const CONTOUR& smUpEyeCurve, const CONTOUR& smLowEyeCurve,
+                       const Point2i& browCP, CONTOUR& finCt);
+
 #endif /* end of EYEBROW_MASK_V8_HPP */
