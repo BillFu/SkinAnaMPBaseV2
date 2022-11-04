@@ -22,10 +22,17 @@ using namespace cv;
 
 //------目前版本只针对封闭多边形进行光滑，断开的折线不在目前的考虑范围之内-----------------------
 // CK: chaikin
-void SmoothContourCK(const CONTOUR& oriCt, int shortThresh,
+void SmoothClosedContourCK(const CONTOUR& oriCt, int shortThresh,
                      int iterTimes, CONTOUR& smCt);
 
-void SmoothOnceCK(const CONTOUR& inCt, int shortThresh,
+void SmoothClosedOnceCK(const CONTOUR& inCt, int shortThresh,
                   CONTOUR& outCt);
+
+void SmUnclosedContCK(const CONTOUR& oriCt,
+                     int iterTimes, CONTOUR& smCt);
+
+void SmUnclosedOnceCK(const CONTOUR& inCt,
+                  CONTOUR& outCt, int K);
+
 
 #endif /* end of CHAIKIN_HPP */

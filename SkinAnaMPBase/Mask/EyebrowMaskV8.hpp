@@ -88,7 +88,8 @@ void ForgeEyePg(Size srcImgS, const SegMask& eyeSegMask,
 void SmCorSecOnEyePg(const CONTOUR& eyeCont, const Point2i& browCP,
                      CONTOUR& finCt);
 
-void SmCorSecOnEyePgV2(const CONTOUR& smUpEyeCurve, const CONTOUR& smLowEyeCurve,
+void SmCorSecOnEyePgV2(const Size& srcImgS,
+                       const CONTOUR& smUpEyeCurve, const CONTOUR& smLowEyeCurve,
                        const Point2i& browCP, CONTOUR& finCt);
 
 #endif /* end of EYEBROW_MASK_V8_HPP */
