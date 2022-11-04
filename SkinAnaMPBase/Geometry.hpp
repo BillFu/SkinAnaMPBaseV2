@@ -116,4 +116,12 @@ void EstMeanStdevCurvateOfCt(const CONTOUR& cont, float& meanCurv,
 // 将间隔小于Th的点给删掉，获得稀疏化的轮廓。
 void SparsePtsOnContV2(const CONTOUR& oriCont, float alpha, CONTOUR& sparCont);
 
+// 每隔numInterval保留一个点，来达到稀疏化轮廓点数目
+void SpaPtsOnCont(const CONTOUR& oriCont, int numInterval, CONTOUR& sparCont);
+
+// 剔除掉轮廓上曲率最大的那个点
+void DelMaxCurPtOnCt(CONTOUR& oriCont);
+
+void DelMaxCurTwoPtsOnCt(const CONTOUR& oriCont, CONTOUR& smCont);
+
 #endif /* end of GEOMETRY_HPP */

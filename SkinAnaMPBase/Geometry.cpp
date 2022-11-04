@@ -368,6 +368,8 @@ void EstMeanStdevCurvateOfCt(const CONTOUR& cont, float& meanCurv,
     stdevCurv = sqrt(Ssq);
 }
 
+//-----------------------------------------------------------------------------
+
 // 思路：计算轮廓上的最大点距，MaxDis，设定阈值: Th = MaxDis*alpha,
 // 将间隔小于Th的点给删掉，获得稀疏化的轮廓。
 void SparsePtsOnContV2(const CONTOUR& oriCont, float alpha, CONTOUR& sparCont)
@@ -396,5 +398,72 @@ void SparsePtsOnContV2(const CONTOUR& oriCont, float alpha, CONTOUR& sparCont)
         {
             sparCont.push_back(oriCont[i]);
         }
+    }
+}
+
+void SpaPtsOnCont(const CONTOUR& oriCt, int numInterval, CONTOUR& sparCont)
+{
+    for(int i=0; i<oriCt.size(); )
+    {
+        sparCont.push_back(oriCt[i]);
+        i += numInterval+1;
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+// 剔除掉轮廓上曲率最大的那个点
+void DelMaxCurPtOnCt(CONTOUR& oriCont)
+{
+    float maxK = -999.9;
+    int   maxIdx = -1;
+    
+    int N = static_cast<int>(oriCont.size());
+    for(int i=1; i<=N-2; i++)
+    {
+        float K = EstCurvate(oriCont[i-1], oriCont[i], oriCont[i+1]);
+        
+        if(K > maxK)
+        {
+            maxK = K;
+            maxIdx = i;
+        }
+    }
+    
+    oriCont.erase(oriCont.begin() + maxIdx);
+}
+
+void DelMaxCurTwoPtsOnCt(const CONTOUR& oriCont, CONTOUR& smCont)
+{
+    float maxK = -999.9;
+    float secMaxK = -999.9;
+    int   maxIdx = -1;
+    int   secMaxIdx = -1;
+    
+    int N = static_cast<int>(oriCont.size());
+    for(int i=1; i<=N-2; i++)
+    {
+        float K = EstCurvate(oriCont[i-1], oriCont[i], oriCont[i+1]);
+        
+        if(K > maxK)
+        {
+            secMaxK = maxK;
+            secMaxIdx = maxIdx;
+            maxK = K;
+            maxIdx = i;
+        }
+        else if(K > secMaxK)
+        {
+            secMaxK = K;
+            secMaxIdx = i;
+        }
+    }
+    
+    for(int i=0; i<oriCont.size(); i++)
+    {
+        if(i == maxIdx || i == secMaxIdx)
+            continue;
+        else
+            smCont.push_back(oriCont[i]);
     }
 }

@@ -344,6 +344,7 @@ void GetLCorSec(const vector<PtInfoV2>& upPtInfoSeq,
                 float lAngTh, CONTOUR& lCorSecCt,
                 int& l1IdxOnUpCur, int& l2IdxOnLowCur)
 {
+    // 求上弧线上属于左角点的点序列
     l1IdxOnUpCur = -1;
     int N1 = static_cast<int>(upPtInfoSeq.size());
     int numGotPtUpCurve = 0;
@@ -360,6 +361,7 @@ void GetLCorSec(const vector<PtInfoV2>& upPtInfoSeq,
         }
     }
     
+    // 求下弧线上属于左角点的点序列
     CONTOUR lCorSecLowCt;
     int N2 = static_cast<int>(lowPtInfoSeq.size());
     for(int i=0; i<=N2-1; i++)
@@ -387,7 +389,7 @@ void GetLCorSec(const vector<PtInfoV2>& upPtInfoSeq,
     CombineSec(middleCt, lCorSecCt);
     CombineSec(lCorSecLowCt, lCorSecCt);
 
-    //l2IdxOnLowCur = lCorSecCt.size() - numGotPtUpCurve - numAddedPt;
+    l2IdxOnLowCur = lCorSecCt.size() - numGotPtUpCurve - numAddedPt;
 }
 
 void GetRCorSec(const vector<PtInfoV2>& upPtInfoSeq,
@@ -395,31 +397,52 @@ void GetRCorSec(const vector<PtInfoV2>& upPtInfoSeq,
                 float rAngTh, CONTOUR& rCorSecCt,
                 int& r1IdxOnUpCur, int& r2IdxOnLowCur)
 {
+    // 先求下弧线上属于右角点的点序列
     r2IdxOnLowCur = -1;
-    int N2 = static_cast<int>(lowPtInfoSeq.size());
+    int N1 = static_cast<int>(lowPtInfoSeq.size());
     int numGotPtLowCurve = 0;
-    for(int i=0; i<=N2-1; i++)
+    CONTOUR rCorSecLowCt;
+    for(int i=0; i<=N1-1; i++)
     {
         if(lowPtInfoSeq[i].polCd.theta > rAngTh)
         {
             numGotPtLowCurve++;
-            rCorSecCt.push_back(lowPtInfoSeq[i].carCd);
+            rCorSecLowCt.push_back(lowPtInfoSeq[i].carCd);
             
-            if(r2IdxOnLowCur == -1)
+            if(r2IdxOnLowCur == -1) // 第一个小于lAngTH的点
                 r2IdxOnLowCur = i;
         }
     }
     
-    int N1 = static_cast<int>(upPtInfoSeq.size());
-    for(int i=0; i<=N1-1; i++)
+    // 再求上弧线上属于右角点的点序列
+    CONTOUR rCorSecUpCt;
+    int N2 = static_cast<int>(upPtInfoSeq.size());
+    for(int i=0; i<=N2-1; i++)
     {
         if(upPtInfoSeq[i].polCd.theta > rAngTh)
         {
-            rCorSecCt.push_back(upPtInfoSeq[i].carCd);
+            rCorSecUpCt.push_back(upPtInfoSeq[i].carCd);
         }
     }
     
-    r1IdxOnUpCur = rCorSecCt.size() - numGotPtLowCurve;
+    // 中间通过插值的方式，多补几个点
+    int numAddedPt = 4;
+    float interval = 1.0 / (numAddedPt + 1);
+    
+    Point2i lastPt = rCorSecLowCt[rCorSecLowCt.size()-1];
+    Point2i nextPt = rCorSecUpCt[0];
+    CONTOUR middleCt;
+    for(int i=1; i<=numAddedPt; i++)
+    {
+        Point2i pt = Interpolate(lastPt, nextPt, i*interval);
+        middleCt.push_back(pt);
+    }
+    
+    CombineSec(rCorSecLowCt, rCorSecCt);
+    CombineSec(middleCt, rCorSecCt);
+    CombineSec(rCorSecUpCt, rCorSecCt);
+    
+    r1IdxOnUpCur = rCorSecCt.size() - numGotPtLowCurve - numAddedPt;
 }
 
 void getR1L1SecOnUpCurv(const CONTOUR& smUpEyeCurve,
@@ -439,18 +462,18 @@ void getL2R2SecOnLowCurv(const CONTOUR& smLowEyeCurve,
 }
 
 void SmCorSecOnEyePgV2(const Size& srcImgS,
-                       const CONTOUR& smUpEyeCurve, const CONTOUR& smLowEyeCurve,
+                       const CONTOUR& upEyeCurve, const CONTOUR& lowEyeCurve,
                        const Point2i& browCP, CONTOUR& finCt)
 {
     float maxA = -999.9;
     float minA = 999.9;
     
     vector<PtInfoV2> upPtInfoSeq;
-    CalcPtInfoSeq(smUpEyeCurve, browCP,
+    CalcPtInfoSeq(upEyeCurve, browCP,
                   minA, maxA, upPtInfoSeq);
     
     vector<PtInfoV2> lowPtInfoSeq;
-    CalcPtInfoSeq(smLowEyeCurve, browCP,
+    CalcPtInfoSeq(lowEyeCurve, browCP,
                   minA, maxA, lowPtInfoSeq);
         
     float devA = (maxA - minA) / 8.0;
@@ -470,40 +493,53 @@ void SmCorSecOnEyePgV2(const Size& srcImgS,
     GetRCorSec(upPtInfoSeq, lowPtInfoSeq, rAngTh, rCorSecCt,
                r1IdxOnUpCur, r2IdxOnLowCur);
     
-    CONTOUR lSmCorSec;
-    SmUnclosedContCK(lCorSecCt,
-                    4, lSmCorSec);
-    
-    Mat canvas(srcImgS, CV_8UC1, Scalar(0));
+    int smIterTimes = 5;
+    CONTOUR lSmCorSec0, lSmCorSec;
+    DelMaxCurTwoPtsOnCt(lCorSecCt, lSmCorSec0);
+    SmUnclosedContCK(lSmCorSec0, smIterTimes, lSmCorSec);
+       
+    Mat canvas2(srcImgS, CV_8UC1, Scalar(0));
     for(int i = 0; i < lCorSecCt.size(); i++)
     {
-        cv::circle(canvas, lCorSecCt[i], 1, Scalar(150), cv::FILLED);
+        cv::circle(canvas2, lCorSecCt[i], 1, Scalar(150), cv::FILLED);
     }
-    cv::putText(canvas, to_string(0), lCorSecCt[0],
+    cv::putText(canvas2, to_string(0), lCorSecCt[0],
                 FONT_HERSHEY_SIMPLEX, 1, Scalar(150), 1);
-    cv::putText(canvas, to_string(lCorSecCt.size()-1), lCorSecCt[lCorSecCt.size()-1],
+    cv::putText(canvas2, to_string(lCorSecCt.size()-1), lCorSecCt[lCorSecCt.size()-1],
                 FONT_HERSHEY_SIMPLEX, 1, Scalar(150), 1);
-    imwrite("lCorSecCt.png", canvas);
+    for(int i = 0; i < rCorSecCt.size(); i++)
+    {
+        cv::circle(canvas2, rCorSecCt[i], 1, Scalar(150), cv::FILLED);
+    }
+    cv::putText(canvas2, to_string(0), rCorSecCt[0],
+                FONT_HERSHEY_SIMPLEX, 1, Scalar(150), 1);
+    cv::putText(canvas2, to_string(rCorSecCt.size()-1), rCorSecCt[rCorSecCt.size()-1],
+                FONT_HERSHEY_SIMPLEX, 1, Scalar(150), 1);
+    imwrite("CorSecCt.png", canvas2);
     
-    Mat canvas2(srcImgS, CV_8UC1, Scalar(0));
+    CONTOUR rSmCorSec0, rSmCorSec;
+    DelMaxCurTwoPtsOnCt(rCorSecCt, rSmCorSec0);
+    SmUnclosedContCK(rSmCorSec0, smIterTimes, rSmCorSec);
+
+    Mat canvas3(srcImgS, CV_8UC1, Scalar(0));
     for(int i = 0; i < lSmCorSec.size(); i++)
     {
-        cv::circle(canvas2, lSmCorSec[i], 1, Scalar(150), cv::FILLED);
+        cv::circle(canvas3, lSmCorSec[i], 1, Scalar(150), cv::FILLED);
     }
-    imwrite("lSmCorSec.png", canvas2);
+    for(int i = 0; i < rSmCorSec.size(); i++)
+    {
+        cv::circle(canvas3, rSmCorSec[i], 1, Scalar(150), cv::FILLED);
+    }
+    imwrite("SmCorSec.png", canvas3);
     
-    CONTOUR rSmCorSec;
-    SmUnclosedContCK(rCorSecCt,
-                    3, rSmCorSec);
-
     //合并的顺序： r1-l1, l1-l2, l2-r2, r2-r1
     CONTOUR R1L1Sec;
-    getR1L1SecOnUpCurv(smUpEyeCurve, r1IdxOnUpCur, l1IdxOnUpCur, R1L1Sec);
+    getR1L1SecOnUpCurv(upEyeCurve, r1IdxOnUpCur, l1IdxOnUpCur, R1L1Sec);
     CombineSec(R1L1Sec, finCt);
-    CombineSec(lCorSecCt, finCt);
+    CombineSec(lSmCorSec, finCt);
 
     CONTOUR L2R2Sec;
-    getL2R2SecOnLowCurv(smLowEyeCurve, l2IdxOnLowCur, r2IdxOnLowCur, L2R2Sec);
+    getL2R2SecOnLowCurv(lowEyeCurve, l2IdxOnLowCur, r2IdxOnLowCur, L2R2Sec);
     CombineSec(L2R2Sec, finCt);
     CombineSec(rSmCorSec, finCt);
 }

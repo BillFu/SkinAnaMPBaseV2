@@ -75,26 +75,15 @@ void SmoothClosedContourCK(const CONTOUR& oriCt,
 void SmUnclosedContCK(const CONTOUR& oriCt,
                      int iterTimes, CONTOUR& smCt)
 {
-    CONTOUR inCt; //(oriCt);
-    
-    for(int i=0; i<oriCt.size(); )
-    {
-        inCt.push_back(oriCt[i]);
-        i += 2;
-    }
+    CONTOUR inCt;
+    SpaPtsOnCont(oriCt, 1, inCt);
     
     CONTOUR outCt;
     for(int k=1; k<=iterTimes-1; k++)
     {
         SmUnclosedOnceCK(inCt, outCt, k);
         inCt.clear();
-        
-        for(int i=0; i<outCt.size(); )
-        {
-            inCt.push_back(outCt[i]);
-            i += 2;
-        }
-            
+        SpaPtsOnCont(outCt, 1, inCt);
         outCt.clear();
     }
     
