@@ -19,6 +19,7 @@ using namespace cv;
 
 #include "../Common.hpp"
 
-void DetectWrinkle(const Mat& inImg, const Rect& faceRect);
+void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
+                   const Mat& wrkMask, CONTOURS& deepWrkConts);
 
 #endif /* end of WRINKLE_HPP */

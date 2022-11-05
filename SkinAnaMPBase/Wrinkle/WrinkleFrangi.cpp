@@ -1,36 +1,34 @@
+#include <algorithm>
+
 #include "WrinkleFrangi.h"
 #include "../ImgProc.h"
-#include <algorithm>
+#include "../Utils.hpp"
 #include "frangi.h"
 
 
 // 计算Frangi滤波响应，并提取深皱纹和长皱纹
-void CalcFrgRespAndExtWrk(const Mat& imgInFR,
+void CalcFrgiRespAndPickWrk(const Mat& grFrImg, // gray and cropped by face rect
                          const Mat& wrkMaskInFR,
                          int scaleRatio,
                          int minWrkSize,
                          int longWrkThresh,
-                         Mat& frangiRespRz,  // Rz: resized, i.e., scale down
+                         Mat& frgiRespRz,  // Rz: resized, i.e., scale down
                          CONTOURS& deepWrkConts,
                          CONTOURS& longWrkConts,
-                         float& avgFrgRespValue)
+                         float& avgFrgiRespValue)
 {
-    int wFR = imgInFR.cols;
-    int hFR = imgInFR.rows;
+    int wFR = grFrImg.cols;
+    int hFR = grFrImg.rows;
     
-    cv::Mat inImgInFR_rz; // resized copy of inImgInFR
-    resize(imgInFR, inImgInFR_rz,
-           cv::Size(wFR/scaleRatio, hFR/scaleRatio)); //scaleRatio now is 5
+    Size rzSize = grFrImg.size() / scaleRatio;
+    Mat grFrRzImg;
+    resize(grFrImg, grFrRzImg, rzSize);
     
-    cv::Mat inImgFR_rz_gray;
-    cvtColor(inImgInFR_rz, inImgFR_rz_gray, COLOR_BGR2GRAY);
-    inImgInFR_rz.release();
+    Mat grFrRzFlImg;
+    grFrRzImg.convertTo(grFrRzFlImg, CV_32FC1);
+    grFrRzImg.release();
     
-    Mat inImgFR_rz_gray_fl;
-    inImgFR_rz_gray.convertTo(inImgFR_rz_gray_fl, CV_32FC1);
-    inImgFR_rz_gray.release();
-    
-    cv::Mat scaleRz, anglesRz;
+    cv::Mat respScaleRz, respAngRz;
     frangi2d_opts opts;
     opts.sigma_start = 1;
     opts.sigma_end = 3;
@@ -40,86 +38,88 @@ void CalcFrgRespAndExtWrk(const Mat& imgInFR,
     opts.BlackWhite = true;
     
     // !!! 计算fangi2d时，使用的是缩小版的衍生影像
-    frangi2d(inImgFR_rz_gray_fl, frangiRespRz, scaleRz, anglesRz, opts); // !!!
-    
-    inImgFR_rz_gray_fl.release();
+    frangi2d(grFrRzFlImg, frgiRespRz, respScaleRz, respAngRz, opts);
+    grFrRzFlImg.release();
     
     //返回的scaleRz, anglesRz没有派上实际的用场
-    scaleRz.release();
-    anglesRz.release();
+    respScaleRz.release();
+    respAngRz.release();
     
-    frangiRespRz.convertTo(frangiRespRz, CV_8UC1, 255.);
+    frgiRespRz.convertTo(frgiRespRz, CV_8UC1, 255.);
     
-    cv::Mat frgRespSrcScale;
-    //把响应强度图又扩大到原始影像的尺度上来，但限定在工作区内。
-    resize(frangiRespRz, frgRespSrcScale, cv::Size(wFR, hFR));
-    frangiRespRz.release();
-    
-#ifdef TEST_RUN_WRK
-    string frgRespFile =  wrk_out_dir + "/FrangiResp.png";
-    imwrite(frgRespFile.c_str(), frgRespSrcScale);
+#ifdef TEST_RUN
+    string frgiRespImgFile = BuildOutImgFNV2(outDir, "frgiFrRz.png");
+    bool isOK = imwrite(frgiRespImgFile, frgiRespRz);
+    assert(isOK);
 #endif
-    
-    getDeepLongWrkFromFrangiResp(frgRespSrcScale,
-                                wrkMaskInFR, // 原始尺度，经过了Face_Rect裁切
-                                longWrkThresh, minWrkSize,
-                                longWrkConts, deepWrkConts);
 
-    cv::Scalar sumResp = cv::sum(frgRespSrcScale);
+    cv::Mat frgiRespSSInFR; // SS: source scale
+    //把响应强度图又扩大到原始影像的尺度上来，但限定在Face Rect内。
+    resize(frgiRespRz, frgiRespSSInFR, cv::Size(wFR, hFR));
+    frgiRespRz.release();
+
+    // DL: deep and long
+    PickDLWrkFromFrgiResp(frgiRespSSInFR,
+                          wrkMaskInFR, // 原始尺度，经过了Face_Rect裁切
+                          longWrkThresh, minWrkSize,
+                          longWrkConts, deepWrkConts);
+
+    cv::Scalar sumResp = cv::sum(frgiRespSSInFR);
     int nonZero2 = cv::countNonZero(wrkMaskInFR); // Mask中有效面积，即非零元素的数目
-    avgFrgRespValue = sumResp[0] / (nonZero2+1) / 12.8;  // 平均响应值，不知道为啥要除以12.8
+    avgFrgiRespValue = sumResp[0] / (nonZero2+1) / 12.8;  // 平均响应值，不知道为啥要除以12.8
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// 从frangi滤波的结果（经过了二值化、细化、反模糊化等处理）中，提取深皱纹、长皱纹
-void getDeepLongWrkFromFrangiResp(const Mat& frangiRespOrigScale,
-                                         const Mat& wrkMaskInFR, // 原始尺度，经过了Face_Rect裁切
-                                         int longWrkThresh,
+void PickDLWrkFromFrgiResp(const Mat& frgiRespOS, //Original Scale
+                            const Mat& wrkMaskInFR, // 原始尺度，经过了Face_Rect裁切
+                            int longWrkThresh,
                                          unsigned int minsWrkSize,
                                          CONTOURS& longWrkConts,
-                                         CONTOURS& DeepWrkConts)
+                                         CONTOURS& deepWrkConts)
 {
-    cv::Mat thickBinary;
-    cv::threshold(frangiRespOrigScale, thickBinary, 40, 255, cv::THRESH_BINARY);
+    cv::Mat thickBi; // thick: 浓的，厚的，粗的
+    cv::threshold(frgiRespOS, thickBi, 20, 255, cv::THRESH_BINARY);
     
-#ifdef TEST_RUN_WRK
-    string fraThRespFile =  wrk_out_dir + "/FrgThreshResp.png";
-    imwrite(fraThRespFile.c_str(), thickBinary);
+#ifdef TEST_RUN
+    string fraThRespFile =  outDir + "/FrgiBiResp.png";
+    imwrite(fraThRespFile.c_str(), thickBi);
 #endif
     
-    thickBinary = 255 - thickBinary;
+    thickBi = 255 - thickBi;
     int wdFR = wrkMaskInFR.cols;
     int htFR = wrkMaskInFR.rows;
-    imageThin(thickBinary.data, wdFR, htFR);
+    // 给二值图像中的粗黑线“瘦身”
+    BlackLineThinInBiImg(thickBi.data, wdFR, htFR);
     
-#ifdef TEST_RUN_WRK
-    string fraThinRespFile =  wrk_out_dir + "/FrgThinResp.png";
-    imwrite(fraThinRespFile.c_str(), thickBinary);
+#ifdef TEST_RUN
+    string frgiThinRespFile =  outDir + "/FrgiThinResp.png";
+    imwrite(frgiThinRespFile.c_str(), thickBi);
 #endif
     
-    thickBinary = 255 - thickBinary;
-    removeBurrs(thickBinary, thickBinary);
-    thickBinary = thickBinary & wrkMaskInFR;
+    thickBi = 255 - thickBi;
+    removeBurrs(thickBi, thickBi);
+    thickBi = thickBi & wrkMaskInFR;
     
-#ifdef TEST_RUN_WRK
-    string frgFinalRespFile =  wrk_out_dir + "/FrgFinalResp.png";
-    imwrite(frgFinalRespFile.c_str(), thickBinary);
+#ifdef TEST_RUN
+    string frgiFinalRespFile =  outDir + "/FrgFinalResp.png";
+    imwrite(frgiFinalRespFile.c_str(), thickBi);
 #endif
     
-    CONTOURS contoursThick;
-    findContours(thickBinary, contoursThick, RETR_EXTERNAL, CHAIN_APPROX_NONE);
+    CONTOURS thickCts;
+    findContours(thickBi, thickCts, RETR_EXTERNAL, CHAIN_APPROX_NONE);
     
-    CONTOURS::const_iterator it_ct = contoursThick.begin();
-    unsigned long ct_size = contoursThick.size();
+    CONTOURS::const_iterator it_ct = thickCts.begin();
+    unsigned long ct_size = thickCts.size();
     for (unsigned int i = 0; i < ct_size; ++i)
     {
         if (it_ct->size() >= minsWrkSize)
         {
-            DeepWrkConts.push_back(contoursThick[i]);
+            deepWrkConts.push_back(thickCts[i]);
         }
         if (it_ct->size() >= longWrkThresh /*&& it_c->size() <= sizeMax*/)
         {
-            longWrkConts.push_back(contoursThick[i]);
+            longWrkConts.push_back(thickCts[i]);
         }
         it_ct++;
     }

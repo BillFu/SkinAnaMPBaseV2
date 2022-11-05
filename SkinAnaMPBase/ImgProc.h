@@ -24,7 +24,8 @@ void connectEdge(cv::Mat& src);
 
 void removeBurrs(const cv::Mat & src, cv::Mat &dst);
 
-int imageThin(uchar *lpBits, int Width, int Height);
+// 给二值图像中的粗黑线“瘦身”
+int BlackLineThinInBiImg(uchar *lpBits, int Width, int Height);
 
 Mat Integral_2(const Mat& image);
 

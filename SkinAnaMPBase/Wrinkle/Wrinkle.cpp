@@ -9,14 +9,16 @@ Date:   2022/11/1
 
 ********************************************************************************/
 
-//#include "Geometry.hpp"
+#include "../Utils.hpp"
+
 #include "Wrinkle.hpp"
 #include "cvgabor.h"
 #include "frangi.h"
-#include "../Utils.hpp"
+#include "WrinkleFrangi.h"
 
 //-------------------------------------------------------------------------------------------
 // Frangi + Gabor Filtering
+/*
 void DetectWrinkle(const Mat& inImg, const Rect& faceRect)
 {
     // In the preprocessing stage, Color ==> Gray should be performed firstly
@@ -76,15 +78,38 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect)
     unsigned int sizeMin = 38;
     //unsigned int sizeMax = 400;
     
-    /*
-    get_deep_long_wrink_from_frangiResp(wrinkRespOrigScale,
-                                       _wrinkleMask_ROI, // 原始尺度，经过了Face_Rect裁切
-                                       longWrinkThresh,
-                                       sizeMin,
-                                       longContours,
-                                       DeepWrinkleContours);
-    */
-#ifdef TEST_RUN
+}
+*/
+
+void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
+                   const Mat& wrkMask,
+                   CONTOURS& deepWrkConts)
+{
+    cv::Mat imgGray;
+    cvtColor(inImg, imgGray, COLOR_BGR2GRAY);
+
+    // crop input gray image by Face Bounding Box, i.e., faceRect
+    Mat grFrImg; // the copy of input image cropped by FaceRect
+    imgGray(faceRect).copyTo(grFrImg);
+    imgGray.release();
     
-#endif
+    Mat wrkMaskInFR; // wrinkle mask cropped by face rect
+    wrkMask(faceRect).copyTo(wrkMaskInFR);
+
+    int longWrkThresh = 0.16 * grFrImg.cols;;
+    int minWrkSize = longWrkThresh / 2; // 皱纹（包括长、短皱纹）的最短下限
+
+    //------------------ 第一次是使用Frangi2d滤波，针对粗皱纹 --------------------
+    
+    // 计算Frangi滤波响应，并提取深皱纹和长皱纹
+    float avgFrgiRespValue;
+    int scaleRatio = 5;
+    Mat wrkRespRz;
+    CONTOURS longWrkConts;
+    CalcFrgiRespAndPickWrk(grFrImg, wrkMaskInFR, scaleRatio, minWrkSize,
+                        longWrkThresh,
+                        wrkRespRz, deepWrkConts, longWrkConts, avgFrgiRespValue);
+       
+    //----------------- 第二次使用Gabor滤波，针对细皱纹---------------------
+    
 }

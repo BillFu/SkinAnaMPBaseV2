@@ -300,7 +300,7 @@ void ExtLightWrk(const Mat& wrkGaborRespMap,
     threshold(wrkGaborRespMap, lightWrkBi, ltWrkGaborRespTh, 255, THRESH_BINARY);
 
     lightWrkBi = 255 - lightWrkBi;
-    imageThin(lightWrkBi.data, lightWrkBi.cols, lightWrkBi.rows);
+    BlackLineThinInBiImg(lightWrkBi.data, lightWrkBi.cols, lightWrkBi.rows);
     lightWrkBi = 255 - lightWrkBi;
     removeBurrs(lightWrkBi, lightWrkBi);
     lightWrkBi = lightWrkBi & wrkMaskInFR;
@@ -357,7 +357,7 @@ void ExtDeepWrk(const Mat& wrkGaborRespMap,
     cv::threshold(wrkGaborRespMap, binaryDeep, dpWrkGaborRespTh, 255, THRESH_BINARY);
     
     binaryDeep = 255 - binaryDeep;
-    imageThin(binaryDeep.data, binaryDeep.cols, binaryDeep.rows);
+    BlackLineThinInBiImg(binaryDeep.data, binaryDeep.cols, binaryDeep.rows);
     binaryDeep = 255 - binaryDeep;
     removeBurrs(binaryDeep, binaryDeep);
     binaryDeep = binaryDeep & wrkMaskInFR;
@@ -515,7 +515,7 @@ void ExtWrkInFhGaborResp(const Mat& fhGaborMap,
     //e_im = cv2.erode(d_im, kernel, iterations=1)
     
     lightWrkBi = 255 - lightWrkBi;
-    imageThin(lightWrkBi.data, lightWrkBi.cols, lightWrkBi.rows);
+    BlackLineThinInBiImg(lightWrkBi.data, lightWrkBi.cols, lightWrkBi.rows);
     lightWrkBi = 255 - lightWrkBi;
     removeBurrs(lightWrkBi, lightWrkBi);
     //lightWrkBi = lightWrkBi & wrkMaskInFR;

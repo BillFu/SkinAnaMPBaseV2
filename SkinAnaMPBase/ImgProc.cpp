@@ -120,8 +120,8 @@ void removeBurrs(const cv::Mat & src, cv::Mat &dst)
     temp.copyTo(dst);
 }
 
-
-int imageThin(uchar *lpBits, int Width, int Height)
+// 给二值图像中的粗黑线“瘦身”
+int BlackLineThinInBiImg(uchar *lpBits, int Width, int Height)
 {
     /////////////////////////////////////////////////////////////////
     //    lpBits: [in, out] 要细化的图像数据缓冲区
