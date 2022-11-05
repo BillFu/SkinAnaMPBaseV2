@@ -93,7 +93,7 @@ void ForgeWrinkleMask(const FaceInfo& faceInfo,
 
 // 一揽子函数，生成各类Mask和它们的Anno Image
 void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
-                       const fs::path& outDir, const string& fileNameBone,
+                       const fs::path& outDir, 
                        const FaceInfo& faceInfo,
                        const FaceSegRst& segResult)
 {
@@ -104,51 +104,71 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     Mat fbBiLab = FaceBgSegmentor::CalcFBBiLabExBeard(segResult);
 
     Mat mouthMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    string mouthMaskImgFile = BuildOutImgFileName(outDir,
-                             fileNameBone, "mc_");
     float expanRatio = 0.3;
     ForgeMouthMask(faceInfo, expanRatio, mouthMask);
     
+#ifdef TEST_RUN
+    string mouthMaskImgFile = BuildOutImgFNV2(outDir, "mouth_ct.png");
+    OverlayMaskOnImage(annoLmImage, mouthMask,
+                        "mouth_mask", mouthMaskImgFile.c_str());
+#endif
+    
     Mat browsMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    string ebsMaskImgFile = BuildOutImgFileName(outDir,
-                             fileNameBone, "ebc_");
     ForgeBrowsMask(faceInfo, segResult, browsMask);
     
+#ifdef TEST_RUN
+    string ebsMaskImgFile = BuildOutImgFNV2(outDir, "brow_ct.png");
+    OverlayMaskOnImage(annoLmImage, browsMask,
+                        "mouth_mask", ebsMaskImgFile.c_str());
+#endif
+    
     Mat eyesMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    string eyeMaskImgFile = BuildOutImgFileName(outDir,
-                             fileNameBone, "eye_");
     ForgeEyesMask(srcImage, faceInfo, segResult, eyesMask);
+
+#ifdef TEST_RUN
+    string eyeMaskImgFile = BuildOutImgFNV2(outDir, "eye_mask.png");
     OverlayMaskOnImage(annoLmImage, eyesMask,
                         "eyes_mask", eyeMaskImgFile.c_str());
-    /*
+#endif
+
     Mat eyesFullMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    string eyeFullMaskImgFile = BuildOutImgFileName(outDir,
-                             fileNameBone, "efc_");
     ForgeEyesFullMask(faceInfo, eyesFullMask);
     
-    string noseBellMaskFile = BuildOutImgFileName(outDir,
-                             fileNameBone, "nb_");
+#ifdef TEST_RUN
+    string eyeFullMaskImgFile = BuildOutImgFNV2(outDir, "eye_full_mask.png");
+    OverlayMaskOnImage(annoLmImage, eyesFullMask,
+                        "eyes_full_mask", eyeFullMaskImgFile.c_str());
+#endif
+
     Mat noseBellMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgeNoseBellMask(faceInfo, noseBellMask);
+    
+#ifdef TEST_RUN
+    string noseBellMaskFile = BuildOutImgFNV2(outDir, "nose_bell.png");
+    OverlayMaskOnImage(annoLmImage, noseBellMask,
+                        "nose_bell_mask", noseBellMaskFile.c_str());
+#endif
     
     Mat lowFaceMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgeLowerFaceMask(segResult, fbBiLab, lowFaceMask);
     
-    string expFhMaskFile = BuildOutImgFileName(outDir,
-                             fileNameBone, "efh_");
     Mat expFhMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgeExpFhMask(faceInfo, fbBiLab, expFhMask);
     
-    string poreMaskAnnoFile = BuildOutImgFileName(outDir,
-                             fileNameBone, "pore_");
+#ifdef TEST_RUN
+    string expFhMaskFile = BuildOutImgFNV2(outDir, "ext_forehead.png");
+    OverlayMaskOnImage(annoLmImage, expFhMask,
+                        "ext_forehead", expFhMaskFile.c_str());
+#endif
+    /*
+    string poreMaskAnnoFile = BuildOutImgFNV2(outDir, "pore_");
     Mat poreMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgePoreMaskV3(faceInfo, lowFaceMask, expFhMask, eyesFullMask,
                     mouthMask, poreMask);
     OverlayMaskOnImage(annoLmImage, poreMask,
                         "pore mask", poreMaskAnnoFile.c_str());
     
-    string wrkMaskAnnoFile = BuildOutImgFileName(outDir,
-                             fileNameBone, "wrk_");
+    string wrkMaskAnnoFile = BuildOutImgFNV2(outDir, "wrk_");
     Mat wrkMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgeWrinkleMask(faceInfo, lowFaceMask, expFhMask, eyesFullMask,
                     noseBellMask, wrkMask);
@@ -156,7 +176,7 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
                         "wrinkle mask", wrkMaskAnnoFile.c_str());
     
     Mat skinMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    string skinMaskImgFile = BuildOutImgFileName(outDir,
+    string skinMaskImgFile = BuildOutImgFNV2(outDir,
                              fileNameBone, "skinMask_");
     
     Point2i raisedFhCurve[NUM_PT_TOP_FH];

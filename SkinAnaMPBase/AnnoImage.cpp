@@ -156,6 +156,7 @@ void AnnoAllLmInfo(Mat& annoImage, const FaceInfo& faceInfo,
     
     AnnoHeadPoseEst(annoImage, faceInfo);
     
+    imwrite(annoFile.c_str(), annoImage);
 }
 
 //-----------------------------------------------------------------------------------------

@@ -66,8 +66,7 @@ void ForgeWrinkleMask(const FaceInfo& faceInfo,
 // 一揽子函数，生成各类Mask和它们的Anno Image
 // Debug版本，打印出许多辅助性结果和信息
 void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
-                       const fs::path& outDir, const string& fileNameBone,
-                       const FaceInfo& faceInfo,
+                       const fs::path& outDir, const FaceInfo& faceInfo,
                        const FaceSegRst& segResult);
 
 

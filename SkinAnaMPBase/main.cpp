@@ -89,12 +89,11 @@ int main(int argc, char **argv)
     else
         cout << "Succeeded to load image: " << crossImgFile << endl;
     
-    string fileBoneName = GetFileBoneName(crossImgFile);
+    //string fileBoneName = GetFileBoneName(crossImgFile);
     fs::path outParePath(outDir);
     
     // FP: full path
-    string segAnnoImgFP = BuildOutImgFileName(
-            outParePath, fileBoneName, "seg_");
+    string segAnnoImgFP = BuildOutImgFNV2(outParePath, "seg.png");
     FaceSegRst segResult;
     FaceBgSegmentor segmentor;
     segmentor.SegImage(crossImage, segResult);
@@ -123,15 +122,13 @@ int main(int argc, char **argv)
         return 0;
     }
     
-    //EstHeadPose(srcImage.size(), faceInfo);
+    EstHeadPose(crossImage.size(), faceInfo);
     
-    //Mat annoLmImage = srcImage.clone();
+    Mat annoLmImage = crossImage.clone();
     
-    /*
-    string annoLmImgFile = BuildOutImgFileName(
-            outParePath, fileBoneName, "lm_");
-    AnnoAllLmInfo(annoLmImage, faceInfo, annoLmImgFile);
-     */
+    string LmImgFile = BuildOutImgFNV2(
+            outParePath, "lm.png");
+    AnnoAllLmInfo(annoLmImage, faceInfo, LmImgFile);
     
     /*
     Scalar yellowColor(255, 0, 0);
@@ -141,11 +138,10 @@ int main(int argc, char **argv)
     string annoLmImgFile = BuildOutImgFileName(
             outParePath, fileBoneName, "lm_");
     imwrite(annoLmImgFile.c_str(), annoLmImage);
-
-    ForgeMaskAnnoPackDebug(srcImage, annoLmImage,
-                      outParePath, fileBoneName,
-                      faceInfo, segResult);
     */
+
+    ForgeMaskAnnoPackDebug(crossImage, annoLmImage,
+                      outParePath, faceInfo, segResult);
     
     /*
     ForgeMaskAnnoPackV2(srcImage, 
@@ -154,7 +150,8 @@ int main(int argc, char **argv)
     */
     crossImage.release();
     
-    string paraImgFile = config_json.at("CrossImage");
+    /*
+    string paraImgFile = config_json.at("ParallelImage");
     Mat paraImage = cv::imread(crossImgFile.c_str());
     if(paraImage.empty())
     {
@@ -172,5 +169,6 @@ int main(int argc, char **argv)
     DetectWrinkle(paraImage, segResult.faceBBox, wrkMask, wrkSpline,
                   deepWrkConts,
                   wrkGaborRespMap);
+    */
     return 0;
 }
