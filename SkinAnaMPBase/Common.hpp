@@ -20,11 +20,15 @@ Date:   2022/9/11
 #include "tensorflow/lite/examples/label_image/get_top_n.h"
 #include "tensorflow/lite/model.h"
 
-
 using namespace std;
 using namespace cv;
 using namespace tflite;
 
+#define TEST_RUN  // !!! 发布编译时，必须把这个定义给注释掉 ！！！
+
+#ifdef TEST_RUN
+extern string outDir;  // 在这里申明，在main.cpp里定义。
+#endif
 
 typedef unique_ptr<tflite::Interpreter> INTERPRETER;
 typedef unique_ptr<FlatBufferModel> TF_LITE_MODEL;

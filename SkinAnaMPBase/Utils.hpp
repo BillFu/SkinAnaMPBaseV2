@@ -63,6 +63,9 @@ string BuildOutImgFileName(const fs::path& outDir,
                          const string& fileNameBone,
                          const string& outPrefix);
 
+string BuildOutImgFNV2(const fs::path& outDir,
+                         const string& fileName);
+
 // File Bone Name: no path and no extension
 // the bone name of "images/JPN/cross_2.jpg" is "cross_2"
 string GetFileBoneName(string fileName);

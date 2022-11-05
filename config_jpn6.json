@@ -3,5 +3,6 @@
 	"ClassColorFile":					"models/classes3.txt",
 	"FaceMeshAttenModel": 				"models/face_lm_attent.tflite",
 	"SourceImage":						"images/JPN/cross_6.jpg",
+	"ParalleImage":						"images/JPN/cross_6.jpg",
 	"OutDir":							"result/JPN/case6"
 }

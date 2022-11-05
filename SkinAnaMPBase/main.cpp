@@ -14,6 +14,9 @@
 #include "Utils.hpp"
 
 #include "FaceBgSeg/FaceBgSegV2.hpp"
+#include "Wrinkle/Wrinkle.hpp"
+
+#include "Common.hpp"
 
 using namespace std;
 
@@ -31,6 +34,10 @@ Date:   2022/9/29
 **************************************************************************/
 
 using json = nlohmann::json;
+
+#ifdef TEST_RUN
+string outDir("");
+#endif
 
 int main(int argc, char **argv)
 {
@@ -50,8 +57,11 @@ int main(int argc, char **argv)
     string classColorFile = config_json.at("ClassColorFile");
     
     string faceMeshAttenModelFile = config_json.at("FaceMeshAttenModel");
-    string srcImgFile = config_json.at("SourceImage");
-    string outDir = config_json.at("OutDir");
+    string crossImgFile = config_json.at("CrossImage");
+    
+#ifdef TEST_RUN
+    outDir = config_json.at("OutDir");
+#endif
     
     // 这个函数在程序初始化时要调用一次，并确保返回true之后，才能往下进行
     bool isOK = FaceBgSegmentor::Initialize(segModelFile, classColorFile);
@@ -70,16 +80,16 @@ int main(int argc, char **argv)
     }
         
     // Load Input Image
-    Mat srcImage = cv::imread(srcImgFile.c_str());
-    if(srcImage.empty())
+    Mat crossImage = cv::imread(crossImgFile.c_str());
+    if(crossImage.empty())
     {
-        cout << "Failed to load input iamge: " << srcImgFile << endl;
+        cout << "Failed to load input iamge: " << crossImgFile << endl;
         return 0;
     }
     else
-        cout << "Succeeded to load image: " << srcImgFile << endl;
+        cout << "Succeeded to load image: " << crossImgFile << endl;
     
-    string fileBoneName = GetFileBoneName(srcImgFile);
+    string fileBoneName = GetFileBoneName(crossImgFile);
     fs::path outParePath(outDir);
     
     // FP: full path
@@ -87,17 +97,17 @@ int main(int argc, char **argv)
             outParePath, fileBoneName, "seg_");
     FaceSegRst segResult;
     FaceBgSegmentor segmentor;
-    segmentor.SegImage(srcImage, segResult);
-    DrawSegOnImage(srcImage, 0.5,
+    segmentor.SegImage(crossImage, segResult);
+    DrawSegOnImage(crossImage, 0.5,
         segResult, segAnnoImgFP.c_str());
     
-    cout << "source image has been segmented!" << endl;
+    cout << "cross Image has been segmented!" << endl;
     
     FaceInfo faceInfo;
 
     float confThresh = 0.75;
     bool hasFace = false;
-    isOK = ExtractFaceLm(srcImage, confThresh, segResult, hasFace,
+    isOK = ExtractFaceLm(crossImage, confThresh, segResult, hasFace,
                               faceInfo, errorMsg);
     if(!isOK)
     {
@@ -113,9 +123,9 @@ int main(int argc, char **argv)
         return 0;
     }
     
-    EstHeadPose(srcImage.size(), faceInfo);
+    //EstHeadPose(srcImage.size(), faceInfo);
     
-    Mat annoLmImage = srcImage.clone();
+    //Mat annoLmImage = srcImage.clone();
     
     /*
     string annoLmImgFile = BuildOutImgFileName(
@@ -123,6 +133,7 @@ int main(int argc, char **argv)
     AnnoAllLmInfo(annoLmImage, faceInfo, annoLmImgFile);
      */
     
+    /*
     Scalar yellowColor(255, 0, 0);
     AnnoTwoEyeRefinePts(annoLmImage, faceInfo, yellowColor, true);
     //AnnoGenKeyPoints(annoLmImage, faceInfo, true);
@@ -134,12 +145,27 @@ int main(int argc, char **argv)
     ForgeMaskAnnoPackDebug(srcImage, annoLmImage,
                       outParePath, fileBoneName,
                       faceInfo, segResult);
+    */
     
     /*
     ForgeMaskAnnoPackV2(srcImage, 
                         outParePath, fileBoneName,
                         faceInfo, segResult);
     */
+    crossImage.release();
     
+    string paraImgFile = config_json.at("CrossImage");
+    Mat paraImage = cv::imread(crossImgFile.c_str());
+    if(paraImage.empty())
+    {
+        cout << "Failed to load parallel source iamge: " << paraImgFile << endl;
+        return 0;
+    }
+    else
+        cout << "Succeeded to load parallel source image: " << paraImgFile << endl;
+    
+    // test the wrinkle detecting algorithm
+    DetectWrinkle(paraImage, segResult.faceBBox);
+
     return 0;
 }

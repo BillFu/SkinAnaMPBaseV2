@@ -190,6 +190,15 @@ string BuildOutImgFileName(const fs::path& outDir,
     return outFileName_FP;
 }
 
+string BuildOutImgFNV2(const fs::path& outDir,
+                         const string& fileName)
+{
+    fs::path outImgFullPath = outDir / fileName;
+    string outFileName_FP = outImgFullPath.string();
+    
+    return outFileName_FP;
+}
+
 
 // File Bone Name: no path and no extension
 // the bone name of "images/JPN/cross_2.jpg" is "cross_2"
