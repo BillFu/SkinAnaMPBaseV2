@@ -33,6 +33,7 @@ extern string outDir;  // 在这里申明，在main.cpp里定义。
 typedef unique_ptr<tflite::Interpreter> INTERPRETER;
 typedef unique_ptr<FlatBufferModel> TF_LITE_MODEL;
 
+typedef vector<Point2i> SPLINE;
 typedef vector<Point2i> POLYGON;
 typedef vector<POLYGON> POLYGON_GROUP;
 

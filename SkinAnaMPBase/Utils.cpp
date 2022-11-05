@@ -289,3 +289,21 @@ CONTOUR ComTwoArcs2Cont(const CONTOUR arc1, const CONTOUR arc2)
 
     return mergeCt;
 }
+
+//-------------------------------------------------------------------------------------------
+// 计算某点相对于Face Rect左上角点的相对坐标
+Point2i CalcRelCdToFR(const Point2i& pt, const Rect& faceRect)
+{
+    return Point2i(pt.x - faceRect.x, pt.y - faceRect.y);
+}
+
+// 用faceRect(宽高分别用frW、frH表示)去裁剪rect。rect既是输入，也是输出。
+void ClipRectByFR(int frW, int frH, int margin, Rect& rect)
+{
+    rect.x = rect.x > 0 ? rect.x : margin;
+    rect.y = rect.y > 0 ? rect.y : margin;
+    rect.y = rect.y < frH ? rect.y : frH - margin;
+    rect.x = rect.x < frW ? rect.x : frW - margin;
+    rect.width = rect.br().x < frW ? rect.width : frW - rect.x;
+    rect.height = rect.br().y < frH ? rect.height : frH - rect.y;
+}

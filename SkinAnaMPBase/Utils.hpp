@@ -81,9 +81,15 @@ Point2i convSegNetPt2SrcPt(const Size& srcImgS, const Point2i& snPt);
 Point2i convSrcPt2SegNetPt(const Size& srcImgS, const Point2i& srcPt);
 
 //-------------------------------------------------------------------------------------------
-
 float stddev_float(vector<float> const & func);
 
 CONTOUR ComTwoArcs2Cont(const CONTOUR arc1, const CONTOUR arc2);
+
+//-------------------------------------------------------------------------------------------
+// 计算某点相对于Face Rect左上角点的相对坐标
+Point2i CalcRelCdToFR(const Point2i& pt, const Rect& faceRect);
+
+// 用faceRect(宽高分别用frW、frH表示)去裁剪rect。rect既是输入，也是输出。
+void ClipRectByFR(int frW, int frH, int margin, Rect& rect);
 
 #endif /* end of UTILS_HPP */

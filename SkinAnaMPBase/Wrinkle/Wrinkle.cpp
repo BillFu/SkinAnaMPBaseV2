@@ -64,6 +64,26 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect)
     
     frgiRespRz.release();
     
+    int temp0 = 0.042*faceRect.width; // ???
+    int longWrkTh = max(temp0, 38);
+    
+#ifdef TEST_RUN
+    cout << "temp0: " << temp0 << endl;
+    cout << "longWrkTh: " << longWrkTh << endl;
+#endif
+    
+    CONTOURS longContours;
+    unsigned int sizeMin = 38;
+    //unsigned int sizeMax = 400;
+    
+    /*
+    get_deep_long_wrink_from_frangiResp(wrinkRespOrigScale,
+                                       _wrinkleMask_ROI, // 原始尺度，经过了Face_Rect裁切
+                                       longWrinkThresh,
+                                       sizeMin,
+                                       longContours,
+                                       DeepWrinkleContours);
+    */
 #ifdef TEST_RUN
     
 #endif
