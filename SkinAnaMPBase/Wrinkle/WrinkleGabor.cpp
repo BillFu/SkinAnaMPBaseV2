@@ -400,7 +400,7 @@ void ExtDeepWrk(const Mat& wrkGaborRespMap,
 ////////////////////////////////////////////////////////////////////////////////////////
 // fine wrinkle： 细皱纹
 // WrinkRespMap的大小和在原始影像坐标系中的位置由Face_Rect限定
-void CalcGaborResp(const Mat& inImgInFR_Gray,
+void CalcGaborResp(const Mat& grFrImg,
                            const Rect& faceRect,
                            const SPLINE& wrkSpline,
                            Mat& gaborRespMap)
@@ -414,26 +414,26 @@ void CalcGaborResp(const Mat& inImgInFR_Gray,
     InitLCheekGaborBank(lGaborBank);
     int lcSpPtIDs[4] = {6, 10, 13, 15};
     Mat lCheekResp = CalcOneCheekGaborResp(wrkSpline,
-        lcSpPtIDs, lGaborBank, faceRect, inImgInFR_Gray, lCheekRect);
+        lcSpPtIDs, lGaborBank, faceRect, grFrImg, lCheekRect);
 
     // 计算右面颊的Gabor滤波响应值
     vector<CvGabor*> rGaborBank;
     InitRCheekGaborBank(rGaborBank);
     int rcSpPtIDs[4] = {25, 21, 18, 16};
     Mat rCheekResp = CalcOneCheekGaborResp(wrkSpline,
-        rcSpPtIDs, rGaborBank, faceRect, inImgInFR_Gray, rCheekRect);
+        rcSpPtIDs, rGaborBank, faceRect, grFrImg, rCheekRect);
 
     // glabella，眉间，印堂
     Mat glabeRegResp = CalcGlabellaGaborResp(wrkSpline,
-                                         faceRect, inImgInFR_Gray, glabeRect, lCheekRect);
+                                         faceRect, grFrImg, glabeRect, lCheekRect);
     
     // 前额
     Mat fhRegResp = CalcFhGaborResp(wrkSpline,
-                                         faceRect, inImgInFR_Gray, fhRect);
+                                         faceRect, grFrImg, fhRect);
     
     //鼻子的上半部分
     Mat noseRegResp = CalcUpperNoseGaborResp(wrkSpline,
-                                          faceRect, inImgInFR_Gray, noseRect);
+                                          faceRect, grFrImg, noseRect);
     
 #ifdef TEST_RUN_WRK
     bool isSuccess;
@@ -444,7 +444,7 @@ void CalcGaborResp(const Mat& inImgInFR_Gray,
     isSuccess = SaveTestOutImgInDir(fhRegResp,  wrk_out_dir,   "fRegResp.png");
     isSuccess = SaveTestOutImgInDir(noseRegResp, wrk_out_dir, "nRegResp.png");
     
-    Mat canvas = inImgInFR_Gray.clone();
+    Mat canvas = grFrImg.clone();
     rectangle(canvas, lCheekRect, CV_COLOR_RED, 8, 0);
     rectangle(canvas, rCheekRect, CV_COLOR_GREEN, 8, 0);
     rectangle(canvas, glabeRect, CV_COLOR_BLUE, 8, 0);
@@ -458,19 +458,19 @@ void CalcGaborResp(const Mat& inImgInFR_Gray,
     CONTOURS LightWrkConts;
     int minLenOfWrk = 200;
 
-    Mat fhGaborMap = Mat(inImgInFR_Gray.size(), inImgInFR_Gray.type(), Scalar(0));
+    Mat fhGaborMap = Mat(grFrImg.size(), grFrImg.type(), Scalar(0));
     fhRegResp.copyTo(fhGaborMap(fhRect));
     
     ExtWrkInFhGaborResp(fhGaborMap, faceRect, minLenOfWrk, LightWrkConts);
     fhGaborMap.release();
     
-    Mat fhWrkImg = drawFhWrk(inImgInFR_Gray, LightWrkConts);
+    Mat fhWrkImg = drawFhWrk(grFrImg, LightWrkConts);
     isSuccess = SaveTestOutImgInDir(fhWrkImg, wrk_out_dir, "fhWrkImg.png");
     fhWrkImg.release();
     */
 #endif
     
-    gaborRespMap = Mat(inImgInFR_Gray.size(), inImgInFR_Gray.type(), Scalar(0));
+    gaborRespMap = Mat(grFrImg.size(), grFrImg.type(), Scalar(0));
 
     // --------把各个小区域的计算结果合并起来，存贮在WrkRespMap------------------------------------
     lCheekResp.copyTo(gaborRespMap(lCheekRect));
@@ -478,8 +478,8 @@ void CalcGaborResp(const Mat& inImgInFR_Gray,
     fhRegResp.copyTo(gaborRespMap(fhRect));
     
     // nose上部和眉间glabella与其他区域有重叠，故而处理与其他三个相互不重叠区域的处理有所不同。
-    cv::Mat noseRegionTemp(inImgInFR_Gray.size(), CV_8UC1, cv::Scalar(0));
-    cv::Mat glabeRegionTemp(inImgInFR_Gray.size(), CV_8UC1, cv::Scalar(0));
+    cv::Mat noseRegionTemp(grFrImg.size(), CV_8UC1, cv::Scalar(0));
+    cv::Mat glabeRegionTemp(grFrImg.size(), CV_8UC1, cv::Scalar(0));
     
     noseRegResp.copyTo(noseRegionTemp(noseRect));
     glabeRegResp.copyTo(glabeRegionTemp(glabeRect));

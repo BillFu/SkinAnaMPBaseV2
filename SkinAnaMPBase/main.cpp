@@ -167,6 +167,10 @@ int main(int argc, char **argv)
     Mat wrkMask(paraImage.size(), CV_8UC1, Scalar(255));
     CONTOURS deepWrkConts;
     // test the wrinkle detecting algorithm
-    DetectWrinkle(paraImage, segResult.faceBBox, wrkMask, deepWrkConts);
+    Mat wrkGaborRespMap;
+    SPLINE wrkSpline;
+    DetectWrinkle(paraImage, segResult.faceBBox, wrkMask, wrkSpline,
+                  deepWrkConts,
+                  wrkGaborRespMap);
     return 0;
 }

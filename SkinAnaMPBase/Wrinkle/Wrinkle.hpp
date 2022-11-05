@@ -19,7 +19,11 @@ using namespace cv;
 
 #include "../Common.hpp"
 
+// wrkGaborRespMap: 输出，记录Gabor滤波的结果，大小和位置由Face_Rect来限定
 void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
-                   const Mat& wrkMask, CONTOURS& deepWrkConts);
+                   const Mat& wrkMask,
+                   const SPLINE& wrkSpline,
+                   CONTOURS& deepWrkConts,
+                   Mat& wrkGaborRespMap);
 
 #endif /* end of WRINKLE_HPP */

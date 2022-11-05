@@ -59,7 +59,7 @@ Mat CalcUpperNoseGaborResp(const vector<Point2i>& wrinkle_spline_curve,
                   const Rect& FaceContour_Rect,
                   const Mat& allWrinkle, Rect& nrect);
 
-void CalcGaborResp(const Mat& inImg_face_gray,
+void CalcGaborResp(const Mat& grFrImg,
                            const Rect& Face_Rect,
                            const SPLINE& wrinkle_spline,
                            Mat& WrinkRespMap //WrinkRespMap的大小和在原始影像坐标系中的位置由Face_Rect限定
