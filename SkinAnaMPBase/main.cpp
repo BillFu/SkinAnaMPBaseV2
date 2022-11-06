@@ -128,17 +128,9 @@ int main(int argc, char **argv)
     
     string LmImgFile = BuildOutImgFNV2(
             outParePath, "lm.png");
-    AnnoAllLmInfo(annoLmImage, faceInfo, LmImgFile);
-    
-    /*
-    Scalar yellowColor(255, 0, 0);
-    AnnoTwoEyeRefinePts(annoLmImage, faceInfo, yellowColor, true);
-    //AnnoGenKeyPoints(annoLmImage, faceInfo, true);
-
-    string annoLmImgFile = BuildOutImgFileName(
-            outParePath, fileBoneName, "lm_");
-    imwrite(annoLmImgFile.c_str(), annoLmImage);
-    */
+    //AnnoAllLmInfo(annoLmImage, faceInfo, LmImgFile);
+    AnnoGenKeyPoints(annoLmImage, faceInfo, true);
+    imwrite(LmImgFile.c_str(), annoLmImage);
 
     ForgeMaskAnnoPackDebug(crossImage, annoLmImage,
                       outParePath, faceInfo, segResult);

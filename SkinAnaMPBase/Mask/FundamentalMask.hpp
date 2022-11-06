@@ -71,6 +71,16 @@ void ForgeNoseBellMask(const FaceInfo& faceInfo, Mat& outNoseBellMask);
 //-------------------------------------------------------------------------------------------
 void OverlayMaskOnImage(const Mat& srcImg, const Mat& mask,
                         const string& maskName,
-                        const char* out_filename);
+                        const char* out_filename,
+                        Scalar drawColor=Scalar(0, 0, 255));
+
+
+//void OverMaskOnCanvas(const Mat& bgImg, const Mat& mask,
+//                      const Scalar& drawColor, Mat& outImg);
+
+void OverMaskOnCanvas(Mat& canvas, const Mat& mask,
+                      const Scalar& drawColor);
+//-------------------------------------------------------------------------------------------
+
 
 #endif /* end of DETECT_REGION_HPP */

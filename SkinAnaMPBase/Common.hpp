@@ -108,6 +108,31 @@ struct SegMask
     Mat  mask; // sub-matrix cropped from the NOS or SP, its location specified by bbox
 };
 
+struct DetectRegion  
+{
+    Rect bbox;
+    Mat  mask;
+    
+    DetectRegion()
+    {
+        bbox = Rect(0, 0, 1, 1);
+        mask = Mat(1, 1, CV_8UC1, Scalar(0));
+    }
+    
+    DetectRegion(const Rect& bbox0, const Mat& mask0):
+    bbox(bbox0), mask(mask0)
+    {
+        
+    }
+};
+
+struct WrkRegGroup
+{
+    DetectRegion fhReg;
+    DetectRegion glaReg; //glabella
+
+};
+
 struct SegEyeFPsNOS
 {
     Point lCorPtNOS;

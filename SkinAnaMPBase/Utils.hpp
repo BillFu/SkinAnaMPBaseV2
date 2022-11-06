@@ -92,4 +92,9 @@ Point2i CalcRelCdToFR(const Point2i& pt, const Rect& faceRect);
 // 用faceRect(宽高分别用frW、frH表示)去裁剪rect。rect既是输入，也是输出。
 void ClipRectByFR(int frW, int frH, int margin, Rect& rect);
 
+//-------------------------------------------------------------------------------------------
+// LS: local space
+// GS: global space
+Mat TransMaskFromLS2GS(const Size& srcSize, const DetectRegion& localMask);
+
 #endif /* end of UTILS_HPP */

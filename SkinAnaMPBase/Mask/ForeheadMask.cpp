@@ -199,6 +199,7 @@ void ForgeForeheadMask(const FaceInfo& faceInfo, const Mat& fbBiLab, Mat& outMas
     int csNumPoint = 80;
     DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
 
+    outMask = Mat(faceInfo.srcImgS, CV_8UC1, Scalar(0));
     DrawContOnMask(refinedPolygon, outMask);
     
     outMask = outMask & fbBiLab;

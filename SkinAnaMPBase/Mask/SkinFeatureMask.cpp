@@ -20,13 +20,15 @@ Date:   2022/9/23
 #include <algorithm>
 
 #include "../Utils.hpp"
-#include "EyebrowMaskV8.hpp"
-#include "ForeheadMask.hpp"
-#include "LowerFaceMask.hpp"
 #include "../AnnoImage.hpp"
 #include "../FaceBgSeg/FaceBgSegV2.hpp"
 #include "../BSpline/ParametricBSpline.hpp"
+
+#include "EyebrowMaskV8.hpp"
+#include "ForeheadMask.hpp"
+#include "LowerFaceMask.hpp"
 #include "SkinMask.hpp"
+#include "WrinkleMask.hpp"
 
 
 namespace fs = std::filesystem;
@@ -88,6 +90,8 @@ void ForgeWrinkleMask(const FaceInfo& faceInfo,
     outWrkMask = faceLowMask | expFhMask ;
     outWrkMask = outWrkMask & (~eyeFullMask) & (~noseBellMask);
 }
+
+
 
 //-------------------------------------------------------------------------------------------
 
@@ -160,6 +164,11 @@ void ForgeMaskAnnoPackDebug(const Mat& srcImage, const Mat& annoLmImage,
     OverlayMaskOnImage(annoLmImage, expFhMask,
                         "ext_forehead", expFhMaskFile.c_str());
 #endif
+    
+    WrkRegGroup wrkRegGroup;
+    ForgeWrkTenRegsDebug(annoLmImage, faceInfo,
+                         fbBiLab, wrkRegGroup);
+
     /*
     string poreMaskAnnoFile = BuildOutImgFNV2(outDir, "pore_");
     Mat poreMask(srcImgS, CV_8UC1, cv::Scalar(0));

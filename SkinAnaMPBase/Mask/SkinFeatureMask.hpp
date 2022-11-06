@@ -13,7 +13,7 @@ Date:   2022/9/23
 #define SKIN_FEATURE_MASK_HPP
 
 #include "opencv2/opencv.hpp"
-#include "Common.hpp"
+#include "../Common.hpp"
 
 using namespace std;
 using namespace cv;

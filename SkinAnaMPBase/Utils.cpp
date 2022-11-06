@@ -307,3 +307,11 @@ void ClipRectByFR(int frW, int frH, int margin, Rect& rect)
     rect.width = rect.br().x < frW ? rect.width : frW - rect.x;
     rect.height = rect.br().y < frH ? rect.height : frH - rect.y;
 }
+
+//-------------------------------------------------------------------------------------------
+Mat TransMaskFromLS2GS(const Size& srcSize, const DetectRegion& localMask)
+{
+    Mat maskInGlobal(srcSize, CV_8UC1, Scalar(0));
+    localMask.mask.copyTo(maskInGlobal(localMask.bbox));
+    return maskInGlobal;
+}

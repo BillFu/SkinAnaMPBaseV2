@@ -19,6 +19,7 @@
 		265B7B9C28E5C9D2004F5E49 /* AnnoImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540028CD861C004CF77D /* AnnoImage.cpp */; };
 		2680A22E28EFC54B00A305EB /* FaceLmExtractV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2680A22C28EFC54B00A305EB /* FaceLmExtractV2.cpp */; };
 		2680A22F28EFC55A00A305EB /* FaceLmExtractV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2680A22C28EFC54B00A305EB /* FaceLmExtractV2.cpp */; };
+		269CC10F29175DB000BA8AA2 /* WrinkleMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269CC10E29175DB000BA8AA2 /* WrinkleMask.cpp */; };
 		26B2C4A32915F3420048B37C /* cvgabor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B2C4A22915F3420048B37C /* cvgabor.cpp */; };
 		26B2C4A92915F4680048B37C /* Wrinkle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B2C4A82915F4680048B37C /* Wrinkle.cpp */; };
 		26B2C4AC2915F9590048B37C /* frangi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B2C4AB2915F9590048B37C /* frangi.cpp */; };
@@ -109,6 +110,8 @@
 		265B7B9728E5B26D004F5E49 /* libtensorflowlite.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtensorflowlite.so; path = m1_lib/libtensorflowlite.so; sourceTree = "<group>"; };
 		2680A22C28EFC54B00A305EB /* FaceLmExtractV2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FaceLmExtractV2.cpp; sourceTree = "<group>"; };
 		2680A22D28EFC54B00A305EB /* FaceLmExtractV2.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FaceLmExtractV2.hpp; sourceTree = "<group>"; };
+		269CC10D29175DB000BA8AA2 /* WrinkleMask.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = WrinkleMask.hpp; sourceTree = "<group>"; };
+		269CC10E29175DB000BA8AA2 /* WrinkleMask.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WrinkleMask.cpp; sourceTree = "<group>"; };
 		26B2C4A12915F3420048B37C /* cvgabor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cvgabor.h; sourceTree = "<group>"; };
 		26B2C4A22915F3420048B37C /* cvgabor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cvgabor.cpp; sourceTree = "<group>"; };
 		26B2C4A72915F4680048B37C /* Wrinkle.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Wrinkle.hpp; sourceTree = "<group>"; };
@@ -206,6 +209,8 @@
 		264E012328D6C1DF00CB94D1 /* Mask */ = {
 			isa = PBXGroup;
 			children = (
+				269CC10E29175DB000BA8AA2 /* WrinkleMask.cpp */,
+				269CC10D29175DB000BA8AA2 /* WrinkleMask.hpp */,
 				CB443CE02913545300E9B24B /* EyebrowMaskV8.cpp */,
 				CB443CE12913545300E9B24B /* EyebrowMaskV8.hpp */,
 				26D773AC2912A1450051177F /* SmEyePg.cpp */,
@@ -513,6 +518,7 @@
 				263B540528CD8B34004CF77D /* Utils.cpp in Sources */,
 				26D773AE2912A1450051177F /* SmEyePg.cpp in Sources */,
 				2606575B28F7122400019FFE /* PolarPtSeq.cpp in Sources */,
+				269CC10F29175DB000BA8AA2 /* WrinkleMask.cpp in Sources */,
 				263BD86729165AD100AF1FEE /* WrinkleFrangi.cpp in Sources */,
 				CBB5DB4028DD5E97003CDED3 /* SkinFeatureMask.cpp in Sources */,
 				CB9D430928F3F9DA00CD3B13 /* SegHelper.cpp in Sources */,

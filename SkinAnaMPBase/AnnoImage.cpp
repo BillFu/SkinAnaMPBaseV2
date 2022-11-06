@@ -54,6 +54,7 @@ void AnnoGenKeyPoints(Mat& annoImage, const FaceInfo& faceInfo, bool showIndices
         }
     }
     
+    /*
     // 对应Dlib上点的序号为18, 22, 23, 27, 37, 40, 43, 46, 32, 36, 49, 55, 58, 9
     int face_2d_pts_indices[] = {46, 55, 285, 276, 33, 173,
         398, 263, 48, 278, 61, 291, 17, 199};  // indics in face lms in mediapipe.
@@ -66,6 +67,7 @@ void AnnoGenKeyPoints(Mat& annoImage, const FaceInfo& faceInfo, bool showIndices
         cv::putText(annoImage, to_string(lm_index), faceInfo.lm_2d[lm_index],
                     FONT_HERSHEY_SIMPLEX, 0.5, blue, 1);
     }
+    */
 }
 
 

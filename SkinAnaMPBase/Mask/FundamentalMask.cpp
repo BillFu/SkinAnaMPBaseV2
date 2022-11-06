@@ -48,104 +48,6 @@ Mat ContourGroup2Mask(Size imgS, const POLYGON_GROUP& contoursGroup)
 
 //-------------------------------------------------------------------------------------------
 
-/**********************************************************************************************
-额头顶部轮廓得到了提升。
-***********************************************************************************************/
-/*
-void ForgeSkinPolygon(const FaceInfo& faceInfo, POLYGON& skinPolygon)
-{
-    // the indices for lm in meadiapipe mesh from
-    // https://github.com/tensorflow/tfjs-models/blob/838611c02f51159afdd77469ce67f0e26b7bbb23/face-landmarks-detection/src/mediapipe-facemesh/keypoints.ts
-    
-    int silhouette[] = {
-        10,  338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288,
-        397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136,
-        172, 58,  132, 93,  234, 127, 162, 21,  54,  103, 67,  109};
-    
-    int num_pts = sizeof(silhouette) / sizeof(int);
-    
-    int raisedFhCurve[9][2];
-    RaiseupForeheadCurve(faceInfo.lm_2d, raisedFhCurve, 0.8);
-
-    // calculate the new version of coordinates of Points on face silhouette.
-    int newSilhouPts[36][2];
-    for(int i = 0; i<num_pts; i++)
-    {
-        int index = silhouette[i];
-        int indexInFHC = getPtIndexOfFHCurve(index);
-        
-        if(indexInFHC == -1) // Not on Forehead Curve
-        {
-            newSilhouPts[i][0] = faceInfo.lm_2d[index].x;
-            newSilhouPts[i][1] = faceInfo.lm_2d[index].y;
-        }
-        else // on Forehead Curve, need update the coordinates, i.e. raising up
-        {
-            newSilhouPts[i][0] = raisedFhCurve[indexInFHC][0];
-            newSilhouPts[i][1] = raisedFhCurve[indexInFHC][1];
-        }
-    }
-    
-    for(int i = 0; i<num_pts; i++)
-    {
-        int x = newSilhouPts[i][0];
-        int y = newSilhouPts[i][1];
-        skinPolygon.push_back(Point2i(x, y));
-    }
-}
-*/
-/*
-void ForgeSkinPolygonV2(const FaceInfo& faceInfo, POLYGON& skinPolygon)
-{
-#define NUM_PT_SILH  34
-    // 36 points in silhouette
-    int silhouette[] = {
-        10,  338, 297, 332, 284, 301, 356, 454, 323, 361, 288,
-        397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136,
-        172, 58,  132, 93,  234, 127, 71,  54,  103, 67,  109
-    };
-    
-    int num_pts = sizeof(silhouette) / sizeof(int);
-    
-    Point2i raisedFhCurve[NUM_PT_TOP_FH];
-    int raisedPtIndices[NUM_PT_TOP_FH];
-    RaiseupFhCurve(faceInfo.lm_2d, raisedFhCurve, raisedPtIndices, 0.8);
-
-    // calculate the new version of coordinates of Points on face silhouette.
-    Point2i newSilhouPts[NUM_PT_SILH];
-    for(int i = 0; i<num_pts; i++)
-    {
-        int index = silhouette[i];
-        int indexInFHC = getPtIndexOfFHCurve(index);
-        
-        if(indexInFHC == -1) // Not on Forehead Curve
-        {
-            newSilhouPts[i] = faceInfo.lm_2d[index];
-        }
-        else // on Forehead Curve, need update the coordinates, i.e. raising up
-        {
-            newSilhouPts[i] = raisedFhCurve[indexInFHC];
-        }
-    }
-    
-    for(int i = 0; i<num_pts-4; i++) // from 10, 338 ... to 139, 71
-    {
-        skinPolygon.push_back(newSilhouPts[i]);
-    }
-    
-    Point2i pt54 = newSilhouPts[num_pts-4];
-    Point2i pt103 = newSilhouPts[num_pts-3];
-    
-    //Point2i pt54p = Interpolate(pt54, pt103, 0.65);
-
-    skinPolygon.push_back(pt103);
-    skinPolygon.push_back(newSilhouPts[num_pts-2]); // 67
-    skinPolygon.push_back(newSilhouPts[num_pts-1]); // 109
-
-}
-*/
-//-------------------------------------------------------------------------------------------
-
 void ForgeMouthPolygon(const FaceInfo& faceInfo,
                        int& mouthWidth, int& mouthHeight,
                        POLYGON& mouthPolygon)
@@ -176,39 +78,9 @@ void ForgeMouthPolygon(const FaceInfo& faceInfo,
 
     mouthHeight = pt17.y - (pt37.y + pt267.y) / 2;
     mouthWidth  = pt287.x - pt57.x;
-    
-    //cout << "mouthHeight: " << mouthHeight << endl;
-    //cout << "mouthWidth: " << mouthWidth << endl;
 }
 
 //-------------------------------------------------------------------------------------------
-/*
-void ForgeSkinMask(const FaceInfo& faceInfo, Mat& outMask)
-{
-    POLYGON coarsePolygon, refinedPolygon;
-
-    ForgeSkinPolygonV2(faceInfo, coarsePolygon);
-    
-    int csNumPoint = 200;
-    CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
-
-    DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
-}
-*/
-
-/*
-// face mask below the eyes, 在鼻子部位向上凸出，接近额头
-void ForgeLowFaceMask(const FaceInfo& faceInfo, Mat& outMask)
-{
-    POLYGON coarsePolygon, refinedPolygon;
-
-    ForgeLowFacePg(faceInfo, coarsePolygon);
-    int csNumPoint = 100;
-    CloseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
-
-    DrawContOnMask(faceInfo.imgWidth, faceInfo.imgHeight, refinedPolygon, outMask);
-}
-*/
 
 //expanRatio: expansion width toward outside / half of mouth height
 void ForgeMouthMask(const FaceInfo& faceInfo, float expanRatio, Mat& outFinalMask)
@@ -306,41 +178,6 @@ void ForgeNoseMask(const FaceInfo& faceInfo, Mat& outMask)
 }
 //-------------------------------------------------------------------------------------------
 
-/*
-// 蝙蝠两翼末端本想弄成圆角，但效果不佳
-void ForgeNoseBellPg(const FaceInfo& faceInfo, POLYGON& outPg)
-{
-    outPg.push_back(getPtOnGLm(faceInfo, 197));
-    outPg.push_back(getPtOnGLm(faceInfo, 196));
-    Point2i pt236a = IpGLmPtWithPair(faceInfo, 236, 217, 0.15);
-    outPg.push_back(pt236a);
-    
-    outPg.push_back(getPtOnGLm(faceInfo, 48));
-    outPg.push_back(getPtOnGLm(faceInfo, 92));
-    outPg.push_back(getPtOnGLm(faceInfo, 202));
-    outPg.push_back(getPtOnGLm(faceInfo, 210));
-
-    // add two special points and 152, the lowest point
-    Point2i pt136 = getPtOnGLm(faceInfo, 136);
-    Point2i pt152 = getPtOnGLm(faceInfo, 152);
-    Point2i pt365 = getPtOnGLm(faceInfo, 365);
-    
-    Point2i sp1 =  getRectCornerPt(pt136, pt152);
-    outPg.push_back(sp1);
-    outPg.push_back(pt152);
-    Point2i sp2 =  getRectCornerPt(pt365, pt152);
-    outPg.push_back(sp2);
-    
-    outPg.push_back(getPtOnGLm(faceInfo, 430));
-    outPg.push_back(getPtOnGLm(faceInfo, 422));
-    outPg.push_back(getPtOnGLm(faceInfo, 322));
-    outPg.push_back(getPtOnGLm(faceInfo, 278));
-    Point2i pt456a = IpGLmPtWithPair(faceInfo, 456, 437, 0.15);
-    outPg.push_back(pt456a);
-    outPg.push_back(getPtOnGLm(faceInfo, 419));
-}
-*/
-
 void ForgeNoseBellPg(const FaceInfo& faceInfo, POLYGON& outPg)
 {
     outPg.push_back(getPtOnGLm(faceInfo, 197));
@@ -392,7 +229,8 @@ void ForgeNoseBellMask(const FaceInfo& faceInfo, Mat& outMask)
 
 void OverlayMaskOnImage(const Mat& srcImg, const Mat& mask,
                         const string& maskName,
-                        const char* out_filename)
+                        const char* out_filename,
+                        Scalar drawColor)
 {
     vector<Mat> blue_mask_chs;
 
@@ -411,9 +249,29 @@ void OverlayMaskOnImage(const Mat& srcImg, const Mat& mask,
     int    stdWidth = 2000;
     double fontScale = srcImg.cols * stdScale / stdWidth;
     
-    Scalar redColor(0, 0, 255);  // BGR
+    //Scalar redColor(0, 0, 255);  // BGR
     cv::putText(outImg, "SkinAnaMPBase: " + maskName, Point(100, 100),
-                    FONT_HERSHEY_SIMPLEX, fontScale, redColor, 2);
+                    FONT_HERSHEY_SIMPLEX, fontScale, drawColor, 2);
 
     imwrite(out_filename, outImg);
+}
+
+void OverMaskOnCanvas(Mat& canvas, const Mat& mask,
+                      const Scalar& drawColor)
+{
+    vector<Mat> mask_chs;
+
+    //Mat zero_chan(srcImg.size(), CV_8UC1, Scalar(0));
+    Mat blueCh = mask*drawColor[0]/255;
+    Mat greenCh = mask*drawColor[1]/255;
+    Mat redCh = mask*drawColor[2]/255;
+
+    mask_chs.push_back(blueCh);
+    mask_chs.push_back(greenCh);
+    mask_chs.push_back(redCh);
+
+    Mat coloredMask;
+    merge(mask_chs, coloredMask);
+    
+    addWeighted(canvas, 0.70, coloredMask, 0.3, 0.0, canvas);
 }
