@@ -134,6 +134,9 @@ struct WrkRegGroup
     DetectRegion lEyeBagReg;
     DetectRegion rEyeBagReg;
 
+    DetectRegion lNagvReg;
+    DetectRegion rNagvReg;
+
 };
 
 struct SegEyeFPsNOS
