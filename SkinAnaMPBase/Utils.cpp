@@ -315,3 +315,11 @@ Mat TransMaskFromLS2GS(const Size& srcSize, const DetectRegion& localMask)
     localMask.mask.copyTo(maskInGlobal(localMask.bbox));
     return maskInGlobal;
 }
+
+void TransMaskFromGS2LS(const Mat& maskGS, DetectRegion& localMask)
+{
+    Rect maskRect = boundingRect(maskGS);
+    Mat cropMask;
+    maskGS(maskRect).copyTo(cropMask);
+    localMask = DetectRegion(maskRect, cropMask);
+}

@@ -127,25 +127,123 @@ Mat ForgeGlabellaMask(const FaceInfo& faceInfo)
 
 //-------------------------------------------------------------------------------
 
+void ForgeEyebagPg(const Point2i eyeRefPts[71],
+                   POLYGON& outPolygon)
+{
+    /*
+    int ptIndices[] = { 34, 35, 36/20, 37/21, 22, 8, 40/47, 61/39, 60, 59, 58, 68/57 // 逆时针计数
+    };
+    */
+    
+    outPolygon.push_back(eyeRefPts[34]);
+    outPolygon.push_back(eyeRefPts[35]);
+    
+    Point2i pt36a = Interpolate(eyeRefPts[36], eyeRefPts[20], 0.25);
+    outPolygon.push_back(pt36a);
+    
+    Point2i pt37a = Interpolate(eyeRefPts[37], eyeRefPts[21], 0.6);
+    outPolygon.push_back(pt37a);
+        
+    outPolygon.push_back(eyeRefPts[22]);
+    outPolygon.push_back(eyeRefPts[8]);
+    
+    Point2i pt40a = Interpolate(eyeRefPts[40], eyeRefPts[47], 0.6);
+    outPolygon.push_back(pt40a);
+    
+    //outPolygon.push_back(eyeRefPts[61]);
+    Point2i pt61a = Interpolate(eyeRefPts[61], eyeRefPts[39], 0.35);
+    outPolygon.push_back(pt61a);
+    
+    outPolygon.push_back(eyeRefPts[60]);
+
+    Point2i pt59a = Interpolate(eyeRefPts[59], eyeRefPts[37], -0.2);
+    outPolygon.push_back(pt59a);
+    
+    //outPolygon.push_back(eyeRefPts[58]);
+    Point2i pt58a = Interpolate(eyeRefPts[58], eyeRefPts[36], -0.2);
+    outPolygon.push_back(pt58a);
+    
+    Point2i pt58b = Interpolate(eyeRefPts[58], eyeRefPts[57], 0.75);
+    outPolygon.push_back(pt58b);
+}
+
+Mat ForgeEyebagMask(Size srcImgS, const Point2i eyeRefPts[71])
+{
+    POLYGON coarsePolygon, refinedPolygon;
+    ForgeEyebagPg(eyeRefPts, coarsePolygon);
+    
+    int csNumPoint = 60;
+    DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+
+    Mat outMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    // !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
+    DrawContOnMask(refinedPolygon, outMask);
+    
+    return outMask;
+}
+//-------------------------------------------------------------------------------
+// nasolabial grooves 鼻唇沟
+void ForgeRightNagvPg( const FaceInfo& faceInfo, POLYGON& outPolygon)
+{
+    outPolygon.push_back(getPtOnGLm(faceInfo, 355));
+    
+    Point2i pt429a = IpGLmPtWithPair(faceInfo, 429, 420, 0.65);
+    outPolygon.push_back(pt429a);
+    
+    Point2i pt360a = IpGLmPtWithPair(faceInfo, 360, 363, 0.5);
+    outPolygon.push_back(pt360a);
+    
+    Point2i pt344a = IpGLmPtWithPair(faceInfo, 344, 440, 0.7);
+    outPolygon.push_back(pt344a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 309));
+
+    Point2i pt391a = IpGLmPtWithPair(faceInfo, 391, 393, 0.5);
+    outPolygon.push_back(pt391a);
+    
+    Point2i pt269a = IpGLmPtWithPair(faceInfo, 269, 270, 0.5);
+    outPolygon.push_back(pt269a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 409));
+
+    Point2i pt287a = IpGLmPtWithPair(faceInfo, 287, 273, 0.6);
+    outPolygon.push_back(pt287a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 430));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 432));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 436));
+
+    Point2i pt426a = IpGLmPtWithPair(faceInfo, 426, 425, 0.2);
+    outPolygon.push_back(pt426a);
+    Point2i pt423a = IpGLmPtWithPair(faceInfo, 423, 266, 0.65);
+    outPolygon.push_back(pt423a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 371));
+}
+
+
+//-------------------------------------------------------------------------------
+
 // 生成皱纹检测的各个检测区（只针对正脸）----新版本
 void ForgeWrkTenRegs(const FaceInfo& faceInfo, const Mat& fbBiLab,
                      WrkRegGroup& wrkRegGroup)
 {
     Mat fhMaskSS;
     ForgeFhMaskForWrk(faceInfo, fbBiLab, fhMaskSS);
-    Rect fhRect = boundingRect(fhMaskSS);
-    Mat fhCropMask;
-    fhMaskSS(fhRect).copyTo(fhCropMask);
-    wrkRegGroup.fhReg = DetectRegion(fhRect, fhCropMask);
+    TransMaskFromGS2LS(fhMaskSS, wrkRegGroup.fhReg);
     fhMaskSS.release();
     
     Mat glabelMaskSS = ForgeGlabellaMask(faceInfo);
-    Rect glabelRect = boundingRect(glabelMaskSS);
-    Mat glabelCropMask;
-    glabelMaskSS(glabelRect).copyTo(glabelCropMask);
-    wrkRegGroup.glaReg = DetectRegion(glabelRect, glabelCropMask);
+    TransMaskFromGS2LS(glabelMaskSS, wrkRegGroup.glaReg);
     glabelMaskSS.release();
-
+    
+    Mat lEyeBagMask = ForgeEyebagMask(faceInfo.srcImgS, faceInfo.lEyeRefinePts);
+    TransMaskFromGS2LS(lEyeBagMask, wrkRegGroup.lEyeBagReg);
+    lEyeBagMask.release();
+    
+    Mat rEyeBagMask = ForgeEyebagMask(faceInfo.srcImgS, faceInfo.rEyeRefinePts);
+    TransMaskFromGS2LS(rEyeBagMask, wrkRegGroup.rEyeBagReg);
+    rEyeBagMask.release();
 }
 
 
@@ -156,11 +254,29 @@ void ForgeWrkTenRegsDebug(const Mat& annoLmImage, const FaceInfo& faceInfo,
     
     Mat fhMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.fhReg);
     Mat glaMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.glaReg);
-    
+    Mat lEyeBagMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.lEyeBagReg);
+    Mat rEyeBagMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.rEyeBagReg);
+        
     Mat showImg = annoLmImage.clone();
     OverMaskOnCanvas(showImg, fhMaskGS, Scalar(0, 0, 255));
+    fhMaskGS.release();
+    
     OverMaskOnCanvas(showImg, glaMaskGS, Scalar(255, 0, 0));
+    glaMaskGS.release();
 
-    string showImgFile = BuildOutImgFNV2(outDir, "WrkTenRegs.png");
-    imwrite(showImgFile.c_str(), showImg);
+    
+    // string showImgFile = BuildOutImgFNV2(outDir, "WrkTenRegs.png");
+    // imwrite(showImgFile.c_str(), showImg);
+    
+#ifdef TEST_RUN
+    string lEyeBagMaskImgFile = BuildOutImgFNV2(outDir, "lEyeBagMask.png");
+    OverlayMaskOnImage(annoLmImage, lEyeBagMaskGS,
+                        "lEyeBagMask", lEyeBagMaskImgFile.c_str());
+#endif
+
+#ifdef TEST_RUN
+    string rEyeBagMaskImgFile = BuildOutImgFNV2(outDir, "rEyeBagMask.png");
+    OverlayMaskOnImage(annoLmImage, rEyeBagMaskGS,
+                        "rEyeBagMask", rEyeBagMaskImgFile.c_str());
+#endif
 }

@@ -130,6 +130,9 @@ int main(int argc, char **argv)
             outParePath, "lm.png");
     //AnnoAllLmInfo(annoLmImage, faceInfo, LmImgFile);
     AnnoGenKeyPoints(annoLmImage, faceInfo, true);
+    
+    Scalar yellowColor(255, 0, 0);
+    //AnnoTwoEyeRefinePts(annoLmImage, faceInfo, yellowColor, true);
     imwrite(LmImgFile.c_str(), annoLmImage);
 
     ForgeMaskAnnoPackDebug(crossImage, annoLmImage,

@@ -131,6 +131,9 @@ struct WrkRegGroup
     DetectRegion fhReg;
     DetectRegion glaReg; //glabella
 
+    DetectRegion lEyeBagReg;
+    DetectRegion rEyeBagReg;
+
 };
 
 struct SegEyeFPsNOS

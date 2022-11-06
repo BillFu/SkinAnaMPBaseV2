@@ -97,4 +97,6 @@ void ClipRectByFR(int frW, int frH, int margin, Rect& rect);
 // GS: global space
 Mat TransMaskFromLS2GS(const Size& srcSize, const DetectRegion& localMask);
 
+void TransMaskFromGS2LS(const Mat& maskGS, DetectRegion& localMask);
+
 #endif /* end of UTILS_HPP */
