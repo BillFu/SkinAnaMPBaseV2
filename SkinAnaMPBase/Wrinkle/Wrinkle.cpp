@@ -23,8 +23,7 @@ Date:   2022/11/1
 
 // wrkGaborRespMap: 输出，记录Gabor滤波的结果，大小和位置由Face_Rect来限定
 void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
-                   const Mat& wrkMask,
-                   const SPLINE& wrkSpline,
+                   WrkRegGroup& wrkRegGroup,
                    CONTOURS& deepWrkConts,
                    Mat& wrkGaborRespMap)
 {
@@ -34,16 +33,15 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     // crop input gray image by Face Bounding Box, i.e., faceRect
     Mat grFrImg; // the copy of input image cropped by FaceRect
     imgGray(faceRect).copyTo(grFrImg);
-    imgGray.release();
     
-    Mat wrkMaskInFR; // wrinkle mask cropped by face rect
-    wrkMask(faceRect).copyTo(wrkMaskInFR);
+    //Mat wrkMaskInFR; // wrinkle mask cropped by face rect
+    //wrkMask(faceRect).copyTo(wrkMaskInFR);
 
-    int longWrkThresh = 0.16 * grFrImg.cols;;
-    int minWrkSize = longWrkThresh / 2; // 皱纹（包括长、短皱纹）的最短下限
+    // int longWrkThresh = 0.16 * grFrImg.cols;;
+    // ??? int minWrkSize = longWrkThresh / 2; // 皱纹（包括长、短皱纹）的最短下限
 
     //------------------ 第一次是使用Frangi2d滤波，针对粗皱纹 --------------------
-    
+    /*
     // 计算Frangi滤波响应，并提取深皱纹和长皱纹
     float avgFrgiRespValue;
     int scaleRatio = 5;
@@ -52,13 +50,14 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     CalcFrgiRespAndPickWrk(grFrImg, wrkMaskInFR, scaleRatio, minWrkSize,
                         longWrkThresh,
                         wrkRespRz, deepWrkConts, longWrkConts, avgFrgiRespValue);
+    */
        
     //----------------- 第二次使用Gabor滤波，针对细皱纹---------------------
     
-    GaussianBlur(grFrImg, grFrImg, cv::Size(11, 11), 0, 0); // ???
+    GaussianBlur(grFrImg, grFrImg, cv::Size(9, 9), 0, 0); // ???
     
     //WrinkRespMap是由Face_Rect来限定的
-    CalcGaborResp(grFrImg, faceRect, wrkSpline, wrkGaborRespMap);
+    CalcGaborResp(imgGray, wrkRegGroup, wrkGaborRespMap);
 
 #ifdef TEST_RUN
     /*

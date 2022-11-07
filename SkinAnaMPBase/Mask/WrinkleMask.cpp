@@ -358,7 +358,7 @@ void ForgeWrkTenRegs(const FaceInfo& faceInfo, const Mat& fbBiLab,
     fhMaskSS.release();
     
     Mat glabelMaskSS = ForgeGlabellaMask(faceInfo);
-    TransMaskFromGS2LS(glabelMaskSS, wrkRegGroup.glaReg);
+    TransMaskFromGS2LS(glabelMaskSS, wrkRegGroup.glabReg);
     glabelMaskSS.release();
     
     Mat lEyeBagMask = ForgeEyebagMask(faceInfo.srcImgS, faceInfo.lEyeRefinePts);
@@ -382,13 +382,15 @@ void ForgeWrkTenRegs(const FaceInfo& faceInfo, const Mat& fbBiLab,
     lCheekMask.release();
 }
 
-void ForgeWrkTenRegsDebug(const Mat& annoLmImage, const FaceInfo& faceInfo,
-                     const Mat& fbBiLab, WrkRegGroup& wrkRegGroup)
+void ForgeWrkTenRegs(
+                          const Mat& annoLmImage,
+                          const FaceInfo& faceInfo,
+                          const Mat& fbBiLab, WrkRegGroup& wrkRegGroup)
 {
     ForgeWrkTenRegs(faceInfo, fbBiLab, wrkRegGroup);
     
     Mat fhMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.fhReg);
-    Mat glaMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.glaReg);
+    Mat glaMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.glabReg);
     Mat lEyeBagMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.lEyeBagReg);
     Mat rEyeBagMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.rEyeBagReg);
         
@@ -400,15 +402,10 @@ void ForgeWrkTenRegsDebug(const Mat& annoLmImage, const FaceInfo& faceInfo,
     glaMaskGS.release();
     
 #ifdef TEST_RUN
-    string lEyeBagMaskImgFile = BuildOutImgFNV2(outDir, "lEyeBagMask.png");
-    OverlayMaskOnImage(annoLmImage, lEyeBagMaskGS,
-                        "lEyeBagMask", lEyeBagMaskImgFile.c_str());
-#endif
-
-#ifdef TEST_RUN
-    string rEyeBagMaskImgFile = BuildOutImgFNV2(outDir, "rEyeBagMask.png");
-    OverlayMaskOnImage(annoLmImage, rEyeBagMaskGS,
-                        "rEyeBagMask", rEyeBagMaskImgFile.c_str());
+    Mat eyeBagMaskGS = lEyeBagMaskGS | rEyeBagMaskGS;
+    string eyeBagMaskImgFile = BuildOutImgFNV2(outDir, "EyeBagMask.png");
+    OverlayMaskOnImage(annoLmImage, eyeBagMaskGS,
+                        "EyeBagMask", eyeBagMaskImgFile.c_str());
 #endif
     
     Mat rNagvMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.rNagvReg);

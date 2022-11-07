@@ -135,17 +135,11 @@ int main(int argc, char **argv)
     //AnnoTwoEyeRefinePts(annoLmImage, faceInfo, yellowColor, true);
     imwrite(LmImgFile.c_str(), annoLmImage);
 
-    ForgeMaskAnnoPackDebug(crossImage, annoLmImage,
-                      outParePath, faceInfo, segResult);
+    DetRegPackage detRegPack;
+    ForgeDetRegPack(crossImage, annoLmImage, outParePath, faceInfo, segResult, detRegPack);
     
-    /*
-    ForgeMaskAnnoPackV2(srcImage, 
-                        outParePath, fileBoneName,
-                        faceInfo, segResult);
-    */
     crossImage.release();
     
-    /*
     string paraImgFile = config_json.at("ParallelImage");
     Mat paraImage = cv::imread(crossImgFile.c_str());
     if(paraImage.empty())
@@ -156,14 +150,12 @@ int main(int argc, char **argv)
     else
         cout << "Succeeded to load parallel source image: " << paraImgFile << endl;
     
-    Mat wrkMask(paraImage.size(), CV_8UC1, Scalar(255));
     CONTOURS deepWrkConts;
     // test the wrinkle detecting algorithm
     Mat wrkGaborRespMap;
-    SPLINE wrkSpline;
-    DetectWrinkle(paraImage, segResult.faceBBox, wrkMask, wrkSpline,
-                  deepWrkConts,
-                  wrkGaborRespMap);
-    */
+    
+    DetectWrinkle(paraImage, segResult.faceBBox, detRegPack.wrkRegGroup,
+                  deepWrkConts, wrkGaborRespMap);
+    
     return 0;
 }

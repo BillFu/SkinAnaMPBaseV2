@@ -98,164 +98,100 @@ void InitRCheekGaborBank(vector<CvGabor*>& rGaborBank)
     }
 }
 
-Mat ApplyGaborFilter(vector<CvGabor*> gaborBank, const Mat& inImgInFR_Gray,
-                   const Rect& detectRect)
+Mat ApplyGaborFilter(const vector<CvGabor*>& gaborBank, const Mat& detRegImg)
 {
-    cv::Mat regImg = inImgInFR_Gray(detectRect).clone();
-    
     //cout << "regImg data type: " << openCVType2str(regImg.type()) << endl;
     
-    uchar maxV = *max_element(regImg.begin<uchar>(), regImg.end<uchar>());
-    uchar minV = *min_element(regImg.begin<uchar>(), regImg.end<uchar>());
+    uchar maxV = *max_element(detRegImg.begin<uchar>(), detRegImg.end<uchar>());
+    uchar minV = *min_element(detRegImg.begin<uchar>(), detRegImg.end<uchar>());
     
     float alpha = 255.0 / (maxV - minV);
-    regImg = (regImg - minV) * alpha;
-    
-    //cout << "regImg data type after scale: " << openCVType2str(regImg.type()) << endl;
+    Mat normImg = (detRegImg - minV) * alpha; // 归一化到[0, 1]
+    cout << "normImg data type after scale: " << openCVType2str(normImg.type()) << endl;
 
-    cv::Mat temp1, temp2, temp3, temp4, temp5;
-    
-#pragma omp parallel sections num_threads(5)
+    vector<Mat> respMapGroup;
+    int numBank = static_cast<int>(gaborBank.size());
+#pragma omp parallel sections num_threads(numBank)
     {
-#pragma omp section
+#pragma omp for
+        for(int i=0; i<numBank; i++)
         {
-            gaborBank[0]->conv_img(regImg, temp1, 1);  // lRegion is source, temp1 is destination
-        }
-#pragma omp section
-        {
-            gaborBank[1]->conv_img(regImg, temp2, 1);
-        }
-#pragma omp section
-        {
-            gaborBank[2]->conv_img(regImg, temp3, 1);
-        }
-#pragma omp section
-        {
-            gaborBank[3]->conv_img(regImg, temp4, 1);
-        }
-#pragma omp section
-        {
-            gaborBank[4]->conv_img(regImg, temp5, 1);
+            Mat respMap;
+            gaborBank[i]->conv_img(normImg, respMap, 1);  // lRegion is source, temp1 is destination
+            respMapGroup.push_back(respMap);
         }
     }
     
     //函数原型： void cv::min(InputArray  src1, InputArray  src2, OutputArray  dst)
     //功   能： 单像素操作（与领域无关）；将src1和src2同位置的像素值取小者，存贮到dst中
-    cv::Mat regResp(regImg.size(), CV_8S, cv::Scalar(127)); // 8S: 8位有符号数
+    cv::Mat regRespMap(detRegImg.size(), CV_8S, cv::Scalar(127)); // 8S: 8位有符号数
     //cout << "lRegResp data type: " << openCVType2str(regResp.type()) << endl;
     
-    cv::min(regResp, temp1, regResp);  //
-    cv::min(regResp, temp2, regResp);
-    cv::min(regResp, temp3, regResp);
-    cv::min(regResp, temp4, regResp);
-    cv::min(regResp, temp5, regResp);
+    for(int i=0; i<numBank; i++)
+    {
+        cv::min(regRespMap, respMapGroup[i], regRespMap);  //
+    }
     
-    regResp.convertTo(regResp, CV_8U, -1.0/*,-1*Min/20*/);
-    return regResp;
+    regRespMap.convertTo(regRespMap, CV_8U, -1.0/*,-1*Min/20*/);
+    return regRespMap;
 }
 
 // 返回左面颊的Gabor滤波响应值
-Mat CalcOneCheekGaborResp(const vector<Point2i>& wrkSpline,
-                          int spPtIDs[4],
-                          vector<CvGabor*> gaborBank,
-                  const Rect& faceRect,
-                  const Mat& inImgInFR_Gray,
-                  Rect& cheekRect)
+Mat CalcGaborRespInOneCheek(const vector<CvGabor*>& gaborBank,
+                  const Mat& grSrcImg,
+                  const Rect& cheekRect)
 {
-    vector<Point2i> cheekPg; // Pg: polygon
-    for(int i=0; i<4; i++)
-    {
-        int spID = spPtIDs[i];
-        Point2i relCd = CalcRelCdToFR(wrkSpline[spID], faceRect);
-        cheekPg.push_back(relCd);
-    }
-    
-    cheekRect = boundingRect(cheekPg);
-    int margin = faceRect.width / 200;
-    ClipRectByFR(faceRect.width, faceRect.height, margin, cheekRect);
-
-    Mat lRegResp = ApplyGaborFilter(gaborBank, inImgInFR_Gray,
-                                  cheekRect);
+    Mat imgInCheekRect = grSrcImg(cheekRect);
+    Mat lRegResp = ApplyGaborFilter(gaborBank, imgInCheekRect);
 
     return lRegResp;
 }
 
 // glabella，眉间，印堂
-Mat CalcGlabellaGaborResp(const vector<Point2i>& wrkSpline,
-                  const Rect& faceRect,
-                  const Mat& inImgInFR_Gray,
-                  Rect& glabeRect,
-                  const Rect& lrect)
+Mat CalcGaborRespOnGlab(const Mat& grSrcImg,
+                  Rect& glabeRect)
 {
-    int x_offset = 100 * faceRect.width / 1800;
-    int y_offset = 100 * faceRect.height / 1800;
+    Mat imgInGlabRect = grSrcImg(glabeRect);
 
-    std::vector<cv::Point2i> yFacePoly;
-    yFacePoly.push_back(Point(wrkSpline[5].x - faceRect.x - x_offset, wrkSpline[5].y - faceRect.y + y_offset));
-    yFacePoly.push_back(Point(wrkSpline[5].x - faceRect.x, wrkSpline[4].y - faceRect.y));
-    yFacePoly.push_back(Point(wrkSpline[26].x - faceRect.x, wrkSpline[4].y - faceRect.y));
-    yFacePoly.push_back(Point(wrkSpline[26].x - faceRect.x + x_offset, wrkSpline[26].y - faceRect.y + y_offset));
-    
-    glabeRect = boundingRect(yFacePoly);
-    
-    glabeRect.x = glabeRect.x > 0 ? glabeRect.x : 0;
-    glabeRect.y = glabeRect.y > 0 ? glabeRect.y : 0;
-    //glabeRect.y = lrect.y < inImgInFR_Gray.rows ? glabeRect.y : inImgInFR_Gray.rows - 10;
-    //glabeRect.x = lrect.x < inImgInFR_Gray.cols ? glabeRect.x : inImgInFR_Gray.cols - 10;
-    glabeRect.y = glabeRect.y < inImgInFR_Gray.rows ? glabeRect.y : inImgInFR_Gray.rows - 10;
-    glabeRect.x = glabeRect.x < inImgInFR_Gray.cols ? glabeRect.x : inImgInFR_Gray.cols - 10;
-
-    glabeRect.width = glabeRect.width < inImgInFR_Gray.cols - glabeRect.x ? glabeRect.width : inImgInFR_Gray.cols - glabeRect.x;
-    glabeRect.height = glabeRect.height < inImgInFR_Gray.rows - glabeRect.y ? glabeRect.height : inImgInFR_Gray.rows - glabeRect.y;
-    
     vector<CvGabor*> gaborBank;
     for(int i=10; i<15; i++)
     {
         gaborBank.push_back(gabor+i);
     }
         
-    Mat eRegionRe = ApplyGaborFilter(gaborBank, inImgInFR_Gray, glabeRect);
-    return eRegionRe;
+    Mat glabRespMap = ApplyGaborFilter(gaborBank, imgInGlabRect);
+    return glabRespMap;
 }
 
 // forehead，前额
-Mat CalcFhGaborResp(const vector<Point2i>& wrkSpline,
-                  const Rect& faceRect,
-                  const Mat& inImgInFR_Gray,
-                  Rect& fhRect)
+Mat CalcGaborRespOnFh(const Mat& grSrcImg,
+                      const Rect& fhRect)
 {
-    std::vector<cv::Point2i> fhPoly;
-    fhPoly.push_back(Point(wrkSpline[0].x - faceRect.x + 20,
-                           wrkSpline[3].y - faceRect.y - 40)); // y坐标采用Pt3，是有意为之，不是笔误
-    fhPoly.push_back(Point(wrkSpline[3].x - faceRect.x - 20, wrkSpline[3].y - faceRect.y - 40));
-    fhPoly.push_back(Point(wrkSpline[4].x - faceRect.x, wrkSpline[4].y - faceRect.y));
-    fhPoly.push_back(Point(wrkSpline[5].x - faceRect.x, wrkSpline[5].y - faceRect.y));
-    fhPoly.push_back(Point(wrkSpline[26].x - faceRect.x, wrkSpline[26].y - faceRect.y));
-    fhPoly.push_back(Point(wrkSpline[27].x - faceRect.x, wrkSpline[27].y - faceRect.y));
     
-#ifdef TEST_RUN_WRK
+#ifdef TEST_RUN
+    /*
     Mat annoImage = inImgInFR_Gray.clone();
     AnnoPointsOnImg(annoImage, fhPoly);
     
     string fhPolyFile =  wrk_out_dir + "/fhPoly.png";
     imwrite(fhPolyFile.c_str(), annoImage);
+    */
 #endif
     
-    Rect rect4 = boundingRect(fhPoly);
-    
-    fhRect = rect4;
-    ClipRectByFR(faceRect.width, faceRect.height, 10, fhRect);
-
     vector<CvGabor*> gaborBank;
     for(int i=15; i<20; i++)
     {
         gaborBank.push_back(gabor+i);
     }
-    Mat fRegionRe = ApplyGaborFilter(gaborBank, inImgInFR_Gray, fhRect);
-    return fRegionRe;
+    
+    Mat imgInFhRect = grSrcImg(fhRect);
+    Mat fhRespMap = ApplyGaborFilter(gaborBank, imgInFhRect);
+
+    return fhRespMap;
 }
 
 // for nose ?
+/*
 Mat CalcUpperNoseGaborResp(const vector<Point2i>& wrkSpline,
                   const Rect& faceRect,
                   const Mat& inImgInFR_Gray,
@@ -276,10 +212,11 @@ Mat CalcUpperNoseGaborResp(const vector<Point2i>& wrkSpline,
     {
         gaborBank.push_back(gabor+i);
     }
-    Mat nRegResp = ApplyGaborFilter(gaborBank, inImgInFR_Gray, nRect);
+    Mat nRegResp = ApplyGaborFilter(gaborBank, inImgInFR_Gray);
     
     return nRegResp;
 }
+*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /////output variable
@@ -395,47 +332,34 @@ void ExtDeepWrk(const Mat& wrkGaborRespMap,
     }
 }
 
-
-
 ////////////////////////////////////////////////////////////////////////////////////////
 // fine wrinkle： 细皱纹
 // WrinkRespMap的大小和在原始影像坐标系中的位置由Face_Rect限定
-void CalcGaborResp(const Mat& grFrImg,
-                           const Rect& faceRect,
-                           const SPLINE& wrkSpline,
-                           Mat& gaborRespMap)
+void CalcGaborResp(const Mat& grSrcImg,
+                   WrkRegGroup& wrkRegGroup,
+                   Mat& gaborRespMap)
 {
     init_gabor();
-    
-    Rect lCheekRect, rCheekRect, glabeRect, fhRect, noseRect;
-    
+   
     // 计算左面颊的Gabor滤波响应值
     vector<CvGabor*> lGaborBank;
     InitLCheekGaborBank(lGaborBank);
-    int lcSpPtIDs[4] = {6, 10, 13, 15};
-    Mat lCheekResp = CalcOneCheekGaborResp(wrkSpline,
-        lcSpPtIDs, lGaborBank, faceRect, grFrImg, lCheekRect);
+    Mat lCheekResp = CalcGaborRespInOneCheek(lGaborBank, grSrcImg, wrkRegGroup.lCheekReg.bbox);
 
     // 计算右面颊的Gabor滤波响应值
     vector<CvGabor*> rGaborBank;
     InitRCheekGaborBank(rGaborBank);
-    int rcSpPtIDs[4] = {25, 21, 18, 16};
-    Mat rCheekResp = CalcOneCheekGaborResp(wrkSpline,
-        rcSpPtIDs, rGaborBank, faceRect, grFrImg, rCheekRect);
+    Mat rCheekResp = CalcGaborRespInOneCheek(rGaborBank, grSrcImg, wrkRegGroup.rCheekReg.bbox);
 
-    // glabella，眉间，印堂
-    Mat glabeRegResp = CalcGlabellaGaborResp(wrkSpline,
-                                         faceRect, grFrImg, glabeRect, lCheekRect);
-    
     // 前额
-    Mat fhRegResp = CalcFhGaborResp(wrkSpline,
-                                         faceRect, grFrImg, fhRect);
+    Mat fhRegResp = CalcGaborRespOnFh(grSrcImg, wrkRegGroup.fhReg.bbox);
     
-    //鼻子的上半部分
-    Mat noseRegResp = CalcUpperNoseGaborResp(wrkSpline,
-                                          faceRect, grFrImg, noseRect);
+    // glabella，眉间，印堂
+    Mat glabeRegResp = CalcGaborRespOnGlab(grSrcImg, wrkRegGroup.glabReg.bbox);
+     
     
 #ifdef TEST_RUN_WRK
+    /*
     bool isSuccess;
     
     isSuccess = SaveTestOutImgInDir(lCheekResp, wrk_out_dir,  "lRegResp.png");
@@ -453,6 +377,7 @@ void CalcGaborResp(const Mat& grFrImg,
     
     isSuccess = SaveTestOutImgInDir(canvas, wrk_out_dir, "fiveRects.png");
     canvas.release();
+    */
 
     /*
     CONTOURS LightWrkConts;
@@ -469,7 +394,7 @@ void CalcGaborResp(const Mat& grFrImg,
     fhWrkImg.release();
     */
 #endif
-    
+    /*
     gaborRespMap = Mat(grFrImg.size(), grFrImg.type(), Scalar(0));
 
     // --------把各个小区域的计算结果合并起来，存贮在WrkRespMap------------------------------------
@@ -487,6 +412,7 @@ void CalcGaborResp(const Mat& grFrImg,
     cv::max(gaborRespMap, glabeRegionTemp, gaborRespMap);
     cv::max(gaborRespMap, noseRegionTemp, gaborRespMap);
     gaborRespMap = gaborRespMap * 10;  //1.2;
+    */
     
     /*
     cout << "gaborRespMap data type: " << openCVType2str(gaborRespMap.type()) << endl;

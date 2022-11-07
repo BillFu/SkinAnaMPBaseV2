@@ -26,7 +26,7 @@ Mat ForgeGlabellaMask(const FaceInfo& faceInfo);
 void ForgeWrkTenRegs(const FaceInfo& faceInfo,
                      const Mat& fbBiLab, WrkRegGroup& wrkRegGroup);
 
-void ForgeWrkTenRegsDebug(const Mat& annoLmImage, const FaceInfo& faceInfo,
+void ForgeWrkTenRegs(const Mat& annoLmImage, const FaceInfo& faceInfo,
                      const Mat& fbBiLab, WrkRegGroup& wrkRegGroup);
 
 #endif /* end of WRINKLE_MASK_HPP */

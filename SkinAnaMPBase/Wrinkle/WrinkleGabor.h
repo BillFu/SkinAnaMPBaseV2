@@ -33,37 +33,30 @@ void AnnoPointsOnImg(Mat& annoImage,
 void InitLCheekGaborBank(CvGabor lcGabor[5]);
 
 // 返回左面颊的Gabor滤波响应值
-Mat CalcOneCheekGaborResp(const vector<Point2i>& wrkSpline,
-                          int spPtIDs[4],
-                          CvGabor lcGabor[5],
-                          const Rect& faceRect,
-                          const Mat& inImgInFR_Gray,
-                          Rect& cheekRect);
+Mat CalcGaborRespInOneCheek(const vector<CvGabor*>& lGaborBank,
+                          const Mat& grSrcImg,
+                          const Rect& cheekRect);
 
 // 返回左面颊的Gabor滤波响应值
 // 返回右面颊的Gabor滤波响应值
 
 // glabella，眉间，印堂
-Mat CalcGlabellaGaborResp(const vector<Point2i>& wrinkle_spline_curve,
-                  const Rect& FaceContour_Rect,
-                  const Mat& allWrinkle,
-                  Rect& erect, const Rect& lrect);
+Mat CalcGaborRespOnGlab(const Mat& grSrcImg,
+                        const Rect& glabRect);
 
 // forehead，前额
-Mat CalcFhGaborResp(const vector<Point2i>& wrinkle_spline_curve,
-                  const Rect& FaceContour_Rect,
-                  Mat& allWrinkle, Rect& frect);
+Mat CalcGaborRespOnFh(const Mat& grSrcImg,
+                      const Rect& fhRect);
 
 // 鼻梁上半部，rhinion(keystone)
 Mat CalcUpperNoseGaborResp(const vector<Point2i>& wrinkle_spline_curve,
                   const Rect& FaceContour_Rect,
                   const Mat& allWrinkle, Rect& nrect);
 
-void CalcGaborResp(const Mat& grFrImg,
-                           const Rect& Face_Rect,
-                           const SPLINE& wrinkle_spline,
-                           Mat& WrinkRespMap //WrinkRespMap的大小和在原始影像坐标系中的位置由Face_Rect限定
-                           );
+//WrinkRespMap的大小和在原始影像坐标系中的位置由Face_Rect限定
+void CalcGaborResp(const Mat& grSrcImg,
+                   WrkRegGroup& wrkRegGroup,
+                   Mat& WrinkRespMap);
 
 // 老百姓理解的深、浅皱纹是以几何深度来划分的，但图像算法又是以颜色深浅来测量的。
 // 提取浅皱纹，Ext: Extract
@@ -91,5 +84,9 @@ void ExtWrkInFhGaborResp(const Mat& fhGaborMap,
                      CONTOURS& LightWrkConts);
 
 Mat drawFhWrk(const Mat& canvas, const CONTOURS& LightWrkConts);
+
+// detRegImg: image block in detecting region
+// Mat ApplyGaborFilter(vector<CvGabor*> gaborBank, const Mat& detRegImg);
+Mat ApplyGaborFilter(const vector<CvGabor*>& gaborBank, const Mat& detRegImg);
 
 #endif /* WRINKLE_GABOR_H */

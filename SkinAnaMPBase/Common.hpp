@@ -108,6 +108,7 @@ struct SegMask
     Mat  mask; // sub-matrix cropped from the NOS or SP, its location specified by bbox
 };
 
+// bbox和mask具体针对的是哪个坐标系，由使用者灵活决定和负责。
 struct DetectRegion  
 {
     Rect bbox;
@@ -126,20 +127,29 @@ struct DetectRegion
     }
 };
 
+// the group of detcting regions for wrinkle
 struct WrkRegGroup
 {
-    DetectRegion fhReg;
-    DetectRegion glaReg; //glabella
+    DetectRegion fhReg; // forehead
+    DetectRegion glabReg; // glabella
 
     DetectRegion lEyeBagReg;
     DetectRegion rEyeBagReg;
 
-    DetectRegion lNagvReg;
+    DetectRegion lNagvReg; //
     DetectRegion rNagvReg;
 
     DetectRegion lCheekReg;
     DetectRegion rCheekReg;
 
+};
+
+// 各类皮肤特征的检测区域汇总
+struct DetRegPackage
+{
+    DetectRegion poreDetReg;
+    
+    WrkRegGroup  wrkRegGroup;
 };
 
 struct SegEyeFPsNOS
