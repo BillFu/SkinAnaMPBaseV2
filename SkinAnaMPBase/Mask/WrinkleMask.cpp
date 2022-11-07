@@ -226,6 +226,126 @@ Mat ForgeRNagvMask(const FaceInfo& faceInfo)
     
     return outMask;
 }
+
+//-------------------------------------------------------------------------------
+
+void ForgeLCheekPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
+{
+    Point2i pt350a = IpGLmPtWithPair(faceInfo, 121, 47, 0.35);
+    outPolygon.push_back(pt350a);
+
+    outPolygon.push_back(getPtOnGLm(faceInfo, 47));
+    
+    Point2i pt355a = IpGLmPtWithPair(faceInfo, 126, 100, 0.2);
+    outPolygon.push_back(pt355a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 142));
+    
+    Point2i pt266a = IpGLmPtWithPair(faceInfo, 36, 203, 0.5);
+    outPolygon.push_back(pt266a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 206));
+    
+    Point2i pt322a = IpGLmPtWithPair(faceInfo, 92, 216, 0.75);
+    outPolygon.push_back(pt322a);
+    
+    Point2i pt212a = IpGLmPtWithPair(faceInfo, 212, 57, 0.5);
+    outPolygon.push_back(pt212a);
+    
+    Point2i pt214a = IpGLmPtWithPair(faceInfo, 214, 210, 0.6);
+    outPolygon.push_back(pt214a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 136));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 172));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 215));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 177));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 137));
+    
+    Point2i pt323a = IpGLmPtWithPair(faceInfo, 93, 227, 0.3);
+    outPolygon.push_back(pt323a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 116));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 111));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 117));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 118));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 119));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 120));
+}
+
+void ForgeRCheekPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
+{
+    Point2i pt350a = IpGLmPtWithPair(faceInfo, 350, 277, 0.35);
+    outPolygon.push_back(pt350a);
+
+    outPolygon.push_back(getPtOnGLm(faceInfo, 277));
+    
+    Point2i pt355a = IpGLmPtWithPair(faceInfo, 355, 329, 0.2);
+    outPolygon.push_back(pt355a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 371));
+    
+    Point2i pt266a = IpGLmPtWithPair(faceInfo, 266, 423, 0.5);
+    outPolygon.push_back(pt266a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 426));
+    
+    Point2i pt322a = IpGLmPtWithPair(faceInfo, 322, 436, 0.75);
+    outPolygon.push_back(pt322a);
+    
+    //outPolygon.push_back(getPtOnGLm(faceInfo, 287));
+    Point2i pt287a = IpGLmPtWithPair(faceInfo, 287, 432, 0.65);
+    outPolygon.push_back(pt287a);
+    
+    Point2i pt434a = IpGLmPtWithPair(faceInfo, 434, 430, 0.6);
+    outPolygon.push_back(pt434a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 365));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 397));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 288));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 401));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 366));
+    
+    Point2i pt323a = IpGLmPtWithPair(faceInfo, 323, 447, 0.3);
+    outPolygon.push_back(pt323a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 345));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 340));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 346));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 347));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 348));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 349));
+}
+
+Mat ForgeRCheekMask(const FaceInfo& faceInfo)
+{
+    POLYGON coarsePolygon, refinedPolygon;
+    ForgeRCheekPg(faceInfo, coarsePolygon);
+
+    int csNumPoint = 120;
+    DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+
+    Mat outMask(faceInfo.srcImgS, CV_8UC1, cv::Scalar(0));
+    // !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
+    DrawContOnMask(refinedPolygon, outMask);
+    
+    return outMask;
+}
+
+Mat ForgeLCheekMask(const FaceInfo& faceInfo)
+{
+    POLYGON coarsePolygon, refinedPolygon;
+    ForgeLCheekPg(faceInfo, coarsePolygon);
+
+    int csNumPoint = 120;
+    DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+
+    Mat outMask(faceInfo.srcImgS, CV_8UC1, cv::Scalar(0));
+    // !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
+    DrawContOnMask(refinedPolygon, outMask);
+    
+    return outMask;
+}
+
 //-------------------------------------------------------------------------------
 
 // 生成皱纹检测的各个检测区（只针对正脸）----新版本
@@ -253,8 +373,14 @@ void ForgeWrkTenRegs(const FaceInfo& faceInfo, const Mat& fbBiLab,
     TransMaskFromGS2LS(rNagvMask, wrkRegGroup.rNagvReg);
     rNagvMask.release();
 
+    Mat rCheekMask = ForgeRCheekMask(faceInfo);
+    TransMaskFromGS2LS(rCheekMask, wrkRegGroup.rCheekReg);
+    rCheekMask.release();
+    
+    Mat lCheekMask = ForgeLCheekMask(faceInfo);
+    TransMaskFromGS2LS(lCheekMask, wrkRegGroup.lCheekReg);
+    lCheekMask.release();
 }
-
 
 void ForgeWrkTenRegsDebug(const Mat& annoLmImage, const FaceInfo& faceInfo,
                      const Mat& fbBiLab, WrkRegGroup& wrkRegGroup)
@@ -272,10 +398,6 @@ void ForgeWrkTenRegsDebug(const Mat& annoLmImage, const FaceInfo& faceInfo,
     
     OverMaskOnCanvas(showImg, glaMaskGS, Scalar(255, 0, 0));
     glaMaskGS.release();
-
-    
-    // string showImgFile = BuildOutImgFNV2(outDir, "WrkTenRegs.png");
-    // imwrite(showImgFile.c_str(), showImg);
     
 #ifdef TEST_RUN
     string lEyeBagMaskImgFile = BuildOutImgFNV2(outDir, "lEyeBagMask.png");
@@ -296,4 +418,12 @@ void ForgeWrkTenRegsDebug(const Mat& annoLmImage, const FaceInfo& faceInfo,
                         "rNagvMaskGS", rNagvMaskImgFile.c_str());
 #endif
 
+    Mat rCheekMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.rCheekReg);
+    Mat lCheekMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.lCheekReg);
+    Mat cheekMaskGS = rCheekMaskGS | lCheekMaskGS;
+#ifdef TEST_RUN
+    string cheekMaskImgFile = BuildOutImgFNV2(outDir, "CheekRegGS.png");
+    OverlayMaskOnImage(annoLmImage, cheekMaskGS,
+                        "CheekMaskGS", cheekMaskImgFile.c_str());
+#endif
 }

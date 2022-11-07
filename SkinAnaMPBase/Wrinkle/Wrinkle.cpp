@@ -55,18 +55,6 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
        
     //----------------- 第二次使用Gabor滤波，针对细皱纹---------------------
     
-#ifdef TEST_RUN
-    /*
-    // view the polygon of forehead used to do gabor filtering
-    Mat annoImage = inImg.clone();
-    int ptIDsInFh[] = {0, 3, 4, 5, 26, 27};
-    AnnoPointsOnImg(annoImage, wrkSpline,
-                        ptIDsInFh,  6);
-    string fhSpPtsFile =  outDir + "/fhSpPts.png";
-    imwrite(fhSpPtsFile.c_str(), annoImage);
-    */
-#endif
-    
     GaussianBlur(grFrImg, grFrImg, cv::Size(11, 11), 0, 0); // ???
     
     //WrinkRespMap是由Face_Rect来限定的
