@@ -99,4 +99,9 @@ Mat TransMaskFromLS2GS(const Size& srcSize, const DetectRegion& localMask);
 
 void TransMaskFromGS2LS(const Mat& maskGS, DetectRegion& localMask);
 
+//-------------------------------------------------------------------------------------------
+bool SaveTestOutImgInDir(const Mat& out_img,
+                         const string& outDir,
+                         const char* outFileName);
+
 #endif /* end of UTILS_HPP */

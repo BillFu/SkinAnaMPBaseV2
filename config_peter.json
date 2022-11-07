@@ -4,5 +4,6 @@
 	"FaceMeshAttenModel": 				"models/face_lm_attent.tflite",
 	"CrossImage":						"images/Peter/cross.jpg",
 	"ParallelImage":					"images/Peter/parallel.jpg",
-	"OutDir":							"result/Peter"
+	"OutDir":							"result/Peter",
+	"WrkOutDir":						"result/Peter/wrk_out"
 }

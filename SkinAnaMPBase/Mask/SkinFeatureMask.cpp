@@ -66,13 +66,15 @@ void ForgePoreMaskV3(const FaceInfo& faceInfo,
                    const Mat& expFhMask,
                    const Mat& eyeFullMask,  // cover the eyes and eyebows and the surrounding nearby area
                    const Mat& mouthMask, // the enlarged mouth mask
-                   Mat& outPoreMask)
+                   DetectRegion& poreDetReg)
 {
     Mat outMask = faceLowMask | expFhMask ;
-    outPoreMask = outMask & (~eyeFullMask) & (~mouthMask);
+    outMask = outMask & (~eyeFullMask) & (~mouthMask);
     
     //int expandSize = 20;
     //expanMask(outMask, expandSize, outPoreMask);
+    
+    TransMaskFromGS2LS(outMask, poreDetReg);
 }
 
 //-------------------------------------------------------------------------------------------
@@ -100,7 +102,7 @@ void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
                        const fs::path& outDir, 
                        const FaceInfo& faceInfo,
                        const FaceSegRst& segResult,
-                       DetRegPackage& detRegPackage)
+                       DetRegPackage& detRegPack)
 {
     cv::Size2i srcImgS = srcImage.size();
     
@@ -166,15 +168,19 @@ void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
                         "ext_forehead", expFhMaskFile.c_str());
 #endif
     
-    WrkRegGroup wrkRegGroup;
-    ForgeWrkTenRegs(annoLmImage, faceInfo, fbBiLab, wrkRegGroup);
+    ForgeWrkTenRegs(annoLmImage, faceInfo, fbBiLab, detRegPack.wrkRegGroup);
 
-    string poreMaskAnnoFile = BuildOutImgFNV2(outDir, "PoreMask.png");
-    Mat poreMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgePoreMaskV3(faceInfo, lowFaceMask, expFhMask, eyesFullMask,
-                    mouthMask, poreMask);
+                    mouthMask, detRegPack.poreDetReg);
+    
+#ifdef TEST_RUN
+    string poreMaskAnnoFile = BuildOutImgFNV2(outDir, "PoreMask.png");
+    Mat poreMask = TransMaskFromLS2GS(faceInfo.srcImgS,
+                                      detRegPack.poreDetReg);
     OverlayMaskOnImage(annoLmImage, poreMask,
                         "pore mask", poreMaskAnnoFile.c_str());
+#endif
+    
     
     /*
     string wrkMaskAnnoFile = BuildOutImgFNV2(outDir, "wrk_");

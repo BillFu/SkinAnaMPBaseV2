@@ -5,6 +5,10 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+// https://www.cnblogs.com/Jack-Lee/p/3649114.html
+// 基于OpenCV的Gabor变换及特征提取
+// 本模块中的代码，采用的是博客中二维Gabor函数的第二种形式。
+
 class CvGabor
 {
 public:
@@ -29,7 +33,7 @@ public:
 	void get_image(int Type, cv::Mat& image);
 	void get_matrix(int Type, cv::Mat& matrix);
 
-	void conv_img(cv::Mat& src, cv::Mat& dst, int Type);
+    void conv_img(cv::Mat& src, cv::Mat& dst); 
 
 protected:
 	double Sigma;

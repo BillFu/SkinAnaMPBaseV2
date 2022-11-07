@@ -54,7 +54,7 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
        
     //----------------- 第二次使用Gabor滤波，针对细皱纹---------------------
     
-    GaussianBlur(grFrImg, grFrImg, cv::Size(9, 9), 0, 0); // ???
+    //GaussianBlur(grFrImg, grFrImg, cv::Size(7, 7), 0, 0); // ???
     
     //WrinkRespMap是由Face_Rect来限定的
     CalcGaborResp(imgGray, wrkRegGroup, wrkGaborRespMap);

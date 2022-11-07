@@ -37,6 +37,7 @@ using json = nlohmann::json;
 
 #ifdef TEST_RUN
 string outDir("");
+string wrkOutDir("");
 #endif
 
 int main(int argc, char **argv)
@@ -61,6 +62,7 @@ int main(int argc, char **argv)
     
 #ifdef TEST_RUN
     outDir = config_json.at("OutDir");
+    wrkOutDir = config_json.at("WrkOutDir");
 #endif
     
     // 这个函数在程序初始化时要调用一次，并确保返回true之后，才能往下进行

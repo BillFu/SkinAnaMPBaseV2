@@ -101,13 +101,13 @@ void InitRCheekGaborBank(vector<CvGabor*>& rGaborBank)
 Mat ApplyGaborFilter(const vector<CvGabor*>& gaborBank, const Mat& detRegImg)
 {
     //cout << "regImg data type: " << openCVType2str(regImg.type()) << endl;
+    Mat detRegImgF; // F for float
+    detRegImg.convertTo(detRegImgF, CV_32FC1);
+
+    float maxV = *max_element(detRegImgF.begin<float>(), detRegImgF.end<float>());
+    float minV = *min_element(detRegImgF.begin<float>(), detRegImgF.end<float>());
     
-    uchar maxV = *max_element(detRegImg.begin<uchar>(), detRegImg.end<uchar>());
-    uchar minV = *min_element(detRegImg.begin<uchar>(), detRegImg.end<uchar>());
-    
-    float alpha = 255.0 / (maxV - minV);
-    Mat normImg = (detRegImg - minV) * alpha; // 归一化到[0, 1]
-    cout << "normImg data type after scale: " << openCVType2str(normImg.type()) << endl;
+    detRegImgF = (detRegImgF - minV) / (maxV - minV); // 调整到[0.0, 1.0]
 
     vector<Mat> respMapGroup;
     int numBank = static_cast<int>(gaborBank.size());
@@ -117,26 +117,38 @@ Mat ApplyGaborFilter(const vector<CvGabor*>& gaborBank, const Mat& detRegImg)
         for(int i=0; i<numBank; i++)
         {
             Mat respMap;
-            gaborBank[i]->conv_img(normImg, respMap, 1);  // lRegion is source, temp1 is destination
+            gaborBank[i]->conv_img(detRegImgF, respMap);  // lRegion is source, temp1 is destination
             respMapGroup.push_back(respMap);
         }
     }
+    detRegImgF.release();
     
+    cout << "data type of respMap: " << openCVType2str(respMapGroup[0].type()) << endl;
+
     //函数原型： void cv::min(InputArray  src1, InputArray  src2, OutputArray  dst)
     //功   能： 单像素操作（与领域无关）；将src1和src2同位置的像素值取小者，存贮到dst中
-    cv::Mat regRespMap(detRegImg.size(), CV_8S, cv::Scalar(127)); // 8S: 8位有符号数
-    //cout << "lRegResp data type: " << openCVType2str(regResp.type()) << endl;
+    cv::Mat regRespMap(detRegImg.size(), CV_32FC1, cv::Scalar(-9999.9)); //
     
     for(int i=0; i<numBank; i++)
     {
-        cv::min(regRespMap, respMapGroup[i], regRespMap);  //
+        cv::max(regRespMap, respMapGroup[i], regRespMap);  //
     }
     
-    regRespMap.convertTo(regRespMap, CV_8U, -1.0/*,-1*Min/20*/);
-    return regRespMap;
+    float maxRespV = *max_element(regRespMap.begin<float>(), regRespMap.end<float>());
+    float minRespV = *min_element(regRespMap.begin<float>(), regRespMap.end<float>());
+    
+    cout << "maxRespV: " << maxRespV << endl;
+    cout << "minRespV: " << minRespV << endl;
+    
+    float alpha = 255.0 / (maxRespV - minRespV);
+    float beta = -255.0*minRespV / (maxRespV - minRespV);
+    Mat regRespMapU;
+    regRespMap.convertTo(regRespMapU, CV_8U, alpha, beta);
+
+    return regRespMapU;
 }
 
-// 返回左面颊的Gabor滤波响应值
+// 返回一个面颊区域的Gabor滤波响应值
 Mat CalcGaborRespInOneCheek(const vector<CvGabor*>& gaborBank,
                   const Mat& grSrcImg,
                   const Rect& cheekRect)
@@ -145,6 +157,17 @@ Mat CalcGaborRespInOneCheek(const vector<CvGabor*>& gaborBank,
     Mat lRegResp = ApplyGaborFilter(gaborBank, imgInCheekRect);
 
     return lRegResp;
+}
+
+
+Mat CalcGaborRespInOneEyeBag(const vector<CvGabor*>& gaborBank,
+                          const Mat& grSrcImg,
+                          const Rect& eyeBagRect)
+{
+    Mat imgInEBRect = grSrcImg(eyeBagRect);
+    Mat respMap = ApplyGaborFilter(gaborBank, imgInEBRect);
+
+    return respMap;
 }
 
 // glabella，眉间，印堂
@@ -167,56 +190,29 @@ Mat CalcGaborRespOnGlab(const Mat& grSrcImg,
 Mat CalcGaborRespOnFh(const Mat& grSrcImg,
                       const Rect& fhRect)
 {
-    
-#ifdef TEST_RUN
-    /*
-    Mat annoImage = inImgInFR_Gray.clone();
-    AnnoPointsOnImg(annoImage, fhPoly);
-    
-    string fhPolyFile =  wrk_out_dir + "/fhPoly.png";
-    imwrite(fhPolyFile.c_str(), annoImage);
-    */
-#endif
+    float F = 1.414;
+    float Sigma = 2*M_PI;
     
     vector<CvGabor*> gaborBank;
-    for(int i=15; i<20; i++)
-    {
-        gaborBank.push_back(gabor+i);
-    }
     
+    CvGabor g1(0.0, 3, Sigma, F);
+    CvGabor g2(0.0, 2, Sigma, F);
+    CvGabor g3(0.0, 4, Sigma, F);
+    CvGabor g4(2.74889356875, 2, Sigma, F);
+    CvGabor g5(0.39269908125, 2, Sigma, F);
+    
+    //gaborBank.push_back(CvGabor(0.0, 4, Sigma, F));
+    gaborBank.push_back(&g1);
+    gaborBank.push_back(&g2);
+    gaborBank.push_back(&g3);
+    gaborBank.push_back(&g4); // 157.5度
+    gaborBank.push_back(&g5); // 22.5 度
+
     Mat imgInFhRect = grSrcImg(fhRect);
     Mat fhRespMap = ApplyGaborFilter(gaborBank, imgInFhRect);
 
     return fhRespMap;
 }
-
-// for nose ?
-/*
-Mat CalcUpperNoseGaborResp(const vector<Point2i>& wrkSpline,
-                  const Rect& faceRect,
-                  const Mat& inImgInFR_Gray,
-                  Rect& nRect)
-{
-    std::vector<cv::Point2i> nFacePoly;
-    nFacePoly.push_back(Point(wrkSpline[5].x - faceRect.x - 100, wrkSpline[5].y - faceRect.y));
-    nFacePoly.push_back(Point(wrkSpline[15].x - faceRect.x, wrkSpline[15].y - faceRect.y));
-    nFacePoly.push_back(Point(wrkSpline[16].x - faceRect.x, wrkSpline[16].y - faceRect.y));
-    nFacePoly.push_back(Point(wrkSpline[26].x - faceRect.x + 100, wrkSpline[26].y - faceRect.y));
-    
-    Rect rect5 = boundingRect(nFacePoly);
-    nRect = rect5;
-    ClipRectByFR(faceRect.width, faceRect.height, 10, nRect);
-
-    vector<CvGabor*> gaborBank;
-    for(int i=15; i<20; i++)
-    {
-        gaborBank.push_back(gabor+i);
-    }
-    Mat nRegResp = ApplyGaborFilter(gaborBank, inImgInFR_Gray);
-    
-    return nRegResp;
-}
-*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /////output variable
@@ -358,16 +354,15 @@ void CalcGaborResp(const Mat& grSrcImg,
     Mat glabeRegResp = CalcGaborRespOnGlab(grSrcImg, wrkRegGroup.glabReg.bbox);
      
     
-#ifdef TEST_RUN_WRK
-    /*
+#ifdef TEST_RUN
     bool isSuccess;
     
-    isSuccess = SaveTestOutImgInDir(lCheekResp, wrk_out_dir,  "lRegResp.png");
-    isSuccess = SaveTestOutImgInDir(rCheekResp, wrk_out_dir,  "rRegResp.png");
-    isSuccess = SaveTestOutImgInDir(glabeRegResp, wrk_out_dir,  "glabeRegResp.png");
-    isSuccess = SaveTestOutImgInDir(fhRegResp,  wrk_out_dir,   "fRegResp.png");
-    isSuccess = SaveTestOutImgInDir(noseRegResp, wrk_out_dir, "nRegResp.png");
+    isSuccess = SaveTestOutImgInDir(fhRegResp,  wrkOutDir,   "fhGaborResp.png");
+    isSuccess = SaveTestOutImgInDir(lCheekResp, wrkOutDir,  "lCheekGaborResp.png");
+    isSuccess = SaveTestOutImgInDir(rCheekResp, wrkOutDir,  "rCheekGaborResp.png");
+    isSuccess = SaveTestOutImgInDir(glabeRegResp, wrkOutDir,  "glabGaborResp.png");
     
+    /*
     Mat canvas = grFrImg.clone();
     rectangle(canvas, lCheekRect, CV_COLOR_RED, 8, 0);
     rectangle(canvas, rCheekRect, CV_COLOR_GREEN, 8, 0);

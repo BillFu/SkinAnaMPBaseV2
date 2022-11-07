@@ -22,9 +22,6 @@
 using namespace cv;
 using namespace std;
 
-#ifdef TEST_RUN_WRK
-extern string wrk_out_dir;
-#endif
 
 void AnnoPointsOnImg(Mat& annoImage,
                          const SPLINE& pts,
@@ -32,13 +29,15 @@ void AnnoPointsOnImg(Mat& annoImage,
 
 void InitLCheekGaborBank(CvGabor lcGabor[5]);
 
-// 返回左面颊的Gabor滤波响应值
+// 返回一个面颊区域的Gabor滤波响应值
 Mat CalcGaborRespInOneCheek(const vector<CvGabor*>& lGaborBank,
                           const Mat& grSrcImg,
                           const Rect& cheekRect);
 
-// 返回左面颊的Gabor滤波响应值
-// 返回右面颊的Gabor滤波响应值
+// 眼袋
+Mat CalcGaborRespInOneEyeBag(const vector<CvGabor*>& lGaborBank,
+                          const Mat& grSrcImg,
+                          const Rect& eyeBagRect);
 
 // glabella，眉间，印堂
 Mat CalcGaborRespOnGlab(const Mat& grSrcImg,

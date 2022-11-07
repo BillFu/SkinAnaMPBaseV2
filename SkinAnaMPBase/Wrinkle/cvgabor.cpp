@@ -309,9 +309,9 @@ void CvGabor::get_matrix(int Type, cv::Mat& matrix)
 /*!
 \fn CvGabor::conv_img_a(IplImage *src, IplImage *dst, int Type)
 */
-void CvGabor::conv_img(cv::Mat &src, cv::Mat &dst, int Type)
+void CvGabor::conv_img(cv::Mat &src, cv::Mat &dst)
 {
-	filter2D(src, dst, 1, Real, cv::Point((Width - 1) / 2, (Width - 1) / 2));
+	filter2D(src, dst, -1, Real, cv::Point((Width - 1) / 2, (Width - 1) / 2));
 }
 
 

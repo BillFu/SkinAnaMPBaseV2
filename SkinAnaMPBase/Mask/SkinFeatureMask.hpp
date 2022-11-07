@@ -43,11 +43,12 @@ void ForgePoreMaskV2(const FaceInfo& faceInfo,
                    Mat& outPoreMask);
 
 void ForgePoreMaskV3(const FaceInfo& faceInfo,
-                   const Mat& faceLowMask,  // lower than eyes
-                   const Mat& expFhMask,
-                   const Mat& eyeFullMask,  // cover the eyes and eyebows and the surrounding nearby area
-                   const Mat& mouthMask, // the enlarged mouth mask
-                     Mat& outPoreMask);
+                     const Mat& faceLowMask,  // lower than eyes
+                     const Mat& expFhMask,
+                     const Mat& eyeFullMask,  // cover the eyes and eyebows and the surrounding nearby area
+                     const Mat& mouthMask, // the enlarged mouth mask
+                     DetectRegion& poreDetReg);
+                     //Mat& outPoreMask);
 //-------------------------------------------------------------------------------------------
 
 /**********************************************************************************************

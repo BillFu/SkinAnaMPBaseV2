@@ -28,6 +28,7 @@ using namespace tflite;
 
 #ifdef TEST_RUN
 extern string outDir;  // 在这里申明，在main.cpp里定义。
+extern string wrkOutDir;
 #endif
 
 typedef unique_ptr<tflite::Interpreter> INTERPRETER;

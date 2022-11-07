@@ -323,3 +323,12 @@ void TransMaskFromGS2LS(const Mat& maskGS, DetectRegion& localMask)
     maskGS(maskRect).copyTo(cropMask);
     localMask = DetectRegion(maskRect, cropMask);
 }
+
+bool SaveTestOutImgInDir(const Mat& out_img,
+                         const string& outDir,
+                         const char* outFileName)
+{
+    string outImgFullPath = outDir + "//" + outFileName;
+    bool isSucceeded = imwrite(outImgFullPath, out_img);
+    return isSucceeded;
+}
