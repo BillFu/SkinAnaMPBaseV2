@@ -1,5 +1,9 @@
 
 #include "ImgProc.h"
+#include <algorithm>
+
+using namespace std;
+
 
 void connectEdge(cv::Mat& src)
 {
@@ -534,4 +538,22 @@ cv::Mat worldGray(const cv::Mat& src)
     merge(g_vChannels, dstImage);//图像各通道合并
     g_vChannels.clear();
     return dstImage;
+}
+
+// Cvt: convert
+Mat CvtFloatImgTo8UImg(Mat& ftImg)
+{
+    float maxV = *max_element(ftImg.begin<float>(), ftImg.end<float>());
+    float minV = *min_element(ftImg.begin<float>(), ftImg.end<float>());
+    
+    cout << "maxV: " << maxV << endl;
+    cout << "minV: " << minV << endl;
+    
+    float alpha = 255.0 / (maxV - minV);
+    float beta = -255.0 * minV / (maxV - minV);
+    
+    Mat img8U;
+    ftImg.convertTo(img8U, CV_8U, alpha, beta);
+
+    return img8U;
 }

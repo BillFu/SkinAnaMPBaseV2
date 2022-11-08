@@ -134,17 +134,7 @@ Mat ApplyGaborFilter(const vector<CvGabor*>& gaborBank, const Mat& detRegImg)
         cv::max(regRespMap, respMapGroup[i], regRespMap);  //
     }
     
-    float maxRespV = *max_element(regRespMap.begin<float>(), regRespMap.end<float>());
-    float minRespV = *min_element(regRespMap.begin<float>(), regRespMap.end<float>());
-    
-    cout << "maxRespV: " << maxRespV << endl;
-    cout << "minRespV: " << minRespV << endl;
-    
-    float alpha = 255.0 / (maxRespV - minRespV);
-    float beta = -255.0*minRespV / (maxRespV - minRespV);
-    Mat regRespMapU;
-    regRespMap.convertTo(regRespMapU, CV_8U, alpha, beta);
-
+    Mat regRespMapU = CvtFloatImgTo8UImg(regRespMap);
     return regRespMapU;
 }
 

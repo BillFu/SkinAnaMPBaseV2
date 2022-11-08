@@ -142,7 +142,7 @@ int main(int argc, char **argv)
     
     crossImage.release();
     
-    /*
+    
     string paraImgFile = config_json.at("ParallelImage");
     Mat paraImage = cv::imread(crossImgFile.c_str());
     if(paraImage.empty())
@@ -159,6 +159,6 @@ int main(int argc, char **argv)
     
     DetectWrinkle(paraImage, segResult.faceBBox, detRegPack.wrkRegGroup,
                   deepWrkConts, wrkGaborRespMap);
-    */
+    
     return 0;
 }

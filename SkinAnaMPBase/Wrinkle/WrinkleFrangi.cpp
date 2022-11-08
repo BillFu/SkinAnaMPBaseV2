@@ -127,4 +127,73 @@ void PickDLWrkFromFrgiResp(const Mat& frgiRespOS, //Original Scale
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
+void CalcFrgiRespInFhReg(const Mat& grSrcImg,
+                         const Rect& fhRect,
+                         int scaleRatio,
+                         Mat& frgiRespRz)
+{
+    Mat imgOfFh = grSrcImg(fhRect);
+    
+    Size rzSize = imgOfFh.size() / scaleRatio;
+    Mat fhRzImg;
+    resize(imgOfFh, fhRzImg, rzSize);
+    
+    Mat fhRzFlImg;
+    fhRzImg.convertTo(fhRzFlImg, CV_32FC1);
+    fhRzImg.release();
+    
+    float maxV = *max_element(fhRzFlImg.begin<float>(), fhRzFlImg.end<float>());
+    float minV = *min_element(fhRzFlImg.begin<float>(), fhRzFlImg.end<float>());
+    
+    fhRzFlImg = (fhRzFlImg - minV) / (maxV - minV); // 调整到[0.0, 1.0]
+    
+    cv::Mat respScaleRz, respAngRz;
+    frangi2d_opts opts;
+    opts.sigma_start = 1;
+    opts.sigma_end = 5;
+    opts.sigma_step = 2;
+    opts.BetaOne = 0.5;  // BetaOne: suppression of blob-like structures.
+    opts.BetaTwo = 15.0; // background suppression. (See Frangi1998...)
+    opts.BlackWhite = true;
+    
+    // !!! 计算fangi2d时，使用的是缩小版的衍生影像
+    frangi2d(fhRzFlImg, frgiRespRz, respScaleRz, respAngRz, opts);
+    fhRzFlImg.release();
+    
+    //返回的scaleRz, anglesRz没有派上实际的用场
+    respScaleRz.release();
+    respAngRz.release();
+        
+    Mat respMap8U = CvtFloatImgTo8UImg(frgiRespRz);
+    
+#ifdef TEST_RUN2
+    string frgiRespImgFile = BuildOutImgFNV2(outDir, "frgiFhRz.png");
+    bool isOK = imwrite(frgiRespImgFile, respMap8U);
+    assert(isOK);
+#endif
 
+}
+
+void CalcSobelRespInFhReg(const Mat& grSrcImg,
+                         const Rect& fhRect,
+                         int scaleRatio,
+                         Mat& frgiRespRz)
+{
+    Mat imgOfFh = grSrcImg(fhRect);
+    
+    GaussianBlur( imgOfFh, imgOfFh, Size(3,3), 0, 0, BORDER_DEFAULT );
+    
+    Mat grad_y;
+    //Sobel(imgOfFh, grad_y, CV_8U, 0, 1, 3, 1, 0, BORDER_DEFAULT);
+
+    Scharr(imgOfFh, grad_y, CV_16S, 0, 1);
+    convertScaleAbs(grad_y, grad_y, 2.0, 20.0);
+    
+    //grad_y = ~grad_y;
+#ifdef TEST_RUN2
+    string gradImgFile = BuildOutImgFNV2(outDir, "gradYInFh.png");
+    bool isOK = imwrite(gradImgFile, grad_y);
+    assert(isOK);
+#endif
+
+}

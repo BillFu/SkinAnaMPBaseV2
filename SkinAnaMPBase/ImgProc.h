@@ -49,4 +49,7 @@ void FindGradient(cv::Mat& InputImage, cv::Mat& OutputImage);
 
 Mat worldGray(const cv::Mat& src);
 
+// Cvt: convert
+Mat CvtFloatImgTo8UImg(Mat& ftImg);
+
 #endif /* IMG_PROC_H */

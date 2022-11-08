@@ -46,4 +46,14 @@ void PickDLWrkFromFrgiResp(const Mat& frgiRespOS, //Original Scale
                                   CONTOURS& longWrkConts,
                                   CONTOURS& DeepWrkConts);
 
+void CalcFrgiRespInFhReg(const Mat& grSrcImg,
+                         const Rect& fhRect,
+                         int scaleRatio,
+                         Mat& frangiRespRz);
+
+
+void CalcSobelRespInFhReg(const Mat& grSrcImg,
+                         const Rect& fhRect,
+                         int scaleRatio,
+                          Mat& frgiRespRz);
 #endif /* WRINKLE_FRANGI_H */
