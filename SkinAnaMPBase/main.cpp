@@ -35,7 +35,7 @@ Date:   2022/9/29
 
 using json = nlohmann::json;
 
-#ifdef TEST_RUN
+#ifdef TEST_RUN2
 string outDir("");
 string wrkOutDir("");
 #endif
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
     string faceMeshAttenModelFile = config_json.at("FaceMeshAttenModel");
     string crossImgFile = config_json.at("CrossImage");
     
-#ifdef TEST_RUN
+#ifdef TEST_RUN2
     outDir = config_json.at("OutDir");
     wrkOutDir = config_json.at("WrkOutDir");
 #endif
@@ -127,7 +127,7 @@ int main(int argc, char **argv)
     EstHeadPose(crossImage.size(), faceInfo);
     
     Mat annoLmImage = crossImage.clone();
-    
+    /*
     string LmImgFile = BuildOutImgFNV2(
             outParePath, "lm.png");
     //AnnoAllLmInfo(annoLmImage, faceInfo, LmImgFile);
@@ -136,12 +136,13 @@ int main(int argc, char **argv)
     Scalar yellowColor(255, 0, 0);
     //AnnoTwoEyeRefinePts(annoLmImage, faceInfo, yellowColor, true);
     imwrite(LmImgFile.c_str(), annoLmImage);
-
+    */
     DetRegPackage detRegPack;
     ForgeDetRegPack(crossImage, annoLmImage, outParePath, faceInfo, segResult, detRegPack);
     
     crossImage.release();
     
+    /*
     string paraImgFile = config_json.at("ParallelImage");
     Mat paraImage = cv::imread(crossImgFile.c_str());
     if(paraImage.empty())
@@ -158,6 +159,6 @@ int main(int argc, char **argv)
     
     DetectWrinkle(paraImage, segResult.faceBBox, detRegPack.wrkRegGroup,
                   deepWrkConts, wrkGaborRespMap);
-    
+    */
     return 0;
 }

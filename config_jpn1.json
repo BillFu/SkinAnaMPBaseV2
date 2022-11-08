@@ -2,6 +2,8 @@
 	"SegModelFile": 				    "models/seg_model.onnx",
 	"ClassColorFile":					"models/classes3.txt",
 	"FaceMeshAttenModel": 				"models/face_lm_attent.tflite",
-	"SourceImage":						"images/JPN/cross_1.jpg",
-	"OutDir":							"result/JPN"
+	"CrossImage":						"images/JPN1/cross.jpg",
+	"ParallelImage":					"images/JPN1/parallel.jpg",
+	"OutDir":							"result/JPN1",
+	"WrkOutDir":						"result/JPN1/wrk_out"
 }

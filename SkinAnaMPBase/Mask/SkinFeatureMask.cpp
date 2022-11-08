@@ -173,7 +173,7 @@ void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
     ForgePoreMaskV3(faceInfo, lowFaceMask, expFhMask, eyesFullMask,
                     mouthMask, detRegPack.poreDetReg);
     
-#ifdef TEST_RUN
+#ifdef TEST_RUN2
     string poreMaskAnnoFile = BuildOutImgFNV2(outDir, "PoreMask.png");
     Mat poreMask = TransMaskFromLS2GS(faceInfo.srcImgS,
                                       detRegPack.poreDetReg);
@@ -181,29 +181,27 @@ void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
                         "pore mask", poreMaskAnnoFile.c_str());
 #endif
     
-    
-    /*
-    string wrkMaskAnnoFile = BuildOutImgFNV2(outDir, "wrk_");
     Mat wrkMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgeWrinkleMask(faceInfo, lowFaceMask, expFhMask, eyesFullMask,
                     noseBellMask, wrkMask);
+    
+#ifdef TEST_RUN2
+    string wrkMaskAnnoFile = BuildOutImgFNV2(outDir, "WrinkleMask.png");
     OverlayMaskOnImage(annoLmImage, wrkMask,
                         "wrinkle mask", wrkMaskAnnoFile.c_str());
+#endif
     
     Mat skinMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    string skinMaskImgFile = BuildOutImgFNV2(outDir,
-                             fileNameBone, "skinMask_");
     
     Point2i raisedFhCurve[NUM_PT_TOP_FH];
     int raisedPtIndices[NUM_PT_TOP_FH];
-    
-    //TestMaskV5(faceInfo, fbBiLab, srcImage);
     
     ForgeSkinMaskV5(faceInfo, mouthMask,
                     browsMask, eyesMask,
                     lowFaceMask,
                     skinMask, raisedFhCurve, raisedPtIndices);
     
+    /*
     cv::Scalar yellow(0, 255, 255); // (B, G, R)
     cv::Scalar blue(255, 0, 0);
     for(int i = 0; i < NUM_PT_TOP_FH; i++)
@@ -215,10 +213,13 @@ void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
         cv::putText(annoLmImage, caption, raisedFhCurve[i],
                         FONT_HERSHEY_SIMPLEX, 0.5, blue, 1);
     }
+    */
     
+#ifdef TEST_RUN2
+    string skinMaskImgFile = BuildOutImgFNV2(outDir, "SkinMask.png");
     OverlayMaskOnImage(annoLmImage, skinMask,
                        "Skin Mask", skinMaskImgFile.c_str());
-    */
+#endif
 }
 
 //-------------------------------------------------------------------------------------------

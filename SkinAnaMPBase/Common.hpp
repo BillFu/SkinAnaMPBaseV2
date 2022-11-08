@@ -24,9 +24,11 @@ using namespace std;
 using namespace cv;
 using namespace tflite;
 
-#define TEST_RUN  // !!! 发布编译时，必须把这个定义给注释掉 ！！！
+//#define TEST_RUN  // !!! 发布编译时，必须把这个定义给注释掉 ！！！
 
-#ifdef TEST_RUN
+#define TEST_RUN2  // !!! 发布编译时，必须把这个定义给注释掉 ！！！
+
+#ifdef TEST_RUN2
 extern string outDir;  // 在这里申明，在main.cpp里定义。
 extern string wrkOutDir;
 #endif
