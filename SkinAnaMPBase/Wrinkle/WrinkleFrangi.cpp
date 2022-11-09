@@ -167,7 +167,7 @@ void CalcFrgiRespInFhReg(const Mat& grSrcImg,
     Mat respMap8U = CvtFloatImgTo8UImg(frgiRespRz);
     
 #ifdef TEST_RUN2
-    string frgiRespImgFile = BuildOutImgFNV2(outDir, "frgiFhRz.png");
+    string frgiRespImgFile = BuildOutImgFNV2(wrkOutDir, "fhFrgiResp.png");
     bool isOK = imwrite(frgiRespImgFile, respMap8U);
     assert(isOK);
 #endif

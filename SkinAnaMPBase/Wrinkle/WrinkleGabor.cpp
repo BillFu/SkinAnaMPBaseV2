@@ -344,7 +344,7 @@ void CalcGaborResp(const Mat& grSrcImg,
     Mat glabeRegResp = CalcGaborRespOnGlab(grSrcImg, wrkRegGroup.glabReg.bbox);
      
     
-#ifdef TEST_RUN
+#ifdef TEST_RUN2
     bool isSuccess;
     
     isSuccess = SaveTestOutImgInDir(fhRegResp,  wrkOutDir,   "fhGaborResp.png");

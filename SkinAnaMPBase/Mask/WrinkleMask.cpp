@@ -394,23 +394,30 @@ void ForgeWrkTenRegs(
     Mat lEyeBagMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.lEyeBagReg);
     Mat rEyeBagMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.rEyeBagReg);
         
-    Mat showImg = annoLmImage.clone();
-    OverMaskOnCanvas(showImg, fhMaskGS, Scalar(0, 0, 255));
-    fhMaskGS.release();
+    //OverMaskOnCanvas(showImg, fhMaskGS, Scalar(0, 0, 255));
     
-    OverMaskOnCanvas(showImg, glaMaskGS, Scalar(255, 0, 0));
+#ifdef TEST_RUN2
+    string fhMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "FhMask.png");
+    OverlayMaskOnImage(annoLmImage, fhMaskGS,
+                        "Forehead Mask", fhMaskImgFile.c_str());
+    
+    string glabMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "glabMask.png");
+    OverlayMaskOnImage(annoLmImage, glaMaskGS,
+                        "Glabella Mask", glabMaskImgFile.c_str());
+#endif
+    fhMaskGS.release();
     glaMaskGS.release();
     
-#ifdef TEST_RUN
+#ifdef TEST_RUN2
     Mat eyeBagMaskGS = lEyeBagMaskGS | rEyeBagMaskGS;
-    string eyeBagMaskImgFile = BuildOutImgFNV2(outDir, "EyeBagMask.png");
+    string eyeBagMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "EyeBagMask.png");
     OverlayMaskOnImage(annoLmImage, eyeBagMaskGS,
                         "EyeBagMask", eyeBagMaskImgFile.c_str());
 #endif
     
     Mat rNagvMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.rNagvReg);
-#ifdef TEST_RUN
-    string rNagvMaskImgFile = BuildOutImgFNV2(outDir, "rNagvMaskGS.png");
+#ifdef TEST_RUN2
+    string rNagvMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "rNagvMaskGS.png");
     OverlayMaskOnImage(annoLmImage, rNagvMaskGS,
                         "rNagvMaskGS", rNagvMaskImgFile.c_str());
 #endif
@@ -418,8 +425,9 @@ void ForgeWrkTenRegs(
     Mat rCheekMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.rCheekReg);
     Mat lCheekMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.lCheekReg);
     Mat cheekMaskGS = rCheekMaskGS | lCheekMaskGS;
-#ifdef TEST_RUN
-    string cheekMaskImgFile = BuildOutImgFNV2(outDir, "CheekRegGS.png");
+    
+#ifdef TEST_RUN2
+    string cheekMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "CheekRegGS.png");
     OverlayMaskOnImage(annoLmImage, cheekMaskGS,
                         "CheekMaskGS", cheekMaskImgFile.c_str());
 #endif

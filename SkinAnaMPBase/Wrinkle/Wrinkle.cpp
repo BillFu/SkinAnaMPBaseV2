@@ -27,6 +27,13 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
                    CONTOURS& deepWrkConts,
                    Mat& wrkGaborRespMap)
 {
+#ifdef TEST_RUN
+    /*
+    string gaborMapFile =  wrk_out_dir + "/gaborResp.png";
+    imwrite(gaborMapFile.c_str(), wrkGaborRespMap);
+    */
+#endif
+    
     cv::Mat imgGray;
     cvtColor(inImg, imgGray, COLOR_BGR2GRAY);
 
@@ -46,9 +53,9 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
                         wrkRespRz, deepWrkConts, longWrkConts, avgFrgiRespValue);
     */
     
-    //Mat frangiRespRz;
-    //CalcFrgiRespInFhReg(imgGray, wrkRegGroup.fhReg.bbox,
-    //                    2, frangiRespRz);
+    Mat frangiRespRz;
+    CalcFrgiRespInFhReg(imgGray, wrkRegGroup.fhReg.bbox,
+                        2, frangiRespRz);
     
     Mat sobelYResp;
     CalcSobelRespInFhReg(imgGray, wrkRegGroup.fhReg.bbox,
