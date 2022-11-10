@@ -66,31 +66,26 @@ void ForgePoreMaskV3(const FaceInfo& faceInfo,
                    const Mat& expFhMask,
                    const Mat& eyeFullMask,  // cover the eyes and eyebows and the surrounding nearby area
                    const Mat& mouthMask, // the enlarged mouth mask
-                   DetectRegion& poreDetReg)
+                     Mat& poreMask)
 {
-    Mat outMask = faceLowMask | expFhMask ;
-    outMask = outMask & (~eyeFullMask) & (~mouthMask);
-    
-    //int expandSize = 20;
-    //expanMask(outMask, expandSize, outPoreMask);
-    
-    TransMaskFromGS2LS(outMask, poreDetReg);
+    poreMask = faceLowMask | expFhMask ;
+    poreMask = poreMask & (~eyeFullMask) & (~mouthMask);
 }
 
 //-------------------------------------------------------------------------------------------
 
 /**********************************************************************************************
-本函数构建Wrinkle的矢量版Mask雏形。
+本函数构建Wrinkle的矢量版Mask雏形，用于Frangi滤波。
 ***********************************************************************************************/
-void ForgeWrinkleMask(const FaceInfo& faceInfo,
+void ForgeWrkFrgiMask(const FaceInfo& faceInfo,
                       const Mat& faceLowMask,  // lower than eyes
                       const Mat& expFhMask,
                       const Mat& eyeFullMask,  // cover the eyes and eyebows and the surrounding nearby area
                       const Mat& noseBellMask,
-                      Mat& outWrkMask)
+                      Mat& wrkFrgiMask)
 {
-    outWrkMask = faceLowMask | expFhMask ;
-    outWrkMask = outWrkMask & (~eyeFullMask) & (~noseBellMask);
+    wrkFrgiMask = faceLowMask | expFhMask ;
+    wrkFrgiMask = wrkFrgiMask & (~eyeFullMask) & (~noseBellMask);
 }
 
 
@@ -102,7 +97,7 @@ void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
                        const fs::path& outDir, 
                        const FaceInfo& faceInfo,
                        const FaceSegRst& segResult,
-                       DetRegPackage& detRegPack)
+                       DetRegPack& detRegPack)
 {
     cv::Size2i srcImgS = srcImage.size();
     
@@ -171,24 +166,22 @@ void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
     ForgeWrkTenRegs(annoLmImage, faceInfo, fbBiLab, detRegPack.wrkRegGroup);
 
     ForgePoreMaskV3(faceInfo, lowFaceMask, expFhMask, eyesFullMask,
-                    mouthMask, detRegPack.poreDetReg);
+                    mouthMask, detRegPack.poreMask);
     
 #ifdef TEST_RUN2
     string poreMaskAnnoFile = BuildOutImgFNV2(outDir, "PoreMask.png");
-    Mat poreMask = TransMaskFromLS2GS(faceInfo.srcImgS,
-                                      detRegPack.poreDetReg);
-    OverlayMaskOnImage(annoLmImage, poreMask,
+    OverlayMaskOnImage(annoLmImage, detRegPack.poreMask,
                         "pore mask", poreMaskAnnoFile.c_str());
 #endif
     
-    Mat wrkMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    ForgeWrinkleMask(faceInfo, lowFaceMask, expFhMask, eyesFullMask,
-                    noseBellMask, wrkMask);
+    //Mat wrkMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    ForgeWrkFrgiMask(faceInfo, lowFaceMask, expFhMask, eyesFullMask,
+                    noseBellMask, detRegPack.wrkFrgiMask);
     
 #ifdef TEST_RUN2
-    string wrkMaskAnnoFile = BuildOutImgFNV2(outDir, "WrinkleMask.png");
-    OverlayMaskOnImage(annoLmImage, wrkMask,
-                        "wrinkle mask", wrkMaskAnnoFile.c_str());
+    string wrkMaskAnnoFile = BuildOutImgFNV2(outDir, "WrkFrgiMask.png");
+    OverlayMaskOnImage(annoLmImage, detRegPack.wrkFrgiMask,
+                        "wrinkle Frgi mask", wrkMaskAnnoFile.c_str());
 #endif
     
     Mat skinMask(srcImgS, CV_8UC1, cv::Scalar(0));

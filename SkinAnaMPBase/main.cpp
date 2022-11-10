@@ -139,7 +139,7 @@ int main(int argc, char **argv)
     //AnnoTwoEyeRefinePts(annoLmImage, faceInfo, yellowColor, true);
     imwrite(LmImgFile.c_str(), annoLmImage);
     */
-    DetRegPackage detRegPack;
+    DetRegPack detRegPack;
     ForgeDetRegPack(crossImage, annoLmImage, outParePath, faceInfo, segResult, detRegPack);
     
     crossImage.release();
@@ -159,7 +159,9 @@ int main(int argc, char **argv)
     // test the wrinkle detecting algorithm
     Mat wrkGaborRespMap;
     
-    DetectWrinkle(paraImage, segResult.faceBBox, detRegPack.wrkRegGroup,
+    DetectWrinkle(paraImage, segResult.faceBBox,
+                  detRegPack.wrkFrgiMask,
+                  detRegPack.wrkRegGroup,
                   deepWrkConts, wrkGaborRespMap);
     
     return 0;

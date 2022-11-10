@@ -27,15 +27,13 @@ extern string wrk_out_dir;
 #endif
 
 // 计算Frangi滤波响应，并提取深皱纹和长皱纹
-void CalcFrgiRespAndPickWrk(const Mat& imgInFR,
-                         const Mat& wrkMaskInFR,
-                         int scaleRatio,
-                         int minWrkSize,
-                         int longWrkThresh,
-                         Mat& frangiRespRz,  // Rz: resized, i.e., scale down
-                         CONTOURS& deepWrkConts,
-                         CONTOURS& longWrkConts,
-                         float& avgFrgiRespValue);
+void PickWrkFromFrgiMap(const Mat& wrkMaskInFR,
+                        int minWrkSize,
+                        int longWrkThresh,
+                        Mat& frgiRespSSInFR,
+                        CONTOURS& deepWrkConts,
+                        CONTOURS& longWrkConts,
+                        float& avgFrgiRespValue);
 
 // 从frangi滤波的结果（经过了二值化、细化、反模糊化等处理）中，提取深皱纹、长皱纹
 // DL: deep and long
@@ -60,11 +58,10 @@ void CcFrgiRespInFhRegACE(const Mat& grSrcImg,
 */
 
 // blur --> clahe --> frangi
-void CcFrgiRespInFR(const Mat& grSrcImg,  // gr: gray
-                      const Rect& faceRect,
-                      int scaleRatio,
-                      Mat& frgiRespRz);
-
+void CcFrgiRespInFR(const Mat& ehGrImg,
+                    const Rect& faceRect,
+                    int scaleRatio,
+                    Mat& frgiMapSSInFR);
 
 // 最核心的Frangi滤波环节
 void ApplyFrgiFilter(const Mat& grSrcImg,

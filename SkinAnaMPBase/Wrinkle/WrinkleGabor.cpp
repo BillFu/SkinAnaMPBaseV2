@@ -123,7 +123,7 @@ Mat ApplyGaborFilter(const vector<CvGabor*>& gaborBank, const Mat& detRegImg)
     }
     detRegImgF.release();
     
-    cout << "data type of respMap: " << openCVType2str(respMapGroup[0].type()) << endl;
+    //cout << "data type of respMap: " << openCVType2str(respMapGroup[0].type()) << endl;
 
     //函数原型： void cv::min(InputArray  src1, InputArray  src2, OutputArray  dst)
     //功   能： 单像素操作（与领域无关）；将src1和src2同位置的像素值取小者，存贮到dst中
@@ -325,23 +325,26 @@ void CalcGaborResp(const Mat& grSrcImg,
                    WrkRegGroup& wrkRegGroup,
                    Mat& gaborRespMap)
 {
+    Mat blurGrImg;
+    GaussianBlur(grSrcImg, blurGrImg, cv::Size(9, 9), 0, 0); // ???
+
     init_gabor();
    
     // 计算左面颊的Gabor滤波响应值
     vector<CvGabor*> lGaborBank;
     InitLCheekGaborBank(lGaborBank);
-    Mat lCheekResp = CalcGaborRespInOneCheek(lGaborBank, grSrcImg, wrkRegGroup.lCheekReg.bbox);
+    Mat lCheekResp = CalcGaborRespInOneCheek(lGaborBank, blurGrImg, wrkRegGroup.lCheekReg.bbox);
 
     // 计算右面颊的Gabor滤波响应值
     vector<CvGabor*> rGaborBank;
     InitRCheekGaborBank(rGaborBank);
-    Mat rCheekResp = CalcGaborRespInOneCheek(rGaborBank, grSrcImg, wrkRegGroup.rCheekReg.bbox);
+    Mat rCheekResp = CalcGaborRespInOneCheek(rGaborBank, blurGrImg, wrkRegGroup.rCheekReg.bbox);
 
     // 前额
-    Mat fhRegResp = CalcGaborRespOnFh(grSrcImg, wrkRegGroup.fhReg.bbox);
+    Mat fhRegResp = CalcGaborRespOnFh(blurGrImg, wrkRegGroup.fhReg.bbox);
     
     // glabella，眉间，印堂
-    Mat glabeRegResp = CalcGaborRespOnGlab(grSrcImg, wrkRegGroup.glabReg.bbox);
+    Mat glabeRegResp = CalcGaborRespOnGlab(blurGrImg, wrkRegGroup.glabReg.bbox);
      
     
 #ifdef TEST_RUN2

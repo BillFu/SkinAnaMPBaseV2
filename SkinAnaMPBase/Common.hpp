@@ -148,10 +148,10 @@ struct WrkRegGroup
 };
 
 // 各类皮肤特征的检测区域汇总
-struct DetRegPackage
+struct DetRegPack
 {
-    DetectRegion poreDetReg;
-    
+    Mat poreMask;
+    Mat wrkFrgiMask; // used for frangi filtering to detect wrinkle
     WrkRegGroup  wrkRegGroup;
 };
 

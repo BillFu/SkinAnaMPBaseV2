@@ -6,58 +6,15 @@
 #include "frangi.h"
 
 
-// 计算Frangi滤波响应，并提取深皱纹和长皱纹
-void CalcFrgiRespAndPickWrk(const Mat& grFrImg, // gray and cropped by face rect
-                         const Mat& wrkMaskInFR,
-                         int scaleRatio,
+// 从Frangi滤波响应中提取深皱纹和长皱纹
+void PickWrkFromFrgiMap( const Mat& wrkMaskInFR,
                          int minWrkSize,
                          int longWrkThresh,
-                         Mat& frgiRespRz,  // Rz: resized, i.e., scale down
+                         Mat& frgiRespSSInFR,  // Rz: resized, i.e., scale down
                          CONTOURS& deepWrkConts,
                          CONTOURS& longWrkConts,
                          float& avgFrgiRespValue)
 {
-    int wFR = grFrImg.cols;
-    int hFR = grFrImg.rows;
-    
-    Size rzSize = grFrImg.size() / scaleRatio;
-    Mat grFrRzImg;
-    resize(grFrImg, grFrRzImg, rzSize);
-    
-    Mat grFrRzFlImg;
-    grFrRzImg.convertTo(grFrRzFlImg, CV_32FC1);
-    grFrRzImg.release();
-    
-    cv::Mat respScaleRz, respAngRz;
-    frangi2d_opts opts;
-    opts.sigma_start = 1;
-    opts.sigma_end = 3;
-    opts.sigma_step = 1;
-    opts.BetaOne = 0.5;  // BetaOne: suppression of blob-like structures.
-    opts.BetaTwo = 10.0; // background suppression. (See Frangi1998...)
-    opts.BlackWhite = true;
-    
-    // !!! 计算fangi2d时，使用的是缩小版的衍生影像
-    frangi2d(grFrRzFlImg, frgiRespRz, respScaleRz, respAngRz, opts);
-    grFrRzFlImg.release();
-    
-    //返回的scaleRz, anglesRz没有派上实际的用场
-    respScaleRz.release();
-    respAngRz.release();
-    
-    frgiRespRz.convertTo(frgiRespRz, CV_8UC1, 255.);
-    
-#ifdef TEST_RUN
-    string frgiRespImgFile = BuildOutImgFNV2(outDir, "frgiFrRz.png");
-    bool isOK = imwrite(frgiRespImgFile, frgiRespRz);
-    assert(isOK);
-#endif
-
-    cv::Mat frgiRespSSInFR; // SS: source scale
-    //把响应强度图又扩大到原始影像的尺度上来，但限定在Face Rect内。
-    resize(frgiRespRz, frgiRespSSInFR, cv::Size(wFR, hFR));
-    frgiRespRz.release();
-
     // DL: deep and long
     PickDLWrkFromFrgiResp(frgiRespSSInFR,
                           wrkMaskInFR, // 原始尺度，经过了Face_Rect裁切
@@ -132,18 +89,8 @@ void CalcFrgiRespInFhReg(const Mat& grSrcImg,
                          int scaleRatio,
                          Mat& frgiRespRz)
 {
-    //cout << "fhRect: " << fhRect << endl;
-
     Mat imgOfFh = grSrcImg(fhRect);
     Size fhImgS = imgOfFh.size();
-    
-    /*
-#ifdef TEST_RUN2
-    string fhImgFile = BuildOutImgFNV2(wrkOutDir, "fhImg.png");
-    bool isOK = imwrite(fhImgFile, imgOfFh);
-    assert(isOK);
-#endif
-    */
     
     // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
     // 也许这个公式以后需要调整为普遍适用的公式。
@@ -154,9 +101,7 @@ void CalcFrgiRespInFhReg(const Mat& grSrcImg,
         blurKerS = 3;
     cout << "blurKerS: " << blurKerS << endl;
     
-    //blurKerS = 7;
     blur(imgOfFh, imgOfFh, Size(blurKerS, blurKerS));
-    //GaussianBlur(imgOfFh, imgOfFh, Size(blurKerS, blurKerS), 0, 0); // ???
     
     Mat clachRst;
     // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
@@ -178,87 +123,23 @@ void CalcFrgiRespInFhReg(const Mat& grSrcImg,
 
 }
 
-/*
-void CcFrgiRespInFhRegACE(const Mat& grSrcImg,
-                         const Rect& fhRect,
-                         int scaleRatio,
-                         Mat& frgiRespRz)
+void CcFrgiRespInFR(const Mat& ehGrImg,
+                    const Rect& faceRect,
+                    int scaleRatio,
+                    Mat& frgiMapSSInFR)
 {
-    Mat imgOfFh = grSrcImg(fhRect);
-    Size fhImgS = imgOfFh.size();
+    Mat ehGrImgFR = ehGrImg(faceRect);
     
-    
-    // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
-    // 也许这个公式以后需要调整为普遍适用的公式。
-    int blurKerS = fhImgS.width / 142; // 1/142 约等于9/1286
-    if(blurKerS % 2 == 0)
-        blurKerS += 1;  // make it be a odd number
-    if(blurKerS < 3)
-        blurKerS = 3;
-    cout << "blurKerS: " << blurKerS << endl;
-    
-    Mat blurGrImg;
-    blur(imgOfFh, blurGrImg, Size(blurKerS, blurKerS));
-    imgOfFh.release();
-    
-    Mat aceRst;
-    int d = 40;
-    float scale = 1.2;
-    float MaxCG = 3.5;
-    ACE(blurGrImg, aceRst, d, scale, MaxCG);
-    
-    Mat frgiRespRz8U;
-    ApplyFrgiFilter(aceRst, scaleRatio, frgiRespRz8U);
-    aceRst.release();
-        
-#ifdef TEST_RUN2
-    string frgiRespImgFile = BuildOutImgFNV2(wrkOutDir, "fhACEFrgi.png");
-    bool isOK = imwrite(frgiRespImgFile, frgiRespRz8U);
-    assert(isOK);
-#endif
-
-}
-*/
-
-void CcFrgiRespInFR(const Mat& grSrcImg,
-                         const Rect& faceRect,
-                         int scaleRatio,
-                         Mat& frgiRespRz)
-{
-    Size srcImgS = grSrcImg.size();
-    Mat imgInFR = grSrcImg(faceRect);
-    
-    // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
-    // 也许这个公式以后需要调整为普遍适用的公式。
-    int blurKerS = srcImgS.width / 272;
-    if(blurKerS % 2 == 0)
-        blurKerS += 1;  // make it be a odd number
-    
-    Mat blurFRGrImg;
-    blur(imgInFR, blurFRGrImg, Size(blurKerS, blurKerS));
-    
-    Mat clachRst;
-    // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
-    // 也许这个公式以后需要调整为普遍适用的公式。
-    int gridSize = srcImgS.width / 100;
-    ApplyCLAHE(blurFRGrImg, gridSize, clachRst);
-    blurFRGrImg.release();
+    Mat frgiMapFRRz8U;
+    ApplyFrgiFilter(ehGrImgFR, scaleRatio, frgiMapFRRz8U);
     
 #ifdef TEST_RUN2
-    string claheFhFN =  wrkOutDir + "/clachFRb" +
-        to_string(blurKerS) + "_g" + to_string(gridSize) + ".png";
-    imwrite(claheFhFN, clachRst);
+    string frgiRespImgFile =  wrkOutDir + "/frgiFR.png";
+    imwrite(frgiRespImgFile, frgiMapFRRz8U);
 #endif
-
-    Mat frgiRespRz8U;
-    ApplyFrgiFilter(clachRst, scaleRatio, frgiRespRz8U);
-    clachRst.release();
     
-#ifdef TEST_RUN2
-    string frgiRespImgFile =  wrkOutDir + "/frgiFRb" +
-        to_string(blurKerS) + "_g" + to_string(gridSize) + ".png";
-    imwrite(frgiRespImgFile, frgiRespRz8U);
-#endif
+    //把响应强度图又扩大到原始影像的尺度上来，但限定在Face Rect内。
+    resize(frgiMapFRRz8U, frgiMapSSInFR, faceRect.size());
 }
 
 void ApplyFrgiFilter(const Mat& inGrImg,

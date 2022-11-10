@@ -47,29 +47,28 @@ void ForgePoreMaskV3(const FaceInfo& faceInfo,
                      const Mat& expFhMask,
                      const Mat& eyeFullMask,  // cover the eyes and eyebows and the surrounding nearby area
                      const Mat& mouthMask, // the enlarged mouth mask
-                     DetectRegion& poreDetReg);
-                     //Mat& outPoreMask);
+                     Mat& poreMask);
 //-------------------------------------------------------------------------------------------
 
 /**********************************************************************************************
-本函数构建Wrinkle的矢量版Mask雏形。
+本函数构建Wrinkle的矢量版Mask雏形，用于Frangi滤波。
 ***********************************************************************************************/
-void ForgeWrinkleMask(const FaceInfo& faceInfo,
+void ForgeWrkFrgiMask(const FaceInfo& faceInfo,
                       const Mat& faceLowMask,  // lower than eyes
                       const Mat& expFhMask,
                       const Mat& eyeFullMask,  // cover the eyes and eyebows and the surrounding nearby area
                       //const Mat& noseMask,
                       const Mat& noseBellMask,
-                      Mat& outWrkMask);
+                      Mat& wrkFrgiMask);
 
 //-------------------------------------------------------------------------------------------
 
 // 一揽子函数，生成各类Mask和它们的Anno Image
 // 用TEST_RUN打印出许多辅助性结果和信息
 void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
-                       const fs::path& outDir, const FaceInfo& faceInfo,
-                       const FaceSegRst& segResult,
-                     DetRegPackage& detRegPack);
+                     const fs::path& outDir, const FaceInfo& faceInfo,
+                     const FaceSegRst& segResult,
+                     DetRegPack& detRegPack);
 
 
 // 一揽子函数，生成各类Mask和它们的Anno Image
