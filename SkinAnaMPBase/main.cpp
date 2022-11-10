@@ -146,7 +146,7 @@ int main(int argc, char **argv)
     
     
     string paraImgFile = config_json.at("ParallelImage");
-    Mat paraImage = cv::imread(crossImgFile.c_str());
+    Mat paraImage = cv::imread(paraImgFile.c_str());
     if(paraImage.empty())
     {
         cout << "Failed to load parallel source iamge: " << paraImgFile << endl;

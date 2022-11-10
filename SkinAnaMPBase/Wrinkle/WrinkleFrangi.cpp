@@ -132,8 +132,18 @@ void CalcFrgiRespInFhReg(const Mat& grSrcImg,
                          int scaleRatio,
                          Mat& frgiRespRz)
 {
+    //cout << "fhRect: " << fhRect << endl;
+
     Mat imgOfFh = grSrcImg(fhRect);
     Size fhImgS = imgOfFh.size();
+    
+    /*
+#ifdef TEST_RUN2
+    string fhImgFile = BuildOutImgFNV2(wrkOutDir, "fhImg.png");
+    bool isOK = imwrite(fhImgFile, imgOfFh);
+    assert(isOK);
+#endif
+    */
     
     // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
     // 也许这个公式以后需要调整为普遍适用的公式。
@@ -151,7 +161,7 @@ void CalcFrgiRespInFhReg(const Mat& grSrcImg,
     Mat clachRst;
     // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
     // 也许这个公式以后需要调整为普遍适用的公式。
-    int gridSize = fhImgS.width / 24; // 1/54与24/1286有关
+    int gridSize = fhImgS.width / 54; // 1/54与24/1286有关
     cout << "gridSize: " << gridSize << endl;
     ApplyCLAHE(imgOfFh, gridSize, clachRst);
     imgOfFh.release();
@@ -162,8 +172,8 @@ void CalcFrgiRespInFhReg(const Mat& grSrcImg,
         
 #ifdef TEST_RUN2
     string frgiRespImgFile = BuildOutImgFNV2(wrkOutDir, "fhFrgiResp.png");
-    bool isOK = imwrite(frgiRespImgFile, frgiRespRz8U);
-    assert(isOK);
+    bool isOK2 = imwrite(frgiRespImgFile, frgiRespRz8U);
+    assert(isOK2);
 #endif
 
 }
@@ -269,11 +279,11 @@ void ApplyFrgiFilter(const Mat& inGrImg,
     
     cv::Mat respScaleRz, respAngRz;
     frangi2d_opts opts;
-    opts.sigma_start = 2;
-    opts.sigma_end = 10;
+    opts.sigma_start = 1;
+    opts.sigma_end = 5;
     opts.sigma_step = 2;
     opts.BetaOne = 0.5;  // BetaOne: suppression of blob-like structures.
-    opts.BetaTwo = 10.0; // background suppression. (See Frangi1998...)
+    opts.BetaTwo = 12.0; // background suppression. (See Frangi1998...)
     opts.BlackWhite = true;
     
     // !!! 计算fangi2d时，使用的是缩小版的衍生影像
