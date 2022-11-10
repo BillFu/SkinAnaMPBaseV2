@@ -178,8 +178,8 @@ void CalcFrgiRespInFhReg(const Mat& grSrcImg,
 
 }
 
-
-void CalcFrgiRespInFhRegV2(const Mat& grSrcImg,
+/*
+void CcFrgiRespInFhRegACE(const Mat& grSrcImg,
                          const Rect& fhRect,
                          int scaleRatio,
                          Mat& frgiRespRz)
@@ -212,29 +212,25 @@ void CalcFrgiRespInFhRegV2(const Mat& grSrcImg,
     aceRst.release();
         
 #ifdef TEST_RUN2
-    string frgiRespImgFile = BuildOutImgFNV2(wrkOutDir, "fhFrgiResp.png");
+    string frgiRespImgFile = BuildOutImgFNV2(wrkOutDir, "fhACEFrgi.png");
     bool isOK = imwrite(frgiRespImgFile, frgiRespRz8U);
     assert(isOK);
 #endif
 
 }
+*/
 
-/*
-void CalcFrgiRespInFR(const Mat& grSrcImg,
+void CcFrgiRespInFR(const Mat& grSrcImg,
                          const Rect& faceRect,
                          int scaleRatio,
                          Mat& frgiRespRz)
 {
     Size srcImgS = grSrcImg.size();
-    
     Mat imgInFR = grSrcImg(faceRect);
-    Size rzSize = imgInFR.size() / scaleRatio;
-    Mat rzFrImg;
-    resize(grSrcImg, rzFrImg, rzSize);
     
     // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
     // 也许这个公式以后需要调整为普遍适用的公式。
-    int blurKerS = (9 * srcImgS.width) / (2448 * scaleRatio); 
+    int blurKerS = srcImgS.width / 272;
     if(blurKerS % 2 == 0)
         blurKerS += 1;  // make it be a odd number
     
@@ -244,8 +240,9 @@ void CalcFrgiRespInFR(const Mat& grSrcImg,
     Mat clachRst;
     // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
     // 也许这个公式以后需要调整为普遍适用的公式。
-    int gridSize = (24 * srcImgS.width) / (2448 * scaleRatio);
+    int gridSize = srcImgS.width / 100;
     ApplyCLAHE(blurFRGrImg, gridSize, clachRst);
+    blurFRGrImg.release();
     
 #ifdef TEST_RUN2
     string claheFhFN =  wrkOutDir + "/clachFRb" +
@@ -254,7 +251,7 @@ void CalcFrgiRespInFR(const Mat& grSrcImg,
 #endif
 
     Mat frgiRespRz8U;
-    ApplyFrgiFilter(clachRst, frgiRespRz8U);
+    ApplyFrgiFilter(clachRst, scaleRatio, frgiRespRz8U);
     clachRst.release();
     
 #ifdef TEST_RUN2
@@ -263,7 +260,6 @@ void CalcFrgiRespInFR(const Mat& grSrcImg,
     imwrite(frgiRespImgFile, frgiRespRz8U);
 #endif
 }
-*/
 
 void ApplyFrgiFilter(const Mat& inGrImg,
                      int scaleRatio,

@@ -49,10 +49,16 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     // Mat frgiRespFrRz;
     // CalcFrgiRespInFR(imgGray, faceRect, 1, frgiRespFrRz);
     int scaleRatio = 2;
-    Mat frgiMapFhRz;
-    CalcFrgiRespInFhReg(imgGray, wrkRegGroup.fhReg.bbox,
-                        scaleRatio, frgiMapFhRz);
-
+    //Mat frgiMapFhRz;
+    //CalcFrgiRespInFhReg(imgGray, wrkRegGroup.fhReg.bbox,
+    //                    scaleRatio, frgiMapFhRz);
+    
+    //CcFrgiRespInFhRegACE(imgGray, wrkRegGroup.fhReg.bbox,
+    //                      scaleRatio, frgiMapFhRz);
+    
+    Mat frgiMapFRRz;
+    CcFrgiRespInFR(imgGray, faceRect,
+                    scaleRatio, frgiMapFRRz);
 
     //----------------- 第二次使用Gabor滤波，针对细皱纹---------------------
     
