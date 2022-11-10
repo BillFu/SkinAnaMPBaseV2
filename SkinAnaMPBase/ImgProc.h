@@ -52,4 +52,8 @@ Mat worldGray(const cv::Mat& src);
 // Cvt: convert
 Mat CvtFloatImgTo8UImg(Mat& ftImg);
 
+void ApplyCLAHE(const Mat& inImg,
+                int gridSize,
+                Mat& outImg);
+
 #endif /* IMG_PROC_H */

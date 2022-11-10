@@ -29,8 +29,7 @@ using namespace tflite;
 #define TEST_RUN2  // !!! 发布编译时，必须把这个定义给注释掉 ！！！
 
 #ifdef TEST_RUN2
-extern string outDir;  // 在这里申明，在main.cpp里定义。
-extern string wrkOutDir;
+ extern string wrkOutDir;
 extern string wrkMaskOutDir;
 #endif
 

@@ -545,7 +545,7 @@ Mat CvtFloatImgTo8UImg(Mat& ftImg)
 {
     float maxV = *max_element(ftImg.begin<float>(), ftImg.end<float>());
     float minV = *min_element(ftImg.begin<float>(), ftImg.end<float>());
-    
+
     cout << "maxV: " << maxV << endl;
     cout << "minV: " << minV << endl;
     
@@ -556,4 +556,14 @@ Mat CvtFloatImgTo8UImg(Mat& ftImg)
     ftImg.convertTo(img8U, CV_8U, alpha, beta);
 
     return img8U;
+}
+
+void ApplyCLAHE(const Mat& inImg,
+                int gridSize,
+                Mat& outImg)
+{
+    cv::Ptr<CLAHE> clahe = cv::createCLAHE();
+    clahe->setClipLimit(4);
+    clahe->setTilesGridSize(cv::Size(gridSize, gridSize));
+    clahe->apply(inImg, outImg);
 }

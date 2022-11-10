@@ -133,67 +133,157 @@ void CalcFrgiRespInFhReg(const Mat& grSrcImg,
                          Mat& frgiRespRz)
 {
     Mat imgOfFh = grSrcImg(fhRect);
+    Size fhImgS = imgOfFh.size();
     
-    Size rzSize = imgOfFh.size() / scaleRatio;
-    Mat fhRzImg;
-    resize(imgOfFh, fhRzImg, rzSize);
+    // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
+    // 也许这个公式以后需要调整为普遍适用的公式。
+    int blurKerS = fhImgS.width / 150; // 1/142 约等于9/1286
+    if(blurKerS % 2 == 0)
+        blurKerS += 1;  // make it be a odd number
+    if(blurKerS < 3)
+        blurKerS = 3;
+    cout << "blurKerS: " << blurKerS << endl;
     
-    Mat fhRzFlImg;
-    fhRzImg.convertTo(fhRzFlImg, CV_32FC1);
-    fhRzImg.release();
+    //blurKerS = 7;
+    blur(imgOfFh, imgOfFh, Size(blurKerS, blurKerS));
+    //GaussianBlur(imgOfFh, imgOfFh, Size(blurKerS, blurKerS), 0, 0); // ???
     
-    float maxV = *max_element(fhRzFlImg.begin<float>(), fhRzFlImg.end<float>());
-    float minV = *min_element(fhRzFlImg.begin<float>(), fhRzFlImg.end<float>());
+    Mat clachRst;
+    // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
+    // 也许这个公式以后需要调整为普遍适用的公式。
+    int gridSize = fhImgS.width / 24; // 1/54与24/1286有关
+    cout << "gridSize: " << gridSize << endl;
+    ApplyCLAHE(imgOfFh, gridSize, clachRst);
+    imgOfFh.release();
     
-    fhRzFlImg = (fhRzFlImg - minV) / (maxV - minV); // 调整到[0.0, 1.0]
-    
-    cv::Mat respScaleRz, respAngRz;
-    frangi2d_opts opts;
-    opts.sigma_start = 1;
-    opts.sigma_end = 5;
-    opts.sigma_step = 2;
-    opts.BetaOne = 0.5;  // BetaOne: suppression of blob-like structures.
-    opts.BetaTwo = 15.0; // background suppression. (See Frangi1998...)
-    opts.BlackWhite = true;
-    
-    // !!! 计算fangi2d时，使用的是缩小版的衍生影像
-    frangi2d(fhRzFlImg, frgiRespRz, respScaleRz, respAngRz, opts);
-    fhRzFlImg.release();
-    
-    //返回的scaleRz, anglesRz没有派上实际的用场
-    respScaleRz.release();
-    respAngRz.release();
+    Mat frgiRespRz8U;
+    ApplyFrgiFilter(clachRst, scaleRatio, frgiRespRz8U);
+    clachRst.release();
         
-    Mat respMap8U = CvtFloatImgTo8UImg(frgiRespRz);
-    
 #ifdef TEST_RUN2
     string frgiRespImgFile = BuildOutImgFNV2(wrkOutDir, "fhFrgiResp.png");
-    bool isOK = imwrite(frgiRespImgFile, respMap8U);
+    bool isOK = imwrite(frgiRespImgFile, frgiRespRz8U);
     assert(isOK);
 #endif
 
 }
 
-void CalcSobelRespInFhReg(const Mat& grSrcImg,
+
+void CalcFrgiRespInFhRegV2(const Mat& grSrcImg,
                          const Rect& fhRect,
                          int scaleRatio,
                          Mat& frgiRespRz)
 {
     Mat imgOfFh = grSrcImg(fhRect);
+    Size fhImgS = imgOfFh.size();
     
-    GaussianBlur( imgOfFh, imgOfFh, Size(3,3), 0, 0, BORDER_DEFAULT );
     
-    Mat grad_y;
-    //Sobel(imgOfFh, grad_y, CV_8U, 0, 1, 3, 1, 0, BORDER_DEFAULT);
-
-    Scharr(imgOfFh, grad_y, CV_16S, 0, 1);
-    convertScaleAbs(grad_y, grad_y, 2.0, 20.0);
+    // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
+    // 也许这个公式以后需要调整为普遍适用的公式。
+    int blurKerS = fhImgS.width / 142; // 1/142 约等于9/1286
+    if(blurKerS % 2 == 0)
+        blurKerS += 1;  // make it be a odd number
+    if(blurKerS < 3)
+        blurKerS = 3;
+    cout << "blurKerS: " << blurKerS << endl;
     
-    //grad_y = ~grad_y;
+    Mat blurGrImg;
+    blur(imgOfFh, blurGrImg, Size(blurKerS, blurKerS));
+    imgOfFh.release();
+    
+    Mat aceRst;
+    int d = 40;
+    float scale = 1.2;
+    float MaxCG = 3.5;
+    ACE(blurGrImg, aceRst, d, scale, MaxCG);
+    
+    Mat frgiRespRz8U;
+    ApplyFrgiFilter(aceRst, scaleRatio, frgiRespRz8U);
+    aceRst.release();
+        
 #ifdef TEST_RUN2
-    string gradImgFile = BuildOutImgFNV2(outDir, "gradYInFh.png");
-    bool isOK = imwrite(gradImgFile, grad_y);
+    string frgiRespImgFile = BuildOutImgFNV2(wrkOutDir, "fhFrgiResp.png");
+    bool isOK = imwrite(frgiRespImgFile, frgiRespRz8U);
     assert(isOK);
 #endif
 
+}
+
+/*
+void CalcFrgiRespInFR(const Mat& grSrcImg,
+                         const Rect& faceRect,
+                         int scaleRatio,
+                         Mat& frgiRespRz)
+{
+    Size srcImgS = grSrcImg.size();
+    
+    Mat imgInFR = grSrcImg(faceRect);
+    Size rzSize = imgInFR.size() / scaleRatio;
+    Mat rzFrImg;
+    resize(grSrcImg, rzFrImg, rzSize);
+    
+    // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
+    // 也许这个公式以后需要调整为普遍适用的公式。
+    int blurKerS = (9 * srcImgS.width) / (2448 * scaleRatio); 
+    if(blurKerS % 2 == 0)
+        blurKerS += 1;  // make it be a odd number
+    
+    Mat blurFRGrImg;
+    blur(imgInFR, blurFRGrImg, Size(blurKerS, blurKerS));
+    
+    Mat clachRst;
+    // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
+    // 也许这个公式以后需要调整为普遍适用的公式。
+    int gridSize = (24 * srcImgS.width) / (2448 * scaleRatio);
+    ApplyCLAHE(blurFRGrImg, gridSize, clachRst);
+    
+#ifdef TEST_RUN2
+    string claheFhFN =  wrkOutDir + "/clachFRb" +
+        to_string(blurKerS) + "_g" + to_string(gridSize) + ".png";
+    imwrite(claheFhFN, clachRst);
+#endif
+
+    Mat frgiRespRz8U;
+    ApplyFrgiFilter(clachRst, frgiRespRz8U);
+    clachRst.release();
+    
+#ifdef TEST_RUN2
+    string frgiRespImgFile =  wrkOutDir + "/frgiFRb" +
+        to_string(blurKerS) + "_g" + to_string(gridSize) + ".png";
+    imwrite(frgiRespImgFile, frgiRespRz8U);
+#endif
+}
+*/
+
+void ApplyFrgiFilter(const Mat& inGrImg,
+                     int scaleRatio,
+                     Mat& frgiRespRzU8)
+{
+    Size rzSize = inGrImg.size() / scaleRatio;
+    Mat rzImg;
+    resize(inGrImg, rzImg, rzSize);
+    
+    Mat rzFtImg; // Ft: float
+    rzImg.convertTo(rzFtImg, CV_32FC1);
+    rzImg.release();
+    
+    cv::Mat respScaleRz, respAngRz;
+    frangi2d_opts opts;
+    opts.sigma_start = 2;
+    opts.sigma_end = 10;
+    opts.sigma_step = 2;
+    opts.BetaOne = 0.5;  // BetaOne: suppression of blob-like structures.
+    opts.BetaTwo = 10.0; // background suppression. (See Frangi1998...)
+    opts.BlackWhite = true;
+    
+    // !!! 计算fangi2d时，使用的是缩小版的衍生影像
+    Mat frgiRespRz;
+    frangi2d(rzFtImg, frgiRespRz, respScaleRz, respAngRz, opts);
+    rzFtImg.release();
+    
+    //返回的scaleRz, anglesRz没有派上实际的用场
+    respScaleRz.release();
+    respAngRz.release();
+        
+    frgiRespRzU8 = CvtFloatImgTo8UImg(frgiRespRz);
 }

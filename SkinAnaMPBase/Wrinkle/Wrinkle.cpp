@@ -27,13 +27,6 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
                    CONTOURS& deepWrkConts,
                    Mat& wrkGaborRespMap)
 {
-#ifdef TEST_RUN
-    /*
-    string gaborMapFile =  wrk_out_dir + "/gaborResp.png";
-    imwrite(gaborMapFile.c_str(), wrkGaborRespMap);
-    */
-#endif
-    
     cv::Mat imgGray;
     cvtColor(inImg, imgGray, COLOR_BGR2GRAY);
 
@@ -53,20 +46,20 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
                         wrkRespRz, deepWrkConts, longWrkConts, avgFrgiRespValue);
     */
     
-    Mat frangiRespRz;
+    // Mat frgiRespFrRz;
+    // CalcFrgiRespInFR(imgGray, faceRect, 1, frgiRespFrRz);
+    int scaleRatio = 2;
+    Mat frgiMapFhRz;
     CalcFrgiRespInFhReg(imgGray, wrkRegGroup.fhReg.bbox,
-                        2, frangiRespRz);
-    
-    Mat sobelYResp;
-    CalcSobelRespInFhReg(imgGray, wrkRegGroup.fhReg.bbox,
-                         2, sobelYResp);
-    
+                        scaleRatio, frgiMapFhRz);
+
+
     //----------------- 第二次使用Gabor滤波，针对细皱纹---------------------
     
     //GaussianBlur(grFrImg, grFrImg, cv::Size(7, 7), 0, 0); // ???
     
     //WrinkRespMap是由Face_Rect来限定的
-    CalcGaborResp(imgGray, wrkRegGroup, wrkGaborRespMap);
+    //CalcGaborResp(imgGray, wrkRegGroup, wrkGaborRespMap);
 
 #ifdef TEST_RUN
     /*

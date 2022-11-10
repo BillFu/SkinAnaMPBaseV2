@@ -51,9 +51,21 @@ void CalcFrgiRespInFhReg(const Mat& grSrcImg,
                          int scaleRatio,
                          Mat& frangiRespRz);
 
-
-void CalcSobelRespInFhReg(const Mat& grSrcImg,
-                         const Rect& fhRect,
+void CalcFrgiRespInFhRegV2(const Mat& grSrcImg,
+                      const Rect& fhRect,
+                      int scaleRatio,
+                      Mat& frangiRespRz);
+/*
+// blur --> clahe --> frangi
+void CalcFrgiRespInFR(const Mat& grSrcImg,
+                         const Rect& faceRect,
                          int scaleRatio,
-                          Mat& frgiRespRz);
+                         Mat& frgiRespRz);
+ */
+
+// 最核心的Frangi滤波环节
+void ApplyFrgiFilter(const Mat& grSrcImg,
+                     int scaleRatio,
+                     Mat& frangiRespRz);
+
 #endif /* WRINKLE_FRANGI_H */
