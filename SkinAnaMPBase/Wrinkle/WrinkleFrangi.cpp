@@ -172,5 +172,5 @@ void ApplyFrgiFilter(const Mat& inGrImg,
     respScaleRz.release();
     respAngRz.release();
         
-    frgiRespRzU8 = CvtFloatImgTo8UImg(frgiRespRz);
+    frgiRespRzU8 = CvtFtImgTo8U_MinMax(frgiRespRz);
 }

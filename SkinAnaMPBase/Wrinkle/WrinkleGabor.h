@@ -30,7 +30,7 @@ void AnnoPointsOnImg(Mat& annoImage,
 
 // agg: aggregated
 void ApplyGaborBank(const GaborOptBank& gBank, const Mat& inGrFtImg,
-                    Mat& aggGabMap8U);
+                    Mat& aggGabMapFt);
 
 /*
 void InitLCheekGaborBank(CvGabor lcGabor[5]);

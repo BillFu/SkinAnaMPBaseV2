@@ -541,7 +541,7 @@ cv::Mat worldGray(const cv::Mat& src)
 }
 
 // Cvt: convert
-Mat CvtFloatImgTo8UImg(Mat& ftImg)
+Mat CvtFtImgTo8U_MinMax(Mat& ftImg)
 {
     float maxV = *max_element(ftImg.begin<float>(), ftImg.end<float>());
     float minV = *min_element(ftImg.begin<float>(), ftImg.end<float>());
@@ -555,6 +555,15 @@ Mat CvtFloatImgTo8UImg(Mat& ftImg)
     Mat img8U;
     ftImg.convertTo(img8U, CV_8U, alpha, beta);
 
+    return img8U;
+}
+
+Mat CvtFtImgTo8U_NoNega(Mat& ftImg)
+{
+    uchar maxV = *max_element(ftImg.begin<float>(), ftImg.end<float>());
+    double alpha = 255.0 / maxV;
+    Mat img8U;
+    ftImg.convertTo(img8U, CV_8UC1, alpha);
     return img8U;
 }
 
