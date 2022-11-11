@@ -19,7 +19,6 @@ Date:   2022/10/10
 #include <opencv2/opencv.hpp>
 #include <opencv2/dnn.hpp>
 
-#include "nlohmann/json.hpp"
 #include "FaceBgSegV2.hpp"
 #include "../Utils.hpp"
 #include "../Geometry.hpp"
@@ -27,7 +26,6 @@ Date:   2022/10/10
 using namespace std;
 using namespace cv;
 
-using json = nlohmann::json;
 
 //-------------------------------------------------------------------------------------------
 

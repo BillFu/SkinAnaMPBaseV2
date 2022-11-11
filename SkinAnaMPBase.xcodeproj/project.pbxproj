@@ -18,9 +18,7 @@
 		265B7B9C28E5C9D2004F5E49 /* AnnoImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263B540028CD861C004CF77D /* AnnoImage.cpp */; };
 		2680A22E28EFC54B00A305EB /* FaceLmExtractV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2680A22C28EFC54B00A305EB /* FaceLmExtractV2.cpp */; };
 		2680A22F28EFC55A00A305EB /* FaceLmExtractV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2680A22C28EFC54B00A305EB /* FaceLmExtractV2.cpp */; };
-		26827DF4291D1C9D0063F345 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 265B7B9728E5B26D004F5E49 /* libtensorflowlite.so */; };
 		269CC10F29175DB000BA8AA2 /* WrinkleMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269CC10E29175DB000BA8AA2 /* WrinkleMask.cpp */; };
-		26B2C4A32915F3420048B37C /* cvgabor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B2C4A22915F3420048B37C /* cvgabor.cpp */; };
 		26B2C4A92915F4680048B37C /* Wrinkle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B2C4A82915F4680048B37C /* Wrinkle.cpp */; };
 		26B2C4AC2915F9590048B37C /* frangi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B2C4AB2915F9590048B37C /* frangi.cpp */; };
 		26B65A5E28EA92900019104F /* LowerFaceMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B65A5C28EA92900019104F /* LowerFaceMask.cpp */; };
@@ -29,6 +27,8 @@
 		26DB15F528D69DEE00F195CF /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 2602327828CCC52E00B11D7A /* libtensorflowlite.so */; };
 		CB02B84F290677E9001F8E61 /* polyitems_fit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB02B84E290677E9001F8E61 /* polyitems_fit.cpp */; };
 		CB1E2AB928DD99AB00F416DF /* ForeheadMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB1E2AB728DD99AB00F416DF /* ForeheadMask.cpp */; };
+		CB205544291E33C800E359F5 /* GaborDL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB205543291E33C800E359F5 /* GaborDL.cpp */; };
+		CB205545291E353000E359F5 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CBD123FD28E58EEB004A42A9 /* libtensorflowlite.so */; };
 		CB255A9628C7237A005C8A81 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB255A9528C7237A005C8A81 /* main.cpp */; };
 		CB2F690D29125C4D00E35FC3 /* Chaikin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB2F690C29125C4C00E35FC3 /* Chaikin.cpp */; };
 		CB2F690E29125C5700E35FC3 /* Chaikin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB2F690C29125C4C00E35FC3 /* Chaikin.cpp */; };
@@ -112,8 +112,6 @@
 		2680A22D28EFC54B00A305EB /* FaceLmExtractV2.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FaceLmExtractV2.hpp; sourceTree = "<group>"; };
 		269CC10D29175DB000BA8AA2 /* WrinkleMask.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = WrinkleMask.hpp; sourceTree = "<group>"; };
 		269CC10E29175DB000BA8AA2 /* WrinkleMask.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WrinkleMask.cpp; sourceTree = "<group>"; };
-		26B2C4A12915F3420048B37C /* cvgabor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cvgabor.h; sourceTree = "<group>"; };
-		26B2C4A22915F3420048B37C /* cvgabor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cvgabor.cpp; sourceTree = "<group>"; };
 		26B2C4A72915F4680048B37C /* Wrinkle.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Wrinkle.hpp; sourceTree = "<group>"; };
 		26B2C4A82915F4680048B37C /* Wrinkle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Wrinkle.cpp; sourceTree = "<group>"; };
 		26B2C4AA2915F9590048B37C /* frangi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = frangi.h; sourceTree = "<group>"; };
@@ -127,6 +125,8 @@
 		CB02B8502906790F001F8E61 /* polyitems_fit.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = polyitems_fit.hpp; sourceTree = "<group>"; };
 		CB1E2AB728DD99AB00F416DF /* ForeheadMask.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ForeheadMask.cpp; sourceTree = "<group>"; };
 		CB1E2AB828DD99AB00F416DF /* ForeheadMask.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ForeheadMask.hpp; sourceTree = "<group>"; };
+		CB205542291E33C800E359F5 /* GaborDL.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GaborDL.hpp; sourceTree = "<group>"; };
+		CB205543291E33C800E359F5 /* GaborDL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GaborDL.cpp; sourceTree = "<group>"; };
 		CB255A9228C7237A005C8A81 /* SkinAnaMPBase */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SkinAnaMPBase; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB255A9528C7237A005C8A81 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		CB2F690B29125C4C00E35FC3 /* Chaikin.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Chaikin.hpp; sourceTree = "<group>"; };
@@ -171,7 +171,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26827DF4291D1C9D0063F345 /* libtensorflowlite.so in Frameworks */,
+				CB205545291E353000E359F5 /* libtensorflowlite.so in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -234,6 +234,8 @@
 		26B2C4A02915F1D00048B37C /* Wrinkle */ = {
 			isa = PBXGroup;
 			children = (
+				CB205543291E33C800E359F5 /* GaborDL.cpp */,
+				CB205542291E33C800E359F5 /* GaborDL.hpp */,
 				263BD86329165AD100AF1FEE /* WrinkleFrangi.cpp */,
 				263BD86429165AD100AF1FEE /* WrinkleFrangi.h */,
 				263BD86529165AD100AF1FEE /* WrinkleGabor.cpp */,
@@ -242,8 +244,6 @@
 				26B2C4AA2915F9590048B37C /* frangi.h */,
 				26B2C4A82915F4680048B37C /* Wrinkle.cpp */,
 				26B2C4A72915F4680048B37C /* Wrinkle.hpp */,
-				26B2C4A22915F3420048B37C /* cvgabor.cpp */,
-				26B2C4A12915F3420048B37C /* cvgabor.h */,
 			);
 			path = Wrinkle;
 			sourceTree = "<group>";
@@ -507,6 +507,7 @@
 				CB9D430628F3F6B000CD3B13 /* FaceBgSegV2.cpp in Sources */,
 				263B540228CD861C004CF77D /* AnnoImage.cpp in Sources */,
 				2680A22E28EFC54B00A305EB /* FaceLmExtractV2.cpp in Sources */,
+				CB205544291E33C800E359F5 /* GaborDL.cpp in Sources */,
 				CBBF6C5428F13E370036619C /* SkinMask.cpp in Sources */,
 				26B65A5E28EA92900019104F /* LowerFaceMask.cpp in Sources */,
 				2602327628CCBFB100B11D7A /* HeadPoseEst.cpp in Sources */,
@@ -525,7 +526,6 @@
 				CB2F690D29125C4D00E35FC3 /* Chaikin.cpp in Sources */,
 				26B2C4A92915F4680048B37C /* Wrinkle.cpp in Sources */,
 				CBD39AEB2910B58700260263 /* Tie.cpp in Sources */,
-				26B2C4A32915F3420048B37C /* cvgabor.cpp in Sources */,
 				CB1E2AB928DD99AB00F416DF /* ForeheadMask.cpp in Sources */,
 				26B2C4AC2915F9590048B37C /* frangi.cpp in Sources */,
 				CBC3D53E290BCC810056D14E /* GaussField.cpp in Sources */,
@@ -689,7 +689,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/include",
-					/Users/fuliye/nlohmann_json/include,
+					/Users/meicet/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/lib,
@@ -719,7 +719,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/include",
-					/Users/fuliye/nlohmann_json/include,
+					/Users/meicet/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/lib,

@@ -12,7 +12,6 @@ Date:   2022/11/1
 #include "../Utils.hpp"
 
 #include "Wrinkle.hpp"
-#include "cvgabor.h"
 #include "frangi.h"
 #include "WrinkleFrangi.h"
 #include "WrinkleGabor.h"
@@ -71,6 +70,7 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     PickWrkFromFrgiMap(wrkFrgiMask(faceRect),
                         minWrkSize, longWrkThresh,
                         frgiMapSSInFR, deepWrkConts, longWrkConts, avgFrgiRespValue);
+    
     //----------------- 第二次使用Gabor滤波，针对细皱纹---------------------
     //WrinkRespMap是由Face_Rect来限定的
     CalcGaborResp(ehGrImg, wrkRegGroup, wrkGaborRespMap);

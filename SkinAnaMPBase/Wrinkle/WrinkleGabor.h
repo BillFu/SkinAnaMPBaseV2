@@ -16,7 +16,7 @@
 
 #include "opencv2/opencv.hpp"
 
-#include "cvgabor.h"
+#include "GaborDL.hpp"
 #include "../Common.hpp"
 
 using namespace cv;
@@ -27,6 +27,12 @@ void AnnoPointsOnImg(Mat& annoImage,
                          const SPLINE& pts,
                      int ptIDs[], int numPt);
 
+
+// agg: aggregated
+void ApplyGaborBank(const GaborOptBank& gBank, const Mat& inGrFtImg,
+                    Mat& aggGabMap8U);
+
+/*
 void InitLCheekGaborBank(CvGabor lcGabor[5]);
 
 // 返回一个面颊区域的Gabor滤波响应值
@@ -51,11 +57,12 @@ Mat CalcGaborRespOnFh(const Mat& grSrcImg,
 Mat CalcUpperNoseGaborResp(const vector<Point2i>& wrinkle_spline_curve,
                   const Rect& FaceContour_Rect,
                   const Mat& allWrinkle, Rect& nrect);
-
+*/
 //WrinkRespMap的大小和在原始影像坐标系中的位置由Face_Rect限定
 void CalcGaborResp(const Mat& grSrcImg,
                    WrkRegGroup& wrkRegGroup,
                    Mat& WrinkRespMap);
+
 
 // 老百姓理解的深、浅皱纹是以几何深度来划分的，但图像算法又是以颜色深浅来测量的。
 // 提取浅皱纹，Ext: Extract
@@ -83,9 +90,5 @@ void ExtWrkInFhGaborResp(const Mat& fhGaborMap,
                      CONTOURS& LightWrkConts);
 
 Mat drawFhWrk(const Mat& canvas, const CONTOURS& LightWrkConts);
-
-// detRegImg: image block in detecting region
-// Mat ApplyGaborFilter(vector<CvGabor*> gaborBank, const Mat& detRegImg);
-Mat ApplyGaborFilter(const vector<CvGabor*>& gaborBank, const Mat& detRegImg);
 
 #endif /* WRINKLE_GABOR_H */

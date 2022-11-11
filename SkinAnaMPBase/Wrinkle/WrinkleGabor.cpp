@@ -3,8 +3,8 @@
 #include "../ImgProc.h"
 #include <algorithm>
 
-CvGabor gabor[20];
-
+//CvGabor gabor[20];
+/*
 void init_gabor()
 {
     double Sigma = 4.442882933081; // sqrt(2) * 3.14159265
@@ -34,18 +34,8 @@ void init_gabor()
     gabor[17].Init(0, 2, Sigma, F);
     gabor[18].Init(2.74889356875, 1, Sigma, F);  // 157.5度
     gabor[19].Init(0.39269908125, 1, Sigma, F);  // 22.5 度
-
-    //gabor[18].Init(2.74889356875, 2, Sigma, F);  // 157.5度
-    //gabor[19].Init(0.39269908125, 2, Sigma, F);  // 22.5 度
-    
-    /*
-    gabor[15].Init(0, 3, Sigma, F);
-    gabor[16].Init(0, 2, Sigma, F);
-    gabor[17].Init(0, 1, Sigma, F);
-    gabor[18].Init(2.74889356875, 1, Sigma, F);  // 157.5度
-    gabor[19].Init(0.39269908125, 1, Sigma, F);  // 22.5 度
-    */
 }
+*/
 
 //-----------------------------------------------------------
 void AnnoPointsOnImg(Mat& annoImage,
@@ -82,63 +72,58 @@ void AnnoPointsOnImg(Mat& annoImage,
 }
 //-----------------------------------------------------------
 
-void InitLCheekGaborBank(vector<CvGabor*>& lGaborBank)
+Mat CcGaborMapInOneEyebag(const Mat& grFtSrcImg,
+                          const Rect& ebRect)
 {
-    for(int i=0; i<5; i++)
-    {
-        lGaborBank.push_back(gabor+i);
-    }
-}
-
-void InitRCheekGaborBank(vector<CvGabor*>& rGaborBank)
-{
-    for(int i=5; i<10; i++)
-    {
-        rGaborBank.push_back(gabor+i);
-    }
-}
-
-Mat ApplyGaborFilter(const vector<CvGabor*>& gaborBank, const Mat& detRegImg)
-{
-    //cout << "regImg data type: " << openCVType2str(regImg.type()) << endl;
-    Mat detRegImgF; // F for float
-    detRegImg.convertTo(detRegImgF, CV_32FC1);
-
-    float maxV = *max_element(detRegImgF.begin<float>(), detRegImgF.end<float>());
-    float minV = *min_element(detRegImgF.begin<float>(), detRegImgF.end<float>());
+    Mat ebGabMap;
+    Mat inGrFtImg = grFtSrcImg(ebRect);
     
-    detRegImgF = (detRegImgF - minV) / (maxV - minV); // 调整到[0.0, 1.0]
+    GaborOptBank gOptBank;
+    GaborOpt opt1(21, 8, 38, 73.125, 180);
+    GaborOpt opt2(21, 8, 38, 50.625, 180);
+    GaborOpt opt3(21, 8, 38, 61.875, 180);
+    GaborOpt opt4(21, 8, 38, 84.375, 180);
+    GaborOpt opt5(21, 8, 38, 95.625, 180);
+    gOptBank.push_back(opt1);
+    gOptBank.push_back(opt2);
+    gOptBank.push_back(opt3);
+    gOptBank.push_back(opt4);
+    gOptBank.push_back(opt5);
 
-    vector<Mat> respMapGroup;
-    int numBank = static_cast<int>(gaborBank.size());
+    Mat aggGabMap8U;
+    ApplyGaborBank(gOptBank, inGrFtImg, aggGabMap8U);
+    
+    return aggGabMap8U;
+}
+
+// agg: aggregated
+void ApplyGaborBank(const GaborOptBank& gBank, const Mat& inGrFtImg,
+                    Mat& aggGabMap8U)
+{
+    vector<Mat> respMapBank;
+    int numBank = static_cast<int>(gBank.size());
 #pragma omp parallel sections num_threads(numBank)
     {
 #pragma omp for
         for(int i=0; i<numBank; i++)
         {
             Mat respMap;
-            gaborBank[i]->conv_img(detRegImgF, respMap);  // lRegion is source, temp1 is destination
-            respMapGroup.push_back(respMap);
+            doGaborFilter(inGrFtImg, gBank[i], respMap);
+            respMapBank.push_back(respMap);
         }
     }
-    detRegImgF.release();
     
-    //cout << "data type of respMap: " << openCVType2str(respMapGroup[0].type()) << endl;
-
-    //函数原型： void cv::min(InputArray  src1, InputArray  src2, OutputArray  dst)
-    //功   能： 单像素操作（与领域无关）；将src1和src2同位置的像素值取小者，存贮到dst中
-    cv::Mat regRespMap(detRegImg.size(), CV_32FC1, cv::Scalar(-9999.9)); //
-    
+    cv::Mat regRespMap(inGrFtImg.size(), CV_32FC1, cv::Scalar(-9999.9));
     for(int i=0; i<numBank; i++)
     {
-        cv::max(regRespMap, respMapGroup[i], regRespMap);  //
+        cv::max(regRespMap, respMapBank[i], regRespMap);
     }
     
-    Mat regRespMapU = CvtFloatImgTo8UImg(regRespMap);
-    return regRespMapU;
+    aggGabMap8U = CvtFloatImgTo8UImg(regRespMap);
 }
 
 // 返回一个面颊区域的Gabor滤波响应值
+/*
 Mat CalcGaborRespInOneCheek(const vector<CvGabor*>& gaborBank,
                   const Mat& grSrcImg,
                   const Rect& cheekRect)
@@ -148,8 +133,9 @@ Mat CalcGaborRespInOneCheek(const vector<CvGabor*>& gaborBank,
 
     return lRegResp;
 }
+*/
 
-
+/*
 Mat CalcGaborRespInOneEyeBag(const vector<CvGabor*>& gaborBank,
                           const Mat& grSrcImg,
                           const Rect& eyeBagRect)
@@ -203,7 +189,7 @@ Mat CalcGaborRespOnFh(const Mat& grSrcImg,
 
     return fhRespMap;
 }
-
+*/
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /////output variable
 void ExtLightWrk(const Mat& wrkGaborRespMap,
@@ -325,11 +311,15 @@ void CalcGaborResp(const Mat& grSrcImg,
                    WrkRegGroup& wrkRegGroup,
                    Mat& gaborRespMap)
 {
-    Mat blurGrImg;
-    GaussianBlur(grSrcImg, blurGrImg, cv::Size(9, 9), 0, 0); // ???
+    Mat grFtSrcImg;
+    grSrcImg.convertTo(grFtSrcImg, CV_32F, 1.0/255, 0);
 
-    init_gabor();
+    Mat lEyebagGabMap = CcGaborMapInOneEyebag(grFtSrcImg, wrkRegGroup.lEyeBagReg.bbox);
+
+    //Mat blurGrImg;
+    //GaussianBlur(grSrcImg, blurGrImg, cv::Size(9, 9), 0, 0); // ???
    
+    /*
     // 计算左面颊的Gabor滤波响应值
     vector<CvGabor*> lGaborBank;
     InitLCheekGaborBank(lGaborBank);
@@ -345,16 +335,16 @@ void CalcGaborResp(const Mat& grSrcImg,
     
     // glabella，眉间，印堂
     Mat glabeRegResp = CalcGaborRespOnGlab(blurGrImg, wrkRegGroup.glabReg.bbox);
-     
+    */
     
 #ifdef TEST_RUN2
-    bool isSuccess;
-    
+    //bool isSuccess;
+    /*
     isSuccess = SaveTestOutImgInDir(fhRegResp,  wrkOutDir,   "fhGaborResp.png");
     isSuccess = SaveTestOutImgInDir(lCheekResp, wrkOutDir,  "lCheekGaborResp.png");
     isSuccess = SaveTestOutImgInDir(rCheekResp, wrkOutDir,  "rCheekGaborResp.png");
     isSuccess = SaveTestOutImgInDir(glabeRegResp, wrkOutDir,  "glabGaborResp.png");
-    
+    */
     /*
     Mat canvas = grFrImg.clone();
     rectangle(canvas, lCheekRect, CV_COLOR_RED, 8, 0);
