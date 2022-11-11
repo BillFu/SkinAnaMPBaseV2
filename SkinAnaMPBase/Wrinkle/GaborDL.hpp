@@ -25,6 +25,7 @@ using namespace cv;
 #include "../Common.hpp"
 
 // 表征参数，外观参数，实际计算时要进行转换为实际可用的数值
+/*
 struct GaborOpt
 {
     int kerSize; 
@@ -41,11 +42,34 @@ struct GaborOpt
         
     }
 };
+*/
+struct GaborOpt
+{
+    int kerSize;
+    int gamma;  // 放大了100倍之后的值
+    int sigma;
+    int lambda;
+    int thetaDeg;
+    int psiDeg;
+    
+    GaborOpt(int kerSize0, int gamma0, 
+             int sigma0, int lambda0,
+             int thetaDeg0, int psiDeg0):
+        kerSize(kerSize0), gamma(gamma0),
+        sigma(sigma0), lambda(lambda0),
+        thetaDeg(thetaDeg0), psiDeg(psiDeg0)
+    {
+        
+    }
+};
 
 typedef vector<GaborOpt> GaborOptBank;
 
 // Deg: in degrees
-Mat BuildGaborKernel(int kerSize, double sig, double thetaDeg, double lm, double psiDeg);
+//Mat BuildGaborKernel(int kerSize, double sig, double thetaDeg, double lm, double psiDeg);
+
+// AR: aspect ratio
+Mat BuildGabKerAR(int kerSize, double gamma, double sig, double thetaDeg, double lm, double psiDeg);
 
 void doGaborFilter(const Mat& inGrFtImg, const GaborOpt& opt, Mat& gaborMap);
 

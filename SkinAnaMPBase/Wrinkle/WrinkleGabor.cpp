@@ -82,7 +82,7 @@ void BuildGabOptsForEb(bool isLeftEye, GaborOptBank& gOptBank)
     {
         for(int i=0; i<numTheta; i++)
         {
-            GaborOpt opt(kerSize, 8, 38, leftThetaSet[i], 180);
+            GaborOpt opt(kerSize, 80, 8, 38, leftThetaSet[i], 180);
             gOptBank.push_back(opt);
         }
     }
@@ -90,7 +90,7 @@ void BuildGabOptsForEb(bool isLeftEye, GaborOptBank& gOptBank)
     {
         for(int i=0; i<numTheta; i++)
         {
-            GaborOpt opt(kerSize, 8, 38, 180.0 - leftThetaSet[i], 180);
+            GaborOpt opt(kerSize, 80, 8, 38, 180.0 - leftThetaSet[i], 180);
             gOptBank.push_back(opt);
         }
     }
