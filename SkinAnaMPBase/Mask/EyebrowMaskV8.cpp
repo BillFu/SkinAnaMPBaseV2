@@ -494,7 +494,8 @@ void SmCorSecOnEyePgV2(const Size& srcImgS,
     CONTOUR lSmCorSec0, lSmCorSec;
     DelMaxCurTwoPtsOnCt(lCorSecCt, lSmCorSec0);
     SmUnclosedContCK(lSmCorSec0, smIterTimes, lSmCorSec);
-       
+    
+    /*
     Mat canvas2(srcImgS, CV_8UC1, Scalar(0));
     for(int i = 0; i < lCorSecCt.size(); i++)
     {
@@ -513,11 +514,13 @@ void SmCorSecOnEyePgV2(const Size& srcImgS,
     cv::putText(canvas2, to_string(rCorSecCt.size()-1), rCorSecCt[rCorSecCt.size()-1],
                 FONT_HERSHEY_SIMPLEX, 1, Scalar(150), 1);
     imwrite("CorSecCt.png", canvas2);
+    */
     
     CONTOUR rSmCorSec0, rSmCorSec;
     DelMaxCurTwoPtsOnCt(rCorSecCt, rSmCorSec0);
     SmUnclosedContCK(rSmCorSec0, smIterTimes, rSmCorSec);
 
+    /*
     Mat canvas3(srcImgS, CV_8UC1, Scalar(0));
     for(int i = 0; i < lSmCorSec.size(); i++)
     {
@@ -528,6 +531,7 @@ void SmCorSecOnEyePgV2(const Size& srcImgS,
         cv::circle(canvas3, rSmCorSec[i], 1, Scalar(150), cv::FILLED);
     }
     imwrite("SmCorSec.png", canvas3);
+    */
     
     //合并的顺序： r1-l1, l1-l2, l2-r2, r2-r1
     CONTOUR R1L1Sec;

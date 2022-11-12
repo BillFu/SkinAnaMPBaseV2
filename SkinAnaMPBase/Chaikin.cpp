@@ -96,14 +96,6 @@ void SmUnclosedOnceCK(const CONTOUR& inCt,
 {
     int inNumPt = static_cast<int>(inCt.size());
     
-    //float avgDis = AvgPointDist(inCt);
-    //float shortThresh = avgDis * 0.5;
-    //if(shortThresh < 3)
-    //    shortThresh = 3;
-    
-    //outCt.reserve(inNumPt * 2);
-    //outCt.push_back(inCt[0]);
-
     for(int i=0; i<=inNumPt-2; i++)
     {
         int j = i+1;
@@ -119,8 +111,7 @@ void SmUnclosedOnceCK(const CONTOUR& inCt,
         outCt.push_back(R);
     }
     
-    //outCt.push_back(inCt[inNumPt-1]);
-
+    /*
     Mat canvas(3264, 2448, CV_8UC1, Scalar(0));
     for(int i = 0; i < outCt.size(); i++)
     {
@@ -133,4 +124,5 @@ void SmUnclosedOnceCK(const CONTOUR& inCt,
     
     string filename = to_string(K) + ".png";
     imwrite(filename, canvas);
+    */
 }
