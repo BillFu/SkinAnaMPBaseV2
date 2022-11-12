@@ -180,35 +180,49 @@ void ForgeNoseMask(const FaceInfo& faceInfo, Mat& outMask)
 
 void ForgeNoseBellPg(const FaceInfo& faceInfo, POLYGON& outPg)
 {
-    outPg.push_back(getPtOnGLm(faceInfo, 197));
+    outPg.push_back(getPtOnGLm(faceInfo, 197)); // center, top most point.
+    
+    // then in CCW order.
     outPg.push_back(getPtOnGLm(faceInfo, 196));
-    //Point2i pt236a = IpGLmPtWithPair(faceInfo, 236, 217, 0.15);
-    //outPg.push_back(pt236a);
-    
     outPg.push_back(getPtOnGLm(faceInfo, 174));
-    outPg.push_back(getPtOnGLm(faceInfo, 198));
-    outPg.push_back(getPtOnGLm(faceInfo, 48));
+    outPg.push_back(getPtOnGLm(faceInfo, 126));
+    Point2i pt142a = IpGLmPtWithPair(faceInfo, 142, 209, 0.25);
+    outPg.push_back(pt142a);
+    
+    Point2i pt203a = IpGLmPtWithPair(faceInfo, 203, 64, 0.25);
+    outPg.push_back(pt203a);
     outPg.push_back(getPtOnGLm(faceInfo, 92));
-    outPg.push_back(getPtOnGLm(faceInfo, 169));
-    
+
+    Point2i pt202a = IpGLmPtWithPair(faceInfo, 202, 43, 0.7);
+    outPg.push_back(pt202a);
+    outPg.push_back(getPtOnGLm(faceInfo, 211));
+    outPg.push_back(getPtOnGLm(faceInfo, 170));
+
     // add two special points and 152, the lowest point
-    Point2i pt169 = getPtOnGLm(faceInfo, 169);
+    Point2i pt170 = getPtOnGLm(faceInfo, 170);
     Point2i pt152 = getPtOnGLm(faceInfo, 152);
-    Point2i pt394 = getPtOnGLm(faceInfo, 394);
+    Point2i pt395 = getPtOnGLm(faceInfo, 395);
     
-    Point2i sp1 =  getRectCornerPt(pt169, pt152);
+    Point2i sp1 =  getRectCornerPt(pt170, pt152);
     outPg.push_back(sp1);
     outPg.push_back(pt152);
-    Point2i sp2 =  getRectCornerPt(pt394, pt152);
+    Point2i sp2 =  getRectCornerPt(pt395, pt152);
     outPg.push_back(sp2);
     
-    outPg.push_back(getPtOnGLm(faceInfo, 394));
-    outPg.push_back(getPtOnGLm(faceInfo, 322));
-    outPg.push_back(getPtOnGLm(faceInfo, 278));
-    //Point2i pt456a = IpGLmPtWithPair(faceInfo, 456, 437, 0.15);
-    //outPg.push_back(pt456a);
+    outPg.push_back(getPtOnGLm(faceInfo, 395));
+    outPg.push_back(getPtOnGLm(faceInfo, 431));
+    Point2i pt422a = IpGLmPtWithPair(faceInfo, 422, 273, 0.7);
+    outPg.push_back(pt422a);
     
-    outPg.push_back(getPtOnGLm(faceInfo, 420));
+    outPg.push_back(getPtOnGLm(faceInfo, 322));
+    
+    Point2i pt423a = IpGLmPtWithPair(faceInfo, 423, 294, 0.25);
+    outPg.push_back(pt423a);
+    
+    Point2i pt371a = IpGLmPtWithPair(faceInfo, 371, 429, 0.25);
+    outPg.push_back(pt371a);
+    
+    outPg.push_back(getPtOnGLm(faceInfo, 355));
     outPg.push_back(getPtOnGLm(faceInfo, 399));
     outPg.push_back(getPtOnGLm(faceInfo, 419));
 }

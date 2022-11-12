@@ -145,7 +145,7 @@ void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
     Mat noseBellMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgeNoseBellMask(faceInfo, noseBellMask);
     
-#ifdef TEST_RUN
+#ifdef TEST_RUN2
     string noseBellMaskFile = BuildOutImgFNV2(outDir, "nose_bell.png");
     OverlayMaskOnImage(annoLmImage, noseBellMask,
                         "nose_bell_mask", noseBellMaskFile.c_str());
