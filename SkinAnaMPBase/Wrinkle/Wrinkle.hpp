@@ -26,6 +26,4 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
                    CONTOURS& deepWrkConts,
                    Mat& wrkGaborRespMap);
 
-void PreprocGrImg(const Mat& grSrcImg, Mat& outImg);
-
 #endif /* end of WRINKLE_HPP */
