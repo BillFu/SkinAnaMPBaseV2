@@ -1,8 +1,8 @@
 //
-//  WrinkleMask.cpp
+//  WrkGaborMask.cpp
 
 /*******************************************************************************
-本模块。
+本模块构建通过Gabor滤波来进行皱纹提取的各个小区域。
   
 Author: Fu Xiaoqiang
 Date:   2022/11/2
@@ -13,7 +13,7 @@ Date:   2022/11/2
 #include "../polyitems_fit.hpp"
 #include "../BSpline/ParametricBSpline.hpp"
 
-#include "WrinkleMask.hpp"
+#include "WrkGaborMask.hpp"
 #include "FundamentalMask.hpp"
 #include "ForeheadMask.hpp"
 

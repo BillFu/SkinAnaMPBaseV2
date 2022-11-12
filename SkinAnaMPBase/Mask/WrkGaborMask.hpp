@@ -1,16 +1,16 @@
 //
-//  WrinkleMask.hpp
+//  WrkGaborMask.hpp
 //
 //
 /*
-本模块。
+本模块构建用于Gabor滤波来进行皱纹提取的各个小区域。
  
 Author: Fu Xiaoqiang
 Date:   2022/11/2
 */
 
-#ifndef WRINKLE_MASK_HPP
-#define WRINKLE_MASK_HPP
+#ifndef WRK_GABOR_MASK_HPP
+#define WRK_GABOR_MASK_HPP
 
 #include "opencv2/opencv.hpp"
 
@@ -29,4 +29,4 @@ void ForgeWrkTenRegs(const FaceInfo& faceInfo,
 void ForgeWrkTenRegs(const Mat& annoLmImage, const FaceInfo& faceInfo,
                      const Mat& fbBiLab, WrkRegGroup& wrkRegGroup);
 
-#endif /* end of WRINKLE_MASK_HPP */
+#endif /* end of WRK_GABOR_MASK_HPP */
