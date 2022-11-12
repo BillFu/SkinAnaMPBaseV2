@@ -51,6 +51,15 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
                      frgiMapSSInFR,
                      deepWrkConts, longWrkConts, avgFrgiMapV);
     
+#ifdef TEST_RUN2
+    Mat canvas = inImg(faceRect).clone();
+    drawContours(canvas, deepWrkConts, -1, cv::Scalar(255, 0, 0), 2);
+    drawContours(canvas, longWrkConts, -1, cv::Scalar(0, 0, 255), 2);
+
+    string frgiDLWrkFile = wrkOutDir + "/DLWrkFrgi.png";
+    imwrite(frgiDLWrkFile.c_str(), canvas);
+#endif
+    
     //----------------- 第二次使用Gabor滤波，针对细皱纹---------------------
     //WrinkRespMap是由Face_Rect来限定的
     CalcGaborResp(imgGray, wrkRegGroup, wrkGaborMap);
