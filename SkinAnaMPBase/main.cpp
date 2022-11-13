@@ -157,13 +157,21 @@ int main(int argc, char **argv)
         cout << "Succeeded to load parallel source image: " << paraImgFile << endl;
     
     CONTOURS deepWrkConts;
+    CONTOURS lightWrkConts;
+
     // test the wrinkle detecting algorithm
     Mat wrkGaborRespMap;
-    
+    int numLongWrk = 0;
+    int numShortWrk = 0;
+    int numDeepWrk = 0;
+    int numLightWrk = 0;
     DetectWrinkle(paraImage, segResult.faceBBox,
                   detRegPack.wrkFrgiMask,
                   detRegPack.wrkRegGroup,
-                  deepWrkConts, wrkGaborRespMap);
+                  deepWrkConts, lightWrkConts,
+                  numLongWrk, numShortWrk,
+                  numDeepWrk, numLightWrk,
+                  wrkGaborRespMap);
     
     return 0;
 }

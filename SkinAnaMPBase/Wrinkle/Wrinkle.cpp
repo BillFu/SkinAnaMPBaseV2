@@ -28,6 +28,9 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
                    const Mat& wrkFrgiMask,
                    WrkRegGroup& wrkRegGroup,
                    CONTOURS& deepWrkConts,
+                   CONTOURS& lightWrkConts,
+                   int& numLongWrk, int& numShortWrk,
+                   int& numDeepWrk, int& numLightWrk,
                    Mat& wrkGaborMap)
 {
     cv::Mat imgGray;
@@ -36,7 +39,7 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     //------------------ 第一次是使用Frangi2d滤波，针对粗皱纹 --------------------
     // 计算Frangi滤波响应，并提取深皱纹和长皱纹
     
-    int scaleRatio = 2;
+    int scaleRatio = 4;
     Mat frgiMapSSInFR; // SS: source scale
     CcFrgiMapInFR(imgGray, faceRect,
                     scaleRatio, frgiMapSSInFR);
@@ -63,12 +66,21 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     //----------------- 第二次使用Gabor滤波，针对细皱纹---------------------
     //WrinkRespMap是由Face_Rect来限定的
     CalcGaborMap(imgGray, wrkRegGroup, wrkGaborMap);
-
-#ifdef TEST_RUN
-    /*
-    string gaborMapFile =  wrk_out_dir + "/gaborResp.png";
-    imwrite(gaborMapFile.c_str(), wrkGaborRespMap);
-    */
+    wrkGaborMap = wrkGaborMap & wrkFrgiMask; // !!!
+    
+#ifdef TEST_RUN2
+    string gaborMapFile = wrkOutDir + "/gaborMap.png";
+    imwrite(gaborMapFile.c_str(), wrkGaborMap);
 #endif
+    
+    int totalWrkLen = 0;
+    //Mat wrkFrgiMaskInFR = wrkFrgiMask(faceRect);
+    ExtLightWrk(wrkGaborMap, minWrkTh, longWrkTh, lightWrkConts, longWrkConts, totalWrkLen);
+    ExtDeepWrk(wrkGaborMap, minWrkTh, longWrkTh, deepWrkConts, longWrkConts);
+
+    numLongWrk = (int)(longWrkConts.size());
+    numLightWrk = (int)(lightWrkConts.size());
+    numDeepWrk = (int)(deepWrkConts.size());
+    numShortWrk = numDeepWrk + numLightWrk - numLongWrk;
     
 }

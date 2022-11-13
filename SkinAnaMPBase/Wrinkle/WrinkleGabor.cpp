@@ -194,43 +194,68 @@ Mat CcGaborMapOnGlab(const Mat& grFtSrcImg,
     return aggMap8U;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 // 返回一个面颊区域的Gabor滤波响应值
-/*
-Mat CalcGaborRespInOneCheek(const vector<CvGabor*>& gaborBank,
-                  const Mat& grSrcImg,
-                  const Rect& cheekRect)
+void BuildGabOptsForCheek(bool isLeftEye, GaborOptBank& gOptBank)
 {
-    Mat imgInCheekRect = grSrcImg(cheekRect);
-    Mat lRegResp = ApplyGaborFilter(gaborBank, imgInCheekRect);
+    int kerSize = 21;
 
-    return lRegResp;
+    // use the left eye as the reference
+    float rightThetaSet[] = {103, 91.75, 80.0, 114.25, 125.5};
+    int numTheta = sizeof(rightThetaSet) / sizeof(float);
+    if(isLeftEye)
+    {
+        for(int i=0; i<numTheta; i++)
+        {
+            GaborOpt opt(kerSize, 53, 8, 40, 180 - rightThetaSet[i], 131);
+            gOptBank.push_back(opt);
+        }
+    }
+    else // right eye
+    {
+        for(int i=0; i<numTheta; i++)
+        {
+            GaborOpt opt(kerSize, 53, 8, 40, rightThetaSet[i], 131);
+            gOptBank.push_back(opt);
+        }
+    }
 }
-*/
 
+Mat CcGaborMapInOneCheek(const Mat& grFtSrcImg,
+                         bool isLeft, const Rect& cheekRect)
+{
+    Mat inGrFtImg = grFtSrcImg(cheekRect);
+    
+    GaborOptBank gOptBank;
+    BuildGabOptsForCheek(isLeft, gOptBank);
+    
+    Mat aggGabMapFt;
+    ApplyGaborBank(gOptBank, inGrFtImg, aggGabMapFt);
+    Mat aggGabMap8U = CvtFtImgTo8U_NoNega(aggGabMapFt);
+    return aggGabMap8U;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /////output variable
-void ExtLightWrk(const Mat& wrkGaborRespMap,
-                     const Mat& wrkMaskInFR, // wrinkle mask cropped by face rectangle
-                     const Rect& faceRect,
+void ExtLightWrk(const Mat& wrkGaborMap,
                      int minLenOfWrk,
                      int longWrkThresh,
                      CONTOURS& LightWrkConts,
                      CONTOURS& LongWrkConts,
                      int& totalWrkLen)
 {
-    cv::Mat lightWrkBi(faceRect.size(), CV_8UC1, cv::Scalar(0));
+    cv::Mat lightWrkBi(wrkGaborMap.size(), CV_8UC1, cv::Scalar(0));
 
     //************************ light wrinkle *******************
     // light_wr_binary : binary version of the light wrinkle response map
     int ltWrkGaborRespTh = 30;
-    threshold(wrkGaborRespMap, lightWrkBi, ltWrkGaborRespTh, 255, THRESH_BINARY);
+    threshold(wrkGaborMap, lightWrkBi, ltWrkGaborRespTh, 255, THRESH_BINARY);
 
     lightWrkBi = 255 - lightWrkBi;
     BlackLineThinInBiImg(lightWrkBi.data, lightWrkBi.cols, lightWrkBi.rows);
     lightWrkBi = 255 - lightWrkBi;
     removeBurrs(lightWrkBi, lightWrkBi);
-    lightWrkBi = lightWrkBi & wrkMaskInFR;
 
     CONTOURS contours;
     findContours(lightWrkBi, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
@@ -255,23 +280,11 @@ void ExtLightWrk(const Mat& wrkGaborRespMap,
         
         it_c++;
     }
-    
-    // 注意：LongWrkConts中的坐标没有校正到全局坐标系，后面也不会显示出来，仅仅用于数量统计。
-    // 将LightWrkConts中的坐标由FaceRect局部坐标系，恢复到输入影像全局坐标系。
-    for (unsigned int i = 0; i < LightWrkConts.size(); i++)
-    {
-        CONTOUR& oneCont = LightWrkConts[i];
-        for (unsigned int j = 0; j < LightWrkConts[i].size(); j++)
-        {
-            oneCont[j].x += faceRect.x;
-            oneCont[j].y += faceRect.y;
-        }
-    }
 }
 
 void ExtDeepWrk(const Mat& wrkGaborRespMap,
-                    const Mat& wrkMaskInFR,
-                    const Rect& faceRect,
+                    //const Mat& wrkMaskInFR,
+                    //const Rect& faceRect,
                     int minLenOfWrk,
                     int longWrkThresh,
                     CONTOURS& DeepWrkConts,
@@ -287,7 +300,7 @@ void ExtDeepWrk(const Mat& wrkGaborRespMap,
     BlackLineThinInBiImg(binaryDeep.data, binaryDeep.cols, binaryDeep.rows);
     binaryDeep = 255 - binaryDeep;
     removeBurrs(binaryDeep, binaryDeep);
-    binaryDeep = binaryDeep & wrkMaskInFR;
+    //binaryDeep = binaryDeep & wrkMaskInFR;
     
     CONTOURS contours;
     cv::findContours(binaryDeep, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
@@ -308,26 +321,14 @@ void ExtDeepWrk(const Mat& wrkGaborRespMap,
             LongWrkConts.push_back(cont);
         }
     }
-    
-    // 将DeepWrkConts中的坐标由FaceRect局部坐标系，恢复到输入影像全局坐标系。
-    unsigned long vector_size = DeepWrkConts.size();
-    for (unsigned int i = 0; i < vector_size; i++)
-    {
-        CONTOUR& oneCont = DeepWrkConts[i];
-        for (unsigned int j = 0; j < DeepWrkConts[i].size(); j++)
-        {
-            oneCont[j].x += faceRect.x;
-            oneCont[j].y += faceRect.y;
-        }
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // fine wrinkle： 细皱纹
 // WrinkRespMap的大小和在原始影像坐标系中的位置由Face_Rect限定
-void CalcGaborMap(const Mat& grSrcImg,
+void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
                    WrkRegGroup& wrkRegGroup,
-                   Mat& gaborRespMap)
+                   Mat& gaborMap)
 {
     Mat grFtSrcImg;
     grSrcImg.convertTo(grFtSrcImg, CV_32F, 1.0/255, 0);
@@ -340,7 +341,13 @@ void CalcGaborMap(const Mat& grSrcImg,
     Mat fhGabMap8U = CcGaborMapOnFh(grFtSrcImg, wrkRegGroup.fhReg.bbox);
     // glabella，眉间，印堂
     Mat glabMap8U = CcGaborMapOnGlab(grFtSrcImg, wrkRegGroup.glabReg.bbox);
+    
+    Mat lCFGabMap8U = CcGabMapInOneCrowFeet(grFtSrcImg, true, wrkRegGroup.lCrowFeetReg.bbox);
+    Mat rCFGabMap8U = CcGabMapInOneCrowFeet(grFtSrcImg, false, wrkRegGroup.rCrowFeetReg.bbox);
 
+    Mat lChkGabMap8U = CcGaborMapInOneCheek(grFtSrcImg, true, wrkRegGroup.lCheekReg.bbox);
+    Mat rChkGabMap8U = CcGaborMapInOneCheek(grFtSrcImg, false, wrkRegGroup.rCheekReg.bbox);
+    
 #ifdef TEST_RUN2
     bool isSuccess;
     isSuccess = SaveTestOutImgInDir(lEbGabMap8U,  wrkOutDir,  "lEbGabMap.png");
@@ -348,79 +355,30 @@ void CalcGaborMap(const Mat& grSrcImg,
     isSuccess = SaveTestOutImgInDir(fhGabMap8U,  wrkOutDir,  "FhGabMap.png");
     isSuccess = SaveTestOutImgInDir(glabMap8U,  wrkOutDir,  "glabMap.png");
 
-    assert(isSuccess);
-#endif
-    
-    Mat lCFGabMap8U = CcGabMapInOneCrowFeet(grFtSrcImg, true, wrkRegGroup.lCrowFeetReg.bbox);
-    Mat rCFGabMap8U = CcGabMapInOneCrowFeet(grFtSrcImg, false, wrkRegGroup.rCrowFeetReg.bbox);
-
-    /*
-    // 计算左面颊的Gabor滤波响应值
-    vector<CvGabor*> lGaborBank;
-    InitLCheekGaborBank(lGaborBank);
-    Mat lCheekResp = CalcGaborRespInOneCheek(lGaborBank, blurGrImg, wrkRegGroup.lCheekReg.bbox);
-
-    // 计算右面颊的Gabor滤波响应值
-    vector<CvGabor*> rGaborBank;
-    InitRCheekGaborBank(rGaborBank);
-    Mat rCheekResp = CalcGaborRespInOneCheek(rGaborBank, blurGrImg, wrkRegGroup.rCheekReg.bbox);
-     */
-    
-#ifdef TEST_RUN2
-    //bool isSuccess;
-    
     isSuccess = SaveTestOutImgInDir(lCFGabMap8U,  wrkOutDir,   "lCFGabMap.png");
     isSuccess = SaveTestOutImgInDir(rCFGabMap8U,  wrkOutDir,   "rCFGabMap.png");
 
-    //isSuccess = SaveTestOutImgInDir(lCheekResp, wrkOutDir,  "lCheekGaborResp.png");
-    //isSuccess = SaveTestOutImgInDir(rCheekResp, wrkOutDir,  "rCheekGaborResp.png");
+    isSuccess = SaveTestOutImgInDir(lChkGabMap8U, wrkOutDir,  "lChkGabMap.png");
+    isSuccess = SaveTestOutImgInDir(rChkGabMap8U, wrkOutDir,  "rChkGabMap.png");
     
-    /*
-    Mat canvas = grFrImg.clone();
-    rectangle(canvas, lCheekRect, CV_COLOR_RED, 8, 0);
-    rectangle(canvas, rCheekRect, CV_COLOR_GREEN, 8, 0);
-    rectangle(canvas, glabeRect, CV_COLOR_BLUE, 8, 0);
-    rectangle(canvas, fhRect, CV_COLOR_YELLOW, 8, 0);
-    rectangle(canvas, noseRect, CV_COLOR_WHITE, 8, 0);
-    
-    isSuccess = SaveTestOutImgInDir(canvas, wrk_out_dir, "fiveRects.png");
-    canvas.release();
-    */
-
-    /*
-    CONTOURS LightWrkConts;
-    int minLenOfWrk = 200;
-
-    Mat fhGaborMap = Mat(grFrImg.size(), grFrImg.type(), Scalar(0));
-    fhRegResp.copyTo(fhGaborMap(fhRect));
-    
-    ExtWrkInFhGaborResp(fhGaborMap, faceRect, minLenOfWrk, LightWrkConts);
-    fhGaborMap.release();
-    
-    Mat fhWrkImg = drawFhWrk(grFrImg, LightWrkConts);
-    isSuccess = SaveTestOutImgInDir(fhWrkImg, wrk_out_dir, "fhWrkImg.png");
-    fhWrkImg.release();
-    */
 #endif
-    /*
-    gaborRespMap = Mat(grFrImg.size(), grFrImg.type(), Scalar(0));
-
+    
     // --------把各个小区域的计算结果合并起来，存贮在WrkRespMap------------------------------------
-    lCheekResp.copyTo(gaborRespMap(lCheekRect));
-    rCheekResp.copyTo(gaborRespMap(rCheekRect));
-    fhRegResp.copyTo(gaborRespMap(fhRect));
+    gaborMap = Mat(grSrcImg.size(), CV_8UC1, Scalar(0));
+
+    lEbGabMap8U.copyTo(gaborMap(wrkRegGroup.lEyeBagReg.bbox));
+    rEbGabMap8U.copyTo(gaborMap(wrkRegGroup.rEyeBagReg.bbox));
+    lCFGabMap8U.copyTo(gaborMap(wrkRegGroup.lCrowFeetReg.bbox));
+    rCFGabMap8U.copyTo(gaborMap(wrkRegGroup.rCrowFeetReg.bbox));
+    lChkGabMap8U.copyTo(gaborMap(wrkRegGroup.lCheekReg.bbox));
+    rChkGabMap8U.copyTo(gaborMap(wrkRegGroup.rCheekReg.bbox));
+    fhGabMap8U.copyTo(gaborMap(wrkRegGroup.fhReg.bbox));
     
-    // nose上部和眉间glabella与其他区域有重叠，故而处理与其他三个相互不重叠区域的处理有所不同。
-    cv::Mat noseRegionTemp(grFrImg.size(), CV_8UC1, cv::Scalar(0));
-    cv::Mat glabeRegionTemp(grFrImg.size(), CV_8UC1, cv::Scalar(0));
+    // 眉间glabella与其他区域有重叠，故而处理与其他相互不重叠区域的处理有所不同。
+    Mat glabeRegTemp(grSrcImg.size(), CV_8UC1, cv::Scalar(0));
+    glabMap8U.copyTo(glabeRegTemp(wrkRegGroup.glabReg.bbox));
     
-    noseRegResp.copyTo(noseRegionTemp(noseRect));
-    glabeRegResp.copyTo(glabeRegionTemp(glabeRect));
-    
-    cv::max(gaborRespMap, glabeRegionTemp, gaborRespMap);
-    cv::max(gaborRespMap, noseRegionTemp, gaborRespMap);
-    gaborRespMap = gaborRespMap * 10;  //1.2;
-    */
+    cv::max(gaborMap, glabeRegTemp, gaborMap);
     
     /*
     cout << "gaborRespMap data type: " << openCVType2str(gaborRespMap.type()) << endl;
@@ -429,59 +387,6 @@ void CalcGaborMap(const Mat& grSrcImg,
     
     cout << "maxV in gaborRespMap:"  << (int)maxV << endl;
     cout << "minV in gaborRespMap:"  << (int)minV << endl;
-    */
-}
-
-void ExtWrkInFhGaborResp(const Mat& fhGaborMap,
-                     const Rect& faceRect,
-                     int minLenOfWrk,
-                     CONTOURS& LightWrkConts)
-{
-    cv::Mat lightWrkBi(faceRect.size(), CV_8UC1, cv::Scalar(0));
-
-    //************************ light wrinkle *******************
-    // light_wr_binary : binary version of the light wrinkle response map
-    int ltWrkGaborRespTh = 10;
-    threshold(fhGaborMap, lightWrkBi, ltWrkGaborRespTh, 255, THRESH_BINARY);
-
-    Mat se = Mat(3, 80, CV_8UC1);
-    dilate(lightWrkBi, lightWrkBi, se);
-    //e_im = cv2.erode(d_im, kernel, iterations=1)
-    
-    lightWrkBi = 255 - lightWrkBi;
-    BlackLineThinInBiImg(lightWrkBi.data, lightWrkBi.cols, lightWrkBi.rows);
-    lightWrkBi = 255 - lightWrkBi;
-    removeBurrs(lightWrkBi, lightWrkBi);
-    //lightWrkBi = lightWrkBi & wrkMaskInFR;
-
-    CONTOURS contours;
-    findContours(lightWrkBi, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
-    
-    CONTOURS::const_iterator it_c = contours.begin();
-
-    for (unsigned int i = 0; i < contours.size(); ++i)
-    {
-        if (it_c->size() >= minLenOfWrk ) //&& it_c->size() <= sizeMax)
-        {
-            LightWrkConts.push_back(contours[i]); // 所有的浅皱纹，包括短的和长的
-            //totalWrkLen += contours[i].size();
-        }
-        
-        it_c++;
-    }
-    
-    /*
-    // 注意：LongWrkConts中的坐标没有校正到全局坐标系，后面也不会显示出来，仅仅用于数量统计。
-    // 将LightWrkConts中的坐标由FaceRect局部坐标系，恢复到输入影像全局坐标系。
-    for (unsigned int i = 0; i < LightWrkConts.size(); i++)
-    {
-        CONTOUR& oneCont = LightWrkConts[i];
-        for (unsigned int j = 0; j < LightWrkConts[i].size(); j++)
-        {
-            oneCont[j].x += faceRect.x;
-            oneCont[j].y += faceRect.y;
-        }
-    }
     */
 }
 

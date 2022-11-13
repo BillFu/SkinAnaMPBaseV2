@@ -24,6 +24,9 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
                    const Mat& wrkFrgiMask,
                    WrkRegGroup& wrkRegGroup,
                    CONTOURS& deepWrkConts,
+                   CONTOURS& lightWrkConts, // light, 轻的
+                   int& numLongWrk, int& numShortWrk,
+                   int& numDeepWrk, int& numLightWrk,
                    Mat& wrkGaborRespMap);
 
 #endif /* end of WRINKLE_HPP */

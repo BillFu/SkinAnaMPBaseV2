@@ -27,45 +27,40 @@ void AnnoPointsOnImg(Mat& annoImage,
                          const SPLINE& pts,
                      int ptIDs[], int numPt);
 
-
 // agg: aggregated
 void ApplyGaborBank(const GaborOptBank& gBank, const Mat& inGrFtImg,
                     Mat& aggGabMapFt);
 
-/*
-// 鼻梁上半部，rhinion(keystone)
-Mat CalcUpperNoseGaborResp(const vector<Point2i>& wrinkle_spline_curve,
-                  const Rect& FaceContour_Rect,
-                  const Mat& allWrinkle, Rect& nrect);
-*/
 //WrinkRespMap的大小和在原始影像坐标系中的位置由Face_Rect限定
 void CalcGaborMap(const Mat& grSrcImg,
                    WrkRegGroup& wrkRegGroup,
                    Mat& WrinkRespMap);
 
 void BuildGabOptsForEb(bool isLeftEye, GaborOptBank& gOptBank);
-Mat CcGabMapInOneEyebag(const Mat& grFtSrcImg,
+Mat CcGaborMapInOneEyebag(const Mat& grFtSrcImg,
                         bool isLeftEye, const Rect& ebRect);
 
 void BuildGabOptsForCF(bool isLeftEye, GaborOptBank& gOptBank);
 // 鱼尾纹
-Mat CcGabMapInOneCrowFeet(const Mat& grFtSrcImg,
+Mat CcGaborMapInOneCrowFeet(const Mat& grFtSrcImg,
                         bool isLeftEye, const Rect& cfRect);
 
 // forehead，前额
-Mat CcGaborMapOnFh(const Mat& grSrcImg,
+Mat CcGaborMapOnFh(const Mat& grFtSrcImg,
                    const Rect& fhRect);
 
 // glabella，眉间，印堂
 Mat CcGaborMapOnGlab(const Mat& grFtSrcImg,
                      const Rect& glabRect);
 
+void BuildGabOptsForCheek(bool isLeftEye, GaborOptBank& gOptBank);
+Mat CcGaborMapInOneCheek(const Mat& grFtSrcImg, bool isLeft, 
+                         const Rect& cheekRect);
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 // 老百姓理解的深、浅皱纹是以几何深度来划分的，但图像算法又是以颜色深浅来测量的。
 // 提取浅皱纹，Ext: Extract
-void ExtLightWrk(const Mat& wrkGaborRespMap,
-                     const Mat& wrkMaskInFR, // wrinkle mask cropped by face rectangle
-                     const Rect& faceRect,
+void ExtLightWrk(const Mat& wrkGaborMap,
                      int minLenOfWrk,
                      int longWrkThresh,
                      CONTOURS& LightWrkConts,
@@ -74,17 +69,10 @@ void ExtLightWrk(const Mat& wrkGaborRespMap,
 
 // 提取深皱纹，Ext: Extract
 void ExtDeepWrk(const Mat& wrkGaborRespMap,
-                    const Mat& wrkMaskInFR,
-                    const Rect& faceRect,
                     int minLenOfWrk,
                     int longWrkThresh,
                     CONTOURS& DeepWrkConts,
                     CONTOURS& LongWrkConts);
-
-void ExtWrkInFhGaborResp(const Mat& fhGaborMap,
-                     const Rect& faceRect,
-                     int minLenOfWrk,
-                     CONTOURS& LightWrkConts);
 
 Mat drawFhWrk(const Mat& canvas, const CONTOURS& LightWrkConts);
 
