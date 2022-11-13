@@ -28,51 +28,48 @@ void PreprocGrImg(const Mat& grSrcImg,
 
 // -------------------------------------------------------------------------
 // 从Frangi滤波响应中提取深皱纹和长皱纹
-void PickWrkInFrgiMap( const Mat& wrkMaskInFR,
-                       int minWrkTh, int longWrkTh,
-                       Mat& frgiRespSSInFR,  // Rz: resized, i.e., scale down
-                       CONTOURS& deepWrkConts,
-                       CONTOURS& longWrkConts,
-                       float& avgFrgiMapValue)
+void PickWrkInFrgiMap(const Mat& wrkMask,
+                      int minWrkTh, int longWrkTh,
+                      Mat& frgiResp8U,
+                      CONTOURS& deepWrkConts,
+                      CONTOURS& longWrkConts,
+                      float& avgFrgiMapValue)
 {
     // DL: deep and long
-    PickDLWrkInFrgiMap(frgiRespSSInFR,
-                       wrkMaskInFR, // 原始尺度，经过了Face_Rect裁切
+    PickDLWrkInFrgiMap(frgiResp8U,
+                       wrkMask, // 原始尺度，经过了Face_Rect裁切
                        minWrkTh, longWrkTh,
                        longWrkConts, deepWrkConts);
-
-    cv::Scalar sumResp = cv::sum(frgiRespSSInFR);
-    int nonZero2 = cv::countNonZero(wrkMaskInFR); // Mask中有效面积，即非零元素的数目
+    
+    Mat frgiMapInMask = frgiResp8U & wrkMask;
+    cv::Scalar sumResp = cv::sum(frgiMapInMask);
+    int nonZero2 = cv::countNonZero(wrkMask); // Mask中有效面积，即非零元素的数目
     avgFrgiMapValue = sumResp[0] / (nonZero2+1) / 12.8;  // 平均响应值，不知道为啥要除以12.8
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// 从frangi滤波的结果（经过了二值化、细化、反模糊化等处理）中，提取深皱纹、长皱纹
-void PickDLWrkInFrgiMap(const Mat& frgiMapSS, //Original Scale
-                            const Mat& wrkMaskInFR, // 原始尺度，经过了Face_Rect裁切
-                            int minsWrkSize,
-                            int longWrkThresh,
-                                         CONTOURS& longWrkConts,
-                                         CONTOURS& deepWrkConts)
+void PickDLWrkInFrgiMap(const Mat& frgiMap8U, //Original Scale
+                        const Mat& wrkMask, // 原始尺度，经过了Face_Rect裁切
+                        int minsWrkSize,
+                        int longWrkThresh,
+                        CONTOURS& longWrkConts,
+                        CONTOURS& deepWrkConts)
 {
     Mat tmp_m, tmp_sd;
     double m = 0, sd = 0;
-    meanStdDev(frgiMapSS, tmp_m, tmp_sd);
+    //Mat frgiMapInMask = frgiMap8U & wrkMask;
+    //meanStdDev(frgiMapInMask, tmp_m, tmp_sd);
+    meanStdDev(frgiMap8U, tmp_m, tmp_sd);
+
     m = tmp_m.at<double>(0,0);
     sd = tmp_sd.at<double>(0,0);
     
-    int thickBiTh = (int)(m + 0.75*sd);
+    int thickBiTh = (int)(m + 4*sd);
     cout << "thickTh: " << thickBiTh << endl;
     
     cv::Mat thickBi; // thick: 浓的，厚的，粗的
-    cv::threshold(frgiMapSS, thickBi, thickBiTh, 255, cv::THRESH_BINARY);
-    
-    /*
-    int openDiameter = 11;
-    Mat element = getStructuringElement(MORPH_ELLIPSE,
-                                        Size(openDiameter, openDiameter));
-    morphologyEx(thickBi, thickBi, MORPH_OPEN, element );
-    */
+    cv::threshold(frgiMap8U, thickBi, thickBiTh, 255, cv::THRESH_BINARY);
     
 #ifdef TEST_RUN2
     string fraThRespFile =  wrkOutDir + "/FrgiBiResp.png";
@@ -80,8 +77,8 @@ void PickDLWrkInFrgiMap(const Mat& frgiMapSS, //Original Scale
 #endif
     
     thickBi = 255 - thickBi;
-    int wdFR = wrkMaskInFR.cols;
-    int htFR = wrkMaskInFR.rows;
+    int wdFR = wrkMask.cols;
+    int htFR = wrkMask.rows;
     // 给二值图像中的粗黑线“瘦身”
     BlackLineThinInBiImg(thickBi.data, wdFR, htFR);
     
@@ -92,7 +89,7 @@ void PickDLWrkInFrgiMap(const Mat& frgiMapSS, //Original Scale
     
     thickBi = 255 - thickBi;
     removeBurrs(thickBi, thickBi);
-    thickBi = thickBi & wrkMaskInFR;
+    thickBi = thickBi & wrkMask;
     
 #ifdef TEST_RUN2
     string frgiFinalRespFile = wrkOutDir + "/FrgFinalResp.png";
@@ -120,10 +117,27 @@ void PickDLWrkInFrgiMap(const Mat& frgiMapSS, //Original Scale
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
+void CcFrgiMap(const Mat& imgGray, int scaleRatio, Mat& frgiMap8U)
+{
+    Mat ehGrImg; // eh: enhanced
+    PreprocGrImg(imgGray, ehGrImg);
+        
+    Mat frgiMapRz8U;
+    ApplyFrgiFilter(ehGrImg, scaleRatio, frgiMapRz8U);
+    
+#ifdef TEST_RUN2
+    string frgiMapFile =  wrkOutDir + "/frgiMap.png";
+    imwrite(frgiMapFile, frgiMapRz8U);
+#endif
+    
+    //把响应强度图又扩大到原始影像的尺度上来，但限定在Face Rect内。
+    resize(frgiMapRz8U, frgiMap8U, imgGray.size());
+}
+
 void CcFrgiMapInFR(const Mat& imgGray,
                     const Rect& faceRect,
                     int scaleRatio,
-                    Mat& frgiMapSSInFR)
+                    Mat& frgiMap8U)
 {
     Mat ehGrImg; // eh: enhanced
     PreprocGrImg(imgGray, ehGrImg);
@@ -139,7 +153,12 @@ void CcFrgiMapInFR(const Mat& imgGray,
 #endif
     
     //把响应强度图又扩大到原始影像的尺度上来，但限定在Face Rect内。
-    resize(frgiMapFRRz8U, frgiMapSSInFR, faceRect.size());
+    Mat frgiMapSSInFR8U;
+    resize(frgiMapFRRz8U, frgiMapSSInFR8U, faceRect.size());
+    Mat frgiMapGS(imgGray.size(), CV_8UC1, Scalar(0));
+    
+    frgiMapSSInFR8U.copyTo(frgiMapGS(faceRect));
+    frgiMap8U = frgiMapGS;
 }
 
 void ApplyFrgiFilter(const Mat& inGrImg,

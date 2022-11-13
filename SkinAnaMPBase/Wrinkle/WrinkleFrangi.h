@@ -37,6 +37,8 @@ void CcFrgiMapInFR(const Mat& imgGray,
                     int scaleRatio,
                     Mat& frgiMapSSInFR);
 
+void CcFrgiMap(const Mat& imgGray, int scaleRatio, Mat& frgiMap8U);
+
 // 最核心的Frangi滤波环节
 void ApplyFrgiFilter(const Mat& grSrcImg,
                      int scaleRatio,
@@ -45,17 +47,17 @@ void ApplyFrgiFilter(const Mat& grSrcImg,
 //-----------------------------------------------------------------------------
 
 // 计算Frangi滤波响应，并提取深皱纹和长皱纹
-void PickWrkInFrgiMap(const Mat& wrkMaskInFR,
+void PickWrkInFrgiMap(const Mat& wrkMask,
                       int minWrkTh, int longWrkTh,
-                        Mat& frgiRespSSInFR,
+                        Mat& frgiResp8U,
                         CONTOURS& deepWrkConts,
                         CONTOURS& longWrkConts,
                         float& avgFrgiRespValue);
 
 // 从frangi滤波的结果（经过了二值化、细化、反模糊化等处理）中，提取深皱纹、长皱纹
 // DL: deep and long
-void PickDLWrkInFrgiMap(const Mat& frgiMapSS, //Original Scale
-                        const Mat& wrkMaskInFR, // 原始尺度，经过了Face_Rect裁切
+void PickDLWrkInFrgiMap(const Mat& frgiMap8U, //Original Scale
+                        const Mat& wrkMask,
                         int minsWrkTh, int longWrkTh,
                         CONTOURS& longWrkConts, CONTOURS& DeepWrkConts);
 

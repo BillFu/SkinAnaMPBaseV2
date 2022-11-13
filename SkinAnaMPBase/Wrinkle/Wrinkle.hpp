@@ -29,4 +29,16 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
                    int& numDeepWrk, int& numLightWrk,
                    Mat& wrkGaborRespMap);
 
+// 把检测出的浅皱纹和深皱纹在背景图像上画出来
+// 返回的标注图像是4通道，即RGBA。
+Mat forgeWrkAnno(const Size& mapSize,
+                   const CONTOURS& LightWrkConts,
+                   const CONTOURS& DeepWrkConts);
+
+
+// Sp: superposition
+Mat SpWrkOnSrcImg(const Mat srcImg,
+                  const CONTOURS& LightWrkConts,
+                  const CONTOURS& DeepWrkConts);
+
 #endif /* end of WRINKLE_HPP */

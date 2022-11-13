@@ -40,22 +40,35 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     // 计算Frangi滤波响应，并提取深皱纹和长皱纹
     
     int scaleRatio = 4;
-    Mat frgiMapSSInFR; // SS: source scale
-    CcFrgiMapInFR(imgGray, faceRect,
-                    scaleRatio, frgiMapSSInFR);
+    Mat frgiMap8U; // SS: source scale
+    CcFrgiMapInFR(imgGray, faceRect, scaleRatio, frgiMap8U);
+    
+    Mat fhMask(imgGray.size(), CV_8UC1, Scalar(0));
+    wrkRegGroup.fhReg.mask.copyTo(fhMask(wrkRegGroup.fhReg.bbox));
+    
+    Mat glabMask(imgGray.size(), CV_8UC1, Scalar(0));
+    wrkRegGroup.glabReg.mask.copyTo(glabMask(wrkRegGroup.glabReg.bbox));
+    
+    Mat clipMask = fhMask | glabMask;
+    string clipMaskFile = wrkOutDir + "/clipMask.png";
+    imwrite(clipMaskFile.c_str(), clipMask);
 
+    fhMask.release();
+    glabMask.release();
+    frgiMap8U = frgiMap8U & clipMask;
+    
     float avgFrgiMapV;
     CONTOURS longWrkConts;
-    int longWrkTh = 0.16 * faceRect.width;  // 大致为2cm
+    int longWrkTh = 0.12 * faceRect.width;  // 大致为2cm
     int minWrkTh = longWrkTh / 2; // 皱纹（包括长、短皱纹）的最短下限，大致为1cm
     cout << "minWrkTh: " << minWrkTh << endl;
-    PickWrkInFrgiMap(wrkFrgiMask(faceRect),
+    PickWrkInFrgiMap(wrkFrgiMask,
                      minWrkTh, longWrkTh,
-                     frgiMapSSInFR,
+                     frgiMap8U,
                      deepWrkConts, longWrkConts, avgFrgiMapV);
     
 #ifdef TEST_RUN2
-    Mat canvas = inImg(faceRect).clone();
+    Mat canvas = inImg.clone();
     drawContours(canvas, deepWrkConts, -1, cv::Scalar(255, 0, 0), 2);
     drawContours(canvas, longWrkConts, -1, cv::Scalar(0, 0, 255), 2);
 
@@ -74,13 +87,69 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
 #endif
     
     int totalWrkLen = 0;
-    //Mat wrkFrgiMaskInFR = wrkFrgiMask(faceRect);
-    ExtLightWrk(wrkGaborMap, minWrkTh, longWrkTh, lightWrkConts, longWrkConts, totalWrkLen);
-    ExtDeepWrk(wrkGaborMap, minWrkTh, longWrkTh, deepWrkConts, longWrkConts);
+    
+    CONTOURS deepWrkConts1, lightWrkConts1;
+    ExtLightWrk(wrkGaborMap, minWrkTh, longWrkTh, lightWrkConts1, longWrkConts, totalWrkLen);
+    ExtDeepWrk(wrkGaborMap, minWrkTh, longWrkTh, deepWrkConts1, longWrkConts);
 
     numLongWrk = (int)(longWrkConts.size());
     numLightWrk = (int)(lightWrkConts.size());
     numDeepWrk = (int)(deepWrkConts.size());
     numShortWrk = numDeepWrk + numLightWrk - numLongWrk;
     
+    // 只显示浅皱纹和深皱纹
+    Mat outDLWrkImg = forgeWrkAnno(inImg.size(), lightWrkConts1, deepWrkConts1);
+        
+#ifdef TEST_RUN2
+    string outDLWrkImgFile =  wrkOutDir + "/DLWrkImg.png";
+    imwrite(outDLWrkImgFile.c_str(), outDLWrkImg);
+    
+    Mat wrkAnnoImg = SpWrkOnSrcImg(inImg, lightWrkConts, deepWrkConts);
+    string wrkAnnoImgFile =  wrkOutDir + "/WrkAnnoImg.png";
+    imwrite(wrkAnnoImgFile.c_str(), wrkAnnoImg);
+#endif
+        
+    //return outDLWrkImg;
+}
+
+// 把检测出的浅皱纹和深皱纹在背景图像上画出来
+// 返回的标注图像是4通道，即RGBA。
+Mat forgeWrkAnno(const Size& mapSize,
+                   const CONTOURS& LightWrkConts,
+                   const CONTOURS& DeepWrkConts)
+{
+    Mat rgbMat(mapSize, CV_8UC3, cv::Scalar(0, 0, 0));
+    //浅皱纹用黄色显示
+    drawContours(rgbMat, LightWrkConts, -1, cv::Scalar(53, 255, 148), 2);
+    //深皱纹用绿色显示
+    drawContours(rgbMat, DeepWrkConts, -1, cv::Scalar(0, 178, 0), 2);
+    
+    Mat alpha_channel(mapSize, CV_8UC1, Scalar(0, 0, 0));
+    drawContours(alpha_channel, LightWrkConts, -1, cv::Scalar(255, 255, 255), 2);
+    drawContours(alpha_channel, DeepWrkConts, -1, cv::Scalar(255, 255, 255), 2);
+    
+    vector<cv::Mat> rgb_channels;
+    split(rgbMat, rgb_channels);
+    
+    Mat fourChans[] = {rgb_channels[0], rgb_channels[1], rgb_channels[2], alpha_channel};
+    
+    cv::Mat resImg(mapSize, CV_8UC4, cv::Scalar(0, 0, 0, 0));
+    merge(fourChans, 4, resImg);
+    
+    return resImg;
+}
+
+// Sp: superposition
+Mat SpWrkOnSrcImg(const Mat srcImg,
+                  const CONTOURS& LightWrkConts,
+                  const CONTOURS& DeepWrkConts)
+{
+    Mat annoImg = srcImg.clone();
+
+    //浅皱纹用黄色显示
+    drawContours(annoImg, LightWrkConts, -1, cv::Scalar(53, 255, 148), 2);
+    //深皱纹用绿色显示
+    drawContours(annoImg, DeepWrkConts, -1, cv::Scalar(0, 178, 0), 2);
+    
+    return annoImg;
 }

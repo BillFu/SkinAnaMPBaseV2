@@ -370,8 +370,8 @@ void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
     rEbGabMap8U.copyTo(gaborMap(wrkRegGroup.rEyeBagReg.bbox));
     lCFGabMap8U.copyTo(gaborMap(wrkRegGroup.lCrowFeetReg.bbox));
     rCFGabMap8U.copyTo(gaborMap(wrkRegGroup.rCrowFeetReg.bbox));
-    lChkGabMap8U.copyTo(gaborMap(wrkRegGroup.lCheekReg.bbox));
-    rChkGabMap8U.copyTo(gaborMap(wrkRegGroup.rCheekReg.bbox));
+    //lChkGabMap8U.copyTo(gaborMap(wrkRegGroup.lCheekReg.bbox));
+    //rChkGabMap8U.copyTo(gaborMap(wrkRegGroup.rCheekReg.bbox));
     fhGabMap8U.copyTo(gaborMap(wrkRegGroup.fhReg.bbox));
     
     // 眉间glabella与其他区域有重叠，故而处理与其他相互不重叠区域的处理有所不同。
