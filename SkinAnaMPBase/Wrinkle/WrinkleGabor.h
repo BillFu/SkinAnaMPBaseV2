@@ -33,35 +33,26 @@ void ApplyGaborBank(const GaborOptBank& gBank, const Mat& inGrFtImg,
                     Mat& aggGabMapFt);
 
 /*
-void InitLCheekGaborBank(CvGabor lcGabor[5]);
-
-// 返回一个面颊区域的Gabor滤波响应值
-Mat CalcGaborRespInOneCheek(const vector<CvGabor*>& lGaborBank,
-                          const Mat& grSrcImg,
-                          const Rect& cheekRect);
-
-// 眼袋
-Mat CalcGaborRespInOneEyeBag(const vector<CvGabor*>& lGaborBank,
-                          const Mat& grSrcImg,
-                          const Rect& eyeBagRect);
-
-// glabella，眉间，印堂
-Mat CalcGaborRespOnGlab(const Mat& grSrcImg,
-                        const Rect& glabRect);
-
-// forehead，前额
-Mat CalcGaborRespOnFh(const Mat& grSrcImg,
-                      const Rect& fhRect);
-
 // 鼻梁上半部，rhinion(keystone)
 Mat CalcUpperNoseGaborResp(const vector<Point2i>& wrinkle_spline_curve,
                   const Rect& FaceContour_Rect,
                   const Mat& allWrinkle, Rect& nrect);
 */
 //WrinkRespMap的大小和在原始影像坐标系中的位置由Face_Rect限定
-void CalcGaborResp(const Mat& grSrcImg,
+void CalcGaborMap(const Mat& grSrcImg,
                    WrkRegGroup& wrkRegGroup,
                    Mat& WrinkRespMap);
+
+Mat CcGabMapInOneEyebag(const Mat& grFtSrcImg,
+                        bool isLeftEye, const Rect& ebRect);
+
+// glabella，眉间，印堂
+Mat CcGaborMapOnGlab(const Mat& grSrcImg,
+                        const Rect& glabRect);
+
+// forehead，前额
+Mat CcGaborMapOnFh(const Mat& grSrcImg,
+                   const Rect& fhRect);
 
 
 // 老百姓理解的深、浅皱纹是以几何深度来划分的，但图像算法又是以颜色深浅来测量的。

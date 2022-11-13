@@ -62,7 +62,7 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     
     //----------------- 第二次使用Gabor滤波，针对细皱纹---------------------
     //WrinkRespMap是由Face_Rect来限定的
-    CalcGaborResp(imgGray, wrkRegGroup, wrkGaborMap);
+    CalcGaborMap(imgGray, wrkRegGroup, wrkGaborMap);
 
 #ifdef TEST_RUN
     /*
