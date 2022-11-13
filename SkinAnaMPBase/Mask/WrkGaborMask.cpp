@@ -346,6 +346,90 @@ Mat ForgeLCheekMask(const FaceInfo& faceInfo)
 
 //-------------------------------------------------------------------------------
 
+void ForgeRCrowFeetPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
+{
+    //从右上角开始，逆时针次序。
+    Point2i pt368a = IpGLmPtWithPair(faceInfo, 368, 356, 0.15);
+    outPolygon.push_back(pt368a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 383));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 353));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 446));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 261));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 448));
+    
+    Point2i pt340a = IpGLmPtWithPair(faceInfo, 340, 346, 0.25);
+    outPolygon.push_back(pt340a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 345));
+    
+    Point2i pt345a = IpGLmPtWithPair(faceInfo, 345, 454, 0.5);
+    Point2i pt447 = getPtOnGLm(faceInfo, 447);
+    Point2i pt447a = Interpolate(pt447, pt345a, 0.6);
+    outPolygon.push_back(pt447a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 454));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 356));
+}
+
+Mat ForgeRCrowFeetMask(const FaceInfo& faceInfo)
+{
+    POLYGON coarsePolygon, refinedPolygon;
+    ForgeRCrowFeetPg(faceInfo, coarsePolygon);
+
+    int csNumPoint = 60;
+    DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+
+    Mat outMask(faceInfo.srcImgS, CV_8UC1, cv::Scalar(0));
+    // !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
+    DrawContOnMask(refinedPolygon, outMask);
+    
+    return outMask;
+}
+
+void ForgeLCrowFeetPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
+{
+    //从右上角开始，逆时针次序。
+    Point2i pt368a = IpGLmPtWithPair(faceInfo, 368, 356, 0.15);
+    outPolygon.push_back(pt368a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 383));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 353));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 446));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 261));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 448));
+    
+    Point2i pt340a = IpGLmPtWithPair(faceInfo, 340, 346, 0.25);
+    outPolygon.push_back(pt340a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 345));
+    
+    Point2i pt345a = IpGLmPtWithPair(faceInfo, 345, 454, 0.5);
+    Point2i pt447 = getPtOnGLm(faceInfo, 447);
+    Point2i pt447a = Interpolate(pt447, pt345a, 0.6);
+    outPolygon.push_back(pt447a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 454));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 356));
+}
+
+Mat ForgeLCrowFeetMask(const FaceInfo& faceInfo)
+{
+    POLYGON coarsePolygon, refinedPolygon;
+    ForgeLCrowFeetPg(faceInfo, coarsePolygon);
+
+    int csNumPoint = 60;
+    DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+
+    Mat outMask(faceInfo.srcImgS, CV_8UC1, cv::Scalar(0));
+    // !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
+    DrawContOnMask(refinedPolygon, outMask);
+    
+    return outMask;
+}
+
+//-------------------------------------------------------------------------------
+
 // 生成皱纹检测的各个检测区（只针对正脸）----新版本
 void ForgeWrkTenRegs(const FaceInfo& faceInfo, const Mat& fbBiLab,
                      WrkRegGroup& wrkRegGroup)
@@ -378,6 +462,16 @@ void ForgeWrkTenRegs(const FaceInfo& faceInfo, const Mat& fbBiLab,
     Mat lCheekMask = ForgeLCheekMask(faceInfo);
     TransMaskFromGS2LS(lCheekMask, wrkRegGroup.lCheekReg);
     lCheekMask.release();
+    
+    Mat rCFMask = ForgeRCrowFeetMask(faceInfo);
+    TransMaskFromGS2LS(rCFMask, wrkRegGroup.rCrowFeetReg);
+    rCFMask.release();
+    
+    /*
+    Mat lCFMask = ForgeLCrowFeetMask(faceInfo);
+    TransMaskFromGS2LS(lCFMask, wrkRegGroup.lCrowFeetReg);
+    lCFMask.release();
+    */
 }
 
 void ForgeWrkTenRegs(
@@ -391,9 +485,7 @@ void ForgeWrkTenRegs(
     Mat glabMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.glabReg);
     Mat lEyeBagMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.lEyeBagReg);
     Mat rEyeBagMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.rEyeBagReg);
-        
-    //OverMaskOnCanvas(showImg, fhMaskGS, Scalar(0, 0, 255));
-    
+            
 #ifdef TEST_RUN2
     string fhMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "FhMask.png");
     OverlayMaskOnImage(annoLmImage, fhMaskGS,
@@ -429,4 +521,12 @@ void ForgeWrkTenRegs(
     OverlayMaskOnImage(annoLmImage, cheekMaskGS,
                         "CheekMaskGS", cheekMaskImgFile.c_str());
 #endif
+    
+    Mat rCFMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.rCrowFeetReg);
+#ifdef TEST_RUN2
+    string rCFMaskFile = BuildOutImgFNV2(wrkMaskOutDir, "rCFRegGS.png");
+    OverlayMaskOnImage(annoLmImage, rCFMaskGS,
+                        "rCFMaskGS", rCFMaskFile.c_str());
+#endif
+
 }

@@ -21,6 +21,12 @@ using namespace cv;
 
 Mat ForgeGlabellaMask(const FaceInfo& faceInfo);
 
+void ForgeRCrowFeetPg(const FaceInfo& faceInfo, POLYGON& outPolygon);
+Mat ForgeRCrowFeetMask(const FaceInfo& faceInfo);
+
+void ForgeLCrowFeetPg(const FaceInfo& faceInfo, POLYGON& outPolygon);
+Mat ForgeLCrowFeetMask(const FaceInfo& faceInfo);
+
 //------------------------------------------------------------------
 // 生成皱纹检测的各个检测区（只针对正脸）----新版本
 void ForgeWrkTenRegs(const FaceInfo& faceInfo,

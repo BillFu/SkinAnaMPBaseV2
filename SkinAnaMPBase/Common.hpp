@@ -145,6 +145,8 @@ struct WrkRegGroup
     DetectRegion lCheekReg;
     DetectRegion rCheekReg;
 
+    DetectRegion lCrowFeetReg;
+    DetectRegion rCrowFeetReg;
 };
 
 // 各类皮肤特征的检测区域汇总
