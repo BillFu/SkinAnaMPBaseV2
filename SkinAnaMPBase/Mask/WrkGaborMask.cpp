@@ -390,27 +390,27 @@ Mat ForgeRCrowFeetMask(const FaceInfo& faceInfo)
 void ForgeLCrowFeetPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
 {
     //从右上角开始，逆时针次序。
-    Point2i pt368a = IpGLmPtWithPair(faceInfo, 368, 356, 0.15);
+    Point2i pt368a = IpGLmPtWithPair(faceInfo, 139, 127, 0.15);
     outPolygon.push_back(pt368a);
     
-    outPolygon.push_back(getPtOnGLm(faceInfo, 383));
-    outPolygon.push_back(getPtOnGLm(faceInfo, 353));
-    outPolygon.push_back(getPtOnGLm(faceInfo, 446));
-    outPolygon.push_back(getPtOnGLm(faceInfo, 261));
-    outPolygon.push_back(getPtOnGLm(faceInfo, 448));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 156));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 124));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 226));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 31));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 228));
     
-    Point2i pt340a = IpGLmPtWithPair(faceInfo, 340, 346, 0.25);
+    Point2i pt340a = IpGLmPtWithPair(faceInfo, 111, 117, 0.25);
     outPolygon.push_back(pt340a);
     
-    outPolygon.push_back(getPtOnGLm(faceInfo, 345));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 116));
     
-    Point2i pt345a = IpGLmPtWithPair(faceInfo, 345, 454, 0.5);
-    Point2i pt447 = getPtOnGLm(faceInfo, 447);
+    Point2i pt345a = IpGLmPtWithPair(faceInfo, 116, 234, 0.5);
+    Point2i pt447 = getPtOnGLm(faceInfo, 227);
     Point2i pt447a = Interpolate(pt447, pt345a, 0.6);
     outPolygon.push_back(pt447a);
     
-    outPolygon.push_back(getPtOnGLm(faceInfo, 454));
-    outPolygon.push_back(getPtOnGLm(faceInfo, 356));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 234));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 127));
 }
 
 Mat ForgeLCrowFeetMask(const FaceInfo& faceInfo)
@@ -467,17 +467,14 @@ void ForgeWrkTenRegs(const FaceInfo& faceInfo, const Mat& fbBiLab,
     TransMaskFromGS2LS(rCFMask, wrkRegGroup.rCrowFeetReg);
     rCFMask.release();
     
-    /*
     Mat lCFMask = ForgeLCrowFeetMask(faceInfo);
     TransMaskFromGS2LS(lCFMask, wrkRegGroup.lCrowFeetReg);
     lCFMask.release();
-    */
 }
 
-void ForgeWrkTenRegs(
-                          const Mat& annoLmImage,
-                          const FaceInfo& faceInfo,
-                          const Mat& fbBiLab, WrkRegGroup& wrkRegGroup)
+void ForgeWrkTenRegs(const Mat& annoLmImage,
+                     const FaceInfo& faceInfo,
+                     const Mat& fbBiLab, WrkRegGroup& wrkRegGroup)
 {
     ForgeWrkTenRegs(faceInfo, fbBiLab, wrkRegGroup);
     
@@ -522,8 +519,12 @@ void ForgeWrkTenRegs(
                         "CheekMaskGS", cheekMaskImgFile.c_str());
 #endif
     
+    Mat lCFMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.lCrowFeetReg);
     Mat rCFMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.rCrowFeetReg);
 #ifdef TEST_RUN2
+    string lCFMaskFile = BuildOutImgFNV2(wrkMaskOutDir, "lCFRegGS.png");
+    OverlayMaskOnImage(annoLmImage, lCFMaskGS,
+                        "lCFMaskGS", lCFMaskFile.c_str());
     string rCFMaskFile = BuildOutImgFNV2(wrkMaskOutDir, "rCFRegGS.png");
     OverlayMaskOnImage(annoLmImage, rCFMaskGS,
                         "rCFMaskGS", rCFMaskFile.c_str());
