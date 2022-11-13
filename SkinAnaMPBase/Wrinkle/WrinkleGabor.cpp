@@ -105,6 +105,48 @@ Mat CcGabMapInOneEyebag(const Mat& grFtSrcImg,
     return aggGabMap8U;
 }
 
+//-----------------------------------------------------------
+void BuildGabOptsForCF(bool isLeftEye, GaborOptBank& gOptBank)
+{
+    int kerSize = 21;
+
+    // use the left eye as the reference
+    float leftThetaSet[] = {90, 78.75, 67.60, 101.25, 112.50};
+    int numTheta = sizeof(leftThetaSet) / sizeof(float);
+    if(isLeftEye)
+    {
+        for(int i=0; i<numTheta; i++)
+        {
+            GaborOpt opt(kerSize, 50, 8, 41, leftThetaSet[i], 125);
+            gOptBank.push_back(opt);
+        }
+    }
+    else // right eye
+    {
+        for(int i=0; i<numTheta; i++)
+        {
+            GaborOpt opt(kerSize, 50, 8, 41, 180.0 - leftThetaSet[i], 125);
+            gOptBank.push_back(opt);
+        }
+    }
+}
+
+// 鱼尾纹
+Mat CcGabMapInOneCrowFeet(const Mat& grFtSrcImg,
+                        bool isLeftEye, const Rect& cfRect)
+{
+    Mat inGrFtImg = grFtSrcImg(cfRect);
+    
+    GaborOptBank gOptBank;
+    BuildGabOptsForCF(isLeftEye, gOptBank);
+    
+    Mat aggGabMapFt;
+    ApplyGaborBank(gOptBank, inGrFtImg, aggGabMapFt);
+    Mat aggGabMap8U = CvtFtImgTo8U_NoNega(aggGabMapFt);
+    return aggGabMap8U;
+}
+
+//----------------------------------------------------------------------
 // forehead，前额
 Mat CcGaborMapOnFh(const Mat& grFtSrcImg,
                    const Rect& fhRect)
@@ -135,7 +177,6 @@ Mat CcGaborMapOnGlab(const Mat& grFtSrcImg,
     Mat inGrFtImg = grFtSrcImg(glabRect);
         
     GaborOptBank gOptBank;
-
     int kerSize = 21;
     // use the left eye as the reference
     float glabThetaSet[] = {163.25, 152, 140.75, 174.50, 185.75};
@@ -310,7 +351,9 @@ void CalcGaborMap(const Mat& grSrcImg,
     assert(isSuccess);
 #endif
     
-    
+    Mat lCFGabMap8U = CcGabMapInOneCrowFeet(grFtSrcImg, true, wrkRegGroup.lCrowFeetReg.bbox);
+    Mat rCFGabMap8U = CcGabMapInOneCrowFeet(grFtSrcImg, false, wrkRegGroup.rCrowFeetReg.bbox);
+
     /*
     // 计算左面颊的Gabor滤波响应值
     vector<CvGabor*> lGaborBank;
@@ -325,12 +368,13 @@ void CalcGaborMap(const Mat& grSrcImg,
     
 #ifdef TEST_RUN2
     //bool isSuccess;
-    /*
-    isSuccess = SaveTestOutImgInDir(fhRegResp,  wrkOutDir,   "fhGaborResp.png");
-    isSuccess = SaveTestOutImgInDir(lCheekResp, wrkOutDir,  "lCheekGaborResp.png");
-    isSuccess = SaveTestOutImgInDir(rCheekResp, wrkOutDir,  "rCheekGaborResp.png");
-    isSuccess = SaveTestOutImgInDir(glabeRegResp, wrkOutDir,  "glabGaborResp.png");
-    */
+    
+    isSuccess = SaveTestOutImgInDir(lCFGabMap8U,  wrkOutDir,   "lCFGabMap.png");
+    isSuccess = SaveTestOutImgInDir(rCFGabMap8U,  wrkOutDir,   "rCFGabMap.png");
+
+    //isSuccess = SaveTestOutImgInDir(lCheekResp, wrkOutDir,  "lCheekGaborResp.png");
+    //isSuccess = SaveTestOutImgInDir(rCheekResp, wrkOutDir,  "rCheekGaborResp.png");
+    
     /*
     Mat canvas = grFrImg.clone();
     rectangle(canvas, lCheekRect, CV_COLOR_RED, 8, 0);

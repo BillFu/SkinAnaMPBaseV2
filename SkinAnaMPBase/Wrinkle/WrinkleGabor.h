@@ -43,8 +43,14 @@ void CalcGaborMap(const Mat& grSrcImg,
                    WrkRegGroup& wrkRegGroup,
                    Mat& WrinkRespMap);
 
+void BuildGabOptsForEb(bool isLeftEye, GaborOptBank& gOptBank);
 Mat CcGabMapInOneEyebag(const Mat& grFtSrcImg,
                         bool isLeftEye, const Rect& ebRect);
+
+void BuildGabOptsForCF(bool isLeftEye, GaborOptBank& gOptBank);
+// 鱼尾纹
+Mat CcGabMapInOneCrowFeet(const Mat& grFtSrcImg,
+                        bool isLeftEye, const Rect& cfRect);
 
 // forehead，前额
 Mat CcGaborMapOnFh(const Mat& grSrcImg,
