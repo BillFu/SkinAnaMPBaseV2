@@ -46,13 +46,13 @@ void CalcGaborMap(const Mat& grSrcImg,
 Mat CcGabMapInOneEyebag(const Mat& grFtSrcImg,
                         bool isLeftEye, const Rect& ebRect);
 
-// glabella，眉间，印堂
-Mat CcGaborMapOnGlab(const Mat& grSrcImg,
-                        const Rect& glabRect);
-
 // forehead，前额
 Mat CcGaborMapOnFh(const Mat& grSrcImg,
                    const Rect& fhRect);
+
+// glabella，眉间，印堂
+Mat CcGaborMapOnGlab(const Mat& grFtSrcImg,
+                     const Rect& glabRect);
 
 
 // 老百姓理解的深、浅皱纹是以几何深度来划分的，但图像算法又是以颜色深浅来测量的。

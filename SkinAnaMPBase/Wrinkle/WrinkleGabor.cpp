@@ -3,39 +3,6 @@
 #include "../ImgProc.h"
 #include <algorithm>
 
-//CvGabor gabor[20];
-/*
-void init_gabor()
-{
-    double Sigma = 4.442882933081; // sqrt(2) * 3.14159265
-    double F = 1.41421356237; //sqrt(2);
-    
-    gabor[0].Init(0.7853981625,  4, Sigma, F);   // 45度
-    gabor[1].Init(1.17809724375, 3, Sigma, F);   // 67.5度
-    gabor[2].Init(0.7853981625,  2, Sigma, F);   // 45度
-    gabor[3].Init(1.17809724375, 1, Sigma, F);   // 67.5度
-    gabor[4].Init(1.17809724375, 0, Sigma, F);   // 67.5度
-    
-    gabor[5].Init(2.3561944875,  4, Sigma, F);   // 135度
-    gabor[6].Init(1.96349540625, 3, Sigma, F);   // 112.5度
-    gabor[7].Init(2.3561944875,  2, Sigma, F);   // 135度
-    gabor[8].Init(1.96349540625, 1, Sigma, F);   // 112.5度
-    gabor[9].Init(1.96349540625, 0, Sigma, F);   // 112.5度
-    
-    gabor[10].Init(1.570796325,   4, Sigma, F);    // 90度
-    gabor[11].Init(1.17809724375, 3, Sigma, F);    // 67.5度
-    gabor[12].Init(1.570796325,   2, Sigma, F);    // 90度
-    gabor[13].Init(1.96349540625, 1, Sigma, F);    // 112.5度
-    gabor[14].Init(1.570796325,   0, Sigma, F);    // 90度
-    
-    // 下面的5个gabor对象用于前额的皱纹检测
-    gabor[15].Init(0, 4, Sigma, F);
-    gabor[16].Init(0, 3, Sigma, F);
-    gabor[17].Init(0, 2, Sigma, F);
-    gabor[18].Init(2.74889356875, 1, Sigma, F);  // 157.5度
-    gabor[19].Init(0.39269908125, 1, Sigma, F);  // 22.5 度
-}
-*/
 
 //-----------------------------------------------------------
 void AnnoPointsOnImg(Mat& annoImage,
@@ -138,21 +105,6 @@ Mat CcGabMapInOneEyebag(const Mat& grFtSrcImg,
     return aggGabMap8U;
 }
 
-void BuildGabOptsForFh(GaborOptBank& gOptBank)
-{
-    int kerSize = 21;
-
-    // use the left eye as the reference
-    float leftThetaSet[] = {73.125, 50.625, 61.875, 84.375, 95.625};
-    int numTheta = sizeof(leftThetaSet) / sizeof(float);
-    
-    for(int i=0; i<numTheta; i++)
-    {
-        GaborOpt opt(kerSize, 80, 8, 38, leftThetaSet[i], 180);
-        gOptBank.push_back(opt);
-    }
-}
-
 // forehead，前额
 Mat CcGaborMapOnFh(const Mat& grFtSrcImg,
                    const Rect& fhRect)
@@ -160,15 +112,46 @@ Mat CcGaborMapOnFh(const Mat& grFtSrcImg,
     Mat inGrFtImg = grFtSrcImg(fhRect);
     
     GaborOptBank gOptBank;
-    BuildGabOptsForFh(gOptBank);
+    int kerSize = 21;
+    // use the left eye as the reference
+    float fhThetaSet[] = {73.125, 50.625, 61.875, 84.375, 95.625};
+    int numTheta = sizeof(fhThetaSet) / sizeof(float);
+    for(int i=0; i<numTheta; i++)
+    {
+        GaborOpt opt(kerSize, 57, 8, 42, fhThetaSet[i], 105);
+        gOptBank.push_back(opt);
+    }
     
     Mat aggFhMapFt;
     ApplyGaborBank(gOptBank, inGrFtImg, aggFhMapFt);
-    Mat aggFhMap8U = CvtFtImgTo8U_NoNega(aggFhMapFt);
-    return aggFhMap8U;
+    Mat aggMap8U = CvtFtImgTo8U_NoNega(aggFhMapFt);
+    return aggMap8U;
 }
 
+// glabella，眉间，印堂
+Mat CcGaborMapOnGlab(const Mat& grFtSrcImg,
+                     const Rect& glabRect)
+{
+    Mat inGrFtImg = grFtSrcImg(glabRect);
+        
+    GaborOptBank gOptBank;
 
+    int kerSize = 21;
+    // use the left eye as the reference
+    float glabThetaSet[] = {163.25, 152, 140.75, 174.50, 185.75};
+    int numTheta = sizeof(glabThetaSet) / sizeof(float);
+    
+    for(int i=0; i<numTheta; i++)
+    {
+        GaborOpt opt(kerSize, 56, 8, 43, glabThetaSet[i], 126);
+        gOptBank.push_back(opt);
+    }
+    
+    Mat aggGlabMapFt;
+    ApplyGaborBank(gOptBank, inGrFtImg, aggGlabMapFt);
+    Mat aggMap8U = CvtFtImgTo8U_NoNega(aggGlabMapFt);
+    return aggMap8U;
+}
 
 // 返回一个面颊区域的Gabor滤波响应值
 /*
@@ -183,23 +166,6 @@ Mat CalcGaborRespInOneCheek(const vector<CvGabor*>& gaborBank,
 }
 */
 
-/*
-// glabella，眉间，印堂
-Mat CalcGaborRespOnGlab(const Mat& grSrcImg,
-                  Rect& glabeRect)
-{
-    Mat imgInGlabRect = grSrcImg(glabeRect);
-
-    vector<CvGabor*> gaborBank;
-    for(int i=10; i<15; i++)
-    {
-        gaborBank.push_back(gabor+i);
-    }
-        
-    Mat glabRespMap = ApplyGaborFilter(gaborBank, imgInGlabRect);
-    return glabRespMap;
-}
- */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /////output variable
@@ -328,19 +294,23 @@ void CalcGaborMap(const Mat& grSrcImg,
     //Eb: eyebag
     Mat lEbGabMap8U = CcGabMapInOneEyebag(grFtSrcImg, true, wrkRegGroup.lEyeBagReg.bbox);
     Mat rEbGabMap8U = CcGabMapInOneEyebag(grFtSrcImg, false, wrkRegGroup.rEyeBagReg.bbox);
+
+    // 前额
+    Mat fhGabMap8U = CcGaborMapOnFh(grFtSrcImg, wrkRegGroup.fhReg.bbox);
+    // glabella，眉间，印堂
+    Mat glabMap8U = CcGaborMapOnGlab(grFtSrcImg, wrkRegGroup.glabReg.bbox);
+
 #ifdef TEST_RUN2
     bool isSuccess;
     isSuccess = SaveTestOutImgInDir(lEbGabMap8U,  wrkOutDir,  "lEbGabMap.png");
     isSuccess = SaveTestOutImgInDir(rEbGabMap8U,  wrkOutDir,  "rEbGabMap.png");
+    isSuccess = SaveTestOutImgInDir(fhGabMap8U,  wrkOutDir,  "FhGabMap.png");
+    isSuccess = SaveTestOutImgInDir(glabMap8U,  wrkOutDir,  "glabMap.png");
+
     assert(isSuccess);
 #endif
-     
-    // 前额
-    Mat fhRegResp = CcGaborMapOnFh(grFtSrcImg, wrkRegGroup.fhReg.bbox);
     
-    // glabella，眉间，印堂
-    //Mat glabeRegResp = CalcGaborRespOnGlab(blurGrImg, wrkRegGroup.glabReg.bbox);
-
+    
     /*
     // 计算左面颊的Gabor滤波响应值
     vector<CvGabor*> lGaborBank;

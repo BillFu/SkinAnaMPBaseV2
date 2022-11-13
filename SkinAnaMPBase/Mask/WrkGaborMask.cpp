@@ -87,27 +87,25 @@ void ForgeFhMaskForWrk(const FaceInfo& faceInfo, const Mat& fbBiLab, Mat& outMas
 void ForgeGlabellPg(const FaceInfo& faceInfo, POLYGON& outPolygon)
 {
     // 点的索引针对468个general landmark而言
-    /*
-    int ptIndices[] = { // 逆时针计数
-        107, 55, 193, 122, 351, 417, 285, 336, // 107是最左、最上的点
-        pt1, pt2
-    };
-    pt1: 在9和337之间插值出来的。
-    pt2: 在9和108之间插值出来的。
-    */
     
-    //outPolygon.push_back(getPtOnGLm(faceInfo, 107));
+    // middle and top point, 逆时针计数
+    Point2i pt1 = IpGLmPtWithPair(faceInfo, 151, 9, 0.25);
+    outPolygon.push_back(pt1);
+    
+    Point2i pt108a = IpGLmPtWithPair(faceInfo, 108, 9, 0.45);
+    outPolygon.push_back(pt108a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 107));
     outPolygon.push_back(getPtOnGLm(faceInfo, 55));
     outPolygon.push_back(getPtOnGLm(faceInfo, 193));
     outPolygon.push_back(getPtOnGLm(faceInfo, 122));
     outPolygon.push_back(getPtOnGLm(faceInfo, 351));
     outPolygon.push_back(getPtOnGLm(faceInfo, 417));
     outPolygon.push_back(getPtOnGLm(faceInfo, 285));
-    //outPolygon.push_back(getPtOnGLm(faceInfo, 336));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 336));
     
-    //Point2i pt1 = IpGLmPtWithPair(faceInfo, 8, 9, 337, 0.6);
-    //outPolygon.push_back(pt1);
-    outPolygon.push_back(getPtOnGLm(faceInfo, 9));
+    Point2i pt337a = IpGLmPtWithPair(faceInfo, 337, 9, 0.45);
+    outPolygon.push_back(pt337a);
 }
 
 Mat ForgeGlabellaMask(const FaceInfo& faceInfo)
@@ -390,7 +388,7 @@ void ForgeWrkTenRegs(
     ForgeWrkTenRegs(faceInfo, fbBiLab, wrkRegGroup);
     
     Mat fhMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.fhReg);
-    Mat glaMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.glabReg);
+    Mat glabMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.glabReg);
     Mat lEyeBagMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.lEyeBagReg);
     Mat rEyeBagMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.rEyeBagReg);
         
@@ -402,11 +400,11 @@ void ForgeWrkTenRegs(
                         "Forehead Mask", fhMaskImgFile.c_str());
     
     string glabMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "glabMask.png");
-    OverlayMaskOnImage(annoLmImage, glaMaskGS,
+    OverlayMaskOnImage(annoLmImage, glabMaskGS,
                         "Glabella Mask", glabMaskImgFile.c_str());
 #endif
     fhMaskGS.release();
-    glaMaskGS.release();
+    glabMaskGS.release();
     
 #ifdef TEST_RUN2
     Mat eyeBagMaskGS = lEyeBagMaskGS | rEyeBagMaskGS;
