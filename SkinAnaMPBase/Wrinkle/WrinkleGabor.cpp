@@ -66,10 +66,8 @@ void ApplyGaborBank(const GaborOptBank& gBank, const Mat& inGrFtImg,
 }
 
 //-----------------------------------------------------------
-void BuildGabOptsForEb(bool isLeftEye, GaborOptBank& gOptBank)
+void BuildGabOptsForEb(int kerSize, int sigma, bool isLeftEye, GaborOptBank& gOptBank)
 {
-    int kerSize = 21;
-
     // use the left eye as the reference
     float leftThetaSet[] = {73.125, 50.625, 61.875, 84.375, 95.625};
     int numTheta = sizeof(leftThetaSet) / sizeof(float);
@@ -77,7 +75,7 @@ void BuildGabOptsForEb(bool isLeftEye, GaborOptBank& gOptBank)
     {
         for(int i=0; i<numTheta; i++)
         {
-            GaborOpt opt(kerSize, 80, 8, 38, leftThetaSet[i], 180);
+            GaborOpt opt(kerSize, 80, sigma, 38, leftThetaSet[i], 180);
             gOptBank.push_back(opt);
         }
     }
@@ -85,19 +83,19 @@ void BuildGabOptsForEb(bool isLeftEye, GaborOptBank& gOptBank)
     {
         for(int i=0; i<numTheta; i++)
         {
-            GaborOpt opt(kerSize, 80, 8, 38, 180.0 - leftThetaSet[i], 180);
+            GaborOpt opt(kerSize, 80, sigma, 38, 180.0 - leftThetaSet[i], 180);
             gOptBank.push_back(opt);
         }
     }
 }
 
-Mat CcGabMapInOneEyebag(const Mat& grFtSrcImg,
+Mat CcGabMapInOneEyebag(const Mat& grFtSrcImg, int kerSize, int sigma,
                         bool isLeftEye, const Rect& ebRect)
 {
     Mat inGrFtImg = grFtSrcImg(ebRect);
     
     GaborOptBank gOptBank;
-    BuildGabOptsForEb(isLeftEye, gOptBank);
+    BuildGabOptsForEb(kerSize, sigma, isLeftEye, gOptBank);
     
     Mat aggGabMapFt;
     ApplyGaborBank(gOptBank, inGrFtImg, aggGabMapFt);
@@ -106,10 +104,9 @@ Mat CcGabMapInOneEyebag(const Mat& grFtSrcImg,
 }
 
 //-----------------------------------------------------------
-void BuildGabOptsForCF(bool isLeftEye, GaborOptBank& gOptBank)
+void BuildGabOptsForCF(int kerSize, int sigma,
+                       bool isLeftEye, GaborOptBank& gOptBank)
 {
-    int kerSize = 21;
-
     // use the left eye as the reference
     float leftThetaSet[] = {90, 78.75, 67.60, 101.25, 112.50};
     int numTheta = sizeof(leftThetaSet) / sizeof(float);
@@ -117,7 +114,7 @@ void BuildGabOptsForCF(bool isLeftEye, GaborOptBank& gOptBank)
     {
         for(int i=0; i<numTheta; i++)
         {
-            GaborOpt opt(kerSize, 50, 8, 41, leftThetaSet[i], 125);
+            GaborOpt opt(kerSize, 50, sigma, 41, leftThetaSet[i], 125);
             gOptBank.push_back(opt);
         }
     }
@@ -125,20 +122,20 @@ void BuildGabOptsForCF(bool isLeftEye, GaborOptBank& gOptBank)
     {
         for(int i=0; i<numTheta; i++)
         {
-            GaborOpt opt(kerSize, 50, 8, 41, 180.0 - leftThetaSet[i], 125);
+            GaborOpt opt(kerSize, 50, sigma, 41, 180.0 - leftThetaSet[i], 125);
             gOptBank.push_back(opt);
         }
     }
 }
 
 // 鱼尾纹
-Mat CcGabMapInOneCrowFeet(const Mat& grFtSrcImg,
+Mat CcGabMapInOneCrowFeet(const Mat& grFtSrcImg, int kerSize, int sigma,
                         bool isLeftEye, const Rect& cfRect)
 {
     Mat inGrFtImg = grFtSrcImg(cfRect);
     
     GaborOptBank gOptBank;
-    BuildGabOptsForCF(isLeftEye, gOptBank);
+    BuildGabOptsForCF(kerSize, sigma, isLeftEye, gOptBank);
     
     Mat aggGabMapFt;
     ApplyGaborBank(gOptBank, inGrFtImg, aggGabMapFt);
@@ -148,19 +145,18 @@ Mat CcGabMapInOneCrowFeet(const Mat& grFtSrcImg,
 
 //----------------------------------------------------------------------
 // forehead，前额
-Mat CcGaborMapOnFh(const Mat& grFtSrcImg,
+Mat CcGaborMapOnFh(const Mat& grFtSrcImg, int kerSize, int sigma,
                    const Rect& fhRect)
 {
     Mat inGrFtImg = grFtSrcImg(fhRect);
     
     GaborOptBank gOptBank;
-    int kerSize = 21;
     // use the left eye as the reference
     float fhThetaSet[] = {73.125, 50.625, 61.875, 84.375, 95.625};
     int numTheta = sizeof(fhThetaSet) / sizeof(float);
     for(int i=0; i<numTheta; i++)
     {
-        GaborOpt opt(kerSize, 57, 8, 42, fhThetaSet[i], 105);
+        GaborOpt opt(kerSize, 57, sigma, 42, fhThetaSet[i], 105);
         gOptBank.push_back(opt);
     }
     
@@ -171,20 +167,20 @@ Mat CcGaborMapOnFh(const Mat& grFtSrcImg,
 }
 
 // glabella，眉间，印堂
-Mat CcGaborMapOnGlab(const Mat& grFtSrcImg,
+Mat CcGaborMapOnGlab(const Mat& grFtSrcImg, int kerSize, int sigma,
                      const Rect& glabRect)
 {
     Mat inGrFtImg = grFtSrcImg(glabRect);
         
     GaborOptBank gOptBank;
-    int kerSize = 21;
+    
     // use the left eye as the reference
     float glabThetaSet[] = {163.25, 152, 140.75, 174.50, 185.75};
     int numTheta = sizeof(glabThetaSet) / sizeof(float);
     
     for(int i=0; i<numTheta; i++)
     {
-        GaborOpt opt(kerSize, 56, 8, 43, glabThetaSet[i], 126);
+        GaborOpt opt(kerSize, 56, sigma, 43, glabThetaSet[i], 126);
         gOptBank.push_back(opt);
     }
     
@@ -197,10 +193,8 @@ Mat CcGaborMapOnGlab(const Mat& grFtSrcImg,
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 // 返回一个面颊区域的Gabor滤波响应值
-void BuildGabOptsForCheek(bool isLeftEye, GaborOptBank& gOptBank)
+void BuildGabOptsForCheek(int kerSize, int sigma, bool isLeftEye, GaborOptBank& gOptBank)
 {
-    int kerSize = 21;
-
     // use the left eye as the reference
     float rightThetaSet[] = {103, 91.75, 80.0, 114.25, 125.5};
     int numTheta = sizeof(rightThetaSet) / sizeof(float);
@@ -208,7 +202,7 @@ void BuildGabOptsForCheek(bool isLeftEye, GaborOptBank& gOptBank)
     {
         for(int i=0; i<numTheta; i++)
         {
-            GaborOpt opt(kerSize, 53, 8, 40, 180 - rightThetaSet[i], 131);
+            GaborOpt opt(kerSize, 53, sigma, 40, 180 - rightThetaSet[i], 131);
             gOptBank.push_back(opt);
         }
     }
@@ -216,19 +210,19 @@ void BuildGabOptsForCheek(bool isLeftEye, GaborOptBank& gOptBank)
     {
         for(int i=0; i<numTheta; i++)
         {
-            GaborOpt opt(kerSize, 53, 8, 40, rightThetaSet[i], 131);
+            GaborOpt opt(kerSize, 53, sigma, 40, rightThetaSet[i], 131);
             gOptBank.push_back(opt);
         }
     }
 }
 
-Mat CcGaborMapInOneCheek(const Mat& grFtSrcImg,
+Mat CcGaborMapInOneCheek(const Mat& grFtSrcImg, int kerSize, int sigma,
                          bool isLeft, const Rect& cheekRect)
 {
     Mat inGrFtImg = grFtSrcImg(cheekRect);
     
     GaborOptBank gOptBank;
-    BuildGabOptsForCheek(isLeft, gOptBank);
+    BuildGabOptsForCheek(kerSize, sigma, isLeft, gOptBank);
     
     Mat aggGabMapFt;
     ApplyGaborBank(gOptBank, inGrFtImg, aggGabMapFt);
@@ -333,20 +327,31 @@ void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
     Mat grFtSrcImg;
     grSrcImg.convertTo(grFtSrcImg, CV_32F, 1.0/255, 0);
 
+    int kerSize = int(21.0 * grSrcImg.cols / 2448.0 + 0.5);
+    if(kerSize % 2 == 0)
+        kerSize++;
+    int sigma = int(8.8 * grSrcImg.cols / 2448.0 + 0.5);
+    
     //Eb: eyebag
-    Mat lEbGabMap8U = CcGabMapInOneEyebag(grFtSrcImg, true, wrkRegGroup.lEyeBagReg.bbox);
-    Mat rEbGabMap8U = CcGabMapInOneEyebag(grFtSrcImg, false, wrkRegGroup.rEyeBagReg.bbox);
+    Mat lEbGabMap8U = CcGabMapInOneEyebag(grFtSrcImg, kerSize, sigma,
+                                          true, wrkRegGroup.lEyeBagReg.bbox);
+    Mat rEbGabMap8U = CcGabMapInOneEyebag(grFtSrcImg, kerSize, sigma,
+                                          false, wrkRegGroup.rEyeBagReg.bbox);
 
     // 前额
-    Mat fhGabMap8U = CcGaborMapOnFh(grFtSrcImg, wrkRegGroup.fhReg.bbox);
+    Mat fhGabMap8U = CcGaborMapOnFh(grFtSrcImg, kerSize, sigma, wrkRegGroup.fhReg.bbox);
     // glabella，眉间，印堂
-    Mat glabMap8U = CcGaborMapOnGlab(grFtSrcImg, wrkRegGroup.glabReg.bbox);
+    Mat glabMap8U = CcGaborMapOnGlab(grFtSrcImg, kerSize, sigma, wrkRegGroup.glabReg.bbox);
     
-    Mat lCFGabMap8U = CcGabMapInOneCrowFeet(grFtSrcImg, true, wrkRegGroup.lCrowFeetReg.bbox);
-    Mat rCFGabMap8U = CcGabMapInOneCrowFeet(grFtSrcImg, false, wrkRegGroup.rCrowFeetReg.bbox);
+    Mat lCFGabMap8U = CcGabMapInOneCrowFeet(grFtSrcImg, kerSize, sigma,
+                                            true, wrkRegGroup.lCrowFeetReg.bbox);
+    Mat rCFGabMap8U = CcGabMapInOneCrowFeet(grFtSrcImg, kerSize, sigma,
+                                            false, wrkRegGroup.rCrowFeetReg.bbox);
 
-    Mat lChkGabMap8U = CcGaborMapInOneCheek(grFtSrcImg, true, wrkRegGroup.lCheekReg.bbox);
-    Mat rChkGabMap8U = CcGaborMapInOneCheek(grFtSrcImg, false, wrkRegGroup.rCheekReg.bbox);
+    Mat lChkGabMap8U = CcGaborMapInOneCheek(grFtSrcImg, kerSize, sigma,
+                                            true, wrkRegGroup.lCheekReg.bbox);
+    Mat rChkGabMap8U = CcGaborMapInOneCheek(grFtSrcImg, kerSize, sigma,
+                                            false, wrkRegGroup.rCheekReg.bbox);
     
 #ifdef TEST_RUN2
     bool isSuccess;

@@ -36,26 +36,28 @@ void CalcGaborMap(const Mat& grSrcImg,
                    WrkRegGroup& wrkRegGroup,
                    Mat& WrinkRespMap);
 
-void BuildGabOptsForEb(bool isLeftEye, GaborOptBank& gOptBank);
-Mat CcGaborMapInOneEyebag(const Mat& grFtSrcImg,
+void BuildGabOptsForEb(int kerSize, int sigma, bool isLeftEye, GaborOptBank& gOptBank);
+Mat CcGaborMapInOneEyebag(const Mat& grFtSrcImg, int kerSize, int sigma,
                         bool isLeftEye, const Rect& ebRect);
 
-void BuildGabOptsForCF(bool isLeftEye, GaborOptBank& gOptBank);
+void BuildGabOptsForCF(int kerSize, int sigma, 
+                       bool isLeftEye, GaborOptBank& gOptBank);
 // 鱼尾纹
-Mat CcGaborMapInOneCrowFeet(const Mat& grFtSrcImg,
+Mat CcGaborMapInOneCrowFeet(const Mat& grFtSrcImg, int kerSize, int sigma,
                         bool isLeftEye, const Rect& cfRect);
 
 // forehead，前额
-Mat CcGaborMapOnFh(const Mat& grFtSrcImg,
+Mat CcGaborMapOnFh(const Mat& grFtSrcImg, int kerSize, int sigma,
                    const Rect& fhRect);
 
 // glabella，眉间，印堂
-Mat CcGaborMapOnGlab(const Mat& grFtSrcImg,
+Mat CcGaborMapOnGlab(const Mat& grFtSrcImg, int kerSize, int sigma,
                      const Rect& glabRect);
 
-void BuildGabOptsForCheek(bool isLeftEye, GaborOptBank& gOptBank);
-Mat CcGaborMapInOneCheek(const Mat& grFtSrcImg, bool isLeft, 
-                         const Rect& cheekRect);
+void BuildGabOptsForCheek(int kerSize, int sigma,
+                          bool isLeftEye, GaborOptBank& gOptBank);
+Mat CcGaborMapInOneCheek(const Mat& grFtSrcImg, int kerSize, int sigma,
+                         bool isLeft, const Rect& cheekRect);
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 // 老百姓理解的深、浅皱纹是以几何深度来划分的，但图像算法又是以颜色深浅来测量的。
