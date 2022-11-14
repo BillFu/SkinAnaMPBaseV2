@@ -32,10 +32,17 @@ void PreprocGrImg(const Mat& grSrcImg, Mat& outImg);
 
 // Cc: calculate
 // blur --> clahe --> frangi
+/*
 void CcFrgiMapInFR(const Mat& imgGray,
                     const Rect& faceRect,
                     int scaleRatio,
                     Mat& frgiMapSSInFR);
+*/
+
+// return Mat is 8U type
+Mat CcFrgiMapInRect(const Mat& imgGray,
+                    const Rect& rect,
+                    int scaleRatio);
 
 void CcFrgiMap(const Mat& imgGray, int scaleRatio, Mat& frgiMap8U);
 
@@ -45,20 +52,10 @@ void ApplyFrgiFilter(const Mat& grSrcImg,
                      Mat& frangiRespRz);
 
 //-----------------------------------------------------------------------------
-
-// 计算Frangi滤波响应，并提取深皱纹和长皱纹
-void PickWrkInFrgiMap(const Mat& wrkMask,
-                      int minWrkTh, int longWrkTh,
-                        Mat& frgiResp8U,
-                        CONTOURS& deepWrkConts,
-                        CONTOURS& longWrkConts,
-                        float& avgFrgiRespValue);
-
 // 从frangi滤波的结果（经过了二值化、细化、反模糊化等处理）中，提取深皱纹、长皱纹
 // DL: deep and long
-void PickDLWrkInFrgiMap(const Mat& frgiMap8U, //Original Scale
-                        const Mat& wrkMask,
-                        int minsWrkTh, int longWrkTh,
-                        CONTOURS& longWrkConts, CONTOURS& DeepWrkConts);
-
+void PickDLWrkInFrgiMapV2(int minWrkTh, int longWrkTh,
+                      Mat& frgiResp8U,
+                      CONTOURS& deepWrkConts,
+                      CONTOURS& longWrkConts);
 #endif /* WRINKLE_FRANGI_H */

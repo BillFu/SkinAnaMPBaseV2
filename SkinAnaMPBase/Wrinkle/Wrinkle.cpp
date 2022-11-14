@@ -40,39 +40,31 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     // 计算Frangi滤波响应，并提取深皱纹和长皱纹
     
     int scaleRatio = 4;
-    Mat frgiMap8U; // SS: source scale
-    CcFrgiMapInFR(imgGray, faceRect, scaleRatio, frgiMap8U);
-    
-    Mat fhMask(imgGray.size(), CV_8UC1, Scalar(0));
-    wrkRegGroup.fhReg.mask.copyTo(fhMask(wrkRegGroup.fhReg.bbox));
-    
-    Mat glabMask(imgGray.size(), CV_8UC1, Scalar(0));
-    wrkRegGroup.glabReg.mask.copyTo(glabMask(wrkRegGroup.glabReg.bbox));
-    
-    Mat clipMask = fhMask | glabMask;
-    string clipMaskFile = wrkOutDir + "/clipMask.png";
-    imwrite(clipMaskFile.c_str(), clipMask);
+    Mat fhFrgiMap8U = CcFrgiMapInRect(imgGray,
+            wrkRegGroup.fhReg.bbox, scaleRatio);
 
-    fhMask.release();
-    glabMask.release();
-    frgiMap8U = frgiMap8U & clipMask;
+    Mat fhMaskGS = TransMaskFromLS2GS(inImg.size(), wrkRegGroup.fhReg);
+    fhFrgiMap8U = fhFrgiMap8U & fhMaskGS;
+    fhMaskGS.release();
     
-    float avgFrgiMapV;
     CONTOURS longWrkConts;
     int longWrkTh = 0.12 * faceRect.width;  // 大致为2cm
     int minWrkTh = longWrkTh / 2; // 皱纹（包括长、短皱纹）的最短下限，大致为1cm
     cout << "minWrkTh: " << minWrkTh << endl;
-    PickWrkInFrgiMap(wrkFrgiMask,
-                     minWrkTh, longWrkTh,
-                     frgiMap8U,
-                     deepWrkConts, longWrkConts, avgFrgiMapV);
+    PickDLWrkInFrgiMapV2(minWrkTh, longWrkTh,
+                         fhFrgiMap8U,
+                     deepWrkConts, longWrkConts);
+    
+    //cv::Scalar sumResp = cv::sum(frgiMap8U);
+    //int nonZero2 = cv::countNonZero(DLWrkMaskGS); // Mask中有效面积，即非零元素的数目
+    //float avgFrgiMapV = sumResp[0] / (nonZero2+1);  // 平均响应值，不知道为啥要除以12.8
     
 #ifdef TEST_RUN2
     Mat canvas = inImg.clone();
-    drawContours(canvas, deepWrkConts, -1, cv::Scalar(255, 0, 0), 2);
+    drawContours(canvas, deepWrkConts, -1, cv::Scalar(255, 0, 0), 2); 
     drawContours(canvas, longWrkConts, -1, cv::Scalar(0, 0, 255), 2);
 
-    string frgiDLWrkFile = wrkOutDir + "/DLWrkFrgi.png";
+    string frgiDLWrkFile = wrkOutDir + "/DLWrkFhFrgi.png";
     imwrite(frgiDLWrkFile.c_str(), canvas);
 #endif
     
