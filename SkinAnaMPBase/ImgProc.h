@@ -64,10 +64,16 @@ void ApplyCLAHE(const Mat& inImg,
 
 // 返回8邻域不为0的像素的数目
 int getConnectDegree(const std::vector<int>& neibValues);
+int getTurnNum(const std::vector<int>& neibValues);
 
 POINT_SET get8NeibCoordinates(const Point2i& pt, const Rect& imgRect);
 
 void get8NeibValues(const Point2i& pt, const Mat& img, const Rect& imgRect,
+                    vector<int>& neibValues);
+
+POINT_SET get16NeibCoordinates(const Point2i& pt, const Rect& imgRect);
+
+void get16NeibValues(const Point2i& pt, const Mat& img, const Rect& imgRect,
                     vector<int>& neibValues);
 
 // opencv 骨架提取/图像细化

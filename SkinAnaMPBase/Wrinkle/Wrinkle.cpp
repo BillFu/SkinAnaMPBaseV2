@@ -62,21 +62,17 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     PickDLWrkInFrgiMapV2(minWrkTh, longWrkTh, fhFrgiMap8U,
                          quasiDeepWrkConts, quasiLongWrkConts);
     
-    //FindBifuPtOnContGroup(dilBi, deepWrkConts, bifuPtSet);
-    //FindBifuPtOnContGroup(fhFrgiMap8U, longWrkConts, contsKeyPts);
-    
-    //cv::Scalar sumResp = cv::sum(frgiMap8U);
-    //int nonZero2 = cv::countNonZero(DLWrkMaskGS); // Mask中有效面积，即非零元素的数目
-    //float avgFrgiMapV = sumResp[0] / (nonZero2+1);  // 平均响应值，不知道为啥要除以12.8
-    
     //Mat canvas = inImg.clone();
     Mat biMap2(inImg.size(), CV_8UC1, Scalar(0));
     drawContours(biMap2, quasiLongWrkConts, -1, cv::Scalar(255), 1);
-    PruneBurrOnConts(biMap2, quasiLongWrkConts);
+    Mat biMap3(inImg.size(), CV_8UC1, Scalar(0));
+    removeBurrs(biMap2, biMap3);
+
+    //PruneBurrOnConts(biMap2, quasiLongWrkConts);
 
 #ifdef TEST_RUN2
     string cleanLongWrkFile = wrkOutDir + "/cleanLongWrk.png";
-    imwrite(cleanLongWrkFile.c_str(), biMap2);
+    imwrite(cleanLongWrkFile.c_str(), biMap3);
 #endif
 
     //----------------- 第二次使用Gabor滤波，针对细皱纹---------------------
@@ -85,8 +81,6 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     wrkGaborMap = wrkGaborMap & wrkFrgiMask; // !!!
     
 #ifdef TEST_RUN2
-    wrkRegGroup.fhReg
-    
     string gaborMapFile = wrkOutDir + "/gaborMap.png";
     imwrite(gaborMapFile.c_str(), wrkGaborMap);
 #endif

@@ -56,7 +56,7 @@ void PickDLWrkInFrgiMapV2(int minWrkTh, int longWrkTh,
     unsigned long ct_size = thickCts.size();
     for (unsigned int i = 0; i < ct_size; ++i)
     {
-        DelDupPtOnCont(thickCts[i]);
+        //DelDupPtOnCont(thickCts[i]);
 
         if (it_ct->size() >= minWrkTh)
         {
@@ -166,14 +166,31 @@ void FindKeyPtsOnCont(const Mat& biImg, const CONTOUR& ct,
     {
         //cout << "pt: " << pt << endl;
         vector<int> neibValues;
-        get8NeibValues(pt, biImg, imgRect, neibValues);
-        int connDeg = getConnectDegree(neibValues);
-        assert(connDeg != 0);
-        if(connDeg == 3)
-            keyPts.bifuPtSet.push_back(pt);
-        else if(connDeg == 1)
-            keyPts.endPtSet.push_back(pt);
+        get16NeibValues(pt, biImg, imgRect, neibValues);
+        int turnNum = getTurnNum(neibValues);
+        //assert(connDeg != 0);
+        if(turnNum >= 3)
+        {
+            if (find(keyPts.bifuPtSet.begin(), keyPts.bifuPtSet.end(), pt)
+                == keyPts.bifuPtSet.end())
+                keyPts.bifuPtSet.push_back(pt);
+        }
+        else if(turnNum == 1)
+        {
+            if (find(keyPts.endPtSet.begin(), keyPts.endPtSet.end(), pt)
+                == keyPts.endPtSet.end())
+                keyPts.endPtSet.push_back(pt);
+        }
     }
+
+    cout << "pt in keyPts.bifuPtSet " << i << endl;
+
+    for(Point2i pt: keyPts.bifuPtSet)
+    {
+        cout << pt << endl;
+    }
+    
+    cout << "----------------------------" << endl;
 
     if(keyPts.bifuPtSet.size() > keyPts.endPtSet.size())
     {

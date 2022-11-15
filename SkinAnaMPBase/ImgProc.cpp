@@ -590,6 +590,22 @@ int getConnectDegree(const std::vector<int>& neibValues)
     return numNonZeros;
 }
 
+int getTurnNum(const std::vector<int>& neibValues)
+{
+    int numRise = 0;
+    
+    int numPt = neibValues.size();
+    for(int i=0; i<numPt; i++)
+    {
+        int j = (i+1) % numPt;
+        
+        if(neibValues[j] > neibValues[i])
+            numRise++;
+    }
+
+    return numRise;
+}
+
 POINT_SET get8NeibCoordinates(const Point2i& pt, const Rect& imgRect)
 {
     POINT_SET NotFilterPtSet;
@@ -617,6 +633,54 @@ void get8NeibValues(const Point2i& pt, const Mat& img, const Rect& imgRect,
                     vector<int>& neibValues)
 {
     POINT_SET neibPts = get8NeibCoordinates(pt, imgRect);
+    
+    for(Point2i pt: neibPts)
+    {
+        uchar v = img.at<uchar>(pt);
+        int i = static_cast<int>(v);
+        neibValues.push_back(i);
+    }
+}
+
+//-------------------------------------------------------------------------
+POINT_SET get16NeibCoordinates(const Point2i& pt, const Rect& imgRect)
+{
+    POINT_SET NotFilterPtSet;
+
+    NotFilterPtSet.push_back(Point2i(pt.x-2, pt.y-2));
+    NotFilterPtSet.push_back(Point2i(pt.x-1, pt.y-2));
+    NotFilterPtSet.push_back(Point2i(pt.x,   pt.y-2));
+    NotFilterPtSet.push_back(Point2i(pt.x+1, pt.y-2));
+    NotFilterPtSet.push_back(Point2i(pt.x+2, pt.y-2));
+
+    NotFilterPtSet.push_back(Point2i(pt.x+2, pt.y-1));
+    NotFilterPtSet.push_back(Point2i(pt.x+2, pt.y));
+    NotFilterPtSet.push_back(Point2i(pt.x+2, pt.y+1));
+    NotFilterPtSet.push_back(Point2i(pt.x+2, pt.y+2));
+
+    NotFilterPtSet.push_back(Point2i(pt.x+1, pt.y+2));
+    NotFilterPtSet.push_back(Point2i(pt.x,   pt.y+2));
+    NotFilterPtSet.push_back(Point2i(pt.x-1, pt.y+2));
+    NotFilterPtSet.push_back(Point2i(pt.x-2, pt.y+2));
+    
+    NotFilterPtSet.push_back(Point2i(pt.x-2, pt.y+1));
+    NotFilterPtSet.push_back(Point2i(pt.x-2, pt.y));
+    NotFilterPtSet.push_back(Point2i(pt.x-2, pt.y-1));
+
+    POINT_SET FilterPtSet;
+    for(Point pt: NotFilterPtSet)
+    {
+        if(imgRect.contains(pt))
+            FilterPtSet.push_back(pt);
+    }
+    
+    return FilterPtSet;
+}
+
+void get16NeibValues(const Point2i& pt, const Mat& img, const Rect& imgRect,
+                    vector<int>& neibValues)
+{
+    POINT_SET neibPts = get16NeibCoordinates(pt, imgRect);
     
     for(Point2i pt: neibPts)
     {
