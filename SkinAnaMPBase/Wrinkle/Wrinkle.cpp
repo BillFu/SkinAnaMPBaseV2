@@ -85,6 +85,8 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     wrkGaborMap = wrkGaborMap & wrkFrgiMask; // !!!
     
 #ifdef TEST_RUN2
+    wrkRegGroup.fhReg
+    
     string gaborMapFile = wrkOutDir + "/gaborMap.png";
     imwrite(gaborMapFile.c_str(), wrkGaborMap);
 #endif
