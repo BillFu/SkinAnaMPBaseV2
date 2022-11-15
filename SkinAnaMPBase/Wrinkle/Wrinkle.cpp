@@ -47,27 +47,38 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     fhFrgiMap8U = fhFrgiMap8U & fhMaskGS;
     fhMaskGS.release();
     
+#ifdef TEST_RUN2
+    string fhFrgiMapFile = wrkOutDir + "/fhFrgiMap8U.png";
+    imwrite(fhFrgiMapFile.c_str(), fhFrgiMap8U);
+#endif
+    
     CONTOURS longWrkConts;
     int longWrkTh = 0.12 * faceRect.width;  // 大致为2cm
     int minWrkTh = longWrkTh / 2; // 皱纹（包括长、短皱纹）的最短下限，大致为1cm
     cout << "minWrkTh: " << minWrkTh << endl;
-    PickDLWrkInFrgiMapV2(minWrkTh, longWrkTh,
-                         fhFrgiMap8U,
-                     deepWrkConts, longWrkConts);
+    
+    CONTOURS_KEYPTS contsKeyPts;
+    CONTOURS quasiDeepWrkConts, quasiLongWrkConts;
+    PickDLWrkInFrgiMapV2(minWrkTh, longWrkTh, fhFrgiMap8U,
+                         quasiDeepWrkConts, quasiLongWrkConts);
+    
+    //FindBifuPtOnContGroup(dilBi, deepWrkConts, bifuPtSet);
+    //FindBifuPtOnContGroup(fhFrgiMap8U, longWrkConts, contsKeyPts);
     
     //cv::Scalar sumResp = cv::sum(frgiMap8U);
     //int nonZero2 = cv::countNonZero(DLWrkMaskGS); // Mask中有效面积，即非零元素的数目
     //float avgFrgiMapV = sumResp[0] / (nonZero2+1);  // 平均响应值，不知道为啥要除以12.8
     
-#ifdef TEST_RUN2
-    Mat canvas = inImg.clone();
-    drawContours(canvas, deepWrkConts, -1, cv::Scalar(255, 0, 0), 2); 
-    drawContours(canvas, longWrkConts, -1, cv::Scalar(0, 0, 255), 2);
+    //Mat canvas = inImg.clone();
+    Mat biMap2(inImg.size(), CV_8UC1, Scalar(0));
+    drawContours(biMap2, quasiLongWrkConts, -1, cv::Scalar(255), 1);
+    PruneBurrOnConts(biMap2, quasiLongWrkConts);
 
-    string frgiDLWrkFile = wrkOutDir + "/DLWrkFhFrgi.png";
-    imwrite(frgiDLWrkFile.c_str(), canvas);
+#ifdef TEST_RUN2
+    string cleanLongWrkFile = wrkOutDir + "/cleanLongWrk.png";
+    imwrite(cleanLongWrkFile.c_str(), biMap2);
 #endif
-    
+
     //----------------- 第二次使用Gabor滤波，针对细皱纹---------------------
     //WrinkRespMap是由Face_Rect来限定的
     CalcGaborMap(imgGray, wrkRegGroup, wrkGaborMap);

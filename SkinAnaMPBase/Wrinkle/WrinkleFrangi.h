@@ -26,8 +26,26 @@ using namespace std;
 extern string wrk_out_dir;
 #endif
 
+
+struct KeyPtsOnCont
+{
+    POINT_SET bifuPtSet;
+    POINT_SET endPtSet;
+};
+
+
+
+typedef vector<KeyPtsOnCont>  CONTOURS_KEYPTS;
+
 void PreprocGrImg(const Mat& grSrcImg, Mat& outImg);
 
+struct dist_less_than
+{
+    inline bool operator() (const TwoPtsPose& p1, const TwoPtsPose& p2)
+    {
+        return (p1.dist < p2.dist);
+    }
+};
 //-----------------------------------------------------------------------------
 
 // Cc: calculate
@@ -54,8 +72,32 @@ void ApplyFrgiFilter(const Mat& grSrcImg,
 //-----------------------------------------------------------------------------
 // 从frangi滤波的结果（经过了二值化、细化、反模糊化等处理）中，提取深皱纹、长皱纹
 // DL: deep and long
+/*
 void PickDLWrkInFrgiMapV2(int minWrkTh, int longWrkTh,
                       Mat& frgiResp8U,
                       CONTOURS& deepWrkConts,
                       CONTOURS& longWrkConts);
+*/
+void PickDLWrkInFrgiMapV2(int minWrkTh, int longWrkTh,
+                          Mat& frgiMap8U,
+                          CONTOURS& deepWrkConts,
+                          CONTOURS& longWrkConts);
+
+
+void FindBifuPtOnContGroup(const Mat& biImg, const CONTOURS& conts,
+                            CONTOURS_KEYPTS&  contsKeyPts);
+
+void FindKeyPtsOnCont(const Mat& biImg, const CONTOUR& ct, KeyPtsOnCont& keyPts,
+                      int i);
+
+void PruneBurrOnConts(Mat& biMap, const CONTOURS& conts);
+
+void PruneBurrOnCont(Mat& biMap, KeyPtsOnCont& keyPts);
+void PruneOneBurrOnCont(Mat& biMap, const Point2i& bifuPt, const Point2i& endPt);
+
+Point2i ChooseEndPtOnBranch(const Point2i& bifuPt, const POINT_SET& endPts,
+                            float refOrient1, float refOrient2);
+
+POINT_SET EraseEndPtOnCont(const POINT_SET& endPts, const Point2i& endPt);
+
 #endif /* WRINKLE_FRANGI_H */

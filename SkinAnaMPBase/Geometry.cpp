@@ -214,12 +214,30 @@ void InflateRect(int inflateSize, Rect& rect)
 }
 
 //-------------------------------------------------------------------------------------------
+bool isInOrientRange(float testOrient, float refOrient, float dev_orient)
+{
+    if(((refOrient - dev_orient) < testOrient) && (testOrient < (refOrient + dev_orient)))
+        return true;
+    else
+        return false;
+}
 
 float DisBetw2Pts(const Point& pt1, const Point& pt2)
 {
     Point dPt = pt1 - pt2;
     float dis = sqrt(dPt.x * dPt.x + dPt.y * dPt.y);
     return dis;
+}
+
+void CalcTwoPtsPose(const Point& pt1, const Point& pt2, TwoPtsPose& pose)
+{
+    Point dPt = pt2 - pt1;
+    pose.p1 = pt1;
+    pose.p2 = pt2;
+    pose.dist = sqrt(dPt.x * dPt.x + dPt.y * dPt.y);
+    pose.angle = -atan2(dPt.y, dPt.x); // a minute sign added
+    
+    pose.angle += M_PI;  // adjust the value range
 }
 
 float LenOfVector(const Point& vect)

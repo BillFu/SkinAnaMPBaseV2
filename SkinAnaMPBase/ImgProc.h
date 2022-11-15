@@ -19,6 +19,8 @@ Date:   2022/11/1
 
 using namespace cv;
 
+#include "Common.hpp"
+
 // functions moved here from Old version of MC_SkinAnalyze(.h&.mm)
 void connectEdge(cv::Mat& src);
 
@@ -56,9 +58,22 @@ Mat CvtFtImgTo8U_MinMax(Mat& ftImg);
 // positive values will be scaled
 Mat CvtFtImgTo8U_NoNega(Mat& ftImg);
 
-
 void ApplyCLAHE(const Mat& inImg,
                 int gridSize,
                 Mat& outImg);
+
+// 返回8邻域不为0的像素的数目
+int getConnectDegree(const std::vector<int>& neibValues);
+
+POINT_SET get8NeibCoordinates(const Point2i& pt, const Rect& imgRect);
+
+void get8NeibValues(const Point2i& pt, const Mat& img, const Rect& imgRect,
+                    vector<int>& neibValues);
+
+// opencv 骨架提取/图像细化
+// csdn: 徐大大平凡之路
+void chao_thinimage(Mat &srcimage); //单通道、二值化后的图像
+
+void DelDupPtOnCont(CONTOUR& aWrk);
 
 #endif /* IMG_PROC_H */

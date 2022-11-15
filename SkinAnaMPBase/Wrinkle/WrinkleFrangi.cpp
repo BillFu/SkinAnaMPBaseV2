@@ -1,8 +1,10 @@
 #include <algorithm>
 
-#include "WrinkleFrangi.h"
 #include "../ImgProc.h"
 #include "../Utils.hpp"
+#include "../Geometry.hpp"
+
+#include "WrinkleFrangi.h"
 #include "frangi.h"
 
 void PreprocGrImg(const Mat& grSrcImg,
@@ -29,47 +31,23 @@ void PreprocGrImg(const Mat& grSrcImg,
 // -------------------------------------------------------------------------
 // 从Frangi滤波响应中提取深皱纹和长皱纹
 void PickDLWrkInFrgiMapV2(int minWrkTh, int longWrkTh,
-                      Mat& frgiMap8U,
-                      CONTOURS& deepWrkConts,
-                      CONTOURS& longWrkConts)
+                          Mat& frgiMap8U,
+                          CONTOURS& deepWrkConts,
+                          CONTOURS& longWrkConts)
 {
     // DL: deep and long
     cv::Mat WrkBi(frgiMap8U.size(), CV_8UC1, cv::Scalar(0));
-    
     threshold(frgiMap8U, WrkBi, 40, 255, THRESH_BINARY);
-
-    Mat thinBi = 255 - WrkBi;
-    WrkBi.release();
-    
-    // 给二值图像中的粗黑线“瘦身”
-    BlackLineThinInBiImg(thinBi.data,
-                         frgiMap8U.cols, frgiMap8U.rows);
+    chao_thinimage(WrkBi);
     
 #ifdef TEST_RUN2
     string frgiThinFile = wrkOutDir + "/FrgiThin.png";
-    imwrite(frgiThinFile.c_str(), thinBi);
-#endif
-    
-    thinBi = 255 - thinBi;
-    //removeBurrs(thinBi, thinBi);
-    
-#ifdef TEST_RUN2
-    //string remBurFile = wrkOutDir + "/remBur.png";
-    //imwrite(remBurFile.c_str(), thinBi);
+    imwrite(frgiThinFile.c_str(), WrkBi);
 #endif
     
     Mat elmt = getStructuringElement(MORPH_ELLIPSE, Size(15, 1));
-    Mat dilBi, EroBi;
-    dilate(thinBi, dilBi, elmt, Point2i(-1,-1), 1);
-    
-    //Mat elmt2 = getStructuringElement(MORPH_ELLIPSE, Size(1, 5));
-    //erode(dilBi, EroBi, elmt2, Point2i(-1,-1), 1);
-    //dilBi.release();
-    
-#ifdef TEST_RUN2
-    //string frgiFinalRespFile = wrkOutDir + "/EroBi.png";
-    //imwrite(frgiFinalRespFile.c_str(), EroBi);
-#endif
+    Mat dilBi;
+    dilate(WrkBi, dilBi, elmt, Point2i(-1,-1), 1);
     
     CONTOURS thickCts;
     findContours(dilBi, thickCts, RETR_EXTERNAL, CHAIN_APPROX_NONE);
@@ -78,6 +56,8 @@ void PickDLWrkInFrgiMapV2(int minWrkTh, int longWrkTh,
     unsigned long ct_size = thickCts.size();
     for (unsigned int i = 0; i < ct_size; ++i)
     {
+        DelDupPtOnCont(thickCts[i]);
+
         if (it_ct->size() >= minWrkTh)
         {
             deepWrkConts.push_back(thickCts[i]);
@@ -108,35 +88,6 @@ void CcFrgiMap(const Mat& imgGray, int scaleRatio, Mat& frgiMap8U)
     //把响应强度图又扩大到原始影像的尺度上来，但限定在Face Rect内。
     resize(frgiMapRz8U, frgiMap8U, imgGray.size());
 }
-
-/*
-void CcFrgiMapInFR(const Mat& imgGray,
-                    const Rect& faceRect,
-                    int scaleRatio,
-                    Mat& frgiMap8U)
-{
-    Mat ehGrImg; // eh: enhanced
-    PreprocGrImg(imgGray, ehGrImg);
-    
-    Mat ehGrImgFR = ehGrImg(faceRect);
-    
-    Mat frgiMapFRRz8U;
-    ApplyFrgiFilter(ehGrImgFR, scaleRatio, frgiMapFRRz8U);
-    
-#ifdef TEST_RUN2
-    string frgiRespImgFile =  wrkOutDir + "/frgiFR.png";
-    imwrite(frgiRespImgFile, frgiMapFRRz8U);
-#endif
-    
-    //把响应强度图又扩大到原始影像的尺度上来，但限定在Face Rect内。
-    Mat frgiMapSSInFR8U;
-    resize(frgiMapFRRz8U, frgiMapSSInFR8U, faceRect.size());
-    Mat frgiMapGS(imgGray.size(), CV_8UC1, Scalar(0));
-    
-    frgiMapSSInFR8U.copyTo(frgiMapGS(faceRect));
-    frgiMap8U = frgiMapGS;
-}
-*/
 
 Mat CcFrgiMapInRect(const Mat& imgGray,
                     const Rect& rect,
@@ -190,4 +141,144 @@ void ApplyFrgiFilter(const Mat& inGrImg,
     respAngRz.release();
         
     frgiRespRzU8 = CvtFtImgTo8U_MinMax(frgiRespRz);
+}
+
+/*
+// bifurcation point: 分叉点
+void FindBifuPtOnContGroup(const Mat& biImg, const CONTOURS& conts,
+                           CONTOURS_KEYPTS&  contsKeyPts)
+{
+    for(CONTOUR ct: conts)
+    {
+        KeyPtsOnCont keyPts;
+        FindKeyPtsOnCont(biImg, ct, keyPts);
+        contsKeyPts.push_back(keyPts);
+    }
+}
+*/
+
+// bifurcation point: 分叉点
+void FindKeyPtsOnCont(const Mat& biImg, const CONTOUR& ct,
+                      KeyPtsOnCont& keyPts, int i)
+{
+    Rect imgRect(0, 0, biImg.cols, biImg.rows);
+    for(Point2i pt: ct)
+    {
+        //cout << "pt: " << pt << endl;
+        vector<int> neibValues;
+        get8NeibValues(pt, biImg, imgRect, neibValues);
+        int connDeg = getConnectDegree(neibValues);
+        assert(connDeg != 0);
+        if(connDeg == 3)
+            keyPts.bifuPtSet.push_back(pt);
+        else if(connDeg == 1)
+            keyPts.endPtSet.push_back(pt);
+    }
+
+    if(keyPts.bifuPtSet.size() > keyPts.endPtSet.size())
+    {
+        cout << "index: " << i << endl;
+        cout << "error ********" << endl;
+        cout << "bifuPtSet.size: " << keyPts.bifuPtSet.size() << endl;
+        cout << "endPtSet.size: " << keyPts.endPtSet.size() << endl;
+    }
+}
+
+void PruneBurrOnConts(Mat& biMap, const CONTOURS& conts)
+{
+    int i = 0;
+    for(CONTOUR ct: conts)
+    {
+        KeyPtsOnCont keyPts;
+        FindKeyPtsOnCont(biMap, ct, keyPts, i);
+        PruneBurrOnCont(biMap, keyPts);
+        i++;
+    }
+}
+
+void PruneBurrOnCont(Mat& biMap, KeyPtsOnCont& keyPts)
+{
+    // for each bifurcation point, choose one end-point to prune
+    // this branch connecting those two points
+    for(Point2i bifuPt: keyPts.bifuPtSet)
+    {
+        Point2i endPt = ChooseEndPtOnBranch(bifuPt, keyPts.endPtSet,
+                                            M_PI*0.5, M_PI*1.5);
+        PruneOneBurrOnCont(biMap, bifuPt, endPt);
+        
+        POINT_SET clearEndPts = EraseEndPtOnCont(keyPts.endPtSet, endPt);
+        keyPts.endPtSet.clear();
+        keyPts.endPtSet = clearEndPts;
+    }
+}
+
+POINT_SET EraseEndPtOnCont(const POINT_SET& endPts, const Point2i& delEndPt)
+{
+    POINT_SET clearEndPts;
+    
+    for(Point2i pt: endPts)
+    {
+        if(pt != delEndPt)
+            clearEndPts.push_back(pt);
+    }
+        
+    return clearEndPts;
+}
+
+// orient1 < orient2
+Point2i ChooseEndPtOnBranch(const Point2i& bifuPt,
+                            const POINT_SET& endPts,
+                            float refOrient1,
+                            float refOrient2)
+{
+    vector<TwoPtsPose> poseSet;
+    for(Point2i endPt: endPts)
+    {
+        TwoPtsPose pose;
+        CalcTwoPtsPose(bifuPt, endPt, pose);
+        poseSet.push_back(pose);
+    }
+    
+    std::sort(poseSet.begin(), poseSet.end(), dist_less_than());
+    cout << "-------------------------" << endl;
+    for(TwoPtsPose pose: poseSet)
+    {
+        cout << "dist: " << pose.dist << endl;
+        cout << "angle: " << pose.angle << endl;
+    }
+    cout << "-------------------------" << endl;
+
+    float dev_orient = M_PI / 4.0;
+    for(TwoPtsPose pose: poseSet)
+    {
+        if(isInOrientRange(pose.angle,  refOrient1, dev_orient))
+            return pose.p2;
+        
+        if(isInOrientRange(pose.angle,  refOrient2, dev_orient))
+            return pose.p2;
+    }
+    
+    return poseSet[0].p2;
+}
+
+void PruneOneBurrOnCont(Mat& biMap, const Point2i& bifuPt, const Point2i& endPt)
+{
+    // starting from endPt, moving torward bifuPt, and erase the intermidate points on contour
+    Point2i curPt = endPt;
+    
+    Rect bbox(0, 0, biMap.cols, biMap.rows);
+    while(curPt != bifuPt)
+    {
+        POINT_SET neibPts = get8NeibCoordinates(curPt, bbox);
+        Point2i nextPt(-1, -1);
+        for(Point2i pt: neibPts)
+            if(biMap.at<uchar>(pt) > 0)
+            {
+                nextPt = pt;
+                break;
+            }
+        
+        biMap.at<uchar>(curPt) = 0; // erase the current point
+        curPt = nextPt;
+    }
 }

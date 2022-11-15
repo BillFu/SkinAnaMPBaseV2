@@ -576,3 +576,200 @@ void ApplyCLAHE(const Mat& inImg,
     clahe->setTilesGridSize(cv::Size(gridSize, gridSize));
     clahe->apply(inImg, outImg);
 }
+
+// 返回8邻域不为0的像素的数目
+int getConnectDegree(const std::vector<int>& neibValues)
+{
+    int numNonZeros = 0;
+    
+    for(int v : neibValues)
+    {
+        if(v != 0)
+            numNonZeros++;
+    }
+    return numNonZeros;
+}
+
+POINT_SET get8NeibCoordinates(const Point2i& pt, const Rect& imgRect)
+{
+    POINT_SET NotFilterPtSet;
+    
+    NotFilterPtSet.push_back(Point2i(pt.x-1, pt.y-1));
+    NotFilterPtSet.push_back(Point2i(pt.x,   pt.y-1));
+    NotFilterPtSet.push_back(Point2i(pt.x+1, pt.y-1));
+    NotFilterPtSet.push_back(Point2i(pt.x-1, pt.y));
+    NotFilterPtSet.push_back(Point2i(pt.x+1, pt.y));
+    NotFilterPtSet.push_back(Point2i(pt.x-1, pt.y+1));
+    NotFilterPtSet.push_back(Point2i(pt.x,   pt.y+1));
+    NotFilterPtSet.push_back(Point2i(pt.x+1, pt.y+1));
+    
+    POINT_SET FilterPtSet;
+    for(Point pt: NotFilterPtSet)
+    {
+        if(imgRect.contains(pt))
+            FilterPtSet.push_back(pt);
+    }
+    
+    return FilterPtSet;
+}
+
+void get8NeibValues(const Point2i& pt, const Mat& img, const Rect& imgRect,
+                    vector<int>& neibValues)
+{
+    POINT_SET neibPts = get8NeibCoordinates(pt, imgRect);
+    
+    for(Point2i pt: neibPts)
+    {
+        uchar v = img.at<uchar>(pt);
+        int i = static_cast<int>(v);
+        neibValues.push_back(i);
+    }
+}
+
+// opencv 骨架提取/图像细化
+// csdn: 徐大大平凡之路
+void chao_thinimage(Mat &srcimage)//单通道、二值化后的图像
+{
+    vector<Point> deletelist1;
+    int Zhangmude[9];
+    int nl = srcimage.rows;
+    int nc = srcimage.cols;
+    while (true)
+    {
+        for (int j = 1; j<(nl - 1); j++)
+        {
+            uchar* data_last = srcimage.ptr<uchar>(j - 1);
+            uchar* data = srcimage.ptr<uchar>(j);
+            uchar* data_next = srcimage.ptr<uchar>(j + 1);
+            for (int i = 1; i<(nc - 1); i++)
+            {
+                if (data[i] == 255)
+                {
+                    Zhangmude[0] = 1;
+                    if (data_last[i] == 255) Zhangmude[1] = 1;
+                    else  Zhangmude[1] = 0;
+                    if (data_last[i + 1] == 255) Zhangmude[2] = 1;
+                    else  Zhangmude[2] = 0;
+                    if (data[i + 1] == 255) Zhangmude[3] = 1;
+                    else  Zhangmude[3] = 0;
+                    if (data_next[i + 1] == 255) Zhangmude[4] = 1;
+                    else  Zhangmude[4] = 0;
+                    if (data_next[i] == 255) Zhangmude[5] = 1;
+                    else  Zhangmude[5] = 0;
+                    if (data_next[i - 1] == 255) Zhangmude[6] = 1;
+                    else  Zhangmude[6] = 0;
+                    if (data[i - 1] == 255) Zhangmude[7] = 1;
+                    else  Zhangmude[7] = 0;
+                    if (data_last[i - 1] == 255) Zhangmude[8] = 1;
+                    else  Zhangmude[8] = 0;
+                    int whitepointtotal = 0;
+                    for (int k = 1; k < 9; k++)
+                    {
+                        whitepointtotal = whitepointtotal + Zhangmude[k];
+                    }
+                    if ((whitepointtotal >= 2) && (whitepointtotal <= 6))
+                    {
+                        int ap = 0;
+                        if ((Zhangmude[1] == 0) && (Zhangmude[2] == 1)) ap++;
+                        if ((Zhangmude[2] == 0) && (Zhangmude[3] == 1)) ap++;
+                        if ((Zhangmude[3] == 0) && (Zhangmude[4] == 1)) ap++;
+                        if ((Zhangmude[4] == 0) && (Zhangmude[5] == 1)) ap++;
+                        if ((Zhangmude[5] == 0) && (Zhangmude[6] == 1)) ap++;
+                        if ((Zhangmude[6] == 0) && (Zhangmude[7] == 1)) ap++;
+                        if ((Zhangmude[7] == 0) && (Zhangmude[8] == 1)) ap++;
+                        if ((Zhangmude[8] == 0) && (Zhangmude[1] == 1)) ap++;
+                        if (ap == 1)
+                        {
+                            if ((Zhangmude[1] * Zhangmude[7] * Zhangmude[5] == 0) && (Zhangmude[3] * Zhangmude[5] * Zhangmude[7] == 0))
+                            {
+                                deletelist1.push_back(Point(i, j));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (deletelist1.size() == 0) break;
+        for (size_t i = 0; i < deletelist1.size(); i++)
+        {
+            Point tem;
+            tem = deletelist1[i];
+            uchar* data = srcimage.ptr<uchar>(tem.y);
+            data[tem.x] = 0;
+        }
+        deletelist1.clear();
+        
+        for (int j = 1; j<(nl - 1); j++)
+        {
+            uchar* data_last = srcimage.ptr<uchar>(j - 1);
+            uchar* data = srcimage.ptr<uchar>(j);
+            uchar* data_next = srcimage.ptr<uchar>(j + 1);
+            for (int i = 1; i<(nc - 1); i++)
+            {
+                if (data[i] == 255)
+                {
+                    Zhangmude[0] = 1;
+                    if (data_last[i] == 255) Zhangmude[1] = 1;
+                    else  Zhangmude[1] = 0;
+                    if (data_last[i + 1] == 255) Zhangmude[2] = 1;
+                    else  Zhangmude[2] = 0;
+                    if (data[i + 1] == 255) Zhangmude[3] = 1;
+                    else  Zhangmude[3] = 0;
+                    if (data_next[i + 1] == 255) Zhangmude[4] = 1;
+                    else  Zhangmude[4] = 0;
+                    if (data_next[i] == 255) Zhangmude[5] = 1;
+                    else  Zhangmude[5] = 0;
+                    if (data_next[i - 1] == 255) Zhangmude[6] = 1;
+                    else  Zhangmude[6] = 0;
+                    if (data[i - 1] == 255) Zhangmude[7] = 1;
+                    else  Zhangmude[7] = 0;
+                    if (data_last[i - 1] == 255) Zhangmude[8] = 1;
+                    else  Zhangmude[8] = 0;
+                    int whitepointtotal = 0;
+                    for (int k = 1; k < 9; k++)
+                    {
+                        whitepointtotal = whitepointtotal + Zhangmude[k];
+                    }
+                    if ((whitepointtotal >= 2) && (whitepointtotal <= 6))
+                    {
+                        int ap = 0;
+                        if ((Zhangmude[1] == 0) && (Zhangmude[2] == 1)) ap++;
+                        if ((Zhangmude[2] == 0) && (Zhangmude[3] == 1)) ap++;
+                        if ((Zhangmude[3] == 0) && (Zhangmude[4] == 1)) ap++;
+                        if ((Zhangmude[4] == 0) && (Zhangmude[5] == 1)) ap++;
+                        if ((Zhangmude[5] == 0) && (Zhangmude[6] == 1)) ap++;
+                        if ((Zhangmude[6] == 0) && (Zhangmude[7] == 1)) ap++;
+                        if ((Zhangmude[7] == 0) && (Zhangmude[8] == 1)) ap++;
+                        if ((Zhangmude[8] == 0) && (Zhangmude[1] == 1)) ap++;
+                        if (ap == 1)
+                        {
+                            if ((Zhangmude[1] * Zhangmude[3] * Zhangmude[5] == 0) && (Zhangmude[3] * Zhangmude[1] * Zhangmude[7] == 0))
+                            {
+                                deletelist1.push_back(Point(i, j));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (deletelist1.size() == 0) break;
+        for (size_t i = 0; i < deletelist1.size(); i++)
+        {
+            Point tem;
+            tem = deletelist1[i];
+            uchar* data = srcimage.ptr<uchar>(tem.y);
+            data[tem.x] = 0;
+        }
+        deletelist1.clear();
+    }
+}
+
+void DelDupPtOnCont(CONTOUR& aWrk)
+{
+    sort( aWrk.begin(), aWrk.end(),
+         [](const cv::Point2i &a, const cv::Point2i &b)
+                   {
+                       return a.x < b.x; //or whatever you like
+                   });
+    aWrk.erase( unique( aWrk.begin(), aWrk.end() ), aWrk.end() );
+}

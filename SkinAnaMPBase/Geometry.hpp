@@ -94,6 +94,9 @@ void InflateRect(int inflateSize, Rect& rect);
 float DisBetw2Pts(const Point& pt1, const Point& pt2);
 float LenOfVector(const Point& vect);
 
+void CalcTwoPtsPose(const Point& pt1, const Point& pt2, TwoPtsPose& pose);
+bool isInOrientRange(float testOrient, float refOrient, float dev_orient);
+
 //-------------------------------------------------------------------------------------------
 float AvgPointDist(const CONTOUR& cont);
 

@@ -37,6 +37,7 @@ typedef unique_ptr<tflite::Interpreter> INTERPRETER;
 typedef unique_ptr<FlatBufferModel> TF_LITE_MODEL;
 
 typedef vector<Point2i> SPLINE;
+typedef vector<Point2i> POINT_SET;
 typedef vector<Point2i> POLYGON;
 typedef vector<POLYGON> POLYGON_GROUP;
 
@@ -45,6 +46,14 @@ typedef vector<CONTOUR> CONTOURS;
 
 #define SEG_NET_INPUT_SIZE   512
 #define SEG_NET_OUTPUT_SIZE  512
+
+struct TwoPtsPose
+{
+    Point2i p1;  // act as the original point
+    Point2i p2;
+    float dist;
+    float angle; // in radian
+};
 
 enum EyeID
 {
