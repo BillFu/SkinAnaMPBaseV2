@@ -64,6 +64,13 @@ void transCt_GlobalSegNOS2SS(const CONTOUR& nosGlobalCt,
 void transCt_SMS2NOS(const CONTOUR& smsCt, const Point& nosBBoxTLPt,
                     CONTOUR& nosCt);
 
+// LSS: local space with source scale
+// GS: global Space
+void transCt_LSS2GS(const CONTOUR& lssCt, const Point& tlPt,
+                    CONTOUR& gsCt);
+
+void transCts_LSS2GS(const CONTOURS& lssCts, const Point& tlPt,
+                    CONTOURS& gsCts);
 /**********************************************************************************************
 Ip: interpolate
 GLm: general landmark

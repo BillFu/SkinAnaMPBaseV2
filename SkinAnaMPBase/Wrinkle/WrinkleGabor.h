@@ -78,4 +78,10 @@ void ExtDeepWrk(const Mat& wrkGaborRespMap,
 
 Mat drawFhWrk(const Mat& canvas, const CONTOURS& LightWrkConts);
 
+void ExtWrkFromFhGabMap(const Mat& wrkGaborRespMap,
+                        int minLenOfWrk,
+                        int longWrkThresh,
+                        CONTOURS& DeepWrkConts,
+                        CONTOURS& LongWrkConts);
+
 #endif /* WRINKLE_GABOR_H */

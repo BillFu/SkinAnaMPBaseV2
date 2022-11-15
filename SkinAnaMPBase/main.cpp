@@ -14,7 +14,7 @@
 #include "Utils.hpp"
 
 #include "FaceBgSeg/FaceBgSegV2.hpp"
-#include "Wrinkle/Wrinkle.hpp"
+#include "Wrinkle/WrinkleV2.hpp"
 
 #include "Common.hpp"
 

@@ -403,3 +403,43 @@ Mat drawFhWrk(const Mat& canvas, const CONTOURS& LightWrkConts)
     
     return resImg;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////
+void ExtWrkFromFhGabMap(const Mat& wrkGaborRespMap,
+                    int minLenOfWrk,
+                    int longWrkThresh,
+                    CONTOURS& DeepWrkConts,
+                    CONTOURS& LongWrkConts)
+{
+    cv::Mat binaryDeep;
+    // 11作为Deep Wrinkle的阈值
+    // 4作为Light Wrinkle的阈值
+    int dpWrkGaborRespTh = 50;
+    cv::threshold(wrkGaborRespMap, binaryDeep, dpWrkGaborRespTh, 255, THRESH_BINARY);
+    
+    binaryDeep = 255 - binaryDeep;
+    BlackLineThinInBiImg(binaryDeep.data, binaryDeep.cols, binaryDeep.rows);
+    binaryDeep = 255 - binaryDeep;
+    removeBurrs(binaryDeep, binaryDeep);
+    //binaryDeep = binaryDeep & wrkMaskInFR;
+    
+    CONTOURS contours;
+    cv::findContours(binaryDeep, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
+    
+    std::sort(contours.begin(), contours.end(),
+        [](const CONTOUR& a, const CONTOUR& b){return a.size() > b.size();});
+    
+    cout << "Max Size of contour in ExtDeepWrk(): " << contours[0].size() << endl;
+    
+    for (CONTOUR cont: contours)
+    {
+        if (cont.size() >= minLenOfWrk ) // && it_c->size() <= sizeMax )
+        {
+            DeepWrkConts.push_back(cont);
+        }
+        if (cont.size() >= longWrkThresh ) // && it_c->size() <= sizeMax )
+        {
+            LongWrkConts.push_back(cont);
+        }
+    }
+}

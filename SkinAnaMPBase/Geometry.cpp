@@ -158,6 +158,29 @@ void transCt_SMS2NOS(const CONTOUR& smsCt, const Point& nosBBoxTLPt,
     }
 }
 
+// LSS: local space with source scale
+// GS: global Space
+void transCt_LSS2GS(const CONTOUR& lssCt, const Point& tlPt,
+                    CONTOUR& gsCt)
+{
+    for(Point pt: lssCt)
+    {
+        Point gsPt = pt + tlPt;
+        gsCt.push_back(gsPt);
+    }
+}
+
+void transCts_LSS2GS(const CONTOURS& lssCts, const Point& tlPt,
+                    CONTOURS& gsCts)
+{
+    for(CONTOUR lssCt: lssCts)
+    {
+        CONTOUR gsCt;
+        transCt_LSS2GS(lssCt, tlPt, gsCt);
+        gsCts.push_back(gsCt);
+    }
+}
+
 //-------------------------------------------------------------------------------------------
 // 如果smallRect完全能被bigRect容纳，返回true
 bool RectContainsRect(const Rect& bigRect, const Rect& smallRect)
