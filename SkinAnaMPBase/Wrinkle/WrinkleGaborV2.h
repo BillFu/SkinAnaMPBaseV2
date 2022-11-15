@@ -34,9 +34,10 @@ void ApplyGaborBank(const GaborOptBank& gBank, const Mat& inGrFtImg,
 //WrinkRespMap的大小和在原始影像坐标系中的位置由Face_Rect限定
 void CalcGaborMap(const Mat& grSrcImg,
                   WrkRegGroup& wrkRegGroup,
-                  Mat& WrinkRespMap,
                   Mat& fhGabMap8U,
-                  Mat& glabGabMap8U);
+                  Mat& glabGabMap8U,
+                  Mat& lEbGabMap8U,
+                  Mat& rEbGabMap8U);
 
 void BuildGabOptsForEb(int kerSize, int sigma, bool isLeftEye, GaborOptBank& gOptBank);
 Mat CcGaborMapInOneEyebag(const Mat& grFtSrcImg, int kerSize, int sigma,
@@ -82,16 +83,23 @@ Mat drawFhWrk(const Mat& canvas, const CONTOURS& LightWrkConts);
 
 void ExtWrkFromFhGabMap(const Rect& fhRect,
                         const Mat& fhGabMap8U,
-                        int minLenOfWrk,
+                        int minWrkTh,
                         int longWrkThresh,
                         CONTOURS& DeepWrkConts,
                         CONTOURS& LongWrkConts);
 
 void ExtWrkFromGlabGabMap(const Rect& glabRect,
                         const Mat& glabGabMap8U,
-                        int minLenOfWrk,
+                        int minWrkTh,
                         int longWrkThresh,
                         CONTOURS& DeepWrkConts,
                         CONTOURS& LongWrkConts);
 
+
+void ExtWrkFromEgGabMap(const DetectRegion& ebReg,
+                        const Mat& ebGabMap8U,
+                        int minWrkTh,
+                        int longWrkThresh,
+                        CONTOURS& lightWrkConts,
+                        CONTOURS& wrkConts);
 #endif /* WRINKLE_GABOR_V2_H */

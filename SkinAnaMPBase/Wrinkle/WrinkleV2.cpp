@@ -22,27 +22,20 @@ Date:   2022/11/15
 
 // wrkGaborRespMap: 输出，记录Gabor滤波的结果，大小和位置由Face_Rect来限定
 void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
-                   const Mat& wrkFrgiMask,
                    WrkRegGroup& wrkRegGroup,
                    CONTOURS& deepWrkConts,
                    CONTOURS& lightWrkConts,
                    int& numLongWrk, int& numShortWrk,
-                   int& numDeepWrk, int& numLightWrk,
-                   Mat& wrkGaborMap)
+                   int& numDeepWrk, int& numLightWrk)
 {
     cv::Mat imgGray;
     cvtColor(inImg, imgGray, COLOR_BGR2GRAY);
 
     //WrinkRespMap是由Face_Rect来限定的
-    Mat fhGabMap8U, glabGabMap8U;
-    CalcGaborMap(imgGray, wrkRegGroup, wrkGaborMap,
-                 fhGabMap8U, glabGabMap8U);
-    wrkGaborMap = wrkGaborMap & wrkFrgiMask; // !!!
-    
-#ifdef TEST_RUN2
-    string gaborMapFile = wrkOutDir + "/gaborMap.png";
-    imwrite(gaborMapFile.c_str(), wrkGaborMap);
-#endif
+    Mat fhGabMap8U, glabGabMap8U, lEbGabMap8U, rEbGabMap8U;
+    CalcGaborMap(imgGray, wrkRegGroup,
+                 fhGabMap8U, glabGabMap8U,
+                 lEbGabMap8U,rEbGabMap8U);
     
     int totalWrkLen = 0;
     
@@ -57,6 +50,14 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     ExtWrkFromGlabGabMap(wrkRegGroup.glabReg.bbox,
                          glabGabMap8U, minWrkTh,longWrkTh,
                          deepWrkConts, longWrkConts);
+
+    ExtWrkFromEgGabMap(wrkRegGroup.lEyeBagReg, lEbGabMap8U,
+                       minWrkTh/2, longWrkTh/2,
+                       lightWrkConts, longWrkConts);
+    
+    ExtWrkFromEgGabMap(wrkRegGroup.rEyeBagReg, rEbGabMap8U,
+                       minWrkTh/2, longWrkTh/2,
+                       lightWrkConts, longWrkConts);
 
     /*
     numLongWrk = (int)(longWrkConts.size());

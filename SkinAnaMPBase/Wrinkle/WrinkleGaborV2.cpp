@@ -325,9 +325,10 @@ void ExtDeepWrk(const Mat& wrkGaborRespMap,
 // WrinkRespMap的大小和在原始影像坐标系中的位置由Face_Rect限定
 void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
                   WrkRegGroup& wrkRegGroup,
-                  Mat& gaborMap,
                   Mat& fhGabMap8U,
-                  Mat& glabGabMap8U)
+                  Mat& glabGabMap8U,
+                  Mat& lEbGabMap8U,
+                  Mat& rEbGabMap8U)
 {
     Mat grFtSrcImg;
     grSrcImg.convertTo(grFtSrcImg, CV_32F, 1.0/255, 0);
@@ -338,9 +339,9 @@ void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
     int sigma = int(8.8 * grSrcImg.cols / 2448.0 + 0.5);
     
     //Eb: eyebag
-    Mat lEbGabMap8U = CcGabMapInOneEyebag(grFtSrcImg, kerSize, sigma,
+    lEbGabMap8U = CcGabMapInOneEyebag(grFtSrcImg, kerSize, sigma,
                                           true, wrkRegGroup.lEyeBagReg.bbox);
-    Mat rEbGabMap8U = CcGabMapInOneEyebag(grFtSrcImg, kerSize, sigma,
+    rEbGabMap8U = CcGabMapInOneEyebag(grFtSrcImg, kerSize, sigma,
                                           false, wrkRegGroup.rEyeBagReg.bbox);
 
     // 前额
@@ -362,7 +363,7 @@ void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
     bool isSuccess;
     isSuccess = SaveTestOutImgInDir(lEbGabMap8U,  wrkOutDir,  "lEbGabMap.png");
     isSuccess = SaveTestOutImgInDir(rEbGabMap8U,  wrkOutDir,  "rEbGabMap.png");
-    isSuccess = SaveTestOutImgInDir(fhGabMap8U,  wrkOutDir,  "FhGabMap.png");
+    isSuccess = SaveTestOutImgInDir(fhGabMap8U,  wrkOutDir,   "FhGabMap.png");
     isSuccess = SaveTestOutImgInDir(glabGabMap8U,  wrkOutDir,  "glabGabMap.png");
 
     isSuccess = SaveTestOutImgInDir(lCFGabMap8U,  wrkOutDir,   "lCFGabMap.png");
@@ -370,34 +371,7 @@ void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
 
     isSuccess = SaveTestOutImgInDir(lChkGabMap8U, wrkOutDir,  "lChkGabMap.png");
     isSuccess = SaveTestOutImgInDir(rChkGabMap8U, wrkOutDir,  "rChkGabMap.png");
-    
 #endif
-    
-    // --------把各个小区域的计算结果合并起来，存贮在WrkRespMap------------------------------------
-    gaborMap = Mat(grSrcImg.size(), CV_8UC1, Scalar(0));
-
-    lEbGabMap8U.copyTo(gaborMap(wrkRegGroup.lEyeBagReg.bbox));
-    rEbGabMap8U.copyTo(gaborMap(wrkRegGroup.rEyeBagReg.bbox));
-    lCFGabMap8U.copyTo(gaborMap(wrkRegGroup.lCrowFeetReg.bbox));
-    rCFGabMap8U.copyTo(gaborMap(wrkRegGroup.rCrowFeetReg.bbox));
-    //lChkGabMap8U.copyTo(gaborMap(wrkRegGroup.lCheekReg.bbox));
-    //rChkGabMap8U.copyTo(gaborMap(wrkRegGroup.rCheekReg.bbox));
-    fhGabMap8U.copyTo(gaborMap(wrkRegGroup.fhReg.bbox));
-    
-    // 眉间glabella与其他区域有重叠，故而处理与其他相互不重叠区域的处理有所不同。
-    Mat glabeRegTemp(grSrcImg.size(), CV_8UC1, cv::Scalar(0));
-    glabGabMap8U.copyTo(glabeRegTemp(wrkRegGroup.glabReg.bbox));
-    
-    cv::max(gaborMap, glabeRegTemp, gaborMap);
-    
-    /*
-    cout << "gaborRespMap data type: " << openCVType2str(gaborRespMap.type()) << endl;
-    uchar maxV = *max_element(gaborRespMap.begin<uchar>(), gaborRespMap.end<uchar>());
-    uchar minV = *min_element(gaborRespMap.begin<uchar>(), gaborRespMap.end<uchar>());
-    
-    cout << "maxV in gaborRespMap:"  << (int)maxV << endl;
-    cout << "minV in gaborRespMap:"  << (int)minV << endl;
-    */
 }
 
 Mat drawFhWrk(const Mat& canvas, const CONTOURS& LightWrkConts)
@@ -412,7 +386,7 @@ Mat drawFhWrk(const Mat& canvas, const CONTOURS& LightWrkConts)
 ////////////////////////////////////////////////////////////////////////////////////////
 void ExtWrkFromFhGabMap(const Rect& fhRect,
                         const Mat& fhGabMap8U,
-                        int minLenOfWrk,
+                        int minWrkTh,
                         int longWrkThresh,
                         CONTOURS& DeepWrkConts,
                         CONTOURS& LongWrkConts)
@@ -443,7 +417,7 @@ void ExtWrkFromFhGabMap(const Rect& fhRect,
     Point2i tlPt = fhRect.tl();
     for (CONTOUR cont: contours)
     {
-        if (cont.size() >= minLenOfWrk ) // && it_c->size() <= sizeMax )
+        if (cont.size() >= minWrkTh ) // && it_c->size() <= sizeMax )
         {
             CONTOUR gsCt;
             transCt_LSS2GS(cont, tlPt, gsCt);
@@ -460,7 +434,7 @@ void ExtWrkFromFhGabMap(const Rect& fhRect,
 
 void ExtWrkFromGlabGabMap(const Rect& glabRect,
                         const Mat& glabGabMap8U,
-                        int minLenOfWrk,
+                        int minWrkTh,
                         int longWrkThresh,
                         CONTOURS& DeepWrkConts,
                         CONTOURS& LongWrkConts)
@@ -491,7 +465,7 @@ void ExtWrkFromGlabGabMap(const Rect& glabRect,
     Point2i tlPt = glabRect.tl();
     for (CONTOUR cont: contours)
     {
-        if (cont.size() >= minLenOfWrk ) // && it_c->size() <= sizeMax )
+        if (cont.size() >= minWrkTh ) // && it_c->size() <= sizeMax )
         {
             CONTOUR gsCt;
             transCt_LSS2GS(cont, tlPt, gsCt);
@@ -502,6 +476,53 @@ void ExtWrkFromGlabGabMap(const Rect& glabRect,
             CONTOUR gsCt;
             transCt_LSS2GS(cont, tlPt, gsCt);
             LongWrkConts.push_back(gsCt);
+        }
+    }
+}
+
+void ExtWrkFromEgGabMap(const DetectRegion& ebReg,
+                        const Mat& ebGabMap8U,
+                        int minWrkTh,
+                        int longWrkThresh,
+                        CONTOURS& lightWrkConts,
+                        CONTOURS& longWrkConts)
+{
+    cv::Mat biMap;
+    int dpWrkBiTh = 70;
+    biMap = ebGabMap8U & ebReg.mask;
+    cv::threshold(biMap, biMap, dpWrkBiTh, 255, THRESH_BINARY);
+    
+#ifdef TEST_RUN2
+    string ebGabBiFile = wrkOutDir + "/ebGabBi.png";
+    imwrite(ebGabBiFile.c_str(), biMap);
+#endif
+    
+    chao_thinimage(biMap); //单通道、二值化后的图像
+#ifdef TEST_RUN2
+    string ebThinGabBiFile = wrkOutDir + "/ebThinGabBi.png";
+    imwrite(ebThinGabBiFile.c_str(), biMap);
+#endif
+    
+    CONTOURS contours;
+    cv::findContours(biMap, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
+    
+    std::sort(contours.begin(), contours.end(),
+        [](const CONTOUR& a, const CONTOUR& b){return a.size() > b.size();});
+        
+    Point2i tlPt = ebReg.bbox.tl();
+    for (CONTOUR cont: contours)
+    {
+        if (cont.size() >= minWrkTh)
+        {
+            CONTOUR gsCt;
+            transCt_LSS2GS(cont, tlPt, gsCt);
+            lightWrkConts.push_back(gsCt);
+        }
+        if (cont.size() >= longWrkThresh ) // && it_c->size() <= sizeMax )
+        {
+            CONTOUR gsCt;
+            transCt_LSS2GS(cont, tlPt, gsCt);
+            longWrkConts.push_back(gsCt);
         }
     }
 }

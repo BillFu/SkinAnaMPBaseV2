@@ -160,18 +160,15 @@ int main(int argc, char **argv)
     CONTOURS lightWrkConts;
 
     // test the wrinkle detecting algorithm
-    Mat wrkGaborRespMap;
     int numLongWrk = 0;
     int numShortWrk = 0;
     int numDeepWrk = 0;
     int numLightWrk = 0;
     DetectWrinkle(paraImage, segResult.faceBBox,
-                  detRegPack.wrkFrgiMask,
                   detRegPack.wrkRegGroup,
                   deepWrkConts, lightWrkConts,
                   numLongWrk, numShortWrk,
-                  numDeepWrk, numLightWrk,
-                  wrkGaborRespMap);
+                  numDeepWrk, numLightWrk);
     
     return 0;
 }

@@ -21,13 +21,11 @@ using namespace cv;
 
 // wrkGaborRespMap: 输出，记录Gabor滤波的结果，大小和位置由Face_Rect来限定
 void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
-                   const Mat& wrkFrgiMask,
                    WrkRegGroup& wrkRegGroup,
                    CONTOURS& deepWrkConts,
                    CONTOURS& lightWrkConts, // light, 轻的
                    int& numLongWrk, int& numShortWrk,
-                   int& numDeepWrk, int& numLightWrk,
-                   Mat& wrkGaborRespMap);
+                   int& numDeepWrk, int& numLightWrk);
 
 // 把检测出的浅皱纹和深皱纹在背景图像上画出来
 // 返回的标注图像是4通道，即RGBA。
