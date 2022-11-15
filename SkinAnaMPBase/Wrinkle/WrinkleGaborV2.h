@@ -35,7 +35,8 @@ void ApplyGaborBank(const GaborOptBank& gBank, const Mat& inGrFtImg,
 void CalcGaborMap(const Mat& grSrcImg,
                   WrkRegGroup& wrkRegGroup,
                   Mat& WrinkRespMap,
-                  Mat& fhGabMap8U);
+                  Mat& fhGabMap8U,
+                  Mat& glabGabMap8U);
 
 void BuildGabOptsForEb(int kerSize, int sigma, bool isLeftEye, GaborOptBank& gOptBank);
 Mat CcGaborMapInOneEyebag(const Mat& grFtSrcImg, int kerSize, int sigma,
@@ -81,6 +82,13 @@ Mat drawFhWrk(const Mat& canvas, const CONTOURS& LightWrkConts);
 
 void ExtWrkFromFhGabMap(const Rect& fhRect,
                         const Mat& fhGabMap8U,
+                        int minLenOfWrk,
+                        int longWrkThresh,
+                        CONTOURS& DeepWrkConts,
+                        CONTOURS& LongWrkConts);
+
+void ExtWrkFromGlabGabMap(const Rect& glabRect,
+                        const Mat& glabGabMap8U,
                         int minLenOfWrk,
                         int longWrkThresh,
                         CONTOURS& DeepWrkConts,

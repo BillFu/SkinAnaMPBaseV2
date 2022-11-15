@@ -326,7 +326,8 @@ void ExtDeepWrk(const Mat& wrkGaborRespMap,
 void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
                   WrkRegGroup& wrkRegGroup,
                   Mat& gaborMap,
-                  Mat& fhGabMap8U)
+                  Mat& fhGabMap8U,
+                  Mat& glabGabMap8U)
 {
     Mat grFtSrcImg;
     grSrcImg.convertTo(grFtSrcImg, CV_32F, 1.0/255, 0);
@@ -345,7 +346,7 @@ void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
     // 前额
     fhGabMap8U = CcGaborMapOnFh(grFtSrcImg, kerSize, sigma, wrkRegGroup.fhReg.bbox);
     // glabella，眉间，印堂
-    Mat glabMap8U = CcGaborMapOnGlab(grFtSrcImg, kerSize, sigma, wrkRegGroup.glabReg.bbox);
+    glabGabMap8U = CcGaborMapOnGlab(grFtSrcImg, kerSize, sigma, wrkRegGroup.glabReg.bbox);
     
     Mat lCFGabMap8U = CcGabMapInOneCrowFeet(grFtSrcImg, kerSize, sigma,
                                             true, wrkRegGroup.lCrowFeetReg.bbox);
@@ -362,7 +363,7 @@ void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
     isSuccess = SaveTestOutImgInDir(lEbGabMap8U,  wrkOutDir,  "lEbGabMap.png");
     isSuccess = SaveTestOutImgInDir(rEbGabMap8U,  wrkOutDir,  "rEbGabMap.png");
     isSuccess = SaveTestOutImgInDir(fhGabMap8U,  wrkOutDir,  "FhGabMap.png");
-    isSuccess = SaveTestOutImgInDir(glabMap8U,  wrkOutDir,  "glabMap.png");
+    isSuccess = SaveTestOutImgInDir(glabGabMap8U,  wrkOutDir,  "glabGabMap.png");
 
     isSuccess = SaveTestOutImgInDir(lCFGabMap8U,  wrkOutDir,   "lCFGabMap.png");
     isSuccess = SaveTestOutImgInDir(rCFGabMap8U,  wrkOutDir,   "rCFGabMap.png");
@@ -385,7 +386,7 @@ void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
     
     // 眉间glabella与其他区域有重叠，故而处理与其他相互不重叠区域的处理有所不同。
     Mat glabeRegTemp(grSrcImg.size(), CV_8UC1, cv::Scalar(0));
-    glabMap8U.copyTo(glabeRegTemp(wrkRegGroup.glabReg.bbox));
+    glabGabMap8U.copyTo(glabeRegTemp(wrkRegGroup.glabReg.bbox));
     
     cv::max(gaborMap, glabeRegTemp, gaborMap);
     
@@ -417,8 +418,6 @@ void ExtWrkFromFhGabMap(const Rect& fhRect,
                         CONTOURS& LongWrkConts)
 {
     cv::Mat biMap;
-    // 11作为Deep Wrinkle的阈值
-    // 4作为Light Wrinkle的阈值
     int dpWrkBiTh = 90;
     cv::threshold(fhGabMap8U, biMap, dpWrkBiTh, 255, THRESH_BINARY);
     
@@ -439,21 +438,70 @@ void ExtWrkFromFhGabMap(const Rect& fhRect,
     std::sort(contours.begin(), contours.end(),
         [](const CONTOUR& a, const CONTOUR& b){return a.size() > b.size();});
     
-    cout << "Max Size of contour in ExtDeepWrk(): " << contours[0].size() << endl;
+    cout << "Max Size of contour in fhGabMap(): " << contours[0].size() << endl;
     
-    CONTOURS lssDeepWrkConts, lssLongWrkConts;
+    Point2i tlPt = fhRect.tl();
     for (CONTOUR cont: contours)
     {
         if (cont.size() >= minLenOfWrk ) // && it_c->size() <= sizeMax )
         {
-            lssDeepWrkConts.push_back(cont);
+            CONTOUR gsCt;
+            transCt_LSS2GS(cont, tlPt, gsCt);
+            DeepWrkConts.push_back(gsCt);
         }
         if (cont.size() >= longWrkThresh ) // && it_c->size() <= sizeMax )
         {
-            lssLongWrkConts.push_back(cont);
+            CONTOUR gsCt;
+            transCt_LSS2GS(cont, tlPt, gsCt);
+            LongWrkConts.push_back(gsCt);
         }
     }
+}
+
+void ExtWrkFromGlabGabMap(const Rect& glabRect,
+                        const Mat& glabGabMap8U,
+                        int minLenOfWrk,
+                        int longWrkThresh,
+                        CONTOURS& DeepWrkConts,
+                        CONTOURS& LongWrkConts)
+{
+    cv::Mat biMap;
+    int dpWrkBiTh = 90;
+    cv::threshold(glabGabMap8U, biMap, dpWrkBiTh, 255, THRESH_BINARY);
     
-    transCts_LSS2GS(lssDeepWrkConts, fhRect.tl(), DeepWrkConts);
-    transCts_LSS2GS(lssLongWrkConts, fhRect.tl(), LongWrkConts);
+#ifdef TEST_RUN2
+    string glabGabBiFile = wrkOutDir + "/glabGabBi.png";
+    imwrite(glabGabBiFile.c_str(), biMap);
+#endif
+    
+    chao_thinimage(biMap); //单通道、二值化后的图像
+#ifdef TEST_RUN2
+    string glabThinGabBiFile = wrkOutDir + "/glabThinGabBi.png";
+    imwrite(glabThinGabBiFile.c_str(), biMap);
+#endif
+    
+    CONTOURS contours;
+    cv::findContours(biMap, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
+    
+    std::sort(contours.begin(), contours.end(),
+        [](const CONTOUR& a, const CONTOUR& b){return a.size() > b.size();});
+    
+    cout << "Max Size of contour in GlabGabMap: " << contours[0].size() << endl;
+    
+    Point2i tlPt = glabRect.tl();
+    for (CONTOUR cont: contours)
+    {
+        if (cont.size() >= minLenOfWrk ) // && it_c->size() <= sizeMax )
+        {
+            CONTOUR gsCt;
+            transCt_LSS2GS(cont, tlPt, gsCt);
+            DeepWrkConts.push_back(gsCt);
+        }
+        if (cont.size() >= longWrkThresh ) // && it_c->size() <= sizeMax )
+        {
+            CONTOUR gsCt;
+            transCt_LSS2GS(cont, tlPt, gsCt);
+            LongWrkConts.push_back(gsCt);
+        }
+    }
 }

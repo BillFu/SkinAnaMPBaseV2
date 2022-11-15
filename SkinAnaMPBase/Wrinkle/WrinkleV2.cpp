@@ -34,8 +34,9 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     cvtColor(inImg, imgGray, COLOR_BGR2GRAY);
 
     //WrinkRespMap是由Face_Rect来限定的
-    Mat fhGabMap8U;
-    CalcGaborMap(imgGray, wrkRegGroup, wrkGaborMap, fhGabMap8U);
+    Mat fhGabMap8U, glabGabMap8U;
+    CalcGaborMap(imgGray, wrkRegGroup, wrkGaborMap,
+                 fhGabMap8U, glabGabMap8U);
     wrkGaborMap = wrkGaborMap & wrkFrgiMask; // !!!
     
 #ifdef TEST_RUN2
@@ -53,11 +54,11 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     ExtWrkFromFhGabMap(wrkRegGroup.fhReg.bbox, fhGabMap8U,
         minWrkTh,longWrkTh, deepWrkConts, longWrkConts);
 
-    /*
-    CONTOURS deepWrkConts1, lightWrkConts1;
-    ExtLightWrk(wrkGaborMap, minWrkTh, longWrkTh, lightWrkConts1, longWrkConts, totalWrkLen);
-    ExtDeepWrk(wrkGaborMap, minWrkTh, longWrkTh, deepWrkConts1, longWrkConts);
+    ExtWrkFromGlabGabMap(wrkRegGroup.glabReg.bbox,
+                         glabGabMap8U, minWrkTh,longWrkTh,
+                         deepWrkConts, longWrkConts);
 
+    /*
     numLongWrk = (int)(longWrkConts.size());
     numLightWrk = (int)(lightWrkConts.size());
     numDeepWrk = (int)(deepWrkConts.size());
