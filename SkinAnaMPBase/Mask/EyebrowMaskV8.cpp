@@ -254,6 +254,14 @@ void ForgeEyesMask(const Mat& srcImage, // add this variable just for debugging
     ForgeEyePg(srcImgS, segRst.rEyeMaskNOS, segRst.rEyeFPs,
                segRst.rightBrowCP, rightEyePg);
     
+    Rect lEyeRect = boundingRect(leftEyePg);
+    Rect rEyeRect = boundingRect(rightEyePg);
+
+    CONTOUR lssLEyeCt;
+    transCt_GS2LSS(leftEyePg, lEyeRect.tl(), lssLEyeCt);
+    Mat lssLEyeMask(lEyeRect.size(), CV_8UC1, Scalar(0));
+    DrawContOnMask(lssLEyeCt, lssLEyeMask);
+    
     POLYGON_GROUP polygonGroup;
     polygonGroup.push_back(rightEyePg);
     polygonGroup.push_back(leftEyePg);

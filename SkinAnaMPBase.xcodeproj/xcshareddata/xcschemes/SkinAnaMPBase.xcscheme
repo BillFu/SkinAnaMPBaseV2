@@ -53,7 +53,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "config_peter3264.json"
+            argument = "config_peter.json"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

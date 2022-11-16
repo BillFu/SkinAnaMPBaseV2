@@ -1,0 +1,9 @@
+{
+	"SegModelFile": 				    "models/seg_model.onnx",
+	"ClassColorFile":					"models/classes3.txt",
+	"FaceMeshAttenModel": 				"models/face_lm_attent.tflite",
+	"CrossImage":						"images/Woman1/cross.jpg",
+	"ParallelImage":					"images/Woman1/parallel.jpg",
+	"OutDir":							"result/Woman1",
+	"WrkOutDir":						"result/Woman1/wrk_out"
+}

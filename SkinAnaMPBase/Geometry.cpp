@@ -170,6 +170,15 @@ void transCt_LSS2GS(const CONTOUR& lssCt, const Point& tlPt,
     }
 }
 
+void transCt_GS2LSS(const CONTOUR& gsCt, const Point& tlPt, CONTOUR& lssCt)
+{
+    for(Point pt: gsCt)
+    {
+        Point lssPt = pt - tlPt;
+        lssCt.push_back(lssPt);
+    }
+}
+
 void transCts_LSS2GS(const CONTOURS& lssCts, const Point& tlPt,
                     CONTOURS& gsCts)
 {
@@ -178,6 +187,16 @@ void transCts_LSS2GS(const CONTOURS& lssCts, const Point& tlPt,
         CONTOUR gsCt;
         transCt_LSS2GS(lssCt, tlPt, gsCt);
         gsCts.push_back(gsCt);
+    }
+}
+
+void transCts_GS2LSS(const CONTOURS& gsCts, const Point& tlPt, CONTOURS& lssCts)
+{
+    for(CONTOUR gsCt: gsCts)
+    {
+        CONTOUR lssCt;
+        transCt_GS2LSS(gsCt, tlPt, lssCt);
+        lssCts.push_back(lssCt);
     }
 }
 

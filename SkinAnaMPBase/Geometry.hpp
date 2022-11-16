@@ -71,6 +71,13 @@ void transCt_LSS2GS(const CONTOUR& lssCt, const Point& tlPt,
 
 void transCts_LSS2GS(const CONTOURS& lssCts, const Point& tlPt,
                     CONTOURS& gsCts);
+
+void transCt_GS2LSS(const CONTOUR& gsCt, const Point& tlPt, CONTOUR& lssCt);
+void transCts_GS2LSS(const CONTOURS& gsCts, const Point& tlPt,
+                    CONTOURS& lssCts);
+
+void makeDetRegFromGSPg();
+
 /**********************************************************************************************
 Ip: interpolate
 GLm: general landmark

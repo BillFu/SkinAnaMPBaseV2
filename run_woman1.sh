@@ -1,0 +1,1 @@
+./bin/SkinAnaMPBase config_woman1.json

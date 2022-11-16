@@ -127,7 +127,7 @@ void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
     Mat eyesMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgeEyesMask(srcImage, faceInfo, segResult, eyesMask);
 
-#ifdef TEST_RUN
+#ifdef TEST_RUN2
     string eyeMaskImgFile = BuildOutImgFNV2(outDir, "eye_mask.png");
     OverlayMaskOnImage(annoLmImage, eyesMask,
                         "eyes_mask", eyeMaskImgFile.c_str());

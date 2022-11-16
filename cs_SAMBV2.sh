@@ -1,1 +1,0 @@
-codesign -s - -f -vvvvvv ./bin/SkinAnaMPBase

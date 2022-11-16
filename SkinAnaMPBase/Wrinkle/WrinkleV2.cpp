@@ -73,7 +73,7 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     imwrite(outDLWrkImgFile.c_str(), outDLWrkImg);
     
     Mat wrkAnnoImg = SpWrkOnSrcImg(inImg, lightWrkConts, deepWrkConts);
-    string wrkAnnoImgFile =  wrkOutDir + "/WrkAnnoImg.png";
+    string wrkAnnoImgFile =  wrkOutDir + "/NewWrkAnno.png";
     imwrite(wrkAnnoImgFile.c_str(), wrkAnnoImg);
 #endif
     

@@ -163,6 +163,9 @@ struct WrkRegGroup
 // 各类皮肤特征的检测区域汇总
 struct DetRegPack
 {
+    DetectRegion lEyeReg;
+    DetectRegion rEyeReg;
+    
     Mat poreMask;
     Mat wrkFrgiMask; // used for frangi filtering to detect wrinkle
     WrkRegGroup  wrkRegGroup;
