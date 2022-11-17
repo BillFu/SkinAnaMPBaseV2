@@ -131,7 +131,6 @@ void ForgeOneEyeFullMask(const FaceInfo& faceInfo, EyeID eyeID, Mat& outMask)
     DrawContOnMask(refinedPolygon, outMask);
 }
 
-
 void ForgeEyesFullMask(const FaceInfo& faceInfo, Mat& outEyesFullMask)
 {
     cv::Mat outMask(faceInfo.srcImgS, CV_8UC1, cv::Scalar(0));
@@ -141,65 +140,6 @@ void ForgeEyesFullMask(const FaceInfo& faceInfo, Mat& outEyesFullMask)
     
     outEyesFullMask = outMask;
     //expanMask(outMask, 20, outEyesFullMask);
-}
-
-//-------------------------------------------------------------------------------------------
-//  环眼睛区域，不包括眉毛
-void ForgeOneCirEyePg(const Point2i eyeRefinePts[71], POLYGON& outPolygon)
-{
-    // 采用Lip Refine Region的点！
-    int fullEyeOuterPtIndices[] = { // 顺时针计数
-        47, 46, 45, 44, 50, 63, 54,  // 下外轮廓线，从左到右
-        56, 57, 58, 59, 60, 39   // 上外轮廓线，从右到左
-    };
-    
-    int num_pts = sizeof(fullEyeOuterPtIndices) / sizeof(int);
-    
-    for(int i = 0; i<num_pts; i++)
-    {
-        int index = fullEyeOuterPtIndices[i];
-        outPolygon.push_back(eyeRefinePts[index]);
-    }
-}
-
-// 环眼睛周边区域，眼睛被抠除
-void ForgeOneCirEyeMask(const FaceInfo& faceInfo, EyeID eyeID,
-                        const DetectRegion& eyeReg,
-                        DetectRegion& lssReg)
-{
-    POLYGON coarsePolygon, refinedPolygon;
-    
-    if(eyeID == LEFT_EYE)
-        ForgeOneCirEyePg(faceInfo.lEyeRefinePts, coarsePolygon);
-    else
-        ForgeOneCirEyePg(faceInfo.rEyeRefinePts, coarsePolygon);
-    
-    int csNumPoint = 50; //200;
-    DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
-    
-    DetectRegion cirFullReg;
-    TransPgGS2LSMask(refinedPolygon, cirFullReg);
-    
-    SubstractDetReg(faceInfo.srcImgS,
-                         cirFullReg, eyeReg, lssReg);
-
-}
-
-void ForgeCirEyesMask(const FaceInfo& faceInfo, Mat& outCirEyesMask,
-                      const DetectRegion& lEyeReg,
-                      const DetectRegion& rEyeReg,
-                      DetectRegion& lCirEyeReg,
-                      DetectRegion& rCirEyeReg)
-{
-    cv::Mat outMask(faceInfo.srcImgS, CV_8UC1, cv::Scalar(0));
-
-    ForgeOneCirEyeMask(faceInfo, LEFT_EYE,
-                       lEyeReg, lCirEyeReg);
-    ForgeOneCirEyeMask(faceInfo, RIGHT_EYE,
-                       rEyeReg, rCirEyeReg);
-        
-    SumDetReg2GSMask(faceInfo.srcImgS, lCirEyeReg,
-                     rCirEyeReg, outCirEyesMask);
 }
 
 //-------------------------------------------------------------------------------------------

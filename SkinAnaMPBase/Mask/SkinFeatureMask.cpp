@@ -144,19 +144,6 @@ void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
     AnnoMaskOnImage(annoLmImage, eyesFullMask,
                         "eyes_full_mask", eyeFullMaskImgFile.c_str());
 #endif
-    
-    Mat cirEyesMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    ForgeCirEyesMask(faceInfo, cirEyesMask,
-                     detRegPack.lEyeReg, detRegPack.rEyeReg,
-                     detRegPack.wrkRegGroup.lCirEyeReg,
-                     detRegPack.wrkRegGroup.rCirEyeReg);
-    detRegPack.cirEyesMask = cirEyesMask;
-    
-#ifdef TEST_RUN2
-    string eyeCirMaskImgFile = BuildOutImgFNV2(outDir, "eye_cir_mask.png");
-    AnnoMaskOnImage(annoLmImage, cirEyesMask,
-                        "eyes_cir_mask", eyeCirMaskImgFile.c_str());
-#endif
 
     Mat noseBellMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgeNoseBellMask(faceInfo, noseBellMask);
@@ -179,7 +166,7 @@ void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
                         "ext_forehead", expFhMaskFile.c_str());
 #endif
     
-    ForgeWrkTenRegs(annoLmImage, faceInfo, fbBiLab, detRegPack.wrkRegGroup);
+    ForgeWrkTenRegs(annoLmImage, faceInfo, fbBiLab, detRegPack);
 
     ForgePoreMaskV3(faceInfo, lowFaceMask, expFhMask, eyesFullMask,
                     mouthMask, detRegPack.poreMask);

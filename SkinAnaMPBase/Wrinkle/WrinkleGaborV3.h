@@ -61,8 +61,8 @@ Mat CcGabMapInOneNagv(bool isLeft, const Mat& grFtSrcImg,
 void BuildGabOptsForCirEye(int kerSize, int sigma, bool isLeft, GaborOptBank& gOptBank);
 
 Mat CcGabMapInOneCirEye(bool isLeft, const Mat& grFtSrcImg,
-                      int kerSize, int sigma,
-                      const Rect& cirEyeRect);
+                        int kerSize, int sigma,
+                        const DetectRegion& cirEyeReg);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -70,33 +70,34 @@ Mat CcGabMapInOneCirEye(bool isLeft, const Mat& grFtSrcImg,
 
 Mat drawFhWrk(const Mat& canvas, const CONTOURS& LightWrkConts);
 
-void ExtWrkFromFhGabMap(const Rect& fhRect,
+void ExtWrkFromFhGabMap(const DetectRegion& fhReg,
                         const Mat& fhGabMap8U,
                         int minWrkTh,
                         int longWrkThresh,
                         CONTOURS& DeepWrkConts,
                         CONTOURS& LongWrkConts);
 
-void ExtWrkFromGlabGabMap(const Rect& glabRect,
+void ExtWrkFromGlabGabMap(const DetectRegion& glabReg,
                         const Mat& glabGabMap8U,
                         int minWrkTh,
                         int longWrkThresh,
                         CONTOURS& DeepWrkConts,
                         CONTOURS& LongWrkConts);
 
-void ExtWrkFromEgGabMap(const DetectRegion& ebReg,
-                        const Mat& ebGabMap8U,
-                        int minWrkTh,
-                        int longWrkThresh,
-                        CONTOURS& lightWrkConts,
-                        CONTOURS& wrkConts);
-
-void ExtWrkFromOneNagvGabMap(bool isLeft,
-                             const DetectRegion& nagvReg,
+void ExtWrkInNagvGabMap(bool isLeft,
+                        const DetectRegion& nagvReg,
                         const Mat& nagvGabMap8U,
                         int minWrkTh,
                         int longWrkThresh,
                         CONTOURS& DeepWrkConts,
                         CONTOURS& LongWrkConts);
+
+void ExtWrkInCirEyeGabMap(bool isLeft,
+                        const DetectRegion& cirEyeReg,
+                        const Mat& cirEyeGabMap8U,
+                        int minWrkTh,
+                        int longWrkThresh,
+                        CONTOURS& lightWrkConts,
+                          CONTOURS& longWrkConts);
 
 #endif /* WRINKLE_GABOR_V3_H */

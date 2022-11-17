@@ -561,12 +561,24 @@ Mat CvtFtImgTo8U_MinMax(Mat& ftImg)
 Mat CvtFtImgTo8U_NoNega(Mat& ftImg)
 {
     uchar maxV = *max_element(ftImg.begin<float>(), ftImg.end<float>());
+    //uchar maxV = *max_element(ftImg.begin<float>(), ftImg.end<float>());
+
     double alpha = 255.0 / maxV;
     Mat img8U;
     ftImg.convertTo(img8U, CV_8UC1, alpha);
     return img8U;
 }
 
+Mat CvtFtImgTo8U_Special(Mat& ftImg)
+{
+    uchar maxV = *max_element(ftImg.begin<float>(), ftImg.end<float>());
+
+    //double alpha = 255.0 / maxV;
+    Mat img8U;
+    ftImg = ftImg*255.0;
+    ftImg.convertTo(img8U, CV_8UC1, 1.0);
+    return img8U;
+}
 void ApplyCLAHE(const Mat& inImg,
                 int gridSize,
                 Mat& outImg)

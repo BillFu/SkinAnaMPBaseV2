@@ -145,8 +145,6 @@ struct WrkRegGroup
     DetectRegion fhReg; // forehead
     DetectRegion glabReg; // glabella
     
-    DetectRegion dlWrkReg; // use to detect deep and long wrk, produced by combining fhReg and glabReg
-
     DetectRegion lNagvReg; //
     DetectRegion rNagvReg;
     

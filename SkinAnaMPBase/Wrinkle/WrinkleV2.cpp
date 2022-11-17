@@ -53,9 +53,10 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
 
     //WrinkRespMap是由Face_Rect来限定的
     Mat fhGabMap8U, glabGabMap8U, lEbGabMap8U, rEbGabMap8U, lNagvGabMap8U, rNagvGabMap8U;
+    Mat lCirEyeGabMap8U, rCirEyeGabMap8U;
     CalcGaborMap(imgGray, wrkRegGroup,
                  fhGabMap8U, glabGabMap8U,
-                 lEbGabMap8U,rEbGabMap8U,
+                 lCirEyeGabMap8U, rCirEyeGabMap8U,
                  lNagvGabMap8U, rNagvGabMap8U);
     
     int totalWrkLen = 0;
@@ -65,20 +66,28 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     cout << "minWrkTh: " << minWrkTh << endl;
     
     CONTOURS longWrkConts;
-    ExtWrkFromFhGabMap(wrkRegGroup.fhReg.bbox, fhGabMap8U,
+    ExtWrkFromFhGabMap(wrkRegGroup.fhReg, fhGabMap8U,
         minWrkTh,longWrkTh, deepWrkConts, longWrkConts);
 
-    ExtWrkFromGlabGabMap(wrkRegGroup.glabReg.bbox,
+    ExtWrkFromGlabGabMap(wrkRegGroup.glabReg,
                          glabGabMap8U, minWrkTh,longWrkTh,
                          deepWrkConts, longWrkConts);
 
-    ExtWrkFromOneNagvGabMap(true, wrkRegGroup.lNagvReg, lNagvGabMap8U,
+    ExtWrkInNagvGabMap(true, wrkRegGroup.lNagvReg, lNagvGabMap8U,
                             minWrkTh/2, longWrkTh/2,
                             lightWrkConts,longWrkConts);
 
-    ExtWrkFromOneNagvGabMap(false, wrkRegGroup.rNagvReg, rNagvGabMap8U,
+    ExtWrkInNagvGabMap(false, wrkRegGroup.rNagvReg, rNagvGabMap8U,
                             minWrkTh/2, longWrkTh/2,
                             lightWrkConts,longWrkConts);
+    
+    ExtWrkInCirEyeGabMap(true, wrkRegGroup.lCirEyeReg, lCirEyeGabMap8U,
+                            minWrkTh/2, longWrkTh/2,
+                        lightWrkConts, longWrkConts);
+    
+    ExtWrkInCirEyeGabMap(false, wrkRegGroup.rCirEyeReg, rCirEyeGabMap8U,
+                            minWrkTh/2, longWrkTh/2,
+                        lightWrkConts, longWrkConts);
     
     numLongWrk = (int)(longWrkConts.size());
     numLightWrk = (int)(lightWrkConts.size());

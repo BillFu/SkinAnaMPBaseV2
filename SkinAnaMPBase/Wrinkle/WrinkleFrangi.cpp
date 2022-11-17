@@ -124,20 +124,6 @@ void ApplyFrgiFilter(const Mat& inGrImg,
     frgiRespRzU8 = CvtFtImgTo8U_MinMax(frgiRespRz);
 }
 
-/*
-// bifurcation point: 分叉点
-void FindBifuPtOnContGroup(const Mat& biImg, const CONTOURS& conts,
-                           CONTOURS_KEYPTS&  contsKeyPts)
-{
-    for(CONTOUR ct: conts)
-    {
-        KeyPtsOnCont keyPts;
-        FindKeyPtsOnCont(biImg, ct, keyPts);
-        contsKeyPts.push_back(keyPts);
-    }
-}
-*/
-
 // bifurcation point: 分叉点
 void FindKeyPtsOnCont(const Mat& biImg, const CONTOUR& ct,
                       KeyPtsOnCont& keyPts, int i)

@@ -57,6 +57,7 @@ Mat CvtFtImgTo8U_MinMax(Mat& ftImg);
 // negative values will be changed into 0,
 // positive values will be scaled
 Mat CvtFtImgTo8U_NoNega(Mat& ftImg);
+Mat CvtFtImgTo8U_Special(Mat& ftImg);
 
 void ApplyCLAHE(const Mat& inImg,
                 int gridSize,

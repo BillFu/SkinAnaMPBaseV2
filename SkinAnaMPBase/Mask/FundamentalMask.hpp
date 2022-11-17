@@ -67,17 +67,6 @@ void ForgeNoseBellPg(const FaceInfo& faceInfo,
 void ForgeNoseBellMask(const FaceInfo& faceInfo, Mat& outNoseBellMask);
 
 //-------------------------------------------------------------------------------------------
-// 环眼睛周边区域，眼睛被抠除
-void ForgeOneCirEyeMask(const FaceInfo& faceInfo, EyeID eyeID,
-                        const DetectRegion& eyeReg, DetectRegion& lssReg);
-
-void ForgeCirEyesMask(const FaceInfo& faceInfo, Mat& cirEyesMask,
-                      const DetectRegion& lEyeReg,
-                      const DetectRegion& rEyeReg,
-                      DetectRegion& lCirEyeReg,
-                      DetectRegion& rCirEyeReg);
-
-//-------------------------------------------------------------------------------------------
 
 
 #endif /* end of DETECT_REGION_HPP */
