@@ -6,6 +6,7 @@
 #include "../Geometry.hpp"
 
 #include "WrinkleGaborV2.h"
+#include "WrinkleV2.hpp"
 
 //-----------------------------------------------------------
 void AnnoPointsOnImg(Mat& annoImage,
@@ -169,6 +170,29 @@ Mat CcGaborMapOnFh(const Mat& grFtSrcImg, int kerSize, int sigma,
     return aggMap8U;
 }
 
+Mat CcGaborMapOnFhV2(const Mat& grFtSrcImg, int kerSize, int sigma,
+                   const Rect& fhRect)
+{
+    Mat inGrFtImg = grFtSrcImg(fhRect);
+    Mat enhImg;
+    PreprocGrImg(inGrFtImg, enhImg);
+    
+    GaborOptBank gOptBank;
+    // use the left eye as the reference
+    float fhThetaSet[] = {73.125, 50.625, 61.875, 84.375, 95.625};
+    int numTheta = sizeof(fhThetaSet) / sizeof(float);
+    for(int i=0; i<numTheta; i++)
+    {
+        GaborOpt opt(kerSize, 57, sigma, 42, fhThetaSet[i], 105);
+        gOptBank.push_back(opt);
+    }
+    
+    Mat aggFhMapFt;
+    ApplyGaborBank(gOptBank, enhImg, aggFhMapFt);
+    Mat aggMap8U = CvtFtImgTo8U_NoNega(aggFhMapFt);
+    return aggMap8U;
+}
+
 // glabella，眉间，印堂
 Mat CcGaborMapOnGlab(const Mat& grFtSrcImg, int kerSize, int sigma,
                      const Rect& glabRect)
@@ -226,6 +250,43 @@ Mat CcGaborMapInOneCheek(const Mat& grFtSrcImg, int kerSize, int sigma,
     
     GaborOptBank gOptBank;
     BuildGabOptsForCheek(kerSize, sigma, isLeft, gOptBank);
+    
+    Mat aggGabMapFt;
+    ApplyGaborBank(gOptBank, inGrFtImg, aggGabMapFt);
+    Mat aggGabMap8U = CvtFtImgTo8U_NoNega(aggGabMapFt);
+    return aggGabMap8U;
+}
+
+void BuildGabOptsForNagv(int kerSize, int sigma, bool isLeft, GaborOptBank& gOptBank)
+{
+    // use the left eye as the reference
+    float rightThetaSet[] = {103, 91.75, 80.0, 114.25, 125.5};
+    int numTheta = sizeof(rightThetaSet) / sizeof(float);
+    if(isLeft)
+    {
+        for(int i=0; i<numTheta; i++)
+        {
+            GaborOpt opt(kerSize, 53, sigma, 40, 180 - rightThetaSet[i], 131);
+            gOptBank.push_back(opt);
+        }
+    }
+    else // right eye
+    {
+        for(int i=0; i<numTheta; i++)
+        {
+            GaborOpt opt(kerSize, 53, sigma, 40, rightThetaSet[i], 131);
+            gOptBank.push_back(opt);
+        }
+    }
+}
+
+Mat CcGabMapInOneNagv(const Mat& grFtSrcImg, int kerSize, int sigma,
+                         bool isLeft, const Rect& nagvRect)
+{
+    Mat inGrFtImg = grFtSrcImg(nagvRect);
+    
+    GaborOptBank gOptBank;
+    BuildGabOptsForNagv(kerSize, sigma, isLeft, gOptBank);
     
     Mat aggGabMapFt;
     ApplyGaborBank(gOptBank, inGrFtImg, aggGabMapFt);
@@ -328,7 +389,9 @@ void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
                   Mat& fhGabMap8U,
                   Mat& glabGabMap8U,
                   Mat& lEbGabMap8U,
-                  Mat& rEbGabMap8U)
+                  Mat& rEbGabMap8U,
+                  Mat& lNagvGabMap8U,
+                  Mat& rNagvGabMap8U)
 {
     Mat grFtSrcImg;
     grSrcImg.convertTo(grFtSrcImg, CV_32F, 1.0/255, 0);
@@ -353,11 +416,15 @@ void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
                                             true, wrkRegGroup.lCrowFeetReg.bbox);
     Mat rCFGabMap8U = CcGabMapInOneCrowFeet(grFtSrcImg, kerSize, sigma,
                                             false, wrkRegGroup.rCrowFeetReg.bbox);
-
+    /*
     Mat lChkGabMap8U = CcGaborMapInOneCheek(grFtSrcImg, kerSize, sigma,
                                             true, wrkRegGroup.lCheekReg.bbox);
     Mat rChkGabMap8U = CcGaborMapInOneCheek(grFtSrcImg, kerSize, sigma,
                                             false, wrkRegGroup.rCheekReg.bbox);
+    */
+    
+    rNagvGabMap8U = CcGabMapInOneNagv(grFtSrcImg, kerSize, sigma,
+                                            false, wrkRegGroup.rNagvReg.bbox);
     
 #ifdef TEST_RUN2
     bool isSuccess;
@@ -369,8 +436,11 @@ void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
     isSuccess = SaveTestOutImgInDir(lCFGabMap8U,  wrkOutDir,   "lCFGabMap.png");
     isSuccess = SaveTestOutImgInDir(rCFGabMap8U,  wrkOutDir,   "rCFGabMap.png");
 
-    isSuccess = SaveTestOutImgInDir(lChkGabMap8U, wrkOutDir,  "lChkGabMap.png");
-    isSuccess = SaveTestOutImgInDir(rChkGabMap8U, wrkOutDir,  "rChkGabMap.png");
+    //isSuccess = SaveTestOutImgInDir(lChkGabMap8U, wrkOutDir,  "lChkGabMap.png");
+    //isSuccess = SaveTestOutImgInDir(rChkGabMap8U, wrkOutDir,  "rChkGabMap.png");
+    
+    isSuccess = SaveTestOutImgInDir(rNagvGabMap8U, wrkOutDir,  "rNagvGabMap.png");
+
 #endif
 }
 

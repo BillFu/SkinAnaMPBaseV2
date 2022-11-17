@@ -7,26 +7,7 @@
 #include "WrinkleFrangi.h"
 #include "frangi.h"
 
-void PreprocGrImg(const Mat& grSrcImg,
-                    Mat& outImg)
-{
-    Size srcImgS = grSrcImg.size();
-    
-    // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
-    // 也许这个公式以后需要调整为普遍适用的公式。
-    int blurKerS = srcImgS.width / 272;
-    if(blurKerS % 2 == 0)
-        blurKerS += 1;  // make it be a odd number
-    
-    Mat blurGrImg;
-    blur(grSrcImg, blurGrImg, Size(blurKerS, blurKerS));
-    
-    // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
-    // 也许这个公式以后需要调整为普遍适用的公式。
-    int gridSize = srcImgS.width / 100;
-    ApplyCLAHE(blurGrImg, gridSize, outImg);
-    blurGrImg.release();
-}
+
 
 // -------------------------------------------------------------------------
 // 从Frangi滤波响应中提取深皱纹和长皱纹

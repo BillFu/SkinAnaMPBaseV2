@@ -17,6 +17,26 @@ Date:   2022/11/15
 #include "WrinkleGaborV2.h"
 #include "../ImgProc.h"
 
+void PreprocGrImg(const Mat& grSrcImg,
+                    Mat& outImg)
+{
+    Size srcImgS = grSrcImg.size();
+    
+    // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
+    // 也许这个公式以后需要调整为普遍适用的公式。
+    int blurKerS = srcImgS.width / 272;
+    if(blurKerS % 2 == 0)
+        blurKerS += 1;  // make it be a odd number
+    
+    Mat blurGrImg;
+    blur(grSrcImg, blurGrImg, Size(blurKerS, blurKerS));
+    
+    // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
+    // 也许这个公式以后需要调整为普遍适用的公式。
+    int gridSize = srcImgS.width / 100;
+    ApplyCLAHE(blurGrImg, gridSize, outImg);
+    blurGrImg.release();
+}
 //-------------------------------------------------------------------------------------------
 // Only Gabor Filtering
 
@@ -32,10 +52,11 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     cvtColor(inImg, imgGray, COLOR_BGR2GRAY);
 
     //WrinkRespMap是由Face_Rect来限定的
-    Mat fhGabMap8U, glabGabMap8U, lEbGabMap8U, rEbGabMap8U;
+    Mat fhGabMap8U, glabGabMap8U, lEbGabMap8U, rEbGabMap8U, lNagvGabMap8U, rNagvGabMap8U;
     CalcGaborMap(imgGray, wrkRegGroup,
                  fhGabMap8U, glabGabMap8U,
-                 lEbGabMap8U,rEbGabMap8U);
+                 lEbGabMap8U,rEbGabMap8U,
+                 lNagvGabMap8U, rNagvGabMap8U);
     
     int totalWrkLen = 0;
     
