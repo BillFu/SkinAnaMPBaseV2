@@ -79,13 +79,24 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     ExtWrkFromEgGabMap(wrkRegGroup.rEyeBagReg, rEbGabMap8U,
                        minWrkTh/2, longWrkTh/2,
                        lightWrkConts, longWrkConts);
+    
+    ExtWrkFromEgGabMap(wrkRegGroup.rEyeBagReg, rEbGabMap8U,
+                       minWrkTh/2, longWrkTh/2,
+                       lightWrkConts, longWrkConts);
 
-    /*
+    ExtWrkFromOneNagvGabMap(true, wrkRegGroup.lNagvReg, lNagvGabMap8U,
+                            minWrkTh/2, longWrkTh/2,
+                            lightWrkConts,longWrkConts);
+
+    ExtWrkFromOneNagvGabMap(false, wrkRegGroup.rNagvReg, rNagvGabMap8U,
+                            minWrkTh/2, longWrkTh/2,
+                            lightWrkConts,longWrkConts);
+    
     numLongWrk = (int)(longWrkConts.size());
     numLightWrk = (int)(lightWrkConts.size());
     numDeepWrk = (int)(deepWrkConts.size());
     numShortWrk = numDeepWrk + numLightWrk - numLongWrk;
-    */
+    
     // 只显示浅皱纹和深皱纹
     Mat outDLWrkImg = forgeWrkAnno(inImg.size(), longWrkConts, deepWrkConts);
         

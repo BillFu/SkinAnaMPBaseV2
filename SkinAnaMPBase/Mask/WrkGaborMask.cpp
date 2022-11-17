@@ -185,21 +185,13 @@ Mat ForgeEyebagMask(Size srcImgS, const Point2i eyeRefPts[71])
 void ForgeRightNagvPg( const FaceInfo& faceInfo, POLYGON& outPolygon)
 {
     outPolygon.push_back(getPtOnGLm(faceInfo, 355));
-    
-    Point2i pt429a = IpGLmPtWithPair(faceInfo, 429, 420, 0.65);
-    outPolygon.push_back(pt429a);
-    Point2i pt360a = IpGLmPtWithPair(faceInfo, 360, 363, 0.5);
-    outPolygon.push_back(pt360a);
-    Point2i pt344a = IpGLmPtWithPair(faceInfo, 344, 440, 0.7);
-    outPolygon.push_back(pt344a);
-    outPolygon.push_back(getPtOnGLm(faceInfo, 309));
-    Point2i pt391a = IpGLmPtWithPair(faceInfo, 391, 393, 0.6);
-    outPolygon.push_back(pt391a);
-    Point2i pt269a = IpGLmPtWithPair(faceInfo, 269, 270, 0.5);
-    outPolygon.push_back(pt269a);
-    outPolygon.push_back(getPtOnGLm(faceInfo, 409));
-    Point2i pt287a = IpGLmPtWithPair(faceInfo, 287, 273, 0.6);
-    outPolygon.push_back(pt287a);
+    outPolygon.push_back(getPtOnGLm(faceInfo, 429));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 279));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 358));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 410));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 273));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 431));
+
     outPolygon.push_back(getPtOnGLm(faceInfo, 430));
     outPolygon.push_back(getPtOnGLm(faceInfo, 432));
     outPolygon.push_back(getPtOnGLm(faceInfo, 436));
@@ -210,11 +202,47 @@ void ForgeRightNagvPg( const FaceInfo& faceInfo, POLYGON& outPolygon)
     outPolygon.push_back(getPtOnGLm(faceInfo, 371));
 }
 
+void ForgeLeftNagvPg( const FaceInfo& faceInfo, POLYGON& outPolygon)
+{
+    outPolygon.push_back(getPtOnGLm(faceInfo, 126));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 209));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 49));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 129));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 186));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 43));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 211));
+
+    outPolygon.push_back(getPtOnGLm(faceInfo, 210));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 212));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 216));
+    Point2i pt426a = IpGLmPtWithPair(faceInfo, 206, 205, 0.2);
+    outPolygon.push_back(pt426a);
+    Point2i pt423a = IpGLmPtWithPair(faceInfo, 203, 36, 0.65);
+    outPolygon.push_back(pt423a);
+    outPolygon.push_back(getPtOnGLm(faceInfo, 142));
+}
+
 Mat ForgeRNagvMask(const FaceInfo& faceInfo)
 {
     POLYGON coarsePolygon, refinedPolygon;
     //ForgeGlabellPg(faceInfo, coarsePolygon);
     ForgeRightNagvPg(faceInfo, coarsePolygon);
+
+    int csNumPoint = 80;
+    DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+
+    Mat outMask(faceInfo.srcImgS, CV_8UC1, cv::Scalar(0));
+    // !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
+    DrawContOnMask(refinedPolygon, outMask);
+    
+    return outMask;
+}
+
+Mat ForgeLNagvMask(const FaceInfo& faceInfo)
+{
+    POLYGON coarsePolygon, refinedPolygon;
+    //ForgeGlabellPg(faceInfo, coarsePolygon);
+    ForgeLeftNagvPg(faceInfo, coarsePolygon);
 
     int csNumPoint = 80;
     DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
@@ -460,6 +488,10 @@ void ForgeWrkTenRegs(const FaceInfo& faceInfo, const Mat& fbBiLab,
     Mat rNagvMask = ForgeRNagvMask(faceInfo);
     TransMaskGS2LS(rNagvMask, wrkRegGroup.rNagvReg);
     rNagvMask.release();
+    
+    Mat lNagvMask = ForgeLNagvMask(faceInfo);
+    TransMaskGS2LS(lNagvMask, wrkRegGroup.lNagvReg);
+    rNagvMask.release();
 
     Mat rCheekMask = ForgeRCheekMask(faceInfo);
     TransMaskGS2LS(rCheekMask, wrkRegGroup.rCheekReg);
@@ -522,6 +554,12 @@ void ForgeWrkTenRegs(const Mat& annoLmImage,
     AnnoMaskOnImage(annoLmImage, rNagvMaskGS,
                         "rNagvMaskGS", rNagvMaskImgFile.c_str());
     rNagvMaskGS.release();
+    
+    Mat lNagvMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.lNagvReg);
+    string lNagvMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "lNagvMaskGS.png");
+    AnnoMaskOnImage(annoLmImage, lNagvMaskGS,
+                        "lNagvMaskGS", lNagvMaskImgFile.c_str());
+    lNagvMaskGS.release();
     
     Mat rCheekMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.rCheekReg);
     Mat lCheekMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.lCheekReg);

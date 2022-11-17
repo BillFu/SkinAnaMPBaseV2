@@ -260,13 +260,14 @@ Mat CcGaborMapInOneCheek(const Mat& grFtSrcImg, int kerSize, int sigma,
 void BuildGabOptsForNagv(int kerSize, int sigma, bool isLeft, GaborOptBank& gOptBank)
 {
     // use the left eye as the reference
-    float rightThetaSet[] = {103, 91.75, 80.0, 114.25, 125.5};
-    int numTheta = sizeof(rightThetaSet) / sizeof(float);
+    float leftThetaSet[] = {22, 11, 33};
+    int numTheta = sizeof(leftThetaSet) / sizeof(float);
     if(isLeft)
     {
+        
         for(int i=0; i<numTheta; i++)
         {
-            GaborOpt opt(kerSize, 53, sigma, 40, 180 - rightThetaSet[i], 131);
+            GaborOpt opt(kerSize, 54, sigma, 42, leftThetaSet[i], 125);
             gOptBank.push_back(opt);
         }
     }
@@ -274,14 +275,15 @@ void BuildGabOptsForNagv(int kerSize, int sigma, bool isLeft, GaborOptBank& gOpt
     {
         for(int i=0; i<numTheta; i++)
         {
-            GaborOpt opt(kerSize, 53, sigma, 40, rightThetaSet[i], 131);
+            GaborOpt opt(kerSize, 54, sigma, 42, 180 - leftThetaSet[i], 125);
             gOptBank.push_back(opt);
         }
     }
 }
 
-Mat CcGabMapInOneNagv(const Mat& grFtSrcImg, int kerSize, int sigma,
-                         bool isLeft, const Rect& nagvRect)
+Mat CcGabMapInOneNagv(bool isLeft,
+                      const Mat& grFtSrcImg, int kerSize, int sigma,
+                          const Rect& nagvRect)
 {
     Mat inGrFtImg = grFtSrcImg(nagvRect);
     
@@ -399,7 +401,7 @@ void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
     int kerSize = int(21.0 * grSrcImg.cols / 2448.0 + 0.5);
     if(kerSize % 2 == 0)
         kerSize++;
-    int sigma = int(8.8 * grSrcImg.cols / 2448.0 + 0.5);
+    int sigma = int(8 * grSrcImg.cols / 2448.0 + 0.5);
     
     //Eb: eyebag
     lEbGabMap8U = CcGabMapInOneEyebag(grFtSrcImg, kerSize, sigma,
@@ -423,8 +425,11 @@ void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
                                             false, wrkRegGroup.rCheekReg.bbox);
     */
     
-    rNagvGabMap8U = CcGabMapInOneNagv(grFtSrcImg, kerSize, sigma,
-                                            false, wrkRegGroup.rNagvReg.bbox);
+    lNagvGabMap8U = CcGabMapInOneNagv(true, grFtSrcImg, kerSize, sigma,
+                                            wrkRegGroup.lNagvReg.bbox);
+
+    rNagvGabMap8U = CcGabMapInOneNagv(false, grFtSrcImg, kerSize, sigma,
+                                            wrkRegGroup.rNagvReg.bbox);
     
 #ifdef TEST_RUN2
     bool isSuccess;
@@ -436,9 +441,6 @@ void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
     isSuccess = SaveTestOutImgInDir(lCFGabMap8U,  wrkOutDir,   "lCFGabMap.png");
     isSuccess = SaveTestOutImgInDir(rCFGabMap8U,  wrkOutDir,   "rCFGabMap.png");
 
-    //isSuccess = SaveTestOutImgInDir(lChkGabMap8U, wrkOutDir,  "lChkGabMap.png");
-    //isSuccess = SaveTestOutImgInDir(rChkGabMap8U, wrkOutDir,  "rChkGabMap.png");
-    
     isSuccess = SaveTestOutImgInDir(rNagvGabMap8U, wrkOutDir,  "rNagvGabMap.png");
 
 #endif
@@ -593,6 +595,70 @@ void ExtWrkFromEgGabMap(const DetectRegion& ebReg,
             CONTOUR gsCt;
             transCt_LSS2GS(cont, tlPt, gsCt);
             longWrkConts.push_back(gsCt);
+        }
+    }
+}
+
+void ExtWrkFromOneNagvGabMap(bool isLeft,
+                             const DetectRegion& nagvReg,
+                        const Mat& nagvGabMap8U,
+                        int minWrkTh,
+                        int longWrkThresh,
+                        CONTOURS& DeepWrkConts,
+                        CONTOURS& LongWrkConts)
+{
+    cv::Mat biMap;
+    int dpWrkBiTh = 15;
+    biMap = nagvGabMap8U & nagvReg.mask;
+    cv::threshold(biMap, biMap, dpWrkBiTh, 255, THRESH_BINARY);
+    
+#ifdef TEST_RUN2
+    if(isLeft)
+    {
+        string GabBiFile = wrkOutDir + "/lnagvGabBi.png";
+        imwrite(GabBiFile.c_str(), biMap);
+    }
+    else
+    {
+        string GabBiFile = wrkOutDir + "/rnagvGabBi.png";
+        imwrite(GabBiFile.c_str(), biMap);
+    }
+#endif
+    
+    chao_thinimage(biMap); //单通道、二值化后的图像
+#ifdef TEST_RUN2
+    if(isLeft)
+    {
+        string ThinGabBiFile = wrkOutDir + "/lNagvThinGabBi.png";
+        imwrite(ThinGabBiFile.c_str(), biMap);
+    }
+    else
+    {
+        string ThinGabBiFile = wrkOutDir + "/rNagvThinGabBi.png";
+        imwrite(ThinGabBiFile.c_str(), biMap);
+    }
+#endif
+    
+    CONTOURS contours;
+    cv::findContours(biMap, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
+    
+    std::sort(contours.begin(), contours.end(),
+        [](const CONTOUR& a, const CONTOUR& b){return a.size() > b.size();});
+        
+    Point2i tlPt = nagvReg.bbox.tl();
+    for (CONTOUR cont: contours)
+    {
+        if (cont.size() >= minWrkTh)
+        {
+            CONTOUR gsCt;
+            transCt_LSS2GS(cont, tlPt, gsCt);
+            DeepWrkConts.push_back(gsCt);
+        }
+        if (cont.size() >= longWrkThresh ) // && it_c->size() <= sizeMax )
+        {
+            CONTOUR gsCt;
+            transCt_LSS2GS(cont, tlPt, gsCt);
+            LongWrkConts.push_back(gsCt);
         }
     }
 }

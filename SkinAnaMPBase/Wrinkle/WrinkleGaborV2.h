@@ -69,8 +69,9 @@ Mat CcGaborMapInOneCheek(const Mat& grFtSrcImg, int kerSize, int sigma,
 
 void BuildGabOptsForNagv(int kerSize, int sigma, bool isLeft, GaborOptBank& gOptBank);
 
-Mat CcGabMapInOneNagv(const Mat& grFtSrcImg, int kerSize, int sigma,
-                         bool isLeft, const Rect& nagvRect);
+Mat CcGabMapInOneNagv(bool isLeft, const Mat& grFtSrcImg,
+                      int kerSize, int sigma,
+                      const Rect& nagvRect);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -106,11 +107,19 @@ void ExtWrkFromGlabGabMap(const Rect& glabRect,
                         CONTOURS& DeepWrkConts,
                         CONTOURS& LongWrkConts);
 
-
 void ExtWrkFromEgGabMap(const DetectRegion& ebReg,
                         const Mat& ebGabMap8U,
                         int minWrkTh,
                         int longWrkThresh,
                         CONTOURS& lightWrkConts,
                         CONTOURS& wrkConts);
+
+void ExtWrkFromOneNagvGabMap(bool isLeft,
+                             const DetectRegion& nagvReg,
+                        const Mat& nagvGabMap8U,
+                        int minWrkTh,
+                        int longWrkThresh,
+                        CONTOURS& DeepWrkConts,
+                        CONTOURS& LongWrkConts);
+
 #endif /* WRINKLE_GABOR_V2_H */
