@@ -14,7 +14,7 @@ Date:   2022/11/15
 #include "WrinkleV2.hpp"
 #include "frangi.h"
 #include "WrinkleFrangi.h"
-#include "WrinkleGaborV2.h"
+#include "WrinkleGaborV3.h"
 #include "../ImgProc.h"
 
 void PreprocGrImg(const Mat& grSrcImg,
@@ -71,18 +71,6 @@ void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
     ExtWrkFromGlabGabMap(wrkRegGroup.glabReg.bbox,
                          glabGabMap8U, minWrkTh,longWrkTh,
                          deepWrkConts, longWrkConts);
-
-    ExtWrkFromEgGabMap(wrkRegGroup.lEyeBagReg, lEbGabMap8U,
-                       minWrkTh/2, longWrkTh/2,
-                       lightWrkConts, longWrkConts);
-    
-    ExtWrkFromEgGabMap(wrkRegGroup.rEyeBagReg, rEbGabMap8U,
-                       minWrkTh/2, longWrkTh/2,
-                       lightWrkConts, longWrkConts);
-    
-    ExtWrkFromEgGabMap(wrkRegGroup.rEyeBagReg, rEbGabMap8U,
-                       minWrkTh/2, longWrkTh/2,
-                       lightWrkConts, longWrkConts);
 
     ExtWrkFromOneNagvGabMap(true, wrkRegGroup.lNagvReg, lNagvGabMap8U,
                             minWrkTh/2, longWrkTh/2,

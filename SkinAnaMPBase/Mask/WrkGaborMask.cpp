@@ -166,20 +166,6 @@ void ForgeEyebagPg(const Point2i eyeRefPts[71],
     outPolygon.push_back(pt58b);
 }
 
-Mat ForgeEyebagMask(Size srcImgS, const Point2i eyeRefPts[71])
-{
-    POLYGON coarsePolygon, refinedPolygon;
-    ForgeEyebagPg(eyeRefPts, coarsePolygon);
-    
-    int csNumPoint = 60;
-    DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
-
-    Mat outMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    // !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
-    DrawContOnMask(refinedPolygon, outMask);
-    
-    return outMask;
-}
 //-------------------------------------------------------------------------------
 // nasolabial grooves 鼻唇沟
 void ForgeRightNagvPg( const FaceInfo& faceInfo, POLYGON& outPolygon)
@@ -476,15 +462,7 @@ void ForgeWrkTenRegs(const FaceInfo& faceInfo, const Mat& fbBiLab,
     glabMaskGS.release();
     fhMaskGS.release();
     DLWrkMaskGS.release();
-    
-    Mat lEyeBagMask = ForgeEyebagMask(faceInfo.srcImgS, faceInfo.lEyeRefinePts);
-    TransMaskGS2LS(lEyeBagMask, wrkRegGroup.lEyeBagReg);
-    lEyeBagMask.release();
-    
-    Mat rEyeBagMask = ForgeEyebagMask(faceInfo.srcImgS, faceInfo.rEyeRefinePts);
-    TransMaskGS2LS(rEyeBagMask, wrkRegGroup.rEyeBagReg);
-    rEyeBagMask.release();
-    
+        
     Mat rNagvMask = ForgeRNagvMask(faceInfo);
     TransMaskGS2LS(rNagvMask, wrkRegGroup.rNagvReg);
     rNagvMask.release();
@@ -492,22 +470,6 @@ void ForgeWrkTenRegs(const FaceInfo& faceInfo, const Mat& fbBiLab,
     Mat lNagvMask = ForgeLNagvMask(faceInfo);
     TransMaskGS2LS(lNagvMask, wrkRegGroup.lNagvReg);
     rNagvMask.release();
-
-    Mat rCheekMask = ForgeRCheekMask(faceInfo);
-    TransMaskGS2LS(rCheekMask, wrkRegGroup.rCheekReg);
-    rCheekMask.release();
-    
-    Mat lCheekMask = ForgeLCheekMask(faceInfo);
-    TransMaskGS2LS(lCheekMask, wrkRegGroup.lCheekReg);
-    lCheekMask.release();
-    
-    Mat rCFMask = ForgeRCrowFeetMask(faceInfo);
-    TransMaskGS2LS(rCFMask, wrkRegGroup.rCrowFeetReg);
-    rCFMask.release();
-    
-    Mat lCFMask = ForgeLCrowFeetMask(faceInfo);
-    TransMaskGS2LS(lCFMask, wrkRegGroup.lCrowFeetReg);
-    lCFMask.release();
 }
 
 void ForgeWrkTenRegs(const Mat& annoLmImage,
@@ -537,18 +499,6 @@ void ForgeWrkTenRegs(const Mat& annoLmImage,
     glabMaskGS.release();
     DLWrkMaskGS.release();
 
-    Mat lEyeBagMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.lEyeBagReg);
-    Mat rEyeBagMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.rEyeBagReg);
-    
-    Mat eyeBagMaskGS = lEyeBagMaskGS | rEyeBagMaskGS;
-    string eyeBagMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "EyeBagMask.png");
-    AnnoMaskOnImage(annoLmImage, eyeBagMaskGS,
-                        "EyeBagMask", eyeBagMaskImgFile.c_str());
-    
-    lEyeBagMaskGS.release();
-    rEyeBagMaskGS.release();
-    eyeBagMaskGS.release();
-
     Mat rNagvMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.rNagvReg);
     string rNagvMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "rNagvMaskGS.png");
     AnnoMaskOnImage(annoLmImage, rNagvMaskGS,
@@ -560,29 +510,6 @@ void ForgeWrkTenRegs(const Mat& annoLmImage,
     AnnoMaskOnImage(annoLmImage, lNagvMaskGS,
                         "lNagvMaskGS", lNagvMaskImgFile.c_str());
     lNagvMaskGS.release();
-    
-    Mat rCheekMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.rCheekReg);
-    Mat lCheekMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.lCheekReg);
-    Mat cheekMaskGS = rCheekMaskGS | lCheekMaskGS;
-    
-    string cheekMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "CheekRegGS.png");
-    AnnoMaskOnImage(annoLmImage, cheekMaskGS,
-                        "CheekMaskGS", cheekMaskImgFile.c_str());
-    rCheekMaskGS.release();
-    lCheekMaskGS.release();
-    cheekMaskGS.release();
-
-    Mat lCFMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.lCrowFeetReg);
-    Mat rCFMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.rCrowFeetReg);
-    Mat CFMaskGS  = rCFMaskGS | lCFMaskGS;
-    
-    string CFMaskFile = BuildOutImgFNV2(wrkMaskOutDir, "CFRegGS.png");
-    AnnoMaskOnImage(annoLmImage, CFMaskGS,
-                        "CFMaskGS", CFMaskFile.c_str());
-    
-    lCFMaskGS.release();
-    rCFMaskGS.release();
-    CFMaskGS.release();
     
 #endif
 

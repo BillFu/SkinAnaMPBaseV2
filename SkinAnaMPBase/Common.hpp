@@ -147,17 +147,8 @@ struct WrkRegGroup
     
     DetectRegion dlWrkReg; // use to detect deep and long wrk, produced by combining fhReg and glabReg
 
-    DetectRegion lEyeBagReg;
-    DetectRegion rEyeBagReg;
-
     DetectRegion lNagvReg; //
     DetectRegion rNagvReg;
-
-    DetectRegion lCheekReg;
-    DetectRegion rCheekReg;
-
-    DetectRegion lCrowFeetReg;
-    DetectRegion rCrowFeetReg;
     
     DetectRegion lCirEyeReg;  // 环眼睛周边区域，眼睛被抠除
     DetectRegion rCirEyeReg;

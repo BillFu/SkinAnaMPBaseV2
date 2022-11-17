@@ -160,42 +160,9 @@ int main(int argc, char **argv)
     AnnoMaskOnImage(paraImage, detRegPack.eyesMask,
                     "eyes_mask", eyesMaskParaImgFile.c_str());
     
-    Mat lEbMaskGS = TransMaskLS2GS(faceInfo.srcImgS, detRegPack.wrkRegGroup.lEyeBagReg);
-    Mat rEbMaskGS = TransMaskLS2GS(faceInfo.srcImgS, detRegPack.wrkRegGroup.rEyeBagReg);
-    Mat ebMaskGS = lEbMaskGS | rEbMaskGS;
-    rEbMaskGS.release();
-    lEbMaskGS.release();
-    
-    /*
-    string ebMaskParaImgFile = BuildOutImgFNV2(wrkMaskOutDir, "ebMaskOnPara.png");
-    AnnoMaskOnImage(paraImage, ebMaskGS,
-                        "Eye bag Mask", ebMaskParaImgFile.c_str());
-    */
     Mat canvas = paraImage.clone();
     AnnoTwoEyeRefinePts(canvas, faceInfo, Scalar(255, 0, 0), true);
     
-    /*
-    Mat lCFMaskGS = TransMaskLS2GS(faceInfo.srcImgS, detRegPack.wrkRegGroup.lCrowFeetReg);
-    Mat rCFMaskGS = TransMaskLS2GS(faceInfo.srcImgS, detRegPack.wrkRegGroup.rCrowFeetReg);
-    Mat cfMaskGS = lCFMaskGS | rCFMaskGS;
-    lCFMaskGS.release();
-    rCFMaskGS.release();
-    
-    Mat eyeAround = ebMaskGS | cfMaskGS;
-    ebMaskGS.release();
-    cfMaskGS.release();
-
-    string ebAroundAnnoImgFile = BuildOutImgFNV2(wrkMaskOutDir, "eyeAroundOnPara.png");
-    AnnoMaskOnImage(canvas, eyeAround,
-                        "Eye Around Mask", ebAroundAnnoImgFile.c_str());
-    
-    string eFullMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "eyeFullMaskOnPara.png");
-    AnnoMaskOnImage(canvas, detRegPack.eyesFullMask,
-                        "Eye Full Mask", eFullMaskImgFile.c_str());
-    */
-    
-    ///Mat lCirEyeMaskGS = TransMaskLS2GS(faceInfo.srcImgS, detRegPack.wrkRegGroup.lCrowFeetReg);
-    //Mat rCirEyeMaskGS = TransMaskLS2GS(faceInfo.srcImgS, detRegPack.wrkRegGroup.rCrowFeetReg);
     Mat cirEyesMaskGS;
     SumDetReg2GSMask(faceInfo.srcImgS,
                      detRegPack.wrkRegGroup.lCirEyeReg,
