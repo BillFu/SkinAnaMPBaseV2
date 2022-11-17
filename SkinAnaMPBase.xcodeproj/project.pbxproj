@@ -21,7 +21,6 @@
 		26B2C4AC2915F9590048B37C /* frangi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B2C4AB2915F9590048B37C /* frangi.cpp */; };
 		26B65A5E28EA92900019104F /* LowerFaceMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B65A5C28EA92900019104F /* LowerFaceMask.cpp */; };
 		26B65A5F28EA983E0019104F /* LowerFaceMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B65A5C28EA92900019104F /* LowerFaceMask.cpp */; };
-		26B8E57E2923A6F600202763 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 265B7B9728E5B26D004F5E49 /* libtensorflowlite.so */; };
 		26B8E5812923C6DD00202763 /* WrinkleV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B8E5802923C6DD00202763 /* WrinkleV2.cpp */; };
 		26B8E5842923CBB000202763 /* WrinkleGaborV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B8E5832923CBB000202763 /* WrinkleGaborV2.cpp */; };
 		26D773AE2912A1450051177F /* SmEyePg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D773AC2912A1450051177F /* SmEyePg.cpp */; };
@@ -35,6 +34,7 @@
 		CB4312AA28D41DDD006D71DA /* ParametricBSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB4312A828D41DDD006D71DA /* ParametricBSpline.cpp */; };
 		CB443CE22913545300E9B24B /* EyebrowMaskV8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB443CE02913545300E9B24B /* EyebrowMaskV8.cpp */; };
 		CB45E23F28E54BA7004E8D25 /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB45E23E28E54BA7004E8D25 /* Geometry.cpp */; };
+		CB58C81C2925C1E200A1B828 /* libtensorflowlite.so in Frameworks */ = {isa = PBXBuildFile; fileRef = CBD123FD28E58EEB004A42A9 /* libtensorflowlite.so */; };
 		CB62F4712908D04600828C4C /* activecontours.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB62F4672908D04600828C4C /* activecontours.cpp */; };
 		CB62F4722908D04600828C4C /* sobel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB62F46A2908D04600828C4C /* sobel.cpp */; };
 		CB7F673F28F4165500060E7C /* SegHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB9D430828F3F9DA00CD3B13 /* SegHelper.cpp */; };
@@ -158,7 +158,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26B8E57E2923A6F600202763 /* libtensorflowlite.so in Frameworks */,
+				CB58C81C2925C1E200A1B828 /* libtensorflowlite.so in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -619,7 +619,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/include",
-					/Users/fuliye/nlohmann_json/include,
+					/Users/meicet/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/lib,
@@ -649,7 +649,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/include/opencv4,
 					"${PROJECT_DIR}/include",
-					/Users/fuliye/nlohmann_json/include,
+					/Users/meicet/nlohmann_json/include,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/Cellar/opencv/4.6.0/lib,

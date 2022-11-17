@@ -187,3 +187,54 @@ void AnnoLowerJaw(const Mat& srcImage, const FaceInfo& faceInfo,
 
     imwrite(annoFile.c_str(), canvas);
 }
+
+//-----------------------------------------------------------------------------------------
+
+void AnnoMaskOnImage(const Mat& srcImg, const Mat& mask,
+                        const string& maskName,
+                        const char* out_filename,
+                        Scalar drawColor)
+{
+    vector<Mat> blue_mask_chs;
+
+    Mat zero_chan(srcImg.size(), CV_8UC1, Scalar(0));
+    blue_mask_chs.push_back(zero_chan);
+    blue_mask_chs.push_back(zero_chan);
+    blue_mask_chs.push_back(mask);
+
+    Mat blueMask;
+    merge(blue_mask_chs, blueMask);
+    
+    Mat outImg = Mat::zeros(srcImg.size(), CV_8UC3);
+    addWeighted(srcImg, 0.70, blueMask, 0.3, 0.0, outImg);
+    
+    double stdScale = 2.0;
+    int    stdWidth = 2000;
+    double fontScale = srcImg.cols * stdScale / stdWidth;
+    
+    //Scalar redColor(0, 0, 255);  // BGR
+    cv::putText(outImg, "SkinAnaMPBase: " + maskName, Point(100, 100),
+                    FONT_HERSHEY_SIMPLEX, fontScale, drawColor, 2);
+
+    imwrite(out_filename, outImg);
+}
+
+void AnnoMaskOnCanvas(Mat& canvas, const Mat& mask,
+                      const Scalar& drawColor)
+{
+    vector<Mat> mask_chs;
+
+    //Mat zero_chan(srcImg.size(), CV_8UC1, Scalar(0));
+    Mat blueCh = mask*drawColor[0]/255;
+    Mat greenCh = mask*drawColor[1]/255;
+    Mat redCh = mask*drawColor[2]/255;
+
+    mask_chs.push_back(blueCh);
+    mask_chs.push_back(greenCh);
+    mask_chs.push_back(redCh);
+
+    Mat coloredMask;
+    merge(mask_chs, coloredMask);
+    
+    addWeighted(canvas, 0.70, coloredMask, 0.3, 0.0, canvas);
+}

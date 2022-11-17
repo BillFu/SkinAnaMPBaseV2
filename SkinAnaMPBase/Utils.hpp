@@ -95,9 +95,20 @@ void ClipRectByFR(int frW, int frH, int margin, Rect& rect);
 //-------------------------------------------------------------------------------------------
 // LS: local space
 // GS: global space
-Mat TransMaskFromLS2GS(const Size& srcSize, const DetectRegion& localMask);
+Mat TransMaskLS2GS(const Size& srcSize, const DetectRegion& localMask);
 
-void TransMaskFromGS2LS(const Mat& maskGS, DetectRegion& localMask);
+void TransMaskGS2LS(const Mat& maskGS, DetectRegion& localMask);
+
+void TransPgGS2LSMask(const POLYGON& gsPg, DetectRegion& localMask);
+
+// !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
+void DrawContOnMask(const POLYGON& contours, Mat& outMask);
+
+void SubstractDetReg(const Size& gsSize, const DetectRegion& reg1,
+                     const DetectRegion& reg2, DetectRegion& outReg);
+
+void SumDetReg2GSMask(const Size& gsSize, const DetectRegion& reg1,
+                      const DetectRegion& reg2, Mat& outMask);
 
 //-------------------------------------------------------------------------------------------
 bool SaveTestOutImgInDir(const Mat& out_img,

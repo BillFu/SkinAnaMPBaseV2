@@ -14,6 +14,7 @@ Date:   2022/9/11
 #include <float.h>
 #include <numeric>      // std::accumulate
 
+#include "Geometry.hpp"
 
 // return a string that present a float with 2 decimal digits.
 // for example, return "3.14" for 3.1415927
@@ -309,14 +310,20 @@ void ClipRectByFR(int frW, int frH, int margin, Rect& rect)
 }
 
 //-------------------------------------------------------------------------------------------
-Mat TransMaskFromLS2GS(const Size& srcSize, const DetectRegion& localMask)
+// !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
+void DrawContOnMask(const POLYGON& contours, Mat& outMask)
+{
+    cv::fillPoly(outMask, contours, cv::Scalar(255));
+}
+
+Mat TransMaskLS2GS(const Size& srcSize, const DetectRegion& localMask)
 {
     Mat maskInGlobal(srcSize, CV_8UC1, Scalar(0));
     localMask.mask.copyTo(maskInGlobal(localMask.bbox));
     return maskInGlobal;
 }
 
-void TransMaskFromGS2LS(const Mat& maskGS, DetectRegion& localMask)
+void TransMaskGS2LS(const Mat& maskGS, DetectRegion& localMask)
 {
     Rect maskRect = boundingRect(maskGS);
     Mat cropMask;
@@ -324,6 +331,41 @@ void TransMaskFromGS2LS(const Mat& maskGS, DetectRegion& localMask)
     localMask = DetectRegion(maskRect, cropMask);
 }
 
+void TransPgGS2LSMask(const POLYGON& gsPg, DetectRegion& localMask)
+{
+    Rect pgRect = boundingRect(gsPg);
+    
+    CONTOUR lssPg;
+    transCt_GS2LSS(gsPg, pgRect.tl(), lssPg);
+    
+    Mat lssMask(pgRect.size(), CV_8UC1, Scalar(0));
+    DrawContOnMask(lssPg, lssMask);
+    
+    localMask = DetectRegion(pgRect, lssMask);
+}
+
+
+void SubstractDetReg(const Size& gsSize, const DetectRegion& reg1,
+                     const DetectRegion& reg2, DetectRegion& outReg)
+{
+    Mat gsMask1 = TransMaskLS2GS(gsSize, reg1);
+    Mat gsMask2 = TransMaskLS2GS(gsSize, reg2);
+
+    Mat outMask = gsMask1 & (~gsMask2);
+    
+    TransMaskGS2LS(outMask, outReg);
+}
+
+void SumDetReg2GSMask(const Size& gsSize, const DetectRegion& reg1,
+                     const DetectRegion& reg2, Mat& outMask)
+{
+    Mat gsMask1 = TransMaskLS2GS(gsSize, reg1);
+    Mat gsMask2 = TransMaskLS2GS(gsSize, reg2);
+    
+    outMask = gsMask1 | gsMask2;
+}
+
+//-------------------------------------------------------------------------------
 bool SaveTestOutImgInDir(const Mat& out_img,
                          const string& outDir,
                          const char* outFileName)

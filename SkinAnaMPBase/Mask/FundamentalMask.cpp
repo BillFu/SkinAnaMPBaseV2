@@ -11,6 +11,7 @@ Date:   2022/9/15
 #include "../BSpline/ParametricBSpline.hpp"
 #include "ForeheadMask.hpp"
 #include "../Geometry.hpp"
+#include "../Utils.hpp"
 
 //-------------------------------------------------------------------------------------------
 void expanMask(const Mat& inMask, int expandSize, Mat& outMask)
@@ -20,12 +21,6 @@ void expanMask(const Mat& inMask, int expandSize, Mat& outMask)
                            Point(expandSize, expandSize));
     
     dilate(inMask, outMask, element);
-}
-
-// !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
-void DrawContOnMask(const POLYGON& contours, Mat& outMask)
-{
-    cv::fillPoly(outMask, contours, cv::Scalar(255));
 }
 
 Mat ContourGroup2Mask(int img_width, int img_height, const POLYGON_GROUP& contoursGroup)
@@ -136,6 +131,7 @@ void ForgeOneEyeFullMask(const FaceInfo& faceInfo, EyeID eyeID, Mat& outMask)
     DrawContOnMask(refinedPolygon, outMask);
 }
 
+
 void ForgeEyesFullMask(const FaceInfo& faceInfo, Mat& outEyesFullMask)
 {
     cv::Mat outMask(faceInfo.srcImgS, CV_8UC1, cv::Scalar(0));
@@ -145,6 +141,65 @@ void ForgeEyesFullMask(const FaceInfo& faceInfo, Mat& outEyesFullMask)
     
     outEyesFullMask = outMask;
     //expanMask(outMask, 20, outEyesFullMask);
+}
+
+//-------------------------------------------------------------------------------------------
+//  环眼睛区域，不包括眉毛
+void ForgeOneCirEyePg(const Point2i eyeRefinePts[71], POLYGON& outPolygon)
+{
+    // 采用Lip Refine Region的点！
+    int fullEyeOuterPtIndices[] = { // 顺时针计数
+        47, 46, 45, 44, 50, 63, 54,  // 下外轮廓线，从左到右
+        56, 57, 58, 59, 60, 39   // 上外轮廓线，从右到左
+    };
+    
+    int num_pts = sizeof(fullEyeOuterPtIndices) / sizeof(int);
+    
+    for(int i = 0; i<num_pts; i++)
+    {
+        int index = fullEyeOuterPtIndices[i];
+        outPolygon.push_back(eyeRefinePts[index]);
+    }
+}
+
+// 环眼睛周边区域，眼睛被抠除
+void ForgeOneCirEyeMask(const FaceInfo& faceInfo, EyeID eyeID,
+                        const DetectRegion& eyeReg,
+                        DetectRegion& lssReg)
+{
+    POLYGON coarsePolygon, refinedPolygon;
+    
+    if(eyeID == LEFT_EYE)
+        ForgeOneCirEyePg(faceInfo.lEyeRefinePts, coarsePolygon);
+    else
+        ForgeOneCirEyePg(faceInfo.rEyeRefinePts, coarsePolygon);
+    
+    int csNumPoint = 50; //200;
+    DenseSmoothPolygon(coarsePolygon, csNumPoint, refinedPolygon);
+    
+    DetectRegion cirFullReg;
+    TransPgGS2LSMask(refinedPolygon, cirFullReg);
+    
+    SubstractDetReg(faceInfo.srcImgS,
+                         cirFullReg, eyeReg, lssReg);
+
+}
+
+void ForgeCirEyesMask(const FaceInfo& faceInfo, Mat& outCirEyesMask,
+                      const DetectRegion& lEyeReg,
+                      const DetectRegion& rEyeReg,
+                      DetectRegion& lCirEyeReg,
+                      DetectRegion& rCirEyeReg)
+{
+    cv::Mat outMask(faceInfo.srcImgS, CV_8UC1, cv::Scalar(0));
+
+    ForgeOneCirEyeMask(faceInfo, LEFT_EYE,
+                       lEyeReg, lCirEyeReg);
+    ForgeOneCirEyeMask(faceInfo, RIGHT_EYE,
+                       rEyeReg, rCirEyeReg);
+        
+    SumDetReg2GSMask(faceInfo.srcImgS, lCirEyeReg,
+                     rCirEyeReg, outCirEyesMask);
 }
 
 //-------------------------------------------------------------------------------------------
@@ -240,52 +295,3 @@ void ForgeNoseBellMask(const FaceInfo& faceInfo, Mat& outMask)
 }
 
 //-------------------------------------------------------------------------------------------
-
-void OverlayMaskOnImage(const Mat& srcImg, const Mat& mask,
-                        const string& maskName,
-                        const char* out_filename,
-                        Scalar drawColor)
-{
-    vector<Mat> blue_mask_chs;
-
-    Mat zero_chan(srcImg.size(), CV_8UC1, Scalar(0));
-    blue_mask_chs.push_back(zero_chan);
-    blue_mask_chs.push_back(zero_chan);
-    blue_mask_chs.push_back(mask);
-
-    Mat blueMask;
-    merge(blue_mask_chs, blueMask);
-    
-    Mat outImg = Mat::zeros(srcImg.size(), CV_8UC3);
-    addWeighted(srcImg, 0.70, blueMask, 0.3, 0.0, outImg);
-    
-    double stdScale = 2.0;
-    int    stdWidth = 2000;
-    double fontScale = srcImg.cols * stdScale / stdWidth;
-    
-    //Scalar redColor(0, 0, 255);  // BGR
-    cv::putText(outImg, "SkinAnaMPBase: " + maskName, Point(100, 100),
-                    FONT_HERSHEY_SIMPLEX, fontScale, drawColor, 2);
-
-    imwrite(out_filename, outImg);
-}
-
-void OverMaskOnCanvas(Mat& canvas, const Mat& mask,
-                      const Scalar& drawColor)
-{
-    vector<Mat> mask_chs;
-
-    //Mat zero_chan(srcImg.size(), CV_8UC1, Scalar(0));
-    Mat blueCh = mask*drawColor[0]/255;
-    Mat greenCh = mask*drawColor[1]/255;
-    Mat redCh = mask*drawColor[2]/255;
-
-    mask_chs.push_back(blueCh);
-    mask_chs.push_back(greenCh);
-    mask_chs.push_back(redCh);
-
-    Mat coloredMask;
-    merge(mask_chs, coloredMask);
-    
-    addWeighted(canvas, 0.70, coloredMask, 0.3, 0.0, canvas);
-}

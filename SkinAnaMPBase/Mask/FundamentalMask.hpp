@@ -23,8 +23,6 @@ using namespace cv;
 //-------------------------------------------------------------------------------------------
 void expanMask(const Mat& inMask, int expandSize, Mat& outMask);
 
-// !!!调用这个函数前，outMask必须进行过初始化，或者已有内容在里面！！！
-void DrawContOnMask(const POLYGON& contours, Mat& outMask);
 
 Mat ContourGroup2Mask(int img_width, int img_height, const POLYGON_GROUP& contoursGroup);
 Mat ContourGroup2Mask(Size imgS, const POLYGON_GROUP& contoursGroup);
@@ -69,17 +67,16 @@ void ForgeNoseBellPg(const FaceInfo& faceInfo,
 void ForgeNoseBellMask(const FaceInfo& faceInfo, Mat& outNoseBellMask);
 
 //-------------------------------------------------------------------------------------------
-void OverlayMaskOnImage(const Mat& srcImg, const Mat& mask,
-                        const string& maskName,
-                        const char* out_filename,
-                        Scalar drawColor=Scalar(0, 0, 255));
+// 环眼睛周边区域，眼睛被抠除
+void ForgeOneCirEyeMask(const FaceInfo& faceInfo, EyeID eyeID,
+                        const DetectRegion& eyeReg, DetectRegion& lssReg);
 
+void ForgeCirEyesMask(const FaceInfo& faceInfo, Mat& cirEyesMask,
+                      const DetectRegion& lEyeReg,
+                      const DetectRegion& rEyeReg,
+                      DetectRegion& lCirEyeReg,
+                      DetectRegion& rCirEyeReg);
 
-//void OverMaskOnCanvas(const Mat& bgImg, const Mat& mask,
-//                      const Scalar& drawColor, Mat& outImg);
-
-void OverMaskOnCanvas(Mat& canvas, const Mat& mask,
-                      const Scalar& drawColor);
 //-------------------------------------------------------------------------------------------
 
 

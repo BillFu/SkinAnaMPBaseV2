@@ -54,7 +54,7 @@ int main(int argc, char **argv)
     json config_json;            // 创建 json 对象
     ifstream jfile(argv[1]);
     jfile >> config_json;        // 以文件流形式读取 json 文件
-        
+    
     string segModelFile = config_json.at("SegModelFile");
     string classColorFile = config_json.at("ClassColorFile");
     
@@ -79,10 +79,10 @@ int main(int argc, char **argv)
     if(!isOK)
     {
         cout << "Failed to load face mesh model file: "
-            << faceMeshAttenModelFile << endl;
+        << faceMeshAttenModelFile << endl;
         return 0;
     }
-        
+    
     // Load Input Image
     Mat crossImage = cv::imread(crossImgFile.c_str());
     if(crossImage.empty())
@@ -102,16 +102,16 @@ int main(int argc, char **argv)
     FaceBgSegmentor segmentor;
     segmentor.SegImage(crossImage, segResult);
     DrawSegOnImage(crossImage, 0.5,
-        segResult, segAnnoImgFP.c_str());
+                   segResult, segAnnoImgFP.c_str());
     
     cout << "cross Image has been segmented!" << endl;
     
     FaceInfo faceInfo;
-
+    
     float confThresh = 0.75;
     bool hasFace = false;
     isOK = ExtractFaceLm(crossImage, confThresh, segResult, hasFace,
-                              faceInfo, errorMsg);
+                         faceInfo, errorMsg);
     if(!isOK)
     {
         cout << "Error Happened to extract face LM: " << errorMsg << endl;
@@ -130,21 +130,20 @@ int main(int argc, char **argv)
     
     Mat annoLmImage = crossImage.clone();
     /*
-    string LmImgFile = BuildOutImgFNV2(
-            outParePath, "lm.png");
-    //AnnoAllLmInfo(annoLmImage, faceInfo, LmImgFile);
+     string LmImgFile = BuildOutImgFNV2(
+     outParePath, "lm.png");
+     //AnnoAllLmInfo(annoLmImage, faceInfo, LmImgFile);
      */
     AnnoGenKeyPoints(annoLmImage, faceInfo, true);
     /*
-    Scalar yellowColor(255, 0, 0);
-    //AnnoTwoEyeRefinePts(annoLmImage, faceInfo, yellowColor, true);
-    imwrite(LmImgFile.c_str(), annoLmImage);
-    */
+     Scalar yellowColor(255, 0, 0);
+     //AnnoTwoEyeRefinePts(annoLmImage, faceInfo, yellowColor, true);
+     imwrite(LmImgFile.c_str(), annoLmImage);
+     */
     DetRegPack detRegPack;
     ForgeDetRegPack(crossImage, annoLmImage, outParePath, faceInfo, segResult, detRegPack);
     
     crossImage.release();
-    
     
     string paraImgFile = config_json.at("ParallelImage");
     Mat paraImage = cv::imread(paraImgFile.c_str());
@@ -155,6 +154,58 @@ int main(int argc, char **argv)
     }
     else
         cout << "Succeeded to load parallel source image: " << paraImgFile << endl;
+    
+#ifdef TEST_RUN2
+    string eyesMaskParaImgFile = BuildOutImgFNV2(outDir, "eyesMaskOnPara.png");
+    AnnoMaskOnImage(paraImage, detRegPack.eyesMask,
+                    "eyes_mask", eyesMaskParaImgFile.c_str());
+    
+    Mat lEbMaskGS = TransMaskLS2GS(faceInfo.srcImgS, detRegPack.wrkRegGroup.lEyeBagReg);
+    Mat rEbMaskGS = TransMaskLS2GS(faceInfo.srcImgS, detRegPack.wrkRegGroup.rEyeBagReg);
+    Mat ebMaskGS = lEbMaskGS | rEbMaskGS;
+    rEbMaskGS.release();
+    lEbMaskGS.release();
+    
+    /*
+    string ebMaskParaImgFile = BuildOutImgFNV2(wrkMaskOutDir, "ebMaskOnPara.png");
+    AnnoMaskOnImage(paraImage, ebMaskGS,
+                        "Eye bag Mask", ebMaskParaImgFile.c_str());
+    */
+    Mat canvas = paraImage.clone();
+    AnnoTwoEyeRefinePts(canvas, faceInfo, Scalar(255, 0, 0), true);
+    
+    /*
+    Mat lCFMaskGS = TransMaskLS2GS(faceInfo.srcImgS, detRegPack.wrkRegGroup.lCrowFeetReg);
+    Mat rCFMaskGS = TransMaskLS2GS(faceInfo.srcImgS, detRegPack.wrkRegGroup.rCrowFeetReg);
+    Mat cfMaskGS = lCFMaskGS | rCFMaskGS;
+    lCFMaskGS.release();
+    rCFMaskGS.release();
+    
+    Mat eyeAround = ebMaskGS | cfMaskGS;
+    ebMaskGS.release();
+    cfMaskGS.release();
+
+    string ebAroundAnnoImgFile = BuildOutImgFNV2(wrkMaskOutDir, "eyeAroundOnPara.png");
+    AnnoMaskOnImage(canvas, eyeAround,
+                        "Eye Around Mask", ebAroundAnnoImgFile.c_str());
+    
+    string eFullMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "eyeFullMaskOnPara.png");
+    AnnoMaskOnImage(canvas, detRegPack.eyesFullMask,
+                        "Eye Full Mask", eFullMaskImgFile.c_str());
+    */
+    
+    ///Mat lCirEyeMaskGS = TransMaskLS2GS(faceInfo.srcImgS, detRegPack.wrkRegGroup.lCrowFeetReg);
+    //Mat rCirEyeMaskGS = TransMaskLS2GS(faceInfo.srcImgS, detRegPack.wrkRegGroup.rCrowFeetReg);
+    Mat cirEyesMaskGS;
+    SumDetReg2GSMask(faceInfo.srcImgS,
+                     detRegPack.wrkRegGroup.lCirEyeReg,
+                     detRegPack.wrkRegGroup.rCirEyeReg, cirEyesMaskGS);
+
+    string cirEyesMaskFile = BuildOutImgFNV2(wrkMaskOutDir, "cirEyesOnPara.png");
+    AnnoMaskOnImage(canvas, cirEyesMaskGS,
+                        "Eye Circular Mask", cirEyesMaskFile.c_str());
+    
+#endif
     
     CONTOURS deepWrkConts;
     CONTOURS lightWrkConts;

@@ -158,6 +158,9 @@ struct WrkRegGroup
 
     DetectRegion lCrowFeetReg;
     DetectRegion rCrowFeetReg;
+    
+    DetectRegion lCirEyeReg;  // 环眼睛周边区域，眼睛被抠除
+    DetectRegion rCirEyeReg;
 };
 
 // 各类皮肤特征的检测区域汇总
@@ -168,6 +171,12 @@ struct DetRegPack
     
     Mat poreMask;
     Mat wrkFrgiMask; // used for frangi filtering to detect wrinkle
+    
+    Mat eyesMask;
+    Mat eyesFullMask;
+    
+    Mat cirEyesMask;
+    
     WrkRegGroup  wrkRegGroup;
 };
 

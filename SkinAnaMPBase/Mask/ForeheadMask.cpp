@@ -11,11 +11,12 @@ Date:   2022/9/23
 
 ********************************************************************************/
 #include <algorithm>
-#include "ForeheadMask.hpp"
-#include "Geometry.hpp"
+#include "../Geometry.hpp"
+#include "../Utils.hpp"
 #include "../BSpline/ParametricBSpline.hpp"
-#include "FundamentalMask.hpp"
 
+#include "FundamentalMask.hpp"
+#include "ForeheadMask.hpp"
 
 
 // 前额顶部轮廓线由9个lm点组成。这9个点组成第0排点集，比它们低一些的9个点组成第1排点集。

@@ -10,11 +10,12 @@ Date:   2022/11/2
 #include <algorithm>
 #include "../Geometry.hpp"
 #include "../Utils.hpp"
+#include "../AnnoImage.hpp"
 #include "../polyitems_fit.hpp"
 #include "../BSpline/ParametricBSpline.hpp"
 
 #include "WrkGaborMask.hpp"
-#include "FundamentalMask.hpp"
+// #include "FundamentalMask.hpp"
 #include "ForeheadMask.hpp"
 
 //-------------------------------------------------------------------------------
@@ -436,44 +437,44 @@ void ForgeWrkTenRegs(const FaceInfo& faceInfo, const Mat& fbBiLab,
 {
     Mat fhMaskGS;
     ForgeFhMaskForWrk(faceInfo, fbBiLab, fhMaskGS);
-    TransMaskFromGS2LS(fhMaskGS, wrkRegGroup.fhReg);
+    TransMaskGS2LS(fhMaskGS, wrkRegGroup.fhReg);
     
     Mat glabMaskGS = ForgeGlabellaMask(faceInfo);
-    TransMaskFromGS2LS(glabMaskGS, wrkRegGroup.glabReg);
+    TransMaskGS2LS(glabMaskGS, wrkRegGroup.glabReg);
     
     Mat DLWrkMaskGS = fhMaskGS | glabMaskGS; // combine two into one
-    TransMaskFromGS2LS(DLWrkMaskGS, wrkRegGroup.dlWrkReg);
+    TransMaskGS2LS(DLWrkMaskGS, wrkRegGroup.dlWrkReg);
 
     glabMaskGS.release();
     fhMaskGS.release();
     DLWrkMaskGS.release();
     
     Mat lEyeBagMask = ForgeEyebagMask(faceInfo.srcImgS, faceInfo.lEyeRefinePts);
-    TransMaskFromGS2LS(lEyeBagMask, wrkRegGroup.lEyeBagReg);
+    TransMaskGS2LS(lEyeBagMask, wrkRegGroup.lEyeBagReg);
     lEyeBagMask.release();
     
     Mat rEyeBagMask = ForgeEyebagMask(faceInfo.srcImgS, faceInfo.rEyeRefinePts);
-    TransMaskFromGS2LS(rEyeBagMask, wrkRegGroup.rEyeBagReg);
+    TransMaskGS2LS(rEyeBagMask, wrkRegGroup.rEyeBagReg);
     rEyeBagMask.release();
     
     Mat rNagvMask = ForgeRNagvMask(faceInfo);
-    TransMaskFromGS2LS(rNagvMask, wrkRegGroup.rNagvReg);
+    TransMaskGS2LS(rNagvMask, wrkRegGroup.rNagvReg);
     rNagvMask.release();
 
     Mat rCheekMask = ForgeRCheekMask(faceInfo);
-    TransMaskFromGS2LS(rCheekMask, wrkRegGroup.rCheekReg);
+    TransMaskGS2LS(rCheekMask, wrkRegGroup.rCheekReg);
     rCheekMask.release();
     
     Mat lCheekMask = ForgeLCheekMask(faceInfo);
-    TransMaskFromGS2LS(lCheekMask, wrkRegGroup.lCheekReg);
+    TransMaskGS2LS(lCheekMask, wrkRegGroup.lCheekReg);
     lCheekMask.release();
     
     Mat rCFMask = ForgeRCrowFeetMask(faceInfo);
-    TransMaskFromGS2LS(rCFMask, wrkRegGroup.rCrowFeetReg);
+    TransMaskGS2LS(rCFMask, wrkRegGroup.rCrowFeetReg);
     rCFMask.release();
     
     Mat lCFMask = ForgeLCrowFeetMask(faceInfo);
-    TransMaskFromGS2LS(lCFMask, wrkRegGroup.lCrowFeetReg);
+    TransMaskGS2LS(lCFMask, wrkRegGroup.lCrowFeetReg);
     lCFMask.release();
 }
 
@@ -484,61 +485,61 @@ void ForgeWrkTenRegs(const Mat& annoLmImage,
     ForgeWrkTenRegs(faceInfo, fbBiLab, wrkRegGroup);
     
 #ifdef TEST_RUN2
-    Mat fhMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.fhReg);
-    Mat glabMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.glabReg);
-    Mat DLWrkMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.dlWrkReg);
+    Mat fhMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.fhReg);
+    Mat glabMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.glabReg);
+    Mat DLWrkMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.dlWrkReg);
     
     string fhMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "FhMask.png");
-    OverlayMaskOnImage(annoLmImage, fhMaskGS,
+    AnnoMaskOnImage(annoLmImage, fhMaskGS,
                         "Forehead Mask", fhMaskImgFile.c_str());
     
     string glabMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "glabMask.png");
-    OverlayMaskOnImage(annoLmImage, glabMaskGS,
+    AnnoMaskOnImage(annoLmImage, glabMaskGS,
                         "Glabella Mask", glabMaskImgFile.c_str());
     
     string dlWrkMaskFile = BuildOutImgFNV2(wrkMaskOutDir, "dlWrkMask.png");
-    OverlayMaskOnImage(annoLmImage, DLWrkMaskGS,
+    AnnoMaskOnImage(annoLmImage, DLWrkMaskGS,
                         "DL Wrk Mask", dlWrkMaskFile.c_str());
     
     fhMaskGS.release();
     glabMaskGS.release();
     DLWrkMaskGS.release();
 
-    Mat lEyeBagMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.lEyeBagReg);
-    Mat rEyeBagMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.rEyeBagReg);
+    Mat lEyeBagMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.lEyeBagReg);
+    Mat rEyeBagMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.rEyeBagReg);
     
     Mat eyeBagMaskGS = lEyeBagMaskGS | rEyeBagMaskGS;
     string eyeBagMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "EyeBagMask.png");
-    OverlayMaskOnImage(annoLmImage, eyeBagMaskGS,
+    AnnoMaskOnImage(annoLmImage, eyeBagMaskGS,
                         "EyeBagMask", eyeBagMaskImgFile.c_str());
     
     lEyeBagMaskGS.release();
     rEyeBagMaskGS.release();
     eyeBagMaskGS.release();
 
-    Mat rNagvMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.rNagvReg);
+    Mat rNagvMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.rNagvReg);
     string rNagvMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "rNagvMaskGS.png");
-    OverlayMaskOnImage(annoLmImage, rNagvMaskGS,
+    AnnoMaskOnImage(annoLmImage, rNagvMaskGS,
                         "rNagvMaskGS", rNagvMaskImgFile.c_str());
     rNagvMaskGS.release();
     
-    Mat rCheekMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.rCheekReg);
-    Mat lCheekMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.lCheekReg);
+    Mat rCheekMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.rCheekReg);
+    Mat lCheekMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.lCheekReg);
     Mat cheekMaskGS = rCheekMaskGS | lCheekMaskGS;
     
     string cheekMaskImgFile = BuildOutImgFNV2(wrkMaskOutDir, "CheekRegGS.png");
-    OverlayMaskOnImage(annoLmImage, cheekMaskGS,
+    AnnoMaskOnImage(annoLmImage, cheekMaskGS,
                         "CheekMaskGS", cheekMaskImgFile.c_str());
     rCheekMaskGS.release();
     lCheekMaskGS.release();
     cheekMaskGS.release();
 
-    Mat lCFMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.lCrowFeetReg);
-    Mat rCFMaskGS = TransMaskFromLS2GS(faceInfo.srcImgS, wrkRegGroup.rCrowFeetReg);
+    Mat lCFMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.lCrowFeetReg);
+    Mat rCFMaskGS = TransMaskLS2GS(faceInfo.srcImgS, wrkRegGroup.rCrowFeetReg);
     Mat CFMaskGS  = rCFMaskGS | lCFMaskGS;
     
     string CFMaskFile = BuildOutImgFNV2(wrkMaskOutDir, "CFRegGS.png");
-    OverlayMaskOnImage(annoLmImage, CFMaskGS,
+    AnnoMaskOnImage(annoLmImage, CFMaskGS,
                         "CFMaskGS", CFMaskFile.c_str());
     
     lCFMaskGS.release();

@@ -78,7 +78,9 @@ void ForgeInitEyePg(const Point2i eyeRefinePts[NUM_PT_EYE_REFINE_GROUP],
 void ForgeEyesMask(const Mat& srcImage,
                    const FaceInfo& faceInfo,
                    const FaceSegRst& segResult, // input, const 
-                   Mat& outMask);
+                   Mat& outMask,
+                   DetectRegion& lEyeReg,
+                   DetectRegion& rEyeReg);
 
 // forge the polygong of one eye, only use the result of face/bg segment
 void ForgeEyePg(Size srcImgS, const SegMask& eyeSegMask,

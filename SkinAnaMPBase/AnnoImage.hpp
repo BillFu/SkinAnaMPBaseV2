@@ -69,4 +69,13 @@ void AnnoLowerJaw(const Mat& srcImage, const FaceInfo& faceInfo,
                   int jawWidth, int faceBBboxW,
                    const string& annoFile);
 
+//-----------------------------------------------------------------------------------------
+
+void AnnoMaskOnCanvas(Mat& canvas, const Mat& mask,
+                      const Scalar& drawColor);
+
+void AnnoMaskOnImage(const Mat& srcImg, const Mat& mask,
+                        const string& maskName,
+                        const char* out_filename,
+                        Scalar drawColor=Scalar(0, 0, 255));
 #endif /* end of ANNO_IMAGE_HPP */

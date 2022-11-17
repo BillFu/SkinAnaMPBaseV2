@@ -125,21 +125,37 @@ void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
 #endif
     
     Mat eyesMask(srcImgS, CV_8UC1, cv::Scalar(0));
-    ForgeEyesMask(srcImage, faceInfo, segResult, eyesMask);
+    ForgeEyesMask(srcImage, faceInfo, segResult, eyesMask,
+                  detRegPack.lEyeReg, detRegPack.rEyeReg);
+    detRegPack.eyesMask = eyesMask;
 
 #ifdef TEST_RUN2
     string eyeMaskImgFile = BuildOutImgFNV2(outDir, "eye_mask.png");
-    OverlayMaskOnImage(annoLmImage, eyesMask,
+    AnnoMaskOnImage(annoLmImage, eyesMask,
                         "eyes_mask", eyeMaskImgFile.c_str());
 #endif
 
     Mat eyesFullMask(srcImgS, CV_8UC1, cv::Scalar(0));
     ForgeEyesFullMask(faceInfo, eyesFullMask);
+    detRegPack.eyesFullMask = eyesFullMask;
     
-#ifdef TEST_RUN
+#ifdef TEST_RUN2
     string eyeFullMaskImgFile = BuildOutImgFNV2(outDir, "eye_full_mask.png");
-    OverlayMaskOnImage(annoLmImage, eyesFullMask,
+    AnnoMaskOnImage(annoLmImage, eyesFullMask,
                         "eyes_full_mask", eyeFullMaskImgFile.c_str());
+#endif
+    
+    Mat cirEyesMask(srcImgS, CV_8UC1, cv::Scalar(0));
+    ForgeCirEyesMask(faceInfo, cirEyesMask,
+                     detRegPack.lEyeReg, detRegPack.rEyeReg,
+                     detRegPack.wrkRegGroup.lCirEyeReg,
+                     detRegPack.wrkRegGroup.rCirEyeReg);
+    detRegPack.cirEyesMask = cirEyesMask;
+    
+#ifdef TEST_RUN2
+    string eyeCirMaskImgFile = BuildOutImgFNV2(outDir, "eye_cir_mask.png");
+    AnnoMaskOnImage(annoLmImage, cirEyesMask,
+                        "eyes_cir_mask", eyeCirMaskImgFile.c_str());
 #endif
 
     Mat noseBellMask(srcImgS, CV_8UC1, cv::Scalar(0));
@@ -147,7 +163,7 @@ void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
     
 #ifdef TEST_RUN2
     string noseBellMaskFile = BuildOutImgFNV2(outDir, "nose_bell.png");
-    OverlayMaskOnImage(annoLmImage, noseBellMask,
+    AnnoMaskOnImage(annoLmImage, noseBellMask,
                         "nose_bell_mask", noseBellMaskFile.c_str());
 #endif
     
@@ -170,7 +186,7 @@ void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
     
 #ifdef TEST_RUN2
     string poreMaskAnnoFile = BuildOutImgFNV2(outDir, "PoreMask.png");
-    OverlayMaskOnImage(annoLmImage, detRegPack.poreMask,
+    AnnoMaskOnImage(annoLmImage, detRegPack.poreMask,
                         "pore mask", poreMaskAnnoFile.c_str());
 #endif
     
@@ -180,7 +196,7 @@ void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
     
 #ifdef TEST_RUN2
     string wrkMaskAnnoFile = BuildOutImgFNV2(outDir, "WrkFrgiMask.png");
-    OverlayMaskOnImage(annoLmImage, detRegPack.wrkFrgiMask,
+    AnnoMaskOnImage(annoLmImage, detRegPack.wrkFrgiMask,
                         "wrinkle Frgi mask", wrkMaskAnnoFile.c_str());
 #endif
     
@@ -210,7 +226,7 @@ void ForgeDetRegPack(const Mat& srcImage, const Mat& annoLmImage,
     
 #ifdef TEST_RUN2
     string skinMaskImgFile = BuildOutImgFNV2(outDir, "SkinMask.png");
-    OverlayMaskOnImage(annoLmImage, skinMask,
+    AnnoMaskOnImage(annoLmImage, skinMask,
                        "Skin Mask", skinMaskImgFile.c_str());
 #endif
 }
