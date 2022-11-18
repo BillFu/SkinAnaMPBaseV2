@@ -76,11 +76,6 @@ Mat CcGaborMapOnFh(const Mat& grFtSrcImg, int kerSize, int sigma,
 {
     Mat inGrFtImg = grFtSrcImg(fhRect);
     
-#ifdef TEST_RUN2
-    bool isSuccess;
-    isSuccess = SaveTestOutImgInDir(inGrFtImg,  wrkOutDir,   "FhImg.png");
-#endif
-    
     GaborOptBank gOptBank;
     // use the left eye as the reference
     float fhThetaSet[] = {73.125, 50.625, 61.875, 84.375, 95.625};
@@ -248,9 +243,9 @@ void CalcGaborMap(const Mat& grSrcImg, // in Global Source Space
     int sigma = int(8 * grSrcImg.cols / 2448.0 + 0.5);
     
     // 前额
-    fhGabMap8U = CcGaborMapOnFh(grSrcImg, kerSize, sigma, wrkRegGroup.fhReg.bbox);
+    fhGabMap8U = CcGaborMapOnFh(grFtSrcImg, kerSize, sigma, wrkRegGroup.fhReg.bbox);
     // glabella，眉间，印堂
-    glabGabMap8U = CcGaborMapOnGlab(grFtSrcImg, kerSize, sigma, wrkRegGroup.glabReg.bbox);
+    glabGabMap8U = CcGaborMapOnGlab(grSrcImg, kerSize, sigma, wrkRegGroup.glabReg.bbox);
     
     lNagvGabMap8U = CcGabMapInOneNagv(true, grFtSrcImg, kerSize, sigma,
                                             wrkRegGroup.lNagvReg.bbox);
@@ -297,7 +292,7 @@ void ExtWrkFromFhGabMap(const DetectRegion& fhReg,
 {
     cv::Mat biMap;
     biMap = fhGabMap8U & fhReg.mask;
-    int dpWrkBiTh = 120;
+    int dpWrkBiTh = 40;
     cv::threshold(biMap, biMap, dpWrkBiTh, 255, THRESH_BINARY);
     
 #ifdef TEST_RUN2
@@ -344,7 +339,7 @@ void ExtWrkFromGlabGabMap(const DetectRegion& glabReg,
 {
     cv::Mat biMap;
     biMap = glabGabMap8U & glabReg.mask;
-    int dpWrkBiTh = 60;
+    int dpWrkBiTh = 120;
     cv::threshold(biMap, biMap, dpWrkBiTh, 255, THRESH_BINARY);
     
 #ifdef TEST_RUN2

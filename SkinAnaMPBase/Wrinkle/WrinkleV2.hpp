@@ -23,6 +23,9 @@ using namespace cv;
 void PreprocGrImg(const Mat& grSrcImg,
                   Mat& outImg);
 
+void BlurGrImg(const Mat& grSrcImg,
+               Mat& outImg);
+
 // wrkGaborRespMap: 输出，记录Gabor滤波的结果，大小和位置由Face_Rect来限定
 void DetectWrinkle(const Mat& inImg, const Rect& faceRect,
                    WrkRegGroup& wrkRegGroup,

@@ -37,6 +37,20 @@ void PreprocGrImg(const Mat& grSrcImg,
     ApplyCLAHE(blurGrImg, gridSize, outImg);
     blurGrImg.release();
 }
+
+void BlurGrImg(const Mat& grSrcImg,
+                    Mat& outImg)
+{
+    Size srcImgS = grSrcImg.size();
+    
+    // 这个公式仅对前额区域有效；若imgW表示图像全域或其他子区域，这个公式需要调整。
+    // 也许这个公式以后需要调整为普遍适用的公式。
+    int blurKerS = srcImgS.width / 272;
+    if(blurKerS % 2 == 0)
+        blurKerS += 1;  // make it be a odd number
+    
+    blur(grSrcImg, outImg, Size(blurKerS, blurKerS));
+}
 //-------------------------------------------------------------------------------------------
 // Only Gabor Filtering
 

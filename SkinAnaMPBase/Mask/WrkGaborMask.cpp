@@ -138,6 +138,7 @@ Mat ForgeGlabellaMask(const FaceInfo& faceInfo)
 // nasolabial grooves 鼻唇沟
 void ForgeRightNagvPg( const FaceInfo& faceInfo, POLYGON& outPolygon)
 {
+    /*  原版的完整区域，但要减去鼻翼部分
     outPolygon.push_back(getPtOnGLm(faceInfo, 355));
     outPolygon.push_back(getPtOnGLm(faceInfo, 429));
     outPolygon.push_back(getPtOnGLm(faceInfo, 279));
@@ -154,10 +155,29 @@ void ForgeRightNagvPg( const FaceInfo& faceInfo, POLYGON& outPolygon)
     Point2i pt423a = IpGLmPtWithPair(faceInfo, 423, 266, 0.65);
     outPolygon.push_back(pt423a);
     outPolygon.push_back(getPtOnGLm(faceInfo, 371));
+    */
+    
+    // 临时性的缩小版本
+    Point2i pt426a = IpGLmPtWithPair(faceInfo, 426, 391, 0.4);
+    outPolygon.push_back(pt426a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 423));
+
+    Point2i pt423a = IpGLmPtWithPair(faceInfo, 423, 425, 0.3);
+    outPolygon.push_back(pt423a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 436));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 432));
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 430));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 431));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 273));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 410));
 }
 
 void ForgeLeftNagvPg( const FaceInfo& faceInfo, POLYGON& outPolygon)
 {
+    /*
     outPolygon.push_back(getPtOnGLm(faceInfo, 126));
     outPolygon.push_back(getPtOnGLm(faceInfo, 209));
     outPolygon.push_back(getPtOnGLm(faceInfo, 49));
@@ -174,6 +194,24 @@ void ForgeLeftNagvPg( const FaceInfo& faceInfo, POLYGON& outPolygon)
     Point2i pt423a = IpGLmPtWithPair(faceInfo, 203, 36, 0.65);
     outPolygon.push_back(pt423a);
     outPolygon.push_back(getPtOnGLm(faceInfo, 142));
+    */
+    
+    // 临时性的缩小版本
+    Point2i pt426a = IpGLmPtWithPair(faceInfo, 206, 165, 0.4);
+    outPolygon.push_back(pt426a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 203));
+
+    Point2i pt423a = IpGLmPtWithPair(faceInfo, 203, 205, 0.3);
+    outPolygon.push_back(pt423a);
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 216));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 212));
+    
+    outPolygon.push_back(getPtOnGLm(faceInfo, 210));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 211));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 43));
+    outPolygon.push_back(getPtOnGLm(faceInfo, 186));
 }
 
 Mat ForgeRNagvMask(const FaceInfo& faceInfo)

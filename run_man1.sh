@@ -1,0 +1,1 @@
+./bin/SkinAnaMPBase config_man1.json
